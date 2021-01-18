@@ -1,298 +1,181 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html><head>
+<html>
+  <head>
+    <link href="style.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+    <title>Dar's Documentation</title>
+  </head>
+  <body>
 
+    <!-- menu -->
 
+    <div class=menu>
+      <img class=center alt="DAR's Documentation" src="dar_doc.jpg">
 
+      <p>
+	This is the central page for <a href="http://dar.linux.free.fr/">dar</a>'s documentation
+      </p>
 
-
-
-  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>Dar's Documentation</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
-<center>
-<div style="text-align: center;"><img style="width: 320px; height: 240px;" alt="DAR's Documentation" src="dar_doc.jpg"><br>
-<br>
-</div><div style="text-align: center;">
-<table style="width: 90%; text-align: left; margin-right: auto; margin-left: auto;" border="0" cellpadding="2" cellspacing="2">
-  <tbody>
-    <tr>
-      <td style="vertical-align: top;">
-      <h2 style="text-align: justify;"><a name="Summary"></a>Summary</h2>
-
-      <div style="text-align: justify; margin-left: 40px;">This is the summary page for <a href="http://dar.linux.free.fr/">dar</a>'s
-documentation<br>
+      <div class=menuitem>
+	<a href="#presentation">Presentation</a>
       </div>
-      <ol style="text-align: justify;">
-
-        <ol>
-          <li><a href="presentation.html">Presentation</a></li>
-          <li><a href="#obtaining">Obtaing dar/libdar</a><br>
-        </li>
-          <li><a href="#command_line">Command-line tools usage</a></li>
-          <li><a href="#libdar">Libdar and its API</a><br>
-        </li>
-          <li><a href="#3">Dar/libdar internals<br>
-</a></li>
-          <li><a href="#actions"><span style="text-decoration: underline;">Actions</span></a></li>
-</ol>
-      </ol>
-
-      </td>
-    </tr>
-  </tbody>
-</table>
-</div>
-<hr style="width: 100%; height: 2px;"><br>
-<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
-  <tbody>
-    <tr>
-      <td style="vertical-align: top;">
-
-      <div style="margin-left: 40px;">
-      <h4 style="text-align: justify;"><a name="presentation"></a>1 - Presentation</h4>
-
-      <ul style="text-align: justify;">
-
-        <ul>
-          <li><a href="presentation.html">General Presentation</a></li>
-          <li><a href="Features.html">Abstract list of features</a></li>
-          <li><a href="presentation.html#external_tools">known projects that rely on dar/libdar</a><br>
-        </li>
-          <li><a href="Limitations.html">Limitations</a></li>
-          <li><a href="presentation.html#dar_news">Staying informed of dar/libdar's events</a><br>
-        </li>
-        </ul>
-
-
-
-
-
-      </ul>
-<a name="obtaining"></a><span style="font-weight: bold;">2 - Obtaining dar/libdar</span><br>
-      <ul style="text-align: justify;">
-        <ul>
-          <li><a href="downloading.html">Obtaining Packages signature</a></li>
-          <li><a href="downloading.html#source_download">Downloading source packages</a><br>
-        </li>
-          <li><a href="downloading.html#linux_binaries">Downloading binaries for Linux</a><br>
-        </li>
-          <li><a href="downloading.html#windows_binaries">Downloading binary packages for windows</a></li>
-          <li><a href="downloading.html#MacOS">Downloading binary packages for Mac OS</a><br>
-          </li>
-
-
-          <li><a href="downloading.html#FreeBSD_portage"><span style="text-decoration: underline;">FreeBSD portage</span></a><br>
-        </li>
-          <li><a href="from_sources.html">Compiling dar from source</a></li>
-
-          <li><a href="from_sources.html#Tools_sites">Related Softwares</a><br>
-        </li>
-        </ul>
-      </ul>
-
-      <h4 style="text-align: justify;"><span style="font-weight: bold;"><a name="command_line"></a>3
-- Command-line</span> tools usage<br>
-</h4>
-      <div style="margin-left: 40px; text-align: justify;">Dar's
-command-line tools is set of six command-line. Since release 2.0.0, dar
-source code has been split in two parts, one is command-line specific,
-the second is the <span style="font-weight: bold;">libdar</span>
-library with its API (application interface). But both parts stay
-released under the same package. The command-line tools relies on libdar
-to manage dar archives. Some other <a href="presentation.html#external_tools">external tools</a>
-do also use dar or libdar, to provide additional features or other
-interfaces like a Graphical User Interface. Here we will see how to use
-the dar command-line tools, see external tools respective documentation for more details about their usage.<br>
-      <br>
-You are invited to read the following documents:<br>
+      <div class=menuitem>
+	<a href="#obtaining">Obtaing dar/libdar</a>
       </div>
-      <ul style="margin-left: 40px; text-align: justify;">
-        <li><a href="Tutorial.html">Tutorial</a></li>
-        <li><a href="mini-howto/index.html">Mini-Howto</a></li>
-        <li><a href="FAQ.html">FAQ</a></li>
-        <li><a href="usage_notes.html">command line usage notes</a><br>
-        </li>
-
-        <li><a href="man/index.html">Man pages</a></li><li><a href="Good_Backup_Practice.html">Good Backup Practice
-short Guide</a></li>
-        <li><a href="samples/index.html">Sample and real Scripts</a></li>
-</ul>
-      <div style="margin-left: 40px;">
-	If you lack some information from the previous documents, you are welcome to <a href="#ask_for_support">ask for support</a>
-
+      <div class=menuitem>
+	<a href="#command_line">Dar documentation</a>
       </div>
-<h4 style="text-align: justify;"><a name="libdar"></a>4 - <span style="font-weight: bold;">Libdar</span> and its API</h4>
-
-
-      <div style="margin-left: 40px; text-align: justify;">Libdar has (I hope) a well documented interface that let you access dar's features
-from your
-program. Libdar is written in C++ thus you have either to use C or C++
-or use existing bindings for the language of your choice. <br>
-      <br>
-You are invited to read the following documents in order, up to the time
-you get enough information to address your need. Most of the time the
-two first source of information should be enough, but don't hesitate to
-subscribe to libdar-api mailing-list if some points are not clear about
-the API and the way to use it.<br>
+      <div class=menuitem>
+	<a href="#libdar">Libdar documenation</a>
       </div>
-
-
-      <div style="margin-left: 40px; text-align: justify;">
-	<ul>
-	  <li>The <a href="api_tutorial.html">API tutorial</a></li>
-          <li>Dar command-line source code for API usage illustration<br>
-          </li>
-	  <li>The libdar's <a href="python/libdar_test.py">python binding tutorial</a> based on examples of use</li>
-<li>The <a href="man/index.html">API reference
-documentation</a></li><li>The <a href="https://lists.sourceforge.net/lists/listinfo/dar-libdar_api">libdar-api</a> mailing-list</li>
-        <li>To report a bug about libdar use the <a href="http://sourceforge.net/tracker/?group_id=65612&amp;atid=511612">dar bug tracker</a> (do not report bugs concerning development code).</li>
-</ul>
+      <div class=menuitem>
+	<a href="#3">Libdar's internals</a>
       </div>
-
-
-      <ul style="margin-left: 40px; text-align: justify;">
-      </ul>
-
-      <h4 style="text-align: justify;"><span style="font-weight: bold;"><a name="3"></a>5
-- Dar's internals</span></h4>
-      <div style="margin-left: 40px; text-align: justify;">
-
-      <div style="margin-left: 40px;">If you want to know more about the way dar is implemented you can read the&nbsp; <a href="Notes.html">dar/libdar internals notes</a>. The <a href="https://lists.sourceforge.net/lists/listinfo/dar-discussions">dar-discussion</a>&nbsp;
-mailing-list is also a place where discussions about the current
-implementation, alternative way of doing and future evolution of dar
-are welcome.<br>
+      <div class=menuitem>
+	<a href="#interactions">Feedback and Interactions</a>
       </div>
+    </div>
 
-      </div>
-      <h4 style="text-align: justify;"><a name="actions"></a>6 - Actions</h4>
+    <!- end of menu -->
 
-      <div style="margin-left: 40px;">
+    <div class=main>
+      <h2><a name="presentation">Presentation</a></h2>
       <ul>
-        <li><a href="#stay_tuned">Stay informed about dar/libdar events</a></li>
-        <li><a href="#ask_for_support">Asking for support</a><br>
-        </li>
-        <li><a href="#reporting_a_bug">Reporting a bug</a></li>
-
-        <li><a href="#Asking_for_a_new_feature">Asking for a new
-feature</a></li>
-        <li><a href="#Submiting_a_patch">Submitting a patch</a></li>
+	<li><a href="presentation.html">General Presentation</a></li>
+	<li><a href="Features.html">Abstract list of features</a></li>
+	<li><a href="presentation.html#external_tools">known projects that rely on dar/libdar</a></li>
+	<li><a href="Limitations.html">Limitations</a></li>
+	<li><a href="presentation.html#dar_news">Staying informed of dar/libdar's events</a></li>
       </ul>
 
-      </div>
-      <div style="text-align: justify; margin-left: 40px;"><i><b>Important :</b> I no
-longer answer support
-requests made
-by email directly addressed to me. The reason is simple: posting your
-request in a public area (like the dar-support mailing-list), makes it
-visible to anyone. Answers to your problem might concern other people,
-and so a public area is the best place for answers to reside as well.
-I do not have as much time as I wish to develop DAR (adding new
-features
-and porting to new systems), so keeping support public will save me a
-little time, since it avoids me repeating the same answers to
-the same questions.</i><br>
-      </div>
-      <div style="margin-left: 40px;">
-      <i>
-      </i>
-
-      <div style="text-align: right;"><i>&nbsp;Sharing must be both directions. </i></div>
-
-      </div>
+      <h2><a name="obtaining">Obtaining dar/libdar</a></h2>
 
       <ul>
+	<li><a href="downloading.html">Obtaining Packages signature</a></li>
+	<li><a href="downloading.html#source_download">Downloading source packages</a></li>
+	<li><a href="downloading.html#linux_binaries">Downloading binaries for Linux</a></li>
+	<li><a href="downloading.html#windows_binaries">Downloading binary packages for windows</a></li>
+	<li><a href="downloading.html#MacOS">Downloading binary packages for Mac OS</a></li>
+	<li><a href="downloading.html#FreeBSD_portage">FreeBSD portage</a></li>
+	<li><a href="from_sources.html">Compiling dar from source</a></li>
+	<li><a href="from_sources.html#Tools_sites">Related Softwares</a></li>
       </ul>
-      </div>
 
-      </td>
-    </tr>
-  </tbody>
-</table><br>
-<hr style="width: 100%; height: 2px;"><br>
+      <h2><a name="command_line">Dar documentation</a></h2>
 
-<table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
-  <tbody>
-    <tr>
-      <td style="vertical-align: top;"><span style="font-weight: bold; text-decoration: underline;"><a name="stay_tuned"></a><br>
-Stay informed about dar/libdar events<br>
-      <br>
-</span>
-      <div style="text-align: justify; margin-left: 40px;">You can subscribe to the <a href="http://lists.sourceforge.net/lists/listinfo/dar-news">dar-news mailing-list</a>,
-which is a read-only mailing-list that has a very low email volume (in
-average, less than one a month), to be informed about major events
-like new releases or security issues.<br>
-      </div>
-      <br>
-      <span style="font-weight: bold; text-decoration: underline;"><a name="ask_for_support"></a><br>
-Asking for support<br>
-      <br>
-      </span>
-      <div style="margin-left: 40px;">
-      <div style="text-align: justify;">If <a href="FAQ.html">FAQ</a>, <a href="Tutorial.html">tutorial</a>, <a href="mini-howto/index.html">mini-howto</a>, <a href="usage_notes.html">usage notes</a>, or <a href="man/index.html">man page</a> do not answer your question, you can read the <a href="http://news.gmane.org/gmane.comp.sysutils.backup.dar.support">dar-support mailing-list archive</a> at <a href="http://gmane.org/">gmane</a>,
-and use the search engine (the green text box at the bottom of the
-page) to look for keywords that match your problem. If that still does
-not solve your problem, you can subscribe to <a href="https://lists.sourceforge.net/lists/listinfo/dar-support">dar-support mailing-list</a> and send an email to the mailing-list describing your issue.<span style="font-weight: bold; text-decoration: underline;"></span><br>
-      </div>
-      <span style="font-weight: bold; text-decoration: underline;"></span></div>
-      <span style="font-weight: bold; text-decoration: underline;">
-      <br>
-      <a name="reporting_a_bug"></a><br>
-Reporting a Bug</span><br>
-      <br>
-      <div style="text-align: justify;">
-      <div style="margin-left: 40px;">First, check that the problem has not already been seen and addressed in <a href="http://news.gmane.org/gmane.comp.sysutils.backup.dar.support">dar-support mailing-list</a>. Then, check the <a href="http://sourceforge.net/tracker/?group_id=65612&amp;atid=511612">Bug
-Tracker</a>
-to see whether the bug has not already been reported (thanks to avoid duplicated). If found, you can monitor
-the corresponding item to be informed of any update concerning this
-bug. If the item is fixed you can grab the source code with the fix
-from <a href="from_sources.html#GIT">GIT</a>. But if the bug you met is not yet reported feel free to
-create a new report providing as much information and details as you can
-to ease reproducing and fixing the bug.<br>
-&nbsp;&nbsp;&nbsp; Note that you need to register at Sourceforge to be
-able
-to open a bug
-(subscription to Sourceforge is free, and won't spam your email: I use
-it since 2002 and never got spam on the email I gave and which is only
-known by sourceforge).
-Giving
-a real email address is beneficial, because you'll get a notification
-when the status of the bug changes (like when it has been resolved) it
-also avoids me wasting time trying to reproduce a bug reported
-anonymously and impossible to reproduce (real bug with very little
-information, user mistake, ...).<br>
-      </div>
+      <p>
+	<i>Dar</i>Since release 2.0.0, <i>dar</i> is a command-line adaptation
+	of the underlying <i>libdar</i> library. It uses libdar's API as well
+	as several other <a href="presentation.html#external_tools">external tools</a>
+      </p>
+      <p>
+	<i>Dar</i> source code provides both <b>dar</b> and <b>libdar</b>, while
+	many distro split each source code in two independent parts (dar and libdar),
+	sometimes also seperating library headers and the current documentation in their
+	own package.
+      </p>
+      <p>
+	the following documentation focuses on the command-line usage:
+      </p>
+      <ul>
+	<li><a href="Tutorial.html">Tutorial</a></li>
+	<li><a href="mini-howto/index.html">Mini-Howto</a></li>
+	<li><a href="FAQ.html">FAQ</a></li>
+	<li><a href="usage_notes.html">command line usage notes</a></li>
+	<li><a href="man/index.html">Man pages</a></li>
+	<li><a href="Good_Backup_Practice.html">Good Backup Practice short Guide</a></li>
+	<li><a href="samples/index.html">Sample and real Scripts</a></li>
+      </ul>
 
-      <br>
-      <span style="font-weight: bold; text-decoration: underline;"><a name="Asking_for_a_new_feature"></a><br>
-Asking for a new feature</span><br>
-      <br>
-      <div style="margin-left: 40px;">Use the <a href="http://sourceforge.net/tracker/?group_id=65612&amp;atid=511615">New
-Feature tracker</a>,
-first checking that no one has already thought about the request you
-are about to ask (thanks to avoid duplications). Note that the ability to ask a feature does not mean
-an obligation for me to implement it, in particular if the feature is not
-compatible with an already existing feature.<br>
-      </div>
+      <p>
+	If after having read the previous documents, you still missing some information, you
+	are welcome to <a href="#ask_for_support">ask for support</a>
+      </p>
 
-      <br>
-      <span style="font-weight: bold; text-decoration: underline;"><a name="Submiting_a_patch"></a>Submitting a patch</span><br>
-      <br>
-      <div style="margin-left: 40px;">Feel free to use the <a href="http://sourceforge.net/tracker/?group_id=65612&amp;atid=511614">Patch
-Tracker</a>
-at Sourceforge.<br>
-      </div>
+      <h2><a name="libdar">Libdar documentation</a></h2>
 
-      <br>
-      </div>
-      </td>
-    </tr>
-  </tbody>
-</table><br>
-<br>
-<br>
-<br>
-<br>
-</center>
+      <p>
+	Libdar, the library that powers the <i>dar</i> command-line tool as well as
+	<a href="presentation.html#external_tools">several other softwares</a>
+	has its own documentation. All features available to <i>dar</i> are available
+	thanks to <i>libdar</i>'s API which is also documented with samples and tutorial.
+      </p>
+      <p>
+	The API exists today for C++ and Python3 languages.
+      </p>
 
+      <ul>
+	<li>The <a href="api_tutorial.html">API tutorial</a></li>
+	<li>Dar command-line source code for API usage illustration</li>
+	<li>The libdar's <a href="python/libdar_test.py">python binding tutorial</a> based on examples of use</li>
+	<li>The <a href="man/index.html">API reference documentation</a></li>
+	<li>The <a href="https://lists.sourceforge.net/lists/listinfo/dar-libdar_api">libdar-api</a> mailing-list</li>
+      </ul>
 
+      <h2><a name="3">Libdar's internals</a></h2>
 
+      <p>
+	This set of documentation gives information about libdar internals.
+	If you want to know more about the way dar is implemented you should find
+	there all what you need:
+      </p>
+      <ul>
+	<li><a href="Notes.html">dar/libdar internals notes</a></li>
+      </ul>
+      <p>
+	If you have questions that could not find their answers in this document or have suggestions, you are
+	welcome to drop your questions on the <a href="https://lists.sourceforge.net/lists/listinfo/dar-discussions">dar-discussion</a>
+	mailing-list.
+      </p>
 
-</body></html>
+      <h2><a name="interactions">Feedback and Interactions</a></h2>
+
+      <dt><a name="ask_for_support">Community</a></dt><dd>
+	<i>Dar</i> has a community quite active on the
+	<a href="https://lists.sourceforge.net/lists/listinfo/dar-support">dar-support mailing-list</a>
+	though it is not a substitute for trying finding your answers from the documentation first.
+      </dd>
+
+      <dt><a name="stay_tuned">The</a> <a href="http://lists.sourceforge.net/lists/listinfo/dar-news">dar-news mailing-list</a></dt><dd>
+	is a read-only mailing-list that has a very low email volume (in
+	average, less than one email a month). Its purpose is to  informed about major events
+	like new releases or security issues
+      </dd>
+
+      <dt><a name="reporting_a_bug">Bug?</a></dt><dd>
+	You thing you have hit a bug? If you are unsure, ask on the
+	<a href="https://lists.sourceforge.net/lists/listinfo/dar-support">dar-support mailing-list</a>
+	else open a bur report at the
+	<a href="http://sourceforge.net/tracker/?group_id=65612&amp;atid=511612">Bug Tracker</a>
+	(if one has not already been openned for the same problem).
+      </dd>
+
+      <dt><a name="Submiting_a_patch">Contributing?</a></dt><dd>
+	You want to contribute? You can either:
+      </dd>
+      <ul>
+	<li>
+	  submit a path at the
+	  <a href="http://sourceforge.net/tracker/?group_id=65612&amp;atid=511614">Patch Tracker</a>
+	</li>
+	<li>
+	  or propose a pull-request on <a href="https://github.com/Edrusb/Dar">github</a>
+	</li>
+	<li>
+	  Last you can also contribute by sharing your millions euro (I also accept dollars) with me :^)
+	</li>
+      </ul>
+      <p>
+	In any case, thanks to respect the <a href=https://github.com/Edrusb/Dr/blob/master/CONTRIBUTUING.md>basic rule</a>
+	like coding style if possible document your code as described.
+      </p>
+
+      <dt><a name="Asking_for_a_new_feature">New feature</a></dt><dd>
+	You can ask for new feature (describing the use case is a plus)
+	at the
+	<a href="http://sourceforge.net/tracker/?group_id=65612&amp;atid=511615">New Feature tracker</a>
+      </dd>
+    </div>
+  </body>
+</html>
