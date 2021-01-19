@@ -25,6 +25,11 @@ p, ul, ol, dl
     text-align: justify;
 }
 
+p
+{
+    padding-left: 20px;
+}
+
 /* floating menu */
 
 div.top
