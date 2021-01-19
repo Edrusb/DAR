@@ -27,6 +27,21 @@ p, ul, ol, dl
 
 /* floating menu */
 
+div.top
+{
+    border-radius: 14px 1px 14px 1px;
+    background: rgb(221,221,221);
+    color: rgb(0,0,170);
+    clear: both;
+    vertical-align: middle;
+    text-align: center;
+    padding-top: 10px;
+    padding-bottom: 40px;
+    padding-left: 10px;
+    margin-bottom: 15px;
+}
+
+
 div.menu
 {
     float: left;
