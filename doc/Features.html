@@ -643,13 +643,15 @@
 	<td>keywords: -z</td>
       </tr>
       <tr>
-	<td colspan="2"><i>dar</i>
-	  can use compression.
-	  Actually gzip, bzip2, lzo, xz/lzma, zstd, lz4 algorithms
-	  are available, and there is still room available for any other
-	  compression algorithm. Note that, compression is made before slicing,
-	  which means that using compression together with slices, will not make
-	  slices smaller, but will probably make less slices in the backup.
+	<td colspan="2">
+	  <p>
+	    <i>dar</i> can use compression.
+	    Actually gzip, bzip2, lzo, xz/lzma, zstd, lz4 algorithms
+	    are available, and there is still room available for any other
+	    compression algorithm. Note that, compression is made before slicing,
+	    which means that using compression together with slices, will not make
+	    slices smaller, but will probably make less slices in the backup.
+	  </p>
 	</td>
       </tr>
     </table>
@@ -931,13 +933,15 @@
       </tr>
       <tr>
 	<td colspan="2">
-	  The direct access feature seen above is well adapted to random access media
-	  like disks, but not for tapes. Since release 2.4.0, dar provides a
-	  sequential mode in which dar sequentially read and write archives. It
-	  has the advantage to be efficient with tape but suffers from the same
-	  drawback as tar archive: it is slow to restore a single file from a
-	  huge archive. The second advantage is to be able to repair a truncated
-	  archive (lack of disk space, power outage, ...) as described above.
+	  <p>
+	    The direct access feature seen above is well adapted to random access media
+	    like disks, but not for tapes. Since release 2.4.0, dar provides a
+	    sequential mode in which dar sequentially read and write archives. It
+	    has the advantage to be efficient with tape but suffers from the same
+	    drawback as tar archive: it is slow to restore a single file from a
+	    huge archive. The second advantage is to be able to repair a truncated
+	    archive (lack of disk space, power outage, ...) as described above.
+	  </p>
 	</td>
       </tr>
     </table>
@@ -955,11 +959,14 @@
 	<td>keywords: --sequential-read</td>
       </tr>
       <tr>
-	<td colspan="2">The independant <i>dar_split </i>program
-	  provides a mean to output <i>dar</i> but also <i>tar</i> archives to several tapes.
-	  If takes care of splitting the archive when writing to tapes and gather
-	  pieces of archive from several tapes for dar/tar to work as if it was a
-	  single pieced archive.
+	<td colspan="2">
+	  <p>
+	    The independant <i>dar_split </i>program
+	    provides a mean to output <i>dar</i> but also <i>tar</i> archives to several tapes.
+	    If takes care of splitting the archive when writing to tapes and gather
+	    pieces of archive from several tapes for dar/tar to work as if it was a
+	    single pieced archive.
+	  </p>
 	</td>
       </tr>
     </table>
@@ -1059,10 +1066,13 @@
 	<td>keywords: -E -F -~</td>
       </tr>
       <tr>
-	<td colspan="2">several hooks are provided for dar
-	  to call a given command once a slice has been written or before reading
-	  a slice. Several macros allow the user command or script to know the
-	  requested slice number, path and backup basename.
+	<td colspan="2">
+	  <p>
+	    several hooks are provided for dar
+	    to call a given command once a slice has been written or before reading
+	    a slice. Several macros allow the user command or script to know the
+	    requested slice number, path and backup basename.
+	  </p>
 	</td>
       </tr>
     </table>
