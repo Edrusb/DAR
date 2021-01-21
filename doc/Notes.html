@@ -1,1450 +1,1313 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
   <head>
-    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+    <link href="style.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
     <title>DAR/LIBDAR Internals - Notes</title>
   </head>
-  <body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" vlink="#000055"
-	link="#0000ff" alink="#ff0000">
-    <center>
-      <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
-             cellspacing="2" cellpadding="2" border="0">
-        <tbody>
-          <tr>
-            <td style="vertical-align: top; width: 161px;"><a href="index.html"><img
-										  style="border: 0px solid ; width: 160px; height: 120px;" alt="Dar Documentation"
-										  src="dar_s_doc.jpg"></a><br>
-            </td>
-            <td style="vertical-align: top;">
-              <h1 style="text-align: center;"><br>
-              </h1>
-              <h1 style="text-align: center;">Dar/Libdar Internals - Notes<br>
-              </h1>
-            </td>
-          </tr>
-        </tbody>
+  <body>
+
+    <div class=top>
+      <img alt="Dar Documentation" src="dar_s_doc.jpg" style="float:left;">
+      <h1>Dar/Libdar Internals - Notes</h1>
+    </div>
+
+    <h2>Introduction</h2>
+    <p>
+      Here takes place a collection of notes. These have been created after
+      implementation of a given feature, mainly for further
+      reference but also as user information. The idea behind
+      these notes are to remind some choices of implementation, the
+      arguments and reasons that lead to them, but also
+      let the user have a way to be informed about the
+      choices done and be able to bring his remarks without having
+      to deeply look into the code to learn dar's internals.
+    </p>
+
+    <div class=menu>
+      <div class=menuitem>
+	<a href="#EA_and_diff">EA &amp;  differential backup</a>
+      </div>
+      <div class=menuitem>
+        <a href="#archive_structure">Archive structure in brief</a>
+      </div>
+      <div class=menuitem>
+        <a href="#scrambling">Scrambling</a>
+      </div>
+      <div class=menuitem>
+        <a href="#asym_encr_and_sig">Asymmetrical Encryption and Signature</a>
+      </div>
+      <div class=menuitem>
+	<a href="#overflow">Overflow in arithmetic integer operations</a>
+      </div>
+      <div class=menuitem>
+	<a href="#thread_safe">libdar and thread-safe requirement</a>
+      </div>
+      <div class=menuitem>
+	<a href="#dar_manager_deleted">Dar_manager and delete files</a>
+      </div>
+      <div class=menuitem>
+	<a href="#NLS">Native Language Support / gettext / libintl</a>
+      </div>
+      <div class=menuitem>
+	<a href="#Dar_relase_Process_in_brief">Dar Release Process</a>
+      </div>
+      <div class=menuitem>
+	<a href="#Dar_version_naming">Dar's Versions</a>
+      </div>
+      <div class=menuitem>
+	<a href="#sym">How symmetric encryption is performed in dar/libdar</a>
+      </div>
+      <div class=menuitem>
+        <a href="#asym">How asymmetric encryption is performed in dar/libdar</a>
+      </div>
+      <div class=menuitem>
+	<a href="#multi-threaded">Multi-threading considerations</a>
+      </div>
+    </div>
+
+    <div class=main>
+      <h2><a name="EA_and_diff">EA &amp; differential backup</a></h2>
+
+      <h3>Brief presentation of EA:</h3>
+
+      <p>
+	EA stands for <i>Extended Attributes</i>.
+	In Unix filesystem a regular file is composed of a
+        set of bytes (the data) and an <i>inode</i> (containing the <i>metadata</i>).
+	The inode add properties to the file, such as owner, group, permission, dates (last
+        modification date of the data [mtime], last access date to
+        data [atime], and last inode change date [ctime]), etc). Last,
+        the name of the file is not contained in the inode, but in the
+        directory(ies) it is linked to. When a file is linked more
+        than once in the directory tree, we speak about "hard links".
+        This way the same data and associated inode appears several
+        time in the same or different directories. This is not the
+        same as a symbolic links, which later one is a file that contains the
+        path to another file (which may or may not exist). A symbolic
+        link has its own inode. OK, now let's talk about EA:
+      </p>
+
+      <p>
+	Extended attributes is a recent feature of Unix file system (at the time
+        of the writing, year 2002). They are not part of the
+        inode, nor part of the data, nor part of a given directory. They
+        are stored beside the inode and are a set of pair of <i>key</i> and
+        <i>value</i>. The owner of the file can add or define any key and
+        eventually associate it an arbitrary data value. The user has also
+	the means to list and remove a particular key for the EA.
+	What are they used for: Simply a more flexible way to associate information to a file.
+      </p>
+      <p>
+        One particular interesting use of EA, is ACL: <i>Access Control
+        List</i>. ACL are implemented using EA (Linux) and add a more fine grain
+        in assigning access permission to file. For more information one
+        EA and ACL, see the site of Andreas Grunbacher:
+      </p>
+
+      <p>
+        <a href="http://acl.bestbits.at/">http://acl.bestbits.at/</a>
+      </p>
+
+      <p>
+	File forks under MACOS X also relies on EA, as well the security features
+	brought by SELinux.
+      </p>
+
+
+      <h3>EA &amp; Differential Backup</h3>
+      <p>
+	to determine
+        that an EA has changed, <i>dar</i> looks at the <i>ctime</i> value of the
+	inode. if <i>ctime</i>
+        has changed, (due to EA change, but also due to permission or owner
+        change) dar saves the EA. ctime also changes, if atime or mtime
+        changes. So if you access a file or modify it, dar will consider
+        that the EA have changed also. This is not really fair, I admit.
+      </p>
+      <p>
+        It may sound better would be to compare EA one by one, and record
+        those that have changed or have been deleted. But to be able to do
+        so, all EA and their associated values  must reside in the archive
+	table of content (the <i>catalogue</i>), which is by design stored
+	in memory. As EA can grow up to 64 KB by file, this can lead to a
+        quick saturation of the virtual memory, which is already enough
+        solicited by other information from <i>catalogue</i>.
+      </p>
+      <p>
+        These two schemes implies a different pattern for saving EA in
+        archive. In the first case (no EA in memory except at time of
+        operation on it), to avoid skipping in the archive (and ask the
+        user to change of disks too often, or just put pressure on the cache and
+	disk I/O), EA must be stored beside the
+        data of the file (if present). Thus they must be distributed all
+        along the archive (except at the end that only contains the
+        catalogue).
+      </p>
+      <p>
+        In the second case (EA are loaded in memory for comparison), EA
+        must reside beside or within the catalogue, in any case at the
+        end of the archive, not to have to user to need all disks to
+        just take an archive as reference.
+      </p>
+      <p>
+        As the catalogue grows already fast with the number of file to
+        save (from a few bytes for hard_link to 400 bytes around per
+        directory inode), the memory saving option has been adopted.
+      </p>
+      <p>
+        Thus, EA changes are based on the ctime change. Unfortunately,
+        no system call permits to restore ctime. Thus, restoring a
+        differential backup after its reference has been restored, will
+        present restored inode as more recent than those in the
+        differential archive, thus the <code>-r</code> option would prevent any EA
+        restoration. In consequence, <code>-r</code> has been disabled for EA, it
+        does only concern data contents. If you don't want to restore
+        any EA but just more recent data, you can use the following :
+	<code> -r -u "*"</code>
+      </p>
+
+      <h2><a name="archive_structure">Archive structure in brief</a></h2>
+
+      <h3>The Slice Level</h3>
+      <p>
+	A slice is composed of a header,
+        data and trailer (the trailer appeared with archive format
+        version 8)
+      </p>
+      <code class=block>
+	+--------+-------------------------------------------+-------+
+	| header |  Data                                     |Trailer|
+	|        |                                           |       |
+	+--------+-------------------------------------------+-------+
+      </code>
+
+      <p>
+        the <b>slice header</b> is composed of:
+      </p>
+
+      <ul>
+        <li>a magic number that tells this is a dar slice</li>
+        <li>
+	  a internal_name which is unique to a given archive and
+          shared by all slices
+        </li>
+        <li>
+	  a flag that tells whether the slice is the last of the
+          archive or whether a trailer is present that contains this
+          info.
+        </li>
+        <li>
+	  a extension flag, that was used in older archive but which
+          now always set to 'T' telling that a TLV list follows
+	</li>
+        <li>
+	  A TLV (Type Length Value) list of item, it contains:
+	</li>
+        <ul>
+          <li>the slice size</li>
+          <li>first slice size</li>
+          <li>the data_name</li>
+        </ul>
+      </ul>
+
+      <p>
+	The TLV list will receive any
+        future new field related to slice header.
+      </p>
+      <code class=block>
+	+-------+----------+------+-----------+-------+
+	| Magic | internal | flag | extension | TLV   |
+	| Num.  | name     | byte | byte      | list  |
+	+-------+----------+------+-----------+-------+
+      </code>
+      <p>
+        The header is the first thing
+        to be written, and if the current slice is not the last slice
+        (all data to write could not fit in it), before format 8, the
+        flag field was changed indicating that another slice follows.
+        Since archive format 8, the flag is set to a specific value
+        indicating that the information telling whether the slice is
+        the last or not is placed in a slice trailer, a new
+        "structure" that appeared with that format and which is
+        located at the end of each slice.
+      </p>
+      <p>
+        The header is also the first part to be read.
+      </p>
+      <p>
+        A TLV list is of course a list of TLV:
+      </p>
+      <code class=block>
+	+-------+----------+------+-----------+- ...-----+-------+
+	| Number| TLV 1    | TLV 2| TLV 3     |          | TLV n |
+	| of TLV|          |      |           |          |       |
+	+-------+----------+------+-----------+--...-----+-------+
+      </code>
+      <p>
+        Each TLV item is, as commonly,
+        defined as set of three fields:
+      </p>
+      <code class=block>
+	+---------+-------------------------+-------------------------+
+	| Type    | Length                  | Value                   |
+	|(2 bytes)| (arbitrary large value) | (arbitrary large data)  |
+	+---------+-------------------------+-------------------------+
+      </code>
+
+      <p>
+        The 2 bytes type is large
+        enough for today's need (65535 different types while only
+        three used), however TLV 65535 is reserved for future use and
+        will signal a new format for the type field.
+      </p>
+
+      <p>
+	To know in
+        which slice and at which position to find a particular data, dar
+        needs to know each file's size. This is the reason why each
+        slice contains the slice size information, in particular the
+        last slice. In older version, dar had to read the first slice
+        first to get this slicing information. Then it could read the
+        archive contents at the end of the last slice. Today, reading
+        the last slice, dar can fetch the slicing scheme from the slice
+        header (what we just detailed) and fetch the archive contents at
+        the end of this same last slice.
+      </p>
+      <p>
+        <b>The trailer</b> (which is one byte length) is new since archive
+        format version 8 (released 2.4.0). It contains the value that
+        was located in the header flag field in older archive format,
+        telling whether the slice is the last of the archive or not.
+        When writting down a single sliced archive (no -s option
+        provided), both the header and the trailer tell that the slice
+        is the last of the archive (duplicated information). However,
+        when doing multi-sliced archive, it is not possible to known
+        whether a slice is the last before reaching the requested amount
+        of data per slice (which depends on the amount of byte to save,
+        compression ratio, encryption overhead, etc.). Thus the header
+        flag contains a value telling that to know whether the slice is
+        the last or not, one must read the trailer.
+      </p>
+      <p>
+        In older format, it was necessary to seek back to update the
+        header with the correct information when a new slice had to be
+        created. But, keeping this behavior, it would not have been
+        possible to make a digest "on the fly" (see --hash option). The
+        addition of the trailer was required for that feature: to
+        compute a md5 or sha1, ... hash for each slice. But, this costs
+        one byte per slice, yes.
+      </p>
+
+      <h3>Data Name</h3>
+      <p>
+	As seen above in the header
+        fields, we have among others the three following identifiers:
+      </p>
+      <ul>
+        <li>magic number</li>
+        <li>internal name</li>
+        <li>data name</li>
+      </ul>
+
+      <p>
+	As already said, magic number
+        is constant and let dar be (almost) sure a given file is a dar
+        slice file, this is also based in particular on that field
+        that the common unix 'file' command identifies an dar archive.
+        Also briefly explained, the internal_name is a identifier that
+        let dar be almost sure that several slices are from the same
+        archive (problem car arise if two archives of same basename
+        have their slices mixed together: dar will see that and report
+        it to the user).
+      </p>
+      <p>
+        The new and not yet described field is the "data_name". The
+        data_name field is also present in the archive catalogue (the
+        table of content) of each archive. It may be the same value as
+        the one in the slice headers (normal archives) or another
+        value if the archive results from a catalogue isolation
+        process.
+      </p>
+      <p>
+        Why this field? A new feature with release 2.4.0 is the
+        ability to use an extracted catalogue to backup a internal
+        catalogue of a given archive. Comparing the data_name value of
+        the catalogue resulting from the isolation operation to the
+        data_name value present int the slices of an archive to
+        rescue, dar can be (almost) sure that the extracted catalogue
+        matches the data present in the archive the user is trying to
+        use it with.
+      </p>
+      <p>
+        In brief:
+      </p>
+      <table class=center>
+        <tr>
+          <th>Fields</th>
+	  <th>Normal Archive</th>
+          <th>Resliced Using dar_xform</th>
+          <th>Resulting From Isolation</th>
+	  <th>isolated archive resliced with dar_xform</th>
+	</tr>
+        <tr>
+          <th>Internal_name (slice header)</th>
+          <td>A</td>
+          <td>B</td>
+          <td>C</td>
+          <td>D</td>
+        </tr>
+        <tr>
+          <th>data_name (slice header)</th>
+          <td>A</td>
+          <td>A</td>
+          <td>C</td>
+          <td>C</td>
+        </tr>
+        <tr>
+          <th>data_name (archive catalogue)</th>
+          <td>A</td>
+          <td>A</td>
+          <td>A</td>
+          <td>A</td>
+        </tr>
       </table>
-      <br>
-      <br>
-      <div style="text-align: center;">
-        <hr style="width: 100%; height: 2px;"></div>
-      <br>
-      <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
-             cellspacing="2" cellpadding="2" border="0">
-        <tbody>
-          <tr>
-            <td style="vertical-align: top;">
-              <div style="text-align: justify;">
-                <h2>Introduction</h2>
-                <div style="text-align: justify; margin-left: 40px;">Here take
-                  place a collection of notes. These have been created after
-                  implementation of a given feature, mainly for further
-                  reference but also for user information. The ideas behind
-                  these notes are to remind some choices of implementation, the
-                  arguments that lead to this choices in on side, and in the
-                  other side let the user have a room to be informed on the
-                  choices done and be able to bring his remarks without having
-                  to deeply look in the code to learn dar's internals.<br>
-                </div>
-              </div>
-              <h2>Contents</h2>
-              <div style="margin-left: 40px;"><a href="#EA_and_diff">EA &amp;
-                  differential backup</a><span style="font-weight: bold;"></span><span
-										   style="font-weight: bold;"></span><span style="font-weight: bold;"></span><br>
-                <span style="font-weight: bold;"></span><a href="#archive_structure">Archive
-		  structure
-                  in brief</a><br>
-                <span style="font-weight: bold;"></span><a href="#scrambling">Scrambling</a><br>
-                <span style="font-weight: bold;"></span><a href="#overflow">Overflow
-		  in
-                  arithmetic integer operations</a><span style="font-weight: bold;"></span><br>
-                <span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span
-												  style="font-weight: bold;"></span><a href="#strong_encryption">Strong
-                  encryption</a><br>
-                <a href="#thread_safe">libdar and thread-safe requirement</a><span
-									       style="font-weight: bold;"></span><br>
-                <span style="font-weight: bold;"></span><a href="#dar_manager_deleted">Dar_manager
-		  and
-                  delete files</a><span style="font-weight: bold;"></span><br>
-                <span style="font-weight: bold;"></span><a href="#NLS">Native
-                  Language Support / gettext / libintl</a><br>
-                <a href="#Dar_relase_Process_in_brief">Dar Release Process</a><br>
-                <a href="#Dar_version_naming">Dar's Versions</a><br>
-                <a href="#sym">How symmetric encryption is performed in
-                  dar/libdar</a><br>
-                <a href="#asym">How asymmetric encryption is performed in
-                  dar/libdar</a><br>
-		<a href="#multi-threaded">Multi-threading considerations</a><br/>
-                <br>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <br>
-      <hr style="width: 100%; height: 2px;">
-      <h3><a name="EA_and_diff"></a></h3>
-      <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
-             cellspacing="2" cellpadding="2" border="0">
-        <tbody>
-          <tr>
-            <td style="vertical-align: top;">
-              <h3>EA &amp; differential backup</h3>
-              <h4>Brief presentation of EA:</h4>
-              <div style="margin-left: 40px;">
-                <div style="text-align: justify;">EA stands for Extended
-                  Attributes. In Unix filesystem a regular file is composed of a
-                  set of byte (the data) and an inode. The inode add properties
-                  to the file, such as owner, group, permission, dates (last
-                  modification date of the data [mtime], last access date to
-                  data [atime], and last inode change date [ctime]), etc). Last,
-                  the name of the file is not contained in the inode, but in the
-                  directory(ies) it is linked to. When a file is linked more
-                  than once in the directory tree, we speak about "hard links".
-                  This way the same data and associated inode appears several
-                  time in the same or different directories. This is not the
-                  same as a symbolic links, which is a file that contains the
-                  path to another file (which may or may not exist). A symbolic
-                  link has its own inode. OK, now let's talk about EA: <br>
-                </div>
-                <br>
-              </div>
-              <div style="text-align: justify; margin-left: 40px;">Extended
-                attributes is a recent feature of Unix file system (at the time
-                of the writing, year 2002). They extend attributes provided by
-                the inode and associated to a data. They are not part of the
-                inode, nor part of the data, nor part of a given directory. They
-                are stored beside the inode and are a set of pair of key and
-                value. The owner of the file can add or define any key and
-                eventually associate data to it. It can also list and remove a
-                particular key. What they are used for ? A way to associate
-                information to a file. <br>
-                <br>
-                One particular interesting use of EA, is ACL: Access Control
-                List. ACL can be implemented using EA and add a more fine grain
-                in assigning access permission to file. For more information one
-                EA and ACL, see the site of Andreas Grunbacher: <br>
-                <br>
-                <div style="margin-left: 40px;"><a href="http://acl.bestbits.at/">http://acl.bestbits.at/</a><br>
-                </div>
-              </div>
-              <h4>EA &amp; Differential Backup</h4>
-              <div style="text-align: justify; margin-left: 40px;">to determine
-                that an EA has changed dar looks at the ctime value. if ctime
-                has changed, (due to EA change, but also to permission or owner
-                change) dar saves the EA. ctime also changes, if atime or mtime
-                changes. So if you access a file or modify it, dar will consider
-                that the EA have changed also. This is not really fair, I admit.<br>
-                <br>
-                Something better would be to compare EA one by one, and record
-                those that have changed or have been deleted. But to be able to
-                compare all EA and their value reference EA must reside in
-                memory. As EA can grow up to 64 KB by file, this can lead to a
-                quick saturation of the virtual memory, which is already enough
-                solicited by the catalogue. <br>
-                <br>
-                These two schemes implies a different pattern for saving EA in
-                archive. In the first case (no EA in memory except at time of
-                operation on it), to avoid skipping in the archive (and ask the
-                user to change of disks too often), EA must be stored beside the
-                data of the file (if present). Thus they must be distributed all
-                along the archive (except at the end that only contains the
-                catalogue).<br>
-                <br>
-                In the second case (EA are loaded in memory for comparison), EA
-                must reside beside or within the catalogue, in any case at the
-                end of the archive, not to have to user to need all disks to
-                just take an archive as reference.<br>
-                <br>
-                As the catalogue, grows already fast with the number of file to
-                save (from a few bytes for hard_link to 400 bytes around per
-                directory inode), the memory saving option has been adopted.<br>
-                <br>
-                Thus, EA changes are based on the ctime change. Unfortunately,
-                no system call permits to restore ctime. Thus, restoring a
-                differential backup after its reference has been restored, will
-                present restored inode as more recent than those in the
-                differential archive, thus the -r option would prevent any EA
-                restoration. In consequence, -r has been disabled for EA, it
-                does only concern data contents. If you don't want to restore
-                any EA but just more recent data, you can use the following : -r
-                -u "*"</div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <br>
-      <hr style="width: 100%; height: 2px;"><a name="archive_structure"></a><br>
-      <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
-             cellspacing="2" cellpadding="2" border="0">
-        <tbody>
-          <tr>
-            <td style="vertical-align: top;">
-              <h3>Archive structure in brief</h3>
-              <br>
-              <h4>The Slice Level</h4>
-              <div style="margin-left: 40px;">A slice is composed of a header,
-                data and trailer (the trailer appeared with archive format
-                version 8)<br>
-              </div>
-              <br>
-              <div style="text-align: justify; margin-left: 80px;"><code>+--------+-------------------------------------------+-------+</code><br>
-                <code>| header |&nbsp;
-                  Data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |Trailer|</code><br>
-                <code>|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |</code><br>
-                <code>+--------+-------------------------------------------+-------+</code><br>
-              </div>
-              <div style="text-align: justify; margin-left: 40px;"><br>
-                the<span style="font-weight: bold;"> </span><span style="text-decoration: underline; font-weight: bold;">slice
-                  header</span><span style="font-weight: bold;"> </span>is
-                composed of<br>
-              </div>
-              <ul style="text-align: justify; margin-left: 40px;">
-                <li>a magic number that tells this is a dar slice</li>
-                <li>a internal_name which is unique to a given archive and
-                  shared by all slices<br>
-                </li>
-                <li>a flag that tells whether the slice is the last of the
-                  archive or whether a trailer is present that contains this
-                  info.<br>
-                </li>
-                <li>a extension flag, that was used in older archive but which
-                  now always set to 'T' telling that a TLV list follows</li>
-                <li>A TLV (Type Length Value) list of item, it contains:</li>
-                <ul>
-                  <li>the slice size</li>
-                  <li>first slice size</li>
-                  <li>the data_name.&nbsp;</li>
-                </ul>
-              </ul>
-              <div style="margin-left: 80px;">The TLV list will receive any
-                future new field related to slice header.<br>
-                <br>
-              </div>
-              <div style="text-align: justify; margin-left: 80px;"><code>+-------+----------+------+-----------+-------+</code><br>
-                <code>| Magic | internal | flag | extension | TLV&nbsp;&nbsp; |<br>
-                </code> <code>| Num.&nbsp; | name&nbsp;&nbsp;&nbsp;&nbsp; |
-                  byte | byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | list&nbsp; |</code><br>
-                <code>+-------+----------+------+-----------+-------+</code><br>
-              </div>
-              <div style="text-align: justify; margin-left: 40px;"><br>
-                <div style="text-align: justify;">The header is the first thing
-                  to be written, and if the current slice is not the last slice
-                  (all data to write could not fit in it), before format 8, the
-                  flag field was changed indicating that another slice follows.
-                  Since archive format 8, the flag is set to a specific value
-                  indicating that the information telling whether the slice is
-                  the last or not is placed in a slice trailer, a new
-                  "structure" that appeared with that format and which is
-                  located at the end of each slice.<br>
-                  <br>
-                  The header is also the first part to be read.<br>
-                </div>
-                <br>
-                A TLV list is of course a list of TLV:<br>
-                <br>
-                <div style="margin-left: 40px;"><code>+-------+----------+------+-----------+-
-                    ...-----+-------+</code><br>
-                  <code>| Number| TLV 1 &nbsp;&nbsp; | TLV 2| TLV 3 &nbsp;
-                    &nbsp;
-                    |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
-                    TLV n |</code><br>
-                  <code> </code><code>| of TLV| &nbsp; &nbsp; &nbsp;
-                    &nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    |&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
-                    |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;
-                    |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
-                  <code>+-------+----------+------+-----------+--...-----+-------+<br>
-                    <br>
-                </code></div>
-              </div>
-              <div style="text-align: justify;">
-                <div style="margin-left: 40px;">Each TLV item is, as commonly,
-                  defined as set of three fields:<br>
-                  <br>
-                  <div style="margin-left: 40px;"><code>+---------+-------------------------+-------------------------+</code><br>
-                    <code>| Type&nbsp;&nbsp;&nbsp; |
-                      Length&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                      |
-                      Value&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                      |<br>
-                      |(2 bytes)| (arbitrary large value) | (arbitrary large
-                      data)&nbsp; |</code><br>
-                    <code>+---------+-------------------------+-------------------------+</code></div>
-                </div>
-              </div>
-              <div style="text-align: justify; margin-left: 40px;"> <br>
-                <div style="text-align: justify;">The 2 bytes type is large
-                  enough for today's need (65535 different types while only
-                  three used), however TLV 65535 is reserved for future use and
-                  will signal a new format for the type field.<br>
-                </div>
-                <br>
-              </div>
-              <div style="margin-left: 40px; text-align: justify;">To know in
-                which slice and at which position to find a particular data, dar
-                needs to know each file's size. This is the reason why each
-                slice contains the slice size information, in particular the
-                last slice. In older version, dar had to read the first slice
-                first to get this slicing information. Then it could read the
-                archive contents at the end of the last slice. Today, reading
-                the last slice, dar can fetch the slicing scheme from the slice
-                header (what we just detailed) and fetch the archive contents at
-                the end of this same last slice.<br>
-              </div>
-              <div style="text-align: justify; margin-left: 40px;"><br>
-                <span style="text-decoration: underline; font-weight: bold;">The
-                  trailer</span> (which is one byte length) is new since archive
-                format version 8 (released 2.4.0). It contains the value that
-                was located in the header flag field in older archive format,
-                telling whether the slice is the last of the archive or not.
-                When writting down a single sliced archive (no -s option
-                provided), both the header and the trailer tell that the slice
-                is the last of the archive (duplicated information). However,
-                when doing multi-sliced archive, it is not possible to known
-                whether a slice is the last before reaching the requested amount
-                of data per slice (which depends on the amount of byte to save,
-                compression ratio, encryption overhead, etc.). Thus the header
-                flag contains a value telling that to know whether the slice is
-                the last or not, one must read the trailer.<br>
-                <br>
-                In older format, it was necessary to seek back to update the
-                header with the correct information when a new slice had to be
-                created. But, keeping this behavior, it would not have been
-                possible to make a digest "on the fly" (see --hash option). The
-                addition of the trailer was required for that feature: to
-                compute a md5 or sha1, ... hash for each slice. But, this costs
-                one byte per slice, yes.<br>
-              </div>
-              <h4>Data Name</h4>
-              <div style="margin-left: 40px;">As seen above in the header
-                fields, we have among others the three following identifiers:<br>
-                <ul>
-                  <li>magic number</li>
-                  <li>internal name</li>
-                  <li>data name<br>
-                  </li>
-                </ul>
-              </div>
-              <div style="margin-left: 40px;">
-                <div style="text-align: justify;">as already said, magic number
-                  is constant and let dar be (almost) sure a given file is a dar
-                  slice file, this is also based in particular on that field
-                  that the common unix 'file' command identifies an dar archive.
-                  Also briefly explained, the internal_name is a identifier that
-                  let dar be almost sure that several slices are from the same
-                  archive (problem car arise if two archives of same basename
-                  have their slices mixed together: dar will see that and report
-                  it to the user).<br>
-                  <br>
-                  The new and not yet described field is the "data_name". The
-                  data_name field is also present in the archive catalogue (the
-                  table of content) of each archive. It may be the same value as
-                  the one in the slice headers (normal archives) or another
-                  value if the archive results from a catalogue isolation
-                  process.<br>
-                  <br>
-                  Why this field? A new feature with release 2.4.0 is the
-                  ability to use an extracted catalogue to backup a internal
-                  catalogue of a given archive. Comparing the data_name value of
-                  the catalogue resulting from the isolation operation to the
-                  data_name value present int the slices of an archive to
-                  rescue, dar can be (almost) sure that the extracted catalogue
-                  matches the data present in the archive the user is trying to
-                  use it with.<br>
-                  <br>
-                  In brief:<br>
-                </div>
-              </div>
-              <br>
-              <table style="text-align: left; width: 1038px; height: 124px; margin-left: auto; margin-right: 0px;"
-                     cellspacing="2" cellpadding="2" border="1">
-                <tbody>
-                  <tr>
-                    <td style="vertical-align: top; text-align: center; width: 20%; font-weight: bold;">Fields</td>
-                    <td style="vertical-align: top; width: 20%; text-align: center; font-weight: bold;">Normal
-                      Archive<br>
-                    </td>
-                    <td style="vertical-align: top; width: 20%; text-align: center; font-weight: bold;">Resliced
-		      Using
-                      dar_xform<br>
-                    </td>
-                    <td style="vertical-align: top; width: 20%; text-align: center; font-weight: bold;">Resulting
-		      From
-                      Isolation<br>
-                    </td>
-                    <td style="vertical-align: top; text-align: center; width: 20%;">&nbsp;<span
-											     style="font-weight: bold;">isolated archive <br>
-                        resliced with dar_xform</span><br>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="vertical-align: top; font-weight: bold;">internal_name
-		      (slice
-                      header)<br>
-                    </td>
-                    <td style="vertical-align: top; text-align: center;">A<br>
-                    </td>
-                    <td style="vertical-align: top; text-align: center;">B<br>
-                    </td>
-                    <td style="vertical-align: top; text-align: center;">C<br>
-                    </td>
-                    <td style="vertical-align: top; text-align: center;">D<br>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="vertical-align: top; font-weight: bold;">data_name
-		      (slice
-                      header)<br>
-                    </td>
-                    <td style="vertical-align: top; text-align: center;">A<br>
-                    </td>
-                    <td style="vertical-align: top; text-align: center;">A<br>
-                    </td>
-                    <td style="vertical-align: top; text-align: center;">C<br>
-                    </td>
-                    <td style="vertical-align: top; text-align: center;">C<br>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="vertical-align: top; font-weight: bold;">data_name
-		      (archive
-                      catalogue)<br>
-                    </td>
-                    <td style="vertical-align: top; text-align: center;">A<br>
-                    </td>
-                    <td style="vertical-align: top; text-align: center;">A<br>
-                    </td>
-                    <td style="vertical-align: top; text-align: center;">A<br>
-                    </td>
-                    <td style="vertical-align: top; text-align: center;">A<br>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-              <br>
-              <h4>Archive Level</h4>
-              <div style="margin-left: 40px;">
-                <div style="text-align: justify;">The archive level describes
-                  the structure of the slice's data field (removing header and
-                  trailer of each slice), when they are all sticked together
-                  from slice to slice:<br>
-                </div>
-                <br>
-              </div>
-              <div style="margin-left: 80px;"><code>+---------+----------------------------+-----------+--------+---------+--------+</code><br>
-                <code>| version |&nbsp;&nbsp; Data&nbsp; &nbsp;
-                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  |
-                  catalogue | term 1 | version | term 2 |<br>
-                  | header&nbsp; </code><code>|
-                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  | trailer |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
-                <code>+---------+----------------------------+-----------+--------+---------+--------+</code><br>
-              </div>
-              <div style="margin-left: 80px;"><code></code></div>
-              <div style="margin-left: 40px;"><br>
-                The <span style="text-decoration: underline; font-weight: bold;">version
-                  header</span> is a short version of the trailer version. It is
-                used when reading an archive in sequential mode, to be able to
-                prepare the proper compression layer, and known whether escape
-                sequence mark are present in the archive.<br>
-                <br>
-                the <span style="text-decoration: underline; font-weight: bold;">version
-                  trailer</span> (which may still be called "version header" in
-                some part of the documentation because it was only located at
-                the beginning of the archive in previous archive format) is
-                composed of:<br>
-              </div>
-              <ul style="margin-left: 40px;">
-                <li>edition version of the archive</li>
-                <li>compression algorithm used</li>
-                <li>command line used for creating the archive, now known as
-                  "user comment"<br>
-                </li>
-                <li>flag, telling:</li>
-                <ul>
-                  <li>whether the archive is encrypted, <br>
-                  </li>
-                  <li>whether it has escape sequence marks, <br>
-                  </li>
-                  <li>whether the header/trailer contains an encrypted key</li>
-                  <li>whether the header/trailer contains the initial offset
-                    field</li>
-                  <li>whether the archive is signed</li>
-                  <li>whether the header/trailer contains the slice layout of
-                    the archive of reference<br>
-                  </li>
-                  <li>whether the archive has salt+iteration count+hash algo for
-                    key derivation fonction (KDF)<br>
-                  </li>
-                </ul>
-                <li>initial offset (telling where starts the data in the
-                  archive, is only present in the trailer)</li>
-                <li>crypto algorithm used (present only if flag tells that the
-                  archive is encrypted)</li>
-                <li>size of the crypted key that follows (present only if the
-                  flag tells an encrypted key is present)</li>
-                <li>encrypted key (encrypted by mean of GPG asymetric algorithm,
-                  present only if flag says so)</li>
-                <li>eventually, salt, iteration_count and hash algo for key
-                  derivation fonction (KDF) (used since version 2.6.0 when
-                  strong encryption is set)<br>
-                </li>
-                <li>CRC (Cyclic Redundancy Check) computed on the whole version
-                  header or trailer<br>
-                </li>
-              </ul>
-              <div style="margin-left: 80px;"><code>+---------+------+---------------+------+--------+-------+----------+---------------+------------+------+------+-----------+-----+-------+</code><br>
-                <code>| edition | algo | command line&nbsp; | flag | initial|
-                  crypto| crypted&nbsp; | gnupg crypted |&nbsp; reference | salt
-                  | salt | iteration |hash | CRC&nbsp;&nbsp; |<br>
-                </code><code>|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  | offset | algo&nbsp; | key size | sym. key &nbsp;
-                  &nbsp;&nbsp; |&nbsp; slicing &nbsp; | size | (KDF)|
-                  count(KDF)|(KDF)|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
-                <code>+---------+------+---------------+------+--------+-------+-------</code><code>---+---------------+------------+------+------+-----------+-----+-------+</code></div>
-              <div style="margin-left: 80px;"> </div>
-              <div style="margin-left: 40px;"><br>
-                <div style="text-align: justify;">The trailer is used when
-                  reading an archive in direct access mode, to build the proper
-                  compression layer, escape layer (it is needed if mark have
-                  been inserted in the archive to un-escape data that could else
-                  be taken as an escape sequence mark) and encryption layer.<br>
-                </div>
-                <br>
-                <span style="text-decoration: underline; font-weight: bold;">The
-                  data</span> is a suite of file contents, with EA and FSA if
-                present. When tape mark is used, a copy of the CRC is placed
-                after's file Data and file's EA, to be used when reading the
-                archive in sequential mode. This CRC is also dropped into the
-                catalogue which takes place at the end of the archive to be used
-                when reading the archive in direct access mode (the default).
-                Last when delta binary is used, a file signature may follow the
-                file's data:<br>
-                <br>
-              </div>
-              <div style="margin-left: 80px;"><code>&nbsp; ....</code><code>--+---------------------+-------+----+----+------------+------------+----+-----------+-----+-....</code><br>
-                <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp; file1
-                  data&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; | delta | EA | FSA|
-                  file2 data | file3 data | EA | file4&nbsp;&nbsp;&nbsp;&nbsp; |
-                  FSA |</code><br>
-                <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | (may be
-                  compressed) | sig &nbsp; |&nbsp;&nbsp;&nbsp;
-                  |&nbsp;&nbsp;&nbsp; |(no EA/FSA)
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;
-                  |&nbsp;&nbsp;&nbsp; | delta sig |&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
-                <code>&nbsp;
-		  ....--+---------------------+-------+----+----+------------+------------+----+-----------+-----+-....</code><br>
-                <code></code></div>
-              <div style="margin-left: 40px;">
-                <div style="margin-left: 40px;">in the previous archive example,
-                  we find:<br>
-                  <ul>
-                    <li>for file1: his data, a delta signature of this data,
-                      Extended Attributes, and File Specific Attributes</li>
-                    <li>for file2: only his data, he has no delta signature, no
-                      EA no FSA</li>
-                    <li>for file3: data and EA</li>
-                    <li>for file4: no data, only a delta signature and FSA</li>
-                  </ul>
-                  file1 shows all fields that can be associated with an inode,
-                  but none is mandatory, though if present they always follow
-                  this order:<br>
-                  <ul>
-                    <li><span style="font-weight: bold;">Data</span> or <span style="font-weight: bold;">delta
-                        patch</span></li>
-                    <li>followed by data/delta patch CRC when tape marks as set<br>
-                    </li>
-                    <li><span style="font-weight: bold;">Delta signature</span>
-                      <br>
-                    </li>
-                    <li>followed by delta signature CRC when tape marks are set<br>
-                    </li>
-                    <li><span style="font-weight: bold;">Extended Attributes</span>
-                      <br>
-                    </li>
-                    <li>followed by EA CRC when tape maks are set<br>
-                    </li>
-                    <li><span style="font-weight: bold;">File Specific
-                        Attributes</span> <br>
-                    </li>
-                    <li>followed by FSA CRC when tape marks are set<br>
-                    </li>
-                  </ul>
-                </div>
-                <div style="margin-left: 80px;">More precisely about<span style="font-weight: bold;">
-                    delta signature </span>combined with tape marks, there is
-                  additional fields present than just the delta sig and its CRC:<br>
-                </div>
-                <div style="margin-left: 120px;"><code>+------+------+---------------+----------+--------+</code><br>
-                  <code>| base | sig&nbsp; | <span style="font-weight: bold;">sig
-                      data</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | <span style="font-weight: bold;">data
-                      CRC </span>| result |</code><br>
-                  <code>| CRC&nbsp; | size | (if size &gt; 0)
-                    |&nbsp;&nbsp;&nbsp; if&nbsp;&nbsp;&nbsp; |&nbsp;
-                    CRC&nbsp;&nbsp; |</code><br>
-                  <code>|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		    |
-                    size &gt; 0 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
-                  <code>+------+------+---------------+----------+--------+</code><br>
-                </div>
-                <div style="margin-left: 40px;">
-                  <ul>
-                    <li><span style="font-weight: bold;">base CRC</span> is the
-                      CRC of the file that delta signature has been based on,
-                      used at restoration time before applying a patch</li>
-                    <li><span style="font-weight: bold;">sig size</span> gives
-                      the size of the next field, that may be zero if the file
-                      does not has signature associated but the file's data is a
-                      delta patch and thus base and result CRCs are needed<br>
-                    </li>
-                    <li><span style="font-weight: bold;">sig data</span> is the
-                      delta signature data. This field and the following are the
-                      only one present outside the ending catalogue about delta
-                      signatures when tape marks are not set.<br>
-                    </li>
-                    <li><span style="font-weight: bold;">data CRC</span> is the
-                      CRC on the previous field "sig data"<br>
-                    </li>
-                    <li><span style="font-weight: bold;">result CRC</span> is
-                      the CRC of the resulting file once patched&nbsp; (to check
-                      the patching was successful)</li>
-                  </ul>
-                </div>
-              </div>
-              <div style="text-align: justify; margin-left: 40px;"><span style="text-decoration: underline; font-weight: bold;">the
-                  catalogue</span>, contains all inode, directory structure and
-                hard_links information as well as data and EA CRC. The directory
-                structure is stored in a simple way: the inode of a directory
-                comes, then the inode of the files it contains, then a special
-                entry named "EOD" for End of Directory. Considering the
-                following tree:<br>
-              </div>
-              <div style="margin-left: 40px; text-align: justify;"><br>
-              </div>
-              <div style="margin-left: 80px; text-align: justify;"><code>&nbsp;-
-                  toto</code><br>
-                <code>&nbsp;&nbsp;&nbsp; | titi</code><br>
-                <code>&nbsp;&nbsp;&nbsp; | tutu</code><br>
-                <code>&nbsp;&nbsp;&nbsp; | tata</code><br>
-                <code>&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp; | blup</code><br>
-                <code>&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp; +--</code><br>
-                <code>&nbsp;&nbsp;&nbsp; | boum</code><br>
-                <code>&nbsp;&nbsp;&nbsp; | coucou</code><br>
-                <code>&nbsp;&nbsp;&nbsp; +---</code><br>
-              </div>
-              <div style="margin-left: 40px; text-align: justify;"><br>
-                it would generate the following sequence for catalogue storage:<br>
-                <br>
-              </div>
-              <div style="margin-left: 80px; text-align: justify;"><code>+-------+------+------+------+------+-----+------+--------+-----+</code><br>
-                <code>|&nbsp; toto | titi | tutu | tata | blup | EOD | boum |
-                  coucou | EOD |</code><br>
-                <code>|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
-                <code>+-------+------+------+------+------+-----+------+--------+-----+</code><br>
-              </div>
-              <div style="margin-left: 40px; text-align: justify;"><br>
-                EOD takes on byte, and this way no need to store the full path
-                of each file, just the filename is recorded.<br>
-                <br>
-                <span style="text-decoration: underline; font-weight: bold;">the
-                  terminator</span> stores the position of the beginning of the
-                catalogue, it is the last thing to be written. Thus dar first
-                reads the terminator, then the catalogue. Well, there is now two
-                terminators, both are meant to be read backward. The second
-                terminator points to the beginning of the "trailer version"
-                which is read first in direct access mode. The first terminator
-                points to the start of the catalogue, which is read once the
-                adhoc compression and encryption layers has been built based on
-                the information found on the "trailer version"<br>
-              </div>
-              <br>
-              <h4>All&nbsp; Together</h4>
-              <div style="text-align: justify; margin-left: 40px;">Here is an
-                example of how data can be structured in a four slice archive:<br>
-                <br>
-              </div>
-              <div style="text-align: justify; margin-left: 80px;"><code>+--------+--------+------------------------+--+</code><br>
-                <code>| slice&nbsp; | version|&nbsp; file data +
-                  EA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |Tr|</code><br>
-                <code>| header | header
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  |&nbsp;
-                  |</code><br>
-                <code>+--------+--------+------------------------+--+</code><br>
-              </div>
-              <div style="text-align: justify; margin-left: 40px;"><br>
-                the first slice (just above) has been defined smaller using the
-                -S option<br>
-                <br>
-              </div>
-              <div style="text-align: justify; margin-left: 80px;"><code>+--------+-----------------------------------------------------------------+--+</code><br>
-                <code>| slice&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  file data +
-                  EA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-                  &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp; |Tr|</code><br>
-                <code>| header
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  &nbsp;
-                  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-                  &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp; |</code><br>
-                <code>+--------+-----------------------------------------------------------------+--+</code><br>
-              </div>
-              <div style="text-align: justify; margin-left: 40px;"><code></code><br>
-                <code></code></div>
-              <div style="text-align: justify; margin-left: 80px;"><code>+--------+-----------------------------------------------------------------+--+</code><br>
-                <code>| slice&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  file data +
-                  EA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  &nbsp;
-                  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-                  &nbsp; &nbsp; |Tr|</code><br>
-                <code>| header
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  &nbsp;
-                  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-                  &nbsp; &nbsp; |&nbsp; |</code><br>
-                <code>+--------+-----------------------------------------------------------------+--+</code><br>
-                <code></code><br>
-                <code>+--------+---------------------+-----------+------
-                  +---------+--------+--+</code><br>
-                <code>| slice&nbsp; |&nbsp;&nbsp; file data +
-                  EA&nbsp;&nbsp;&nbsp; | catalogue | term 1| version | term 2
-                  |Tr|</code><br>
-                <code>| header
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  | trailer |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;
-                  |</code><br>
-                <code>+--------+---------------------+-----------+-------+---------+--------+--+<br>
-                  <br>
-              </code></div>
-              <div style="text-align: justify; margin-left: 40px;">the last
-                slice is smaller because there was not enough data to make it
-                full.<br>
-                <br>
-                The archive is written sequentially this way.<br>
-                <br>
-              </div>
-              <br>
-              <h4>Other Levels</h4>
-              <div style="text-align: justify; margin-left: 40px;">Things get a
-                bit more complicated if we consider compression and encryption.
-                The way the problem is addressed in dar's code is a bit like
-                networks are designed in computer science, using the notion of <span
-										 style="text-decoration: underline;">layers</span>. Here, there
-                is a additional constraint, a given layer may or may not be
-                present (encryption, compression, slicing for example). So all
-                layer must have the same interface for serving the layer above
-                them. This interface is defined by the pure virtual class
-                "generic_file", which provides generic methods for reading,
-                writing, skipping, getting the current offset when writing or
-                reading data to a "generic_file". This way the compressor class
-                acts like a file which compresses data wrote to it and writes
-                compressed data to another "generic_file" below it. The strong
-                encryption and scramble classes act the same but in place of
-                compressing/uncompressing they encrypt/decrypt the data to/from
-                another generic_file object. The slicing we have seen above
-                follows the same principle, this is a "sar" object that
-                transfers data wrote to it to several fichier [=file] objects.
-                Class fichier [=file] also inherit from generic_file class, and
-                is a wrapper for the plain file system calls. Some new classes
-                have been added with format 8, in particular the escape class,
-                which inserts escape sequence mark at requested position, and
-                modifies data wrote for it never looks like an escape sequence
-                mark. To reduce the level of context switch when reading the
-                catalogue (which makes a ton of small read), a cache class is
-                also present, it gather small writes made to it into larger
-                writes, and pre-reads a large amount of data to answer to the
-                many small reads when building the catalogue in memory from the
-                archive.<br>
-              </div>
-              <div style="margin-left: 40px;"><br>
-                Here are now all currently possible layers together:<br>
-                <br>
-              </div>
-              <div style="margin-left: 80px;"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  +----+--+----+-...........+---------+</code><br>
-                <code>archive&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |file|EA|file|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |catalogue|</code><br>
-                <code>layout&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |data|&nbsp;
-                  |data|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
-                <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  +----+--+----+-...........+---------+</code><br>
-                <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  |&nbsp;&nbsp;
-		  |&nbsp;&nbsp;&nbsp;
-                  | &nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |<br>
-                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  +-----+
-                  | +-------+
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |<br>
-                  sparse&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |spars| | |sparse |
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  | <br>
-                  file&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |file | |
-                  |file&nbsp;&nbsp; |
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |<br>
-                  detection&nbsp;&nbsp; |detec| | |detect.|
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |<br>
-                  layer &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-----+ | +-------+
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |<br>
-                </code> <code>(optional)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp; |&nbsp; &nbsp;&nbsp;&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |</code><br>
-                <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  V
-                  &nbsp; V&nbsp;&nbsp;&nbsp; V &nbsp; &nbsp;&nbsp;
-                  V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  V</code><br>
-                <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  +-----------------------------------+</code><br>
-                <code>compression&nbsp;&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  (compressed)&nbsp;
-                  data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
-                <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  +-----------------------------------+</code><br>
-                <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |<br>
-                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |<br>
-                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  V
-                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  V<br>
-                </code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  +-----------------------------------+</code><br>
-                <code>escape layer&nbsp; |&nbsp;&nbsp; escaped data / escape
-                  sequences |<br>
-                </code><code>(optional)&nbsp;&nbsp;&nbsp;
-                  +-----------------------------------+</code><br>
-                <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  / First Terminateur</code><br>
-                <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |</code><br>
-                <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  V</code><br>
-                <code>elastic&nbsp; +---+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  +----+---+</code><br>
-                <code>buffers&nbsp; |EEE|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  | T1 |EEE|</code><br>
-                <code>&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
-                  +---+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  +----+---+</code><br>
-                <code>&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  Second </code><br>
-                <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  Terminator</code><br>
-                <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  +--------------------------------------------------+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |</code><br>
-                <code>cipher&nbsp;&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (encrypted) data /
-                  cache if no encryption
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |</code><br>
-                <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  +--------------------------------------------------+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  V</code><br>
-                <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                </code><code>+---------+----+</code><br>
-                <code>+-------+&nbsp;
-                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                </code><code>| trailer | T2 |</code><br>
-                <code>|
-                  header|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                </code><code>+---------+----+<br>
-                  +-------+
-                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  |&nbsp;&nbsp;&nbsp;
-                  &nbsp;
-                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |<br>
-                  &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-                  &nbsp; | &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-                  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | &nbsp; &nbsp; &nbsp;
-                  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |<br>
-                </code> <code>&nbsp;&nbsp;&nbsp; V
-                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  V
-                  &nbsp;&nbsp;&nbsp;&nbsp; v<br>
-                </code><code>+-----------------------------------------------------------------------------+</code><br>
-                <code>|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		  &nbsp;
-                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
-                <span style="font-family: monospace;">+</span><code>-----------------------------------------------------------------------------+</code><br>
-                <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp; |&nbsp;&nbsp;&nbsp; |&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
-                <code>slice&nbsp;&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp; |&nbsp;&nbsp;&nbsp; |&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
-                <code>headers |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp; |&nbsp;&nbsp;&nbsp; |&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
-                <code>&nbsp;|&nbsp; |&nbsp;&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp; |&nbsp;&nbsp;&nbsp; |&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
-                <code>&nbsp;|&nbsp; +---|------\&nbsp; |&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  |&nbsp; |&nbsp;&nbsp;&nbsp; |&nbsp;
-                  |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |</code><br>
-                <code>&nbsp;V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; V&nbsp; V&nbsp;
-                  V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  V&nbsp;&nbsp; V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  V&nbsp;&nbsp; V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  V&nbsp; V&nbsp;&nbsp;&nbsp; V&nbsp;
-                  V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; V</code><br>
-                <code>+---------+&nbsp; +---------+&nbsp; +---------+&nbsp;
-                  +---------+&nbsp; +-------+&nbsp; </code><code>+-------+&nbsp;
-                </code><code>+----+</code><br>
-                <code>|HH| data |&nbsp; |HH| data |&nbsp; |HH| data |&nbsp; |HH|
-                  data |&nbsp; |HH|data|&nbsp; </code><code>|HH|data|&nbsp; </code><code>|HH|
-                  |</code><br>
-                <code>+---------+&nbsp; +---------+&nbsp; +---------+&nbsp;
-                  +---------+&nbsp; +-------+&nbsp; </code><code>+-------+&nbsp;
-                </code><code>+----+</code><br>
-                <code>&nbsp; slice 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; slice
-                  2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; slice
-                  3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; slice
-                  4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; slice 5</code><br>
-                <code></code></div>
-              <div style="margin-left: 40px;"><br>
-              </div>
-              <br>
-              <div style="margin-left: 40px;">
-                <div style="text-align: justify;">The <span style="text-decoration: underline; font-weight: bold;">elastic
-                    buffers</span> are here to prevent plain text attack, where
-                  one knows which data is expected at a given place, an trying
-                  to guess the cipher comparing the expected data and the
-                  encrypted one. As dar generates structured archives, there
-                  would have some possibility that one use this attack to crack
-                  an archive encryption. To overcome this problem, elastic
-                  buffers have been added at the beginning and at the end of
-                  encrypted data. This way it is not possible to know where is
-                  located a given archive structure within the encrypted data.
-                  The elastic buffers are random data that contain at a random
-                  place a pattern that tells the overall size of the buffer
-                  (which size is randomly chosen during archive creation). The
-                  pattern is of the form "&gt;###&lt;" where the hash field
-                  (###) contains the elastic buffer size in binary. Small
-                  elastic buffer can be "&gt;&lt;" for two bytes or "X" for one
-                  byte, but as it is encrypted beside archive data, it is not
-                  possible to determine its size for one that does not hold the
-                  archive encryption key. Elastic buffer are usually several
-                  kilobyte long. Here follows an example of elastic buffer:<br>
-                </div>
-                <code><br>
-                </code>
-                <div style="margin-left: 40px;"><code>972037219&gt;20&lt;8172839</code><br>
-                  <code><br>
-                    <br>
-                </code></div>
-              </div>
-              <div style="margin-left: 40px; text-align: justify;">For clarity,
-                the size field between '&gt;' and '&lt;' has been written in
-                decimal instead of binary, as well as the random data inside the
-                elastic buffer. The location of the size field '&gt;20&lt;' is
-                also randomly chosen at creation time.<span style="text-decoration: underline; font-weight: bold;"><br>
-                  <br>
-                </span>A <span style="text-decoration: underline; font-weight: bold;">Teminateur</span>
-                is short structure that is intended to be read backward. It
-                gives the absolute position of a given item within the archive:
-                The second terminateur let dar skip at the beginning of the
-                archive trailer. The first terminateur (eventually encrypted)
-                let dar skip at the beginning of the catalogue).<br>
-              </div>
-              <div style="margin-left: 40px;"><code></code><br>
-              </div>
-              <br>
-              <br>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <br>
-      <hr style="width: 100%; height: 2px;"><a name="scrambling"></a>
-      <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
-             cellspacing="2" cellpadding="2" border="0">
-        <tbody>
-          <tr>
-            <td style="vertical-align: top;">
-              <h3>Scrambling</h3>
-              <br>
-              <div style="text-align: justify;">Before strong encryption was
-                implemented, dar had only a very simple and weak encryption
-                mechanism. It remains available in current release under the
-                "scram" algorithm name. It mains advantage is that is does not
-                rely on any external library, it is completely part of libdar.<br>
-              </div>
-              <br>
-              How does it works?<br>
-              <br>
-              <div style="text-align: justify;">Consider the pass phrase as a
-                string, thus a sequence of bytes, thus a sequence of integer
-                each one between 0 and 255 (including 0 and 255). The data to
-                "scramble" is also a sequence of byte, usually much longer than
-                the pass phrase. The principle is to add byte by byte the pass
-                phrase to the data, modulo 256. The pass phrase is repeated all
-                along the archive. Let's take an example: <br>
-              </div>
-              <br>
-              the pass phrase is "he\220lo" (where \220 is the character which
-              decimal value is 220). the data is "example"<br>
-              <br>
-              taken from ASCII standard:<br>
-              <div style="margin-left: 40px;">h = 104<br>
-                l = 108<br>
-                o = 111<br>
-                e = 101<br>
-                x = 120<br>
-                a = 97<br>
-                m = 109<br>
-                p = 112<br>
-              </div>
-              <br>
-              &nbsp;<code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                e&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                m&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                p&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; e<br>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                101&nbsp;&nbsp;&nbsp;&nbsp; 120&nbsp;&nbsp;&nbsp;&nbsp;
-                97&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 109&nbsp;&nbsp;&nbsp;&nbsp;
-                112&nbsp;&nbsp;&nbsp;&nbsp; 108&nbsp;&nbsp;&nbsp;&nbsp; 101<br>
-                <br>
-                +&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                h&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                e&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \220&nbsp;&nbsp;&nbsp;
-                l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                o&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                h&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; e<br>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                104&nbsp;&nbsp;&nbsp;&nbsp; 101&nbsp;&nbsp;&nbsp;&nbsp;
-                220&nbsp;&nbsp;&nbsp;&nbsp; 108&nbsp;&nbsp;&nbsp;&nbsp;
-                111&nbsp;&nbsp;&nbsp;&nbsp; 104&nbsp;&nbsp;&nbsp;&nbsp; 101<br>
-                <br>
-                ---------------------------------------------------------------<br>
-                <br>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                205&nbsp;&nbsp;&nbsp;&nbsp; 221&nbsp;&nbsp;&nbsp;&nbsp;
-                317&nbsp;&nbsp;&nbsp;&nbsp; 217&nbsp;&nbsp;&nbsp;&nbsp;
-                223&nbsp;&nbsp;&nbsp;&nbsp; 212&nbsp;&nbsp;&nbsp;&nbsp; 202<br>
-                <br>
-                ---------------------------------------------------------------<br>
-                modulo<br>
-                256 :&nbsp;&nbsp; 205&nbsp;&nbsp;&nbsp;&nbsp;
-                221&nbsp;&nbsp;&nbsp;&nbsp; 61&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                217&nbsp;&nbsp;&nbsp;&nbsp; 223&nbsp;&nbsp;&nbsp;&nbsp;
-                212&nbsp;&nbsp;&nbsp;&nbsp; 202<br>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                \205&nbsp;&nbsp;&nbsp; \201&nbsp;&nbsp;&nbsp;
-                =&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \217&nbsp;&nbsp;&nbsp;
-                \223&nbsp;&nbsp;&nbsp; \212&nbsp;&nbsp;&nbsp; \202</code><br>
-              <br>
-              thus the data "example" will be written in the archive
-              "\205\201=\217\223\212\202"<br>
-              <br>
-              <div style="text-align: justify;">This method allows to decode any
-                portion without knowing the rest of the data. It does not
-                consume much resources to compute, but it is terribly weak and
-                easy to crack. Of course, the data is more difficult to retrieve
-                without the key when the key is long. Today dar can also use
-                strong encryption (blowfish and few others) and thanks to a
-                encryption block can still avoid reading the whole archive to
-                restore any single file.</div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <br>
-      <hr style="width: 100%; height: 2px;"><br>
-      <table style="text-align: left; width: 90%;" cellspacing="2" cellpadding="2"
-             border="0">
-        <tbody>
-          <tr>
-            <td style="vertical-align: top;">
-              <h3>Asymmetrical Encryption and Signature<br>
-              </h3>
-              <br>
-              <div style="text-align: justify;">dar relies on gpgme library (GPG
-                made Easy) to provide strong asymmetrical encryption and
-                signature of an archive. Asymmetrical encryption is what you do
-                when you use a public key to cypher data (=encrypt data) and a
-                private key to uncypher it (=decrypt it). However, <span style="font-weight: bold;">dar
-                  does <span style="text-decoration: underline;">not </span>encrypt
-                  <span style="text-decoration: underline;">the whole archive</span>
-                  that way</span>, not it signs it that way, neither.<br>
-                <br>
-                Instead, dar relies on the symmetrical strong encryption
-                algorithm it is aware of for some time (blowfish, twofish,
-                camellia, aes, etc.) to cipher the archive. The key used to
-                cipher the archive is chosen randomly, encrypted and eventually
-                signed using the provided recipient email of the user keyring.
-                This encrypted key is then put in the archive header and
-                trailer.<br>
-                <br>
-                Well, to be more precise about the symmetrical key that is
-                encrypted in the archive: its length user defined and defaults
-                to 512 bytes (4096 bits). A random variation of +0 to +255 bytes
-                is added by libdar to this size. Then the key value itself is
-                chosen randomly. The random generator used here is the one
-                provided by libgcrypt using the GCRY_STRONG_RANDOM entropy
-                level.<br>
-                <br>
-                Why doing that way and not using the asymmetrical algorithm to
-                cypher the whole archive? <br>
-                <ul>
-                  <li>Because it would no more be possible to extract a single
-                    file from the archive or to read the archive's contents
-                    whithout reading the whole archive.</li>
-                  <li>Because it would not be possible the quickly verify
-                    archive signatures (well, see below)<br>
-                  </li>
-                  <li>Because it would avoid recovering an corrupted archive
-                    after the point of corruption</li>
-                  <li>Because it would cost much disk space to encrypt an
-                    archive for it be readable by more than one recipients<br>
-                  </li>
-                </ul>
-                Yes, you can provide several recipients from your GPG keyring
-                giving their email addresses and also at the same time sign the
-                archive with one of your private key. The resulting archive will
-                be possible to decrypt only by those recipients. And anyone
-                knowing your public key will be able to verify that the archive
-                has been generated by you. Of course the verification only
-                validates the encryption key is from an archive you have
-                personnaly generated, a man in the middle could modify the
-                archive data located after the key in the archive, however it
-                would not be possible to uncipher the tampered data using the
-                signed key, or it would mean that the man in the middle could
-                generate encrypted data using the same symmetric key that is
-                encrypted in the archive. This might be the possible if a
-                recipient's private key has been compromised. Thus the signature
-                of the key is not sufficient to prove the authenticity of the
-                whole archive. To cope with that risks, a better solution is to
-                activate the slice hashing (md5 or sha1) and to sign these small
-                files to be provided beside the archive slices.<br>
-                <br>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <hr style="width: 100%; height: 2px;"><a name="overflow"></a><br>
-      <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
-             cellspacing="2" cellpadding="2" border="0">
-        <tbody>
-          <tr>
-            <td style="vertical-align: top;">
-              <h3>Overflow in arithmetic integer operations</h3>
-              <br>
-              <div style="text-align: justify;">Some code explanation about the
-                detection of integer arithmetic operation overflows. We speak
-                about *unsigned* integers, and we have only portable standard
-                ways to detect overflows when using 32 bits or 64 bits integer
-                in place of infinint.<br>
-                <br>
-                Developed in binary, a number is a finite suite of digits (0 or
-                1). To obtain the original number from the binary
-                representation, we must multiply each digit by a power of two.
-                example the binary representation "101101" designs the number N
-                where:<br>
-                <br>
-              </div>
-              <div style="margin-left: 40px; text-align: justify;">N = 2^5 + 2^3
-                + 2^2 + 2^0<br>
-              </div>
-              <div style="text-align: justify;"><br>
-                in that context we will say that 5 is the maximum power of N
-                (the power of the higher non null binary digit).<br>
-                <br>
-              </div>
-              for the addition "+" operation, if an overflow occurs, the result
-              is less than one or both operands, so overflow is not difficult to
-              detect. To convince you, let's assume that the result is greater
-              both operands while it has overflowed. Thus the real result
-              (without overflow) less the first operands should gives the second
-              argument, but here we get a value that is greater than the all 1
-              bits integer (because there was an overflow and the resulting
-              overflowed value is greater than the first second and the first
-              operand), so this is absurd, and in case of overflow the resulting
-              value is less than one of the operands.<br>
-              <div style="text-align: justify;"><br>
-                for substraction "-" operation, if the second operand is greater
-                than the first there will be an overflow (result must be
-                unsigned thus positive) else there will not be any overflow.
-                Thus detection is even more simple.<br>
-                <br>
-                for division "/" and modulo "%" operations, there is never an
-                overflow (there is just illicit the division by zero).<br>
-                <br>
-                for multiplication "*" operation, a heuristic has been chosen to
-                quickly detect overflow, the drawback is that it may triggers
-                false overflow when number get near the maximum possible integer
-                value. Here is the heuristic used:<br>
-                <br>
-                given A and B two integers, which max powers are m and n
-                respectively, we have<br>
-                <br>
-              </div>
-              <div style="margin-left: 40px; text-align: justify;">A &lt;
-                2^(m+1)<br>
-              </div>
-              <div style="text-align: justify;">and<br>
-              </div>
-              <div style="margin-left: 40px; text-align: justify;">B &lt;
-                2^(n+1)<br>
-              </div>
-              <div style="text-align: justify;"><br>
-                thus we also have:<br>
-                <br>
-              </div>
-              <div style="margin-left: 40px; text-align: justify;">A.B &lt;
-                2^(m+1).2^(n+1)<br>
-              </div>
-              <div style="text-align: justify;"><br>
-                which is:<br>
-                <br>
-              </div>
-              <div style="margin-left: 40px; text-align: justify;">A.B &lt;
-                2^(m+n+2)<br>
-              </div>
-              <div style="text-align: justify;"><br>
-              </div>
-              by consequences we know that the maximum power of the product of A
-              by B is at most m+n+1 and while m+n+1 is less than or equal to the
-              maximum power of the integer field there will not be overflow else
-              we consider there will be an overflow even if it may not be always
-              the case (this is an heuristic algorithm). </td>
-          </tr>
-        </tbody>
-      </table>
-      <br>
-      <hr style="width: 100%; height: 2px;"><a name="strong_encryption"></a><br>
-      <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;"
-             cellspacing="2" cellpadding="2" border="0">
-        <tbody>
-          <tr>
-            <td style="vertical-align: top;">
-              <h3>Strong encryption</h3>
-              <br>
-              <div style="text-align: justify;">Several cyphers are available.
-                Remind that "scrambling" is not a strong encryption cypher, all
-                other are.<br>
-                <br>
-                to be able to use a strong encrypted archive you need to know
-                the three parameters used at creation time:<br>
-              </div>
-              <ul style="text-align: justify;">
-                <li>the cypher used (blowfish, ...)</li>
-                <li>the key or password used</li>
-                <li>the encryption block size used</li>
-              </ul>
-              <div style="text-align: justify;">no information about these
-                parameters is stored in the generated archive. If you make an
-                error on just one of them, you will not be able to use your
-                archive. If you forgot one of them, nobody can help you, you can
-                just consider the data in this archive as lost. This is the
-                drawback of strong encryption. <br>
-                <br>
-              </div>
-              <h4 style="text-align: justify;">How is it implemented?</h4>
-              <div style="text-align: justify;">To not completely break the
-                possibility to directly access file, the archive is&nbsp; not
-                encrypted as a whole (as would do an external program). The
-                encryption is done block of data by block of data. Each block
-                can be decrypted, and if you want to read some data somewhere
-                you need to decrypt the whole block(s) it is in.<br>
-                <br>
-                In consequence, the larger the block size is, the stronger the
-                encryption is. But also the larger the block size is, the longer
-                it will take to recover a given file, in particular when the
-                file size to restore is much smaller than the encryption block
-                size used.<br>
-                <br>
-                An encryption block size can range from 10 bytes to 4 GB.<br>
-                <br>
-                If encryption is used as well as compression, compression is
-                done first, then encryption is done on compressed data.<br>
-                <br>
-                An "elastic buffer" is introduced at the beginning and at the
-                end of the archive, to protect against plain text attack.&nbsp;
-                The elastic buffer size randomly varies and is defined at
-                execution time. It is composed of random (srand()) values. Two
-                marks characters '&gt;' and '&lt;' delimit the size field, which
-                indicate the byte size of the elastic buffer. The size field is
-                randomly placed in the buffer. Last, the buffer is encrypted
-                with the rest of the data. Typical elastic buffer size range
-                from 1 byte to 10 kB, for both initial and terminal elastic
-                buffers. <br>
-                <br>
-                Elastic buffers are also used inside encryption blocks. The
-                underlying cypher may not be able to encrypt at the requested
-                block size boundary. If necessary a small elastic buffer is
-                appended to the data before encryption, to be able, at
-                restoration time, to know the amount of data and the amount of
-                noise around it.<br>
-                <br>
-                Let's take an example with blowfish. Blowfish encrypts by
-                multiple of 8 bytes (blowfish chain block cypher). An elastic
-                buffer is always added to the data of a encryption block, its
-                minimal size is 1 byte. <br>
-                <br>
-                Thus, if you request a encryption block of 3 bytes, these 3
-                bytes will be padded by an elastic buffer of 5 bytes for these 8
-                bytes to be encrypted. This will make a very poor compression
-                ratio as only 3 bytes on 8 bytes are significant.<br>
-                <br>
-                If you request a encryption block of 8 bytes, as there is no
-                room for the minimal elastic buffer of 1 byte, a second 8 byte
-                block is used to put the elastic buffer, so the real encryption
-                block will be 16 bytes.<br>
-                <br>
-                Ideally, a encryption block of 7 bytes, will use 8 bytes with 1
-                byte for the elastic buffer.<br>
-                <br>
-                This problem tends to disappear when the encryption block size
-                grows, so this should not be a problem in normal conditions.
-                Encryption block of 3 bytes is not a good idea to have a strong
-                encryption scheme, for information, the default encryption block
-                size is 10kB and is user settable to larger values.<br>
-                <br>
-                <h4>Key Derivation Fonction - KDF<br>
-                </h4>
-                strong encryption uses secret key, to cipher/uncipher data, we
-                will say "password" to simplify in the following. <br>
-                <br>
-                But directly using a human provided password would provide a
-                weak encryption. To overcome this weakness, the state of the art
-                is to use a key derivation function, which takes in input the
-                human provided password plus a "salt" and outputs a stronger key
-                (salt is described below). This function is based on a hash
-                algoritm (sha1 by default, but this value can be modified since
-                archive format 10/release 2.6.0) and an iteration count (2000
-                before format 10, 200000 since release 2.6.0 by default and this
-                can be changed), it will mix salt and passphrase then hash the
-                result the number of iteration count that is defined, taking as
-                hash input the previous hash output at each cycle.<br>
-                <br>
-                The <span style="font-weight: bold;">salt</span> is a randomly
-                chosen value by libdar that is stored in clear in the archive
-                header, beside the iteration count and hash algorithm used for
-                the KDF. Thus even if the user has the same password for
-                different archive, the effective key used for strong encryption
-                will differ from archive to archive, making much more difficult
-                for an attacker to crack an archive using statiscical methods
-                over a large number of archives sharing the same human provided
-                password, as the effective encryption key used differs from
-                archive to archive thanks to the salt. Even knowing the salt
-                (which is available in clear for each archive) the attacker
-                should have to use the KDF function for each archive, times each
-                password to test in order to leverage the fact several archives
-                have been encrypted with the same password. In today computer
-                200,000 iteration of sha1 takes almost one second, this is quite
-                unoticeable by the real user, but for an attacker wanting to try
-                100,000 passwords over 8 archives sharing the same human
-                passwords, this would cost 800,000 seconds (around 10 days) just
-                be in order to start cracking user archives...<br>
-                <br>
-                As seen above, an archive is encrypted block by block.
-                Independently of a salt per archive, a second level of salt per
-                encryption block is used inside a give archive, salt which is
-                derived from the block number, <a href="#sym">more details
-                  below</a><br>
-                <br>
-              </div>
-            </td>
-          </tr>
-        </tbody>
+
+      <h3>Archive Level</h3>
+      <p>
+	The archive level describes
+        the structure of the slice's data field (removing header and
+        trailer of each slice), when they are all sticked together
+        from slice to slice:
+      </p>
+      <code class=block>
+	+---------+----------------------------+-----------+--------+---------+--------+
+	| version |   Data                     | catalogue | term 1 | version | term 2 |
+	| header  |                            |           |        | trailer |        |
+	+---------+----------------------------+-----------+--------+---------+--------+
+      </code>
+
+      <h4>version header</h4>
+      <p>
+        The <b>version header</b> is an almost diplication of <i>version trailer</i>. It is
+        used when reading an archive in sequential mode, to be able to
+        prepare the proper compression layer, and known whether escape
+        sequence mark are present in the archive. It is present by default but absent
+	when removing tape marks (<code>-at</code> option).
+      </p>
+
+      <h4>version trailer</h4>
+      <p>
+        the <b>version trailer</b> (which may still be called "version header" in
+        some part of the documentation because it was originallt located at
+        the beginning of the archive in previous archive format) is
+        composed of:
+      </p>
+
+      <ul>
+        <li>edition version of the archive</li>
+        <li>compression algorithm used</li>
+        <li>
+	  command line used for creating the archive, now known as
+          "user comment"
+        </li>
+        <li>flag, telling:
+          <ul>
+            <li>whether the archive is encrypted,</li>
+            <li>whether it has escape sequence marks,</li>
+            <li>whether the header/trailer contains an encrypted key</li>
+            <li>whether the header/trailer contains the initial offset field</li>
+            <li>whether the archive is signed</li>
+            <li>
+	      whether the header/trailer contains the slice
+	      layout of the archive of reference
+	    </li>
+            <li>
+	      whether the archive has salt+iteration count+hash algo for
+              key derivation fonction (KDF)
+            </li>
+          </ul>
+        <li>
+	  initial offset (telling where starts the data in the
+          archive, is only present in the trailer)
+	</li>
+        <li>
+	  crypto algorithm used (present only if flag tells that the
+          archive is encrypted)
+	</li>
+        <li>
+	  size of the crypted key that follows (present only if the
+          flag tells an encrypted key is present)
+	</li>
+        <li>
+	  encrypted key (encrypted by mean of GPG asymetric algorithm,
+          present only if flag says so)
+	</li>
+        <li>
+	  eventually, salt, iteration_count and hash algo for key
+          derivation fonction (KDF) (used since version 2.6.0 when
+          strong encryption is set)
+        </li>
+        <li>
+	  CRC (Cyclic Redundancy Check) computed on the whole version
+          header or trailer
+        </li>
+      </ul>
+
+      <code class=block>
+	+---------+------+---------------+------+--------+-------+----------+---------------+------------+------+------+-----------+-----+-------+
+	| edition | algo | command line  | flag | initial| crypto| crypted  | gnupg crypted |  reference | salt | salt | iteration |hash | CRC   |
+	|         |      |               |      | offset | algo  | key size | sym. key      |  slicing   | size | (KDF)| count(KDF)|(KDF)|       |
+	+---------+------+---------------+------+--------+-------+----------+---------------+------------+------+------+-----------+-----+-------+
+      </code>
+
+      <p>
+	The trailer is used when
+        reading an archive in direct access mode, to build the proper
+        compression layer, escape layer (it is needed if mark have
+        been inserted in the archive to un-escape data that could else
+        be taken as an escape sequence mark) and encryption layer.
+      </p>
+
+      <h4>The data</h4>
+
+      <p>
+        <b>The data</b> is a suite of file contents, with EA and FSA if
+        present. When tape mark is used, a copy of the CRC is placed
+        after's file Data and file's EA, to be used when reading the
+        archive in sequential mode. This CRC is also dropped into the
+        catalogue which takes place at the end of the archive to be used
+        when reading the archive in direct access mode (the default).
+        Last when delta binary is used, a file signature may follow the
+        file's data:
+      </p>
+
+      <code class=block>
+	&nbsp;....--+---------------------+-------+----+----+------------+------------+----+-----------+-----+-....
+	&nbsp;      |  file1 data         | delta | EA | FSA| file2 data | file3 data | EA | file4     | FSA |
+	&nbsp;      | (may be compressed) | sig   |    |    |(no EA/FSA) |            |    | delta sig |     |
+	&nbsp;....--+---------------------+-------+----+----+------------+------------+----+-----------+-----+-....
+      </code>
+
+      <p>
+        In the previous archive example,
+        we find:
+      </p>
+      <ul>
+        <li>
+	  for file1: his data, a delta signature of this data,
+          Extended Attributes, and File Specific Attributes
+	</li>
+        <li>
+	  for file2: only his data, he has no delta signature, no
+          EA no FSA
+	</li>
+        <li>
+	  for file3: data and EA
+	</li>
+        <li>
+	  for file4: no data, only a delta signature and FSA
+	</li>
+      </ul>
+
+      <p>
+        file1 shows all fields that can be associated with an inode,
+        but none is mandatory, though if present they always follow
+        this order:
+      </p>
+      <ul>
+        <li><b>Data</b> or <b>delta patch</b></li>
+        <li>followed by data/delta patch CRC when tape marks as set</li>
+        <li><b>Delta signature</b></li>
+        <li>followed by delta signature CRC when tape marks are set</li>
+        <li><b>Extended Attributes</b></li>
+        <li>followed by EA CRC when tape maks are set</li>
+        <li><b>File Specific Attributes</b></li>
+        <li>followed by FSA CRC when tape marks are set</li>
+      </ul>
+
+      <p>
+	when tape marks are not set, the CRC listed above are not present
+	inline in the archive, though they are still stored in the <i>catalogue</i>
+	at the end of the archive (see below)
+      </p>
+
+      <p>
+        More precisely about<b>delta signature</b>
+	combined with tape marks, there is
+        additional fields present than just the delta sig and its CRC:
+	</p>
+
+      <code class=block>
+	+------+------+---------------+----------+--------+
+	| base | sig  | sig data      | data CRC | result |
+	| CRC  | size | (if size > 0) |    if    |  CRC   |
+	|      |      |               | size > 0 |        |
+	+------+------+---------------+----------+--------+
+      </code>
+
+      <ul>
+        <li>
+	  <b>base CRC</b> is the
+          CRC of the file that delta signature has been based on,
+          used at restoration time before applying a patch
+	</li>
+        <li>
+	  <b>sig size</b> gives
+          the size of the next field, that may be zero if the file
+          does not has signature associated but the file's data is a
+          delta patch and thus base and result CRCs are needed
+        </li>
+        <li>
+	  <b>sig data</b> is the
+          delta signature data. This field and the following are the
+          only one present outside the ending catalogue about delta
+          signatures when tape marks are not set.
+        </li>
+        <li>
+	  <b>data CRC</b> is the
+          CRC on the previous field "sig data"
+        </li>
+        <li>
+	  <b>result CRC</b> is
+          the CRC of the resulting file once patched (to check
+          the patching was successful)
+	</li>
+      </ul>
+
+      <h4>The catalogue</h4>
+
+      <p>
+        <b>the catalogue</b>, contains all inode, directory structure and
+        hard_links information as well as data and EA CRC. The directory
+        structure is stored in a simple way: the inode of a directory
+        comes, then the inode of the files it contains, then a special
+        entry named "EOD" for End of Directory. Considering the
+        following tree:
+      </p>
+
+      <code class=block>
+	&nbsp;- toto
+	&nbsp;   | titi
+	&nbsp;   | tutu
+	&nbsp;   | tata
+	&nbsp;   |   | blup
+	&nbsp;   |   +--
+	&nbsp;   | boum
+	&nbsp;   | coucou
+	&nbsp;   +---
+      </code>
+
+      <p>
+	it would generate the following sequence for catalogue storage:
+      </p>
+      <code class=block>
+	+-------+------+------+------+------+-----+------+--------+-----+
+	|  toto | titi | tutu | tata | blup | EOD | boum | coucou | EOD |
+	|       |      |      |      |      |     |      |        |     |
+	+-------+------+------+------+------+-----+------+--------+-----+
+      </code>
+
+      <p>
+        the <i>EOD</i> entries take on byte. Doing this way, there is
+	no need to store the full path
+        of each file, just the filename is recorded. The file order and the
+	EOD can be used to find the relative path of each entry.
+      </p>
+      <p>
+
+	<h4>The terminator</h4>
+      <p>
+	<b>the terminator</b> stores the position of the beginning of the
+        catalogue, it is the last thing to be written. Thus dar first
+        reads the terminator, then the catalogue. Well, there is now two
+        terminators, both are meant to be read backward. The second
+        terminator points to the beginning of the "trailer version"
+        which is read first in direct access mode. The first terminator
+        points to the start of the catalogue, which is read once the
+        adhoc compression and encryption layers has been built based on
+        the information found on the "trailer version"
+      </p>
+
+      <h3>All Together</h3>
+      <p>
+	Here is an example of how data can be structured in a
+	four sliced archive:
+      </p>
+      <code class=block>
+	+--------+--------+------------------------+--+
+	| slice  | version|  file data + EA        |Tr|
+	| header | header |                        |  |
+	+--------+--------+------------------------+--+
+      </code>
+      <p>
+        the first slice (just above) has been defined smaller using the
+        -S option
+      </p>
+      <code class=block>
+	+--------+-----------------------------------------------------------------+--+
+	| slice  |           file data + EA                                        |Tr|
+	| header |                                                                 |  |
+	+--------+-----------------------------------------------------------------+--+
+
+	+--------+-----------------------------------------------------------------+--+
+	| slice  |           file data + EA                                        |Tr|
+	| header |                                                                 |  |
+	+--------+-----------------------------------------------------------------+--+
+
+	+--------+---------------------+-----------+------ +---------+--------+--+
+	| slice  |   file data + EA    | catalogue | term 1| version | term 2 |Tr|
+	| header |                     |           |       | trailer |        |  |
+	+--------+---------------------+-----------+-------+---------+--------+--+
+      </code>
+
+      <p>
+	the last slice is smaller because there was not enough data to make it
+        full.
+      </p>
+
+      <h3>Other Levels</h3>
+
+      <p>
+	Things get a bit more complicated if we consider compression and encryption.
+        The way the problem is addressed in dar's code is a bit like
+        networks are designed in computer science, using the notion of
+	<b>layers</b>.
+      </p>
+      <p>
+	Here, there
+        is a additional constraint, a given layer may or may not be
+        present (encryption, compression, slicing for example). So all
+        layer must have the same interface for serving the layer above
+        them.
+      </p>
+
+      <p>
+	This interface is defined by the pure virtual class name
+        <i>generic_file</i>, which provides generic methods for reading,
+        writing, skipping, getting the current offset when writing or
+        reading data to any layer. Here follows some example of implementation:
+      </p>
+
+      <ul>
+	<li>
+	  <p>
+	    For example the <b>compressor</b> class
+            acts as a file which compresses data wrote to it and writes
+            compressed data to another <i>generic_file</i> below it.
+	  </p>
+	</li>
+	<li>
+	  <p>
+	    The <b>strong encryption</b> and <b>scramble</b> classes
+	    act the same but in place of
+            compressing/uncompressing they encrypt/decrypt the data to/from
+            another generic_file object "below" them.
+	  </p>
+	</li>
+	<li>
+	  <p>
+	    The <b>sar</b> class which <b>s</b>egment <b>a</b>nd
+	    <b>r</b>eassmbles (perfoming thus the slicing)
+            follows the same principle:
+            it transfers data wrote to it to several fichier
+	    [mening <i>file</i> in French] objects.
+	  </p>
+	</li>
+	<li>
+	  <p>
+            Class <b>fichier</b> also inherit from <i>generic_file</i> class,
+	    and is just a wrapper for the plain file system calls.
+	  </p>
+	</li>
+	<li>
+	  <p>
+	    Some new classes
+            have been added with format 8, in particular the <b>escape</b> class,
+            which inserts escape sequence mark at requested position, and
+            modifies data wrote for it never looks like an escape sequence
+            mark. To reduce the level of context switch when reading the
+            catalogue (which makes a ton of small read)
+	  </p>
+	</li>
+	<li>
+	  <p>
+	    a <b>cache</b> class is also present, it gather small writes made
+	    to it into larger writes, and pre-reads a large amount of data
+	    to answer to the many small reads when building the catalogue
+	    in memory from the archive.
+	  </p>
+	</li>
+	<li>
+	  <p>
+	    <b>fichier_libcurl</b> is acts like the class <i>fichier</i>
+	    but as it relies on <i>libcurl</i> it let libdar read and write
+	    files to remote repository (using SFTP or FTP as of today).
+	  </p>
+	</li>
+	<li>
+	  <p>
+	    class <b>generic_rsync</b> computes the delta signature, or patch a file
+	    using <i>librsync</i>
+	  </p>
+	</li>
+	<li>
+	  <p>
+	    class <b>hash_fichier</b> computes a hash (md5, sha1, sh512,...) of the
+	    data it is written to before transmitting it unchanged to the layer below it
+	  </p>
+	</li>
+	<li>
+	  <p>
+	    class <b>memory_file</b> is used to store data in memory.
+	    <b>secu_memory_file</b> does the same but in secured memory (relying on
+	    <i>libgcrypt</i>. It is used to store sensible data like keys and passwords
+	  </p>
+	</li>
+	<li>
+	  <p>
+	    class <b>null_file</b> acts as the well known <code>/dev/null</code> block
+	    device of Unix system (drops all what is written to it and reads not data, like
+	    an empty file)
+	  </p>
+	</li>
+	<li>
+	  <p>
+	    class <b>spares_file</b> replaces long sequence of zeroed bytes by a special
+	    and small structure (a hole) the contains the number of replaced zeroed bytes
+	    when you write data to it. The resulting is transmitted to the underlying layer.
+	    At reading time, depending on its mode of operation,  it fetches data from
+	    the underlying data and either reconstructs the hole on the filesystem
+	    (skipping the write cursor after the hole) or replaces the read <i> hole</i>
+	    structure by the zeroed bytes it was replacing.
+	  </p>
+	</li>
+      </ul>
+      <p>
+        Here are below is an example of possible layer stacking libdar is using to address a particular combinaison of commands and options:
+      </p>
+
+      <code class=block>
+
+	&nbsp;              +----+--+----+-................+---------+
+	&nbsp;archive       |file|EA|file|                 |catalogue|
+	&nbsp;layout        |data|  |data|                 |         |
+	&nbsp;              +----+--+----+-................+---------+
+	&nbsp;                |   |    |      |              |
+	&nbsp;            +-----+ | +-------+ |              |
+	&nbsp;sparse      |spars| | |sparse | |              |
+	&nbsp;file        |file | | |file   | |              |
+	&nbsp;detection   |detec| | |detect.| |              |
+	&nbsp;layer       +-----+ | +-------+ |              |
+	&nbsp;(optional)      |   |    |      |              |
+	&nbsp;                |   |    |      |              |
+  	&nbsp;            +-----+ |    |   +-----+           |
+	&nbsp;            |delta| |    |   |delta|           |
+	&nbsp;            |sig  | |    |   |sig  |           |
+	&nbsp;            +-----+ |    |   +-----+           |
+	&nbsp;                |   |    |      |              |
+	&nbsp;                |   |    |      |              |
+	&nbsp;                V   V    V      V              V
+	&nbsp;              +-----------------------------------------+
+	&nbsp;compression   |         (compressed)  data              |
+	&nbsp;              +-----------------------------------------+
+  	&nbsp;                     |                      |
+	&nbsp;                     |                      |
+	&nbsp;                     V                      V
+	&nbsp;              +-----------------------------------------+
+	&nbsp;escape layer  |   escaped data / escape sequences       |
+	&nbsp;(optional)    +-----------------------------------------+
+	&nbsp;                    |                      |                 / First Terminateur
+	&nbsp;                    |                      |                 |
+	&nbsp;                    |                      |                 V
+	&nbsp;elastic  +---+      |                      |              +----+---+
+	&nbsp;buffers  |EEE|      |                      |              | T1 |EEE|
+	&nbsp;         +---+      |                      |              +----+---+
+	&nbsp;           |        |                      |                    |           Second
+	&nbsp;           V        V                      V                    V         Terminator
+	&nbsp;         +---------------------------------------------------------+            |
+	&nbsp;cipher   |        (encrypted) data / cache if no encryption        |            |
+	&nbsp;         +---------------------------------------------------------+            V
+	&nbsp;                    |                         |                     +---------+----+
+	&nbsp;+-------+           |                         |                     | trailer | T2 |
+	&nbsp;| header|           |                         |                     +---------+----+
+	&nbsp;+-------+           |                         |                          |      |
+	&nbsp;    |               |                         |                          |      |
+	&nbsp;    V               V                         V                          V      v
+	&nbsp;+----------------------------------------------------------------------------------+
+	&nbsp;|                  data                                                            |
+	&nbsp;+----------------------------------------------------------------------------------+
+	&nbsp;        |         |  |         |   |        |   |        |  |        |  |        |
+	&nbsp;+---------+  +---------+  +---------+  +---------+  +---------+  +---------+  +----+
+	&nbsp;|hash_file|  |hash_file|  |hash_file|  |hash_file|  |hash_file|  |hash_file|  |hash|
+	&nbsp;+---------+  +---------+  +---------+  +---------+  +---------+  +---------+  +----+
+	&nbsp;        |        (hash_file are optional)   |   |        |  |        |  |        |
+	&nbsp;slice   |         |  |         |   |        |   |        |  |        |  |        |
+	&nbsp;headers |         |  |         |   |        |   |        |  |        |  |        |
+	&nbsp; |  |   |         |  |         |   |        |   |        |  |        |  |        |
+	&nbsp; |  +---|------\  |  |         |   |        |   |        |  |        |  |        |
+	&nbsp; |      |      |  |  |         |   |        |   |        |  |        |  |        |
+	&nbsp; V      V      V  V  V         V   V        V   V        V  V        V  V        V
+	&nbsp;+---------+  +---------+  +---------+  +---------+  +---------+  +---------+  +----+
+	&nbsp;|HH| data |  |HH| data |  |HH| data |  |HH| data |  |HH| data |  |HH| data |  |HH| |
+	&nbsp;+---------+  +---------+  +---------+  +---------+  +---------+  +---------+  +----+
+	&nbsp; slice 1      slice 2      slice 3      slice 4       slice 5      slice 6    slice 7
+      </code>
+
+      <p>
+        The <b>elastic buffers</b> are here to prevent plain text attack, where
+        one knows which data is expected at a given place, an trying
+        to guess the cipher comparing the expected data and the
+        encrypted one. As dar generates structured archives, there
+        would have some possibility that one use this attack to crack
+        an archive encryption. To overcome this problem, elastic
+        buffers have been added at the beginning and at the end of
+        encrypted data. This way it is not possible to know where is
+        located a given archive structure within the encrypted data.
+        The elastic buffers are random data that contain at a random
+        place a pattern that tells the overall size of the buffer
+        (which size is randomly chosen during archive creation). The
+        pattern is of the form "&gt;###&lt;" where the hash field
+        (###) contains the elastic buffer size in binary. Small
+        elastic buffer can be "&gt;&lt;" for two bytes or "X" for one
+        byte, but as it is encrypted beside archive data, it is not
+        possible to determine its size for one that does not hold the
+        archive encryption key. Elastic buffer are usually several
+        kilobyte long. Here follows an example of elastic buffer:
+      </p>
+
+      <code class=block>
+	972037219&gt;20&lt;8172839
+      </code>
+
+      <p>
+	For clarity,
+	the size field between '&gt;' and '&lt;' has been written in
+	decimal instead of binary, as well as the random data inside the
+	elastic buffer. The location of the size field '&gt;20&lt;' is
+	also randomly chosen at creation time.
+      </p>
+
+    <p>
+      <b>Teminateur</b>
+      is short structure that is intended to be read backward. It
+      gives the absolute position of a given item within the archive:
+      The second terminateur let dar skip at the beginning of the
+      archive trailer. The first terminateur (eventually encrypted)
+      let dar skip at the beginning of the catalogue).
+    </p>
+
+    <h2><a name="scrambling">Scrambling</a></h2>
+
+      <p>
+        Before strong encryption was
+        implemented, dar had only a very simple and weak encryption
+        mechanism. It remains available in current release under the
+        "scram" algorithm name. It mains advantage is that is does not
+        rely on any external library, it is completely part of libdar.
+      </p>
+
+      <p>
+        How does it works?
+      </p>
+      <p>
+        Consider the pass phrase as a
+        string, thus a sequence of bytes, thus a sequence of integer
+        each one between 0 and 255 (including 0 and 255). The data to
+        "scramble" is also a sequence of byte, usually much longer than
+        the pass phrase. The principle is to add byte by byte the pass
+        phrase to the data, modulo 256. The pass phrase is repeated all
+        along the archive. Let's take an example:
+      </p>
+      <p>
+        the pass phrase is "he\220lo" (where \220 is the character which
+        decimal value is 220). The data is "example"
+      </p>
+      <p>
+        Taken from ASCII standard we have:
+      </p>
+      <ul>
+	<li>h = 104</li>
+        <li>l = 108</li>
+        <li>o = 111</li>
+        <li>e = 101</li>
+        <li>x = 120</li>
+        <li>a = 97</li>
+        <li>m = 109</li>
+        <li>p = 112</li>
+      </ul>
+
+      <code class=block>
+        &nbsp;          e       x       a       m       p       l       e
+        &nbsp;          101     120     97      109     112     108     101
+        &nbsp;
+        &nbsp;  +       h       e       \220    l       o       h       e
+        &nbsp;          104     101     220     108     111     104     101
+        &nbsp;
+        &nbsp;  ---------------------------------------------------------------
+        &nbsp;
+        &nbsp;          205     221     317     217     223     212     202
+        &nbsp;
+        &nbsp;  ---------------------------------------------------------------
+        &nbsp;  modulo
+        &nbsp;  256 :   205     221     61      217     223     212     202
+        &nbsp;          \205    \201    =       \217    \223    \212    \202
+      </code>
+
+      <p>
+        thus the data "example" will be written in the archive as
+        <code>\205\201=\217\223\212\202</code>
+      </p>
+
+      <p>
+        This method allows to decode any
+        portion without knowing the rest of the data. It does not
+        consume much resources to compute, but it is terribly weak and
+        easy to crack. Of course, the data is more difficult to retrieve
+        without the key when the key is long. Today dar can also use
+        strong encryption (blowfish and few others) and thanks to a
+        encryption block can still avoid reading the whole archive to
+        restore any single file.
+      </p>
+
+      <h2><a name="asym_encr_and_sig">Asymmetrical Encryption and Signature</a></h2>
+
+      <p>
+        <i>dar</i> relies on <b>gpgme</b> library (GPG
+        made Easy) to provide strong asymmetrical encryption and
+        signature of an archive. Asymmetrical encryption is what you do
+        when you use a public key to cypher data (=encrypt data) and a
+        private key to uncypher it (=decrypt it). However, <b><i>dar</i>
+	  does not encrypt the whole archive that way</b>, nor it signs
+	it that way, neither.
+      </p>
+      <p>
+        Instead, dar relies on the symmetrical strong encryption
+        algorithm it is aware of, for some time (blowfish, twofish,
+        camellia, aes, etc.) to cipher the archive. The key used to
+        cipher the archive is chosen randomly, encrypted and eventually
+        signed using the provided recipient email of the user keyring.
+        This encrypted key is then put in the archive header and
+        trailer.
+      </p>
+      <p>
+	Well, to be more precise about the symmetrical key that is used
+        to encrypted in the archive: its length is the maximum length
+	supported by the symmetric encryption algorithm. It value is
+	randomly chosen using <code>gcry_randomize</code> routine from
+	libgcrypt and the resulting key is check for robustness using
+	libgcrypt routines.
+      </p>
+      <p>
+        Why doing that way and not using the asymmetrical algorithm to
+        cypher the whole archive?
+      </p>
+      <ul>
+        <li>
+	  Because it would no more be possible to extract a single
+          file from the archive or to read the archive's contents
+          whithout reading the whole archive.
+	</li>
+        <li>
+	  Because it would not be possible the quickly verify
+          archive signatures (well, see below)
+        </li>
+        <li>
+	  Because it would avoid recovering an corrupted archive
+          after the point of corruption
+	</li>
+        <li>
+	  Because it would cost much disk space to encrypt an
+          archive for it be readable by more than one recipients
+        </li>
+      </ul>
+      <p>
+        Yes, you can provide several recipients from your GPG keyring
+        giving their email addresses and also at the same time sign the
+        archive with one of your private key. The resulting archive will
+        be possible to decrypt only by those recipients. And anyone
+        knowing your public key will be able to verify that the archive
+        has been generated by you. Of course the verification only
+        validates the encryption key is from an archive you have
+        personnaly generated, a man in the middle could modify the
+        archive data located after the key in the archive, however it
+        would not be possible to uncipher the tampered data using the
+        signed key, or it would mean that the man in the middle could
+        generate encrypted data using the same symmetric key that is
+        encrypted in the archive. This might be the possible if a
+        recipient's private key has been compromised. Thus the signature
+        of the key is not sufficient to prove the authenticity of the
+        whole archive. To cope with that risks, a better solution is to
+        activate the slice hashing (md5 or sha1) and to sign these small
+        files to be provided beside the archive slices.
+      </p>
+
+
+      <h2><a name="overflow">Overflow in arithmetic integer operations</a></h2>
+      <p>
+	Some code explanation about the
+        detection of integer arithmetic operation overflows. We speak
+        about *unsigned* integers, and we have only portable standard
+        ways to detect overflows when using 32 bits or 64 bits integer
+        in place of infinint.
+      </p>
+      <p>
+        Written in binary notation, a number is a finite suite of digits (0 or
+        1). To obtain the original number from its binary
+        representation, we must multiply each digit by successive powers of two.
+        Example the binary representation "101101" designs the number N
+        where:
+	<code class=block>
+          N = 2^5 + 2^3 + 2^2 + 2^0
+	  </code>
+      <p>
+        In that context we will say that 5 is the maximum power of N
+        (the power of the higher non null binary digit).
+      </p>
+      <p>
+        For the addition operation ("+"), if an overflow occurs, the result
+        is less than one or both operands, so overflow is not difficult to
+        detect. To convince you, let's assume that the result is greater
+        than both operands while it has overflowed. Thus the real result
+        (without overflow) less the first operands should gives the second
+        argument, but here we get a value that is greater than the all 1
+        bits integer (because there was an overflow and the resulting
+        overflowed value is greater than the second and the first
+        operand), so this is absurd, and in case of overflow the resulting
+        value is less than one of the operands.
+      </p>
+      <p>
+        For substraction operation ("-"), if the second operand is greater
+        than the first there will be an overflow (result must be
+        unsigned thus positive) else there will not be any overflow.
+        Thus detection is even more simple.
+      </p>
+      <p>
+        for division ("/") and modulo ("%") operations, there is never an
+        overflow (there is just the illicit division by zero).
+      </p>
+      <p>
+        for multiplication operation ("*"), a heuristic has been chosen to
+        quickly detect overflow, the drawback is that it may triggers
+        false overflow when number get near the maximum possible integer
+        value. Here is the heuristic used:
+      </p>
+      <p>
+        given A and B two integers, which max powers are m and n
+        respectively, we have:
+      </p>
+      <code class=block>
+	A &lt; 2^(m+1)
+      </code>
+      <p>
+        and
+      </p>
+      <code class=block>
+        B &lt; 2^(n+1)
+      </code>
+      <p>
+        thus we also have:
+      </p>
+      <code class=block>
+        A.B &lt; 2^(m+1).2^(n+1)
+      </code>
+      <p>
+        which is:
+      </p>
+      <code class=block>
+        A.B &lt; 2^(m+n+2)
+      </code>
+      <p>
+        In consequences we know that the maximum power of the product of A
+        by B is at most m+n+1 and while m+n+1 is less than or equal to the
+        maximum power of the integer field there will not be overflow else
+        we consider there will be an overflow even if it may not be always
+        the case (this is an heuristic algorithm).
+      </p>
+
+      <h2><a name="strong_encryption">Strong encryption</a></h2>
+
+      <h3>Encryption per block</h3>
+      <p>
+	To not completely break the
+        possibility to directly access a file withing a <i>dar</i>backup,
+	the archive is not encrypted as a whole (as would do probably do
+	an external program, like openssh). The
+        encryption is done block of data, by block of data. This way,
+	each block can be decrypted independently from the others,
+	and if you want to read some data somewhere
+        you only need to decrypt the whole block(s) it is in.
+      </p>
+      <p>
+	An encryption block size can range from 10 bytes to 4 GB. We will
+	design these as <b>libdar cipher block</b>, to differentiate with what's
+	the blocks used by the ciphering algorithm.
+      </p>
+      <h3>CBC and IV</h3>
+      <p>
+	Inside each libdar cipher block, <i>dar</i> relies on
+	the CBC mode (Cipher Block Chaining). In this mode, the data
+	of a libdar cipher block is split in small plaintext blocks (a few tens of
+	bytes depending on the cipher algorithm). These plaintext blocks
+	are not ciphered independently, but the ciphering result is melt with
+	the next plaintext block before the ciphering operation.
+	The advantage of doing so, is that a repeated data pattern
+	does not lead to a repeated encryption pattern. However the first
+	plaintext block of a libdar cipher block needs to be initialized,
+	this is the purpose of the <i>Initial Vector</i> (IV).
+      </p>
+      <p>
+	The <i>IV</i> for each libdar cipher block is derived from its number
+	inside the dar backup/archive and from the encryption key. The result
+	is that even if you have the same data in two libdar cipher block,
+	it will not result in the same encrypted data common to two (or more
+	libdar cipher blocks
+      </p>
+      <h3>Elastic buffer</h3>
+      <p>
+        An "elastic buffer" is introduced at the beginning and at the
+        end of the archive, to protect against plain text attack.
+        The elastic buffer size randomly varies and is defined at
+        execution time. It is composed of randomly generated data
+	(using <code>gcry_create_nonce()</code> generated values).
+      </p>
+      <p>
+	But to be able at reading time to determine the amount of random garbage
+	that has been put at the beginning and at the end of the archive by mean
+	of such elastic buffers, a small structure is randomly dropped inside
+	the garbage that tells the overall size of this random data:
+      </p>
+      <p>
+	Two marks characters '&gt;' and '&lt;' delimit a <b>size field</b>, which
+	indicate the byte size of the elastic buffer. The size field is
+	randomly placed in the buffer. Last, the buffer is encrypted
+	with the rest of the data. Typical elastic buffer size range
+	from 1 byte to 10 kB, for both initial and terminal elastic
+	buffers.
+      </p>
+      <p>
+        Elastic buffers may also used inside libdar encryption blocks, when
+	the <i>libdar cipher block</i> size is not a multiple of the
+	the ciphering algorithm plaintext block size. Such elastic buffer
+	is added for padding at the end of the libdar cipher block.
+      </p>
+
+      <h3>Key Derivation Fonction - KDF</h3>
+      <p>
+	Just above, we saw:
+      </p>
+      <ul>
+	<li>
+	  how CBC inside a <i>libdar cipher block</i> avoided repetitive data
+	  to be seen as repetitive encrypted data
+	</li>
+	<li>
+	  how different IV could avoid exposing repetitive data between
+	  <i>libdar cipher blocks</i> to be seen as repetivive encrypted data
+	</li>
+	<li>
+	  We also see how <i>elastic buffer</i> randomly moved data structure
+	  inside an archive to minimize code book attack.
+	</li>
+      </ul>
+
+      <p>
+	But what if you use always the same password/passphrase between
+	different archives? Breaking one archive will let the attacker access
+	all archives or backups. Worse, an attacker has much more data
+	to work on and compute statistical decryption methods to get to its
+	goal.
+      </p>
+      <p>
+	To get one step further in securing your data, <i>libdar</i> make use
+	of a key derivation function (KDF):
+      </p>
+      <p>
+	strong encryption uses secret key, to cipher/uncipher data, we
+        will say "password" to simplify in the following.
+      </p>
+      <p>
+        First, directly using a human provided password would provide a
+        weak encryption. Because in all the possible key values, humans use
+	a very restricted set of values: only letters, digits, space and eventually
+	punctuation characters, with a certain order at words level and
+	phrase level, even 5ubst1tu1n9 (substituing) letters by digits does
+	not bring much more randomness... Think that in the 256 different values
+	a byte can have we barely use 50 of them. Thing that in the may letter
+	combinaisons we have, we are far from using all of the (how many English words do you
+	know that contain 'xz'?) Now add all possible byte values add orders
+	and compare to what a human can generate as encryption key!
+      </p>
+      <p>
+	To overcome this human weakness, the state of the art
+        is to use a <i>Key Derivation Function</i>, which takes in input the
+        human provided password plus a "salt" and outputs a stronger key
+        (salt is described below). This function is based on a hash
+        algoritm (sha1 by default, but this value can be modified since
+        archive format 10/release 2.6.0) and an iteration count (2000
+        before format 10, 200000 since release 2.6.0 by default and this
+        can be changed), it will mix salt and passphrase then hash the
+        result the number of iteration count that is defined, taking as
+        hash input the previous hash output at each cycle.
+      </p>
+      <p>
+	Note that as KDF
+	alternative to PBKDF2 from PKCS#5 v2 which is the name of the KDF algorithm
+	we have just described, release 2.7.0 brings the modern <b>argon2</b>
+	algorithm, which is the default, it has been built against libargon2 library,
+	but it also makes use of a salt and an interation could.
+      </p>
+      <p>
+	So the KDF transfor the well know human namespace for key in a new namespace
+	for keys, not wider, but not well known. Anyone with the knownledge
+	of the salt, iteration count and algorithm is able to know it, but it costs
+	a lot of effort in computing resource! And this is the objective.
+	No need to hide or make secret the KDF parameters, when an attacker that
+	would requires hors or days to crack a password based on a dictionnary attack
+	now needs years or centuries to do so.
+      </p>
+
+      <h3>Choosing the salt</h3>
+
+      <p>
+        The <b>salt</b> is a randomly
+        chosen value by <i>libdar</i> which is stored in clear in the archive
+        header, beside the iteration count and hash algorithm used for
+        the KDF. Thus even if the user has the same password for
+        different archive, the effective real key used for strong encryption
+        will differ from archive to archive or from backup to backup,
+	making much more difficult
+        for an attacker to crack an archive using statiscical methods
+        over a large number of archives sharing the same human provided
+        password. And second point, a dictionnary attack is much more costly
+	to succeed, either you need hundred thouthand more time of hundred
+	thouthand more CPU power.
+      </p>
+
+      <p>
+	as the effective encryption key used differs from
+        archive to archive thanks to the salt. Even knowing the salt
+        (which is available in clear for each archive) the attacker
+        should have to use the KDF function for each archive, times each
+        password to test in order to leverage the fact several archives
+        have been encrypted with the same password. In today computer
+        200,000 iteration of sha1 takes almost one second, this is quite
+        unoticeable by the real user, but for an attacker wanting to try
+        100,000 passwords over 8 archives sharing the same human
+        passwords, this would cost 800,000 seconds (around 10 days) just
+        be in order to start cracking user archives...
+      </p>
+
+      <h3>In summary</h3>
+
+      <p>
+	In summary, <b>salt</b> randomize keys between archive, <b>elastic buffers</b>
+	randomize
+	data location inside the archive, <b>IV</b> randomize encryption between libdar
+	encryption blocks, and <b>CBC mode</B> randomize encryption withing a libdar encryption
+	block.
+      </p>
       </table>
       <br>
       <hr style="width: 100%; height: 2px;"><a name="thread_safe"></a><br>
@@ -4246,6 +4109,6 @@
       </tbody>
      </table>
 
-
+</div>
   </body>
 </html>
