@@ -1400,7 +1400,11 @@ namespace libdar
 
 			crypto_asym engine(dialog);
 			if(!gnupg_signatories.empty())
+			{
+			    if(gnupg_recipients.size() > 1)
+				dialog->message(gettext("WARNING: When signing an archive with more than one recipient, there is a theorical risk that a recipient forges a slightly modified version of the generated archive without breaking the signature validation. It is advised in that context to sign the archive externally by calling \"gpg --detach-sign\" once dar has completed the archive"));
 			    engine.set_signatories(gnupg_signatories);
+			}
 			clear.skip(0);
 			key->skip(0);
 			if(clear.get_size().is_zero())
