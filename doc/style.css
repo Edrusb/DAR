@@ -25,7 +25,7 @@ p, ul, ol, dl
     text-align: justify;
 }
 
-p
+p, dt
 {
     padding-left: 20px;
 }
