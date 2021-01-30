@@ -7,144 +7,148 @@
     <title>Flexible Restoration with dar</title>
   </head>
   <body>
-    <center><h1>Flexibly Restoring a whole system with dar</h1></center>
 
-    <h2>Introduction</h2>
-    <p>
-      Restoration is usually the most tricky part of a backup process. By <i>backup process</i> is designed the whole
-      process of creating backups, storing them in a secured place, protecting backup data against unauthorized access,
-      and rebuilding a whole system from scratch upon major failure/system corruption/security breach/...
-      (a single system or a set of systems, hypervisor, virtual machines, local storage, activating remote
-      storage, and making the restored system bootable).
-    </p>
-    <p>
-      No backup process matches the need of all. For example, syncing your local files in the cloud
-      is easy and may be suitable for personal use. But as it also exposes all your data, values, proprietary software, patents,
-      to the eye of the cloud provider, it may thus not be suitable for companies having production secrets, secret recipes that
-      constitute the source of their revenue. It may neither be suitable for a individual fighting for human
-      rights and for freedom in a country where these natural rights are banished. And last, it does not let you
-      rebuild your whole system: you will have to reinstall all applications and configurations you had done for them, as well
-      as eventually find the license keys to active the proprietary software you were using.
-    </p>
-    <p>
-      At the opposite, restoring a whole system with not only the user data but also the application binaries, configurations,
-      operating system,... in the state it had at the time of the backup requires some skills and knowledge. The objective
-      of this document is to provide this type of information to help anyone new to this operation, using <b>Disk ARchive</b> (dar)
-      as backup tool under Linux and more generally Unixes (including MaCOS X).
-    </p>
-    <p>
-      Because its easy, you might consider for your backup process, the use of some well designed disk cloning tools that operate
-      at block level but this has several constraints:
-    <ul>
-      <li>
-	As all block level tools, to avoid data corruption it requires the copied
-	system to be off. In other terms, you should not clone a disk if it is under use. Block level tools are thus not adapted
-	for a day to day invisible backup process, running in background at low priority or automated at nightly hours, preserving
-	this way your workload from being impacted by backup maintenance tasks.
-      </li>
-      <li>
-	block copy/backup is is inefficient, as it saves all data, including free space on the disk and takes a lot of time to
-	complete, time during which you cannot use the system.
-      </li>
-      <li>
-	Restoring the system on a different disk size and numbers (smaller disks, more disks, different partitionning)
-	is not possible, while most of the time, the disks you will find on the market when restoration is need,
-	differ from the ones you were using so far: larger disks or smaller storage but relying
-	on a more recent technology that you would like to leverage (SSD, NVMe...).
-      </li>
-      <li>
-	Restoring your data to an encrypted disk (LUKS) while it was not encrypted is not possible and viceversa.
-      </li>
-    </ul>
-    To avoid all these pitfalls we prefer filesystem agnostic tools, that backup the content of disks rather than
-    the disks as a whole. In the following we will describe how to restore a whole system with or without:
-      <ul>
-	<li>data encryption,</li>
-	<li>local or remote storage,</li>
-	<li>data parity,</li>
-	<li>legacy MBR or UEFI boot,</li>
-	<li>For a single system to a complete <i>Proxmox</i> hypervisor, its containers and its VMs</li>
-      </ul>
-    </p>
-    <p>
-      <b><u>Some notes about Dar software:</u></b><br/>
-      At the opposite of backup tools that copy bytes verbatim from the disk to a file, <i>dar</i> keeps traces of files inside
-      the file-system, it stores every possible thing related to these files (metadata, attributes, Extended Attributes, data, sparse nature of files).<br/><br/>
-      <b>The advantages</b> are
+    <div class=top>
+      <img alt="Dar Documentation" src="dar_s_doc.jpg" style="float:left;">
+      <h1>Flexibly Restoring a whole system with dar</h1>
+    </div>
+
+    <div class=menu>
+      <div class=menuitem>
+	<a href="#intro">Introduction</a>
+      </div>
+      <div class=menuitem>
+	<a href="#backup">Backup creation</a>
+      </div>
+      <div class=menuitem>
+	<a href="#restoration">Restoration Process</a>
+      </div>
+      <div class=menuitem>
+	Variations:
+      </div>
+      <div class=menuitem>
+	<a href="#lvm">Restoring to LVM volumes</a>
+      </div>
+      <div class=menuitem>
+	<a href="#proxmox">Proxomox specific</a>
+      </div>
+      <div class=menuitem>
+	<a href="#luks">Restoring a LUKS ciphered disk</a>
+      </div>
+    </div>
+
+    <div class=main>
+      <h2><a name="intro">Introduction</a></h2>
+      <p>
+	Restoration is usually the most tricky part of a backup process. The <i>backup process</i> designs the whole
+	process of creating backups, storing them in a secured place, protecting backup data against unauthorized access,
+	against corruption over time, rebuilding a whole system from scratch upon major failure,system corruption,security breach,...
+	It may concern a single system (a host with its operating system, applications, configurations, user data),
+	a set of systems independent systems, but also "recursive systems" like an hypervisors and their many virtual possible machines.
+	(we will illustrate that later case also in this document).
+      </p>
+      <p>
+	The second purpose of a <i>backup process</i> is to provide file history, in order to be able to restore a file
+	deleted by mistake (even long after the mistake was made), corrupted, or to get back this file(s) in the state
+	it has in a for a previous application version.
+      </p>
+      <p>
+	But there is not a single backup process that matches the need of all. For example, syncing your local <b>data</b> in the cloud
+	is easy and may be suitable for personal use (well...). But as it also exposes all your data, values, proprietary software, patents,
+	to the eye of the cloud provider, it may thus not be suitable for companies having production secrets, secret recipes that
+	constitute the source of their revenue. It may neither be suitable for a individual fighting for human
+	rights and for freedom in a country where these natural rights are banished. And last, it does not let you
+	rebuild your whole system: you will have to reinstall all applications and configurations you had done, as well
+	as eventually finding or rebuying the license keys to active the proprietary software you were using.
+      </p>
+      <p>
+	At the opposite, restoring a <b>whole system</b> with not only the user data but also the application binaries, configurations,
+	operating system,... in the state it had at the time of the backup requires some skills and knowledge. The objective
+	of this document is to provide some tested recipies to help anyone new to this operation, using <b>Disk ARchive</b> (dar)
+	as backup tool under Linux and more generally Unixes (including MaCOS X).
+      </p>
+      <p>
+	<b><u>Some notes about Dar software:</u></b><br/>
+	At the opposite of backup tools that copy bytes verbatim from the disk to a file, <i>dar</i> keeps traces of files inside
+	the file-system, it stores every possible thing related to these files (metadata, attributes, Extended Attributes, data, sparse nature of files).<br/><br/>
+	<b>The advantages are:</b>
+      </p>
       <ul>
 	<li>much less data (not the free block space of a file-system),</li>
 	<li>can perform differential and incremental backups (so the new backup is very small and processing time very fast),</li>
 	<li>can even use rsync-based binary delta per saved file between two backups (so you do not re-save a whole large binary file when it has changed),</li>
-	<li> The other advantage is that you can restore on any disk size (if large enough to hold the data),</li>
+	<li>can restore on any disk size (if large enough to hold the data),</li>
 	<li>change the partition layout,</li>
 	<li>use a different file-system,</li>
 	<li>can compress specific files and avoid trying compressing some others during the backup process</li>
-	<li>use strong encryption efficiently</li>
+	<li>use strong encryption efficiently and in the state of the art</li>
 	<li>the backup format is very robust against corruption and can both detect corruption affecting
 	  a file and still recover the rest of the backup</li>
 	<li>the use of parity data can be integrated with dar (thanks to <a href="http://parchive.sourceforge.net/">Parchive</a> software
-	  as we will show here), can even allow the repairing of the backup</li>
-      even be repaired upon corruption.<br/><br/>
+	  as we will show here), leading to the ability to repair the backup</li>
 	<li>and so on.</li>
       </ul>
-      <b>The drawbacks</b> are that you will have to manually recreate the disk partitions and format the file-system as you want,
-      in order to restore files into them. The objective of this document is thus to explain how to do that and let you see that this task
-      is not complex and brings a lot of freedom.
-    </p>
-    <h2>Backup creation</h2>
-    <h3>What to backup</h3>
-    <p>
-      Do I have to backup Everything? Well, in fact no. You can exclude all virtual file-systems like /dev /proc and /sys (see dar's -P option)
-      as well as any temporary and cache directory (/tmp /var/tmp /var/cache/apt/archives /var/backups /home/*cache*/*...) and the directories
-      named "lost+found" that will be recreated at restoration time while formatting the target file-system.
-      If you use LVM to store you system, you might be interested, just for reference, in recording within the backup the output of
-      the <b>lsblk</b> command, that gives the current partitions, Virtual Group name, Logical Volume names and their usage in the running
-      system at the time of the backup (see -&lt; and -= options below).
-    </p>
-    <p>
-      Here is an example of configuration I use for myself on a <i>Proxmox</i> system (Debian based kvm hypervisor). For more details refer to the
-      man page but in summary here is the options unsed and their meaning:
-    </p>
-    <dl>
-      <dt class=void>-R option</dt><dd>
-	Defines the root of the data to backup. Here the backup scope is system wide so we give it "/" as argument</dd>
-      <dt class=void>-am</dt><dd>
-	Let using the ordered and natural mask combinaison</dd>
-      <dt class=void>-D</dt><dd>
-	When excluding a directory (like /sys for example) store the directory as empty in the backup, this way at restoration
-	time the mount-point will be recreated</dd>
-      <dt class=void>-P</dt><dd>
-	prunes the directory given in argument (which is relative to the -R root, so <code>-P dev</code> excludes /dev here). It can be used
-	multiple times.</dd>
-      <dt class=void>-g</dt><dd>
-	derogate to a previous -P option by including the directory given in argument</dd>
-      <dt class=void>-z/-zbzip2</dt><dd>
-	compress the backup here with bzip2 algorithm</dd>
-      <dt class=void>-s</dt><dd>
-	split backup in several files (called slices) to avoid having a possibily huge file</dd>
-      <dt class=void>-B</dt><dd>
-	includes other options defined in the file given in argument</dd>
-      <dt class=void>compress-exclusion</dt><dd>
-	is a set of options (a so called "target") defined in /etc/darrc that provides a long list
-	of files types that do not worth trying to compress (already compressed files, for example)</dd>
-      <dt class=void>no-emacs-backup</dt><dd>
-	is another target avoiding to save emacs temporary backup files</dd>
-      <dt class=void>bell</dt><dd>
-	yet another target still defined in /etc/darrc that makes the terminal ring upon user interaction request</dd>
-      <dt class=void>-E</dt><dd>
-	execute the provided command after each created slice, here we run a script that lead par2 to
-	generate parity data for each slice</dd>
-      <dt class=void>--slice-mode</dt><dd>
-	defines the permission of the backup slices that will be created</dd>
-      <dt class=void>--retry-on-change</dt><dd>
-	as we perform the backup of a live system, we need retry saving up to 3 times
-	any file that changed at the time it was read for backup.</dd>
-      <dt class=void>-&lt;</dt><dd>
-	when entering the /root directory execute the command provided with -= option</dd>
-      <dt class=void>-=</dt><dd>
-	execute the provided command when saving a directory or file referred by -&lt; option</dd>
-    </dl>
-    <div><code>
+      <p>
+	<b>The drawbacks</b> are that you will have to manually recreate the disk partitions and format the file-system as you want,
+	in order to restore files into them. The objective of this document is thus to explain how to do that and let you see that this task
+	is not complex and brings a lot of freedom.
+      </p>
+      <h2><a name="backup">Backup creation</a></h2>
+      <h3>What to backup</h3>
+      <p>
+	Do I have to backup Everything? Well, in fact no. You can exclude all virtual file-systems like <code>/dev</code> <code>/proc</code>
+	and <code>/sys</code> (see dar's -P option)
+	as well as any temporary and cache directory (<code>/tmp</code> <code>/var/tmp</code>
+	<code>/var/cache/apt/archives</code> <code>/var/backups</code> <code>/home/*cache*/*</code>...) and the directories
+	named <code>"lost+found"</code> that will be recreated at restoration time while formatting the target file-system.
+	If you use LVM to store you system, you might be interested just for further reference, in recording within the backup the output of
+	the <code>lsblk</code> command, that gives the current partitions, Virtual Group name, Logical Volume names and their usage in the running
+	system at the time of the backup (see <code>-&lt;</code> and <code>-=</code> options, below).
+      </p>
+      <p>
+	Here is an example of configuration used on a <i>Proxmox</i> system (Debian based kvm hypervisor). For more details refer to the
+	man page, but in summary here is the options unsed and their meaning:
+      </p>
+      <dl>
+	<dt class=void>-R option</dt><dd>
+	  Defines the root of the data to backup. Here the backup scope is system wide so we give it "/" as argument</dd>
+	<dt class=void>-am</dt><dd>
+	  Let using the ordered and natural mask combinaison</dd>
+	<dt class=void>-D</dt><dd>
+	  When excluding a directory (like /sys for example) store the directory as empty in the backup, this way at restoration
+	  time the mount-point will be recreated</dd>
+	<dt class=void>-P</dt><dd>
+	  prunes the directory given in argument (which is relative to the -R root, so <code>-P dev</code> excludes /dev here). It can be used
+	  multiple times.</dd>
+	<dt class=void>-g</dt><dd>
+	  derogate to a previous -P option by including the directory given in argument</dd>
+	<dt class=void>-z/-zbzip2</dt><dd>
+	  compress the backup here with bzip2 algorithm</dd>
+	<dt class=void>-s</dt><dd>
+	  split backup in several files (called slices) to avoid having a possibily huge file</dd>
+	<dt class=void>-B</dt><dd>
+	  includes other options defined in the file given in argument</dd>
+	<dt class=void>compress-exclusion</dt><dd>
+	  is a set of options (a so called "target") defined in /etc/darrc that provides a long list
+	  of files types that do not worth trying to compress (already compressed files, for example)</dd>
+	<dt class=void>no-emacs-backup</dt><dd>
+	  is another target avoiding to save emacs temporary backup files</dd>
+	<dt class=void>bell</dt><dd>
+	  yet another target still defined in /etc/darrc that makes the terminal ring upon user interaction request</dd>
+	<dt class=void>-E</dt><dd>
+	  execute the provided command after each created slice, here we run a script that lead par2 to
+	  generate parity data for each slice</dd>
+	<dt class=void>--slice-mode</dt><dd>
+	  defines the permission of the backup slices that will be created</dd>
+	<dt class=void>--retry-on-change</dt><dd>
+	  as we perform the backup of a live system, we need retry saving up to 3 times
+	  any file that changed at the time it was read for backup.</dd>
+	<dt class=void>-&lt;</dt><dd>
+	  when entering the /root directory execute the command provided with -= option</dd>
+	<dt class=void>-=</dt><dd>
+	  execute the provided command when saving a directory or file referred by -&lt; option</dd>
+      </dl>
+      <code class=block>
 
 	root@soleil:~# cat .darrc
 	all:
@@ -187,81 +191,89 @@
 	-&lt; root
 	-= "/bin/lsblk &gt; %p/lsblk.txt"
 
-    </code></div>
+      </code>
 
-    <h3>Dar_static</h3>
-    <p>
-      We will copy <b>dar_static</b> binary beside the backup to not rely on anything else for restoration.
-      Some user also add a bit of dar documentation (including this document), that's up to you to decide.
-    </p>
+      <h3>Dar_static</h3>
+      <p>
+	We will copy <b>dar_static</b> binary beside the backup to not rely on anything else for restoration.
+	Some user also add a bit of dar documentation (including this document), that's up to you to decide.
+      </p>
 
-    <h3>Ciphering</h3>
-    <p>
-      If backup has to be ciphered (-K option), better use symmetric encryption algorithm, than assymmetrical:
-      For the first, you will be asked for the passphrases to decipher the backup and restore your data,
-      while with asymmetrical encryption, this is the private key and the knowledge of the
-      passphrase used to unlock it (if used) that will be needed. In consequences this needed information
-      be stored <u>outside the backup</u> (in your head for a passphrase, or in a removable media for a private
-      key, for example).
-      <br/><br/>
-      The interest of ciphering backups is especially strong when using a public cloud provider to store them.
-    </p>
-    <h3>Direct Attached Storage (DAS)</h3>
-    <p>
-      For direct attached storage (DAS), like local disk, key, or legacy DVDs, there is no difficulties, just the risk
-      to erase the backup by formatting the wrong disk by mistake.
-    </p>
-    <h3>Network Attached Storage (NAS)</h3>
-    <p>
-      you will of course need to setup a network access before being able to restore your data. The rescue system must also support
-      one of the network protocol available with your NAS to access your backups. For protocols other than FTP and SFTP,
-      a temporary local storage may be needed and thus slicing dar backups (see -s option) will be very useful to be able
-      to perform a restoration without consuming a lot of disk. But, when using FTP or SFTP instead dar can read
-      the backup directly from the NAS and thus no local temporary storage is required.
-    </p>
-    <h3>Partitions</h3>
-    <p>
-      Dar is partitions independent so we will have to recreate them before restoration starts: Either the exactly same layout of
-      partitions with the same size or or not if you realize some partitions are nearly saturated or oversized. Or a completely different
-      partition/disk layout (splitting /var from / in a separated partition for example, or putting some partitions together if
-      it makes better sense).
-    </p>
-    <h3>UEFI Boot</h3>
-    <p>
-      UEFI boot uses an EFI partition (vfat formatted) where are stored binaries for the different operating systems
-      present in the host. Under Debian and many other systems, this partition is only used before
-      the Linux system is started but it is mounted afterward under /boot/efi when the system has booted, so it can
-      be saved by dar without effort. We will see the little trick to do about that before restoring dar.
-    </p>
-    <h3>Legacy MBR boot</h3>
-    <p>
-      Nothing too complicated here: it will just be necessary re-install the boot loader from the restored system, we
-      will describe that too.
-    </p>
-    <h2>Restoration Process</h2>
-    <h3>Booting a pristine system</h3>
-    <p>
-      So you have done and tested your backup as usually and today you need to restore them on a brand-new computer.
-      The proposition is to use <a href="https://www.system-rescue.org/">System-rescueCD</a> for that. Do not be
-      confused by this name, it can not only make bootabe CD/DVD, but is also bootable USB key.
-      <a href="https://www.knopper.net/knoppix/index-en.html">Knoppix</a> is also an good option.
-    </p>
-    <p>
-      Once systemRescueCD has booted, you get to a shell prompt ready to interpret your commands.
-      For those not having US native keyboards, you can change its layout thanks to the <b>loadkeys</b> command:<br/>
-    </p>
-    <div><code>
+      <h3>Ciphering</h3>
+      <p>
+	If backup has to be ciphered (-K option), better use symmetric encryption algorithm, than assymmetrical:
+	For the first, you will be asked for the passphrases to decipher the backup and restore your data,
+	while with asymmetrical encryption, this is the private key and the knowledge of the
+	passphrase used to unlock it (if used) that will be needed. In consequences this needed information
+	--- the private key --- must be stored <u>outside the backup</u>
+	(in your head for a passphrase, or in a unciphered removable media for a private
+	key, for example).
+	<br/><br/>
+	The interest of ciphering backups is necessary when using a public cloud provider to store them,
+	or when your system itslef is stored on ciphered volumes (LUKS for example).
+      </p>
+      <h3>Direct Attached Storage (DAS)</h3>
+      <p>
+	For direct attached storage (DAS), like local disk, key, or legacy DVDs, there is no difficulties. You will
+	probably want to adapt the <code>-s/-S options</code> to a divisor of the media size, eventually adding parity data
+	for when low end media are used.
+      </p>
+      <h3>Network Attached Storage (NAS)</h3>
+      <p>
+	Of course a network access need to be setup before being able to restore your data. The rescue system must also support
+	one of the network protocols available with your NAS to access your backups. For protocols other than FTP and SFTP,
+	a temporary local storage may be needed and thus slicing dar backups (see <code>-s</code> option) will be very useful to be able
+	to perform a restoration without consuming a lot of disk. In addition you can automate the downloading of slices
+	from dar by mean of <code>-E</code> option. But, when using FTP or SFTP instead dar can read
+	the backup directly from the NAS and thus absolutely no local temporary storage is required for restoration.
+      </p>
+      <h3>Partitions</h3>
+      <p>
+	Dar is partitions independent so we will have to recreate them before restoration starts: At no time you have to recreate
+	the exactly same layout of partitions: if you know some partitions were nearly saturated or oversized, you can take the
+	opportunity to review the partition sizes, or even reconsider a completely different
+	partition/disk layout (for example, splitting <code>/var</code> from <code>/</code>
+	in a separated partition for example, or putting some partitions together if
+	it makes better sense).
+      </p>
+      <h3>UEFI Boot</h3>
+      <p>
+	UEFI boot uses an EFI partition (vfat formatted) where are stored binaries for the different operating systems
+	present in the host. This partition is only used before
+	the Linux system is started but it is mounted afterward under /boot/efi when the system has booted, so it can
+	be saved by dar without any effort. We will see a little trick about EFI partition at restoration time.
+      </p>
+      <h3>Legacy MBR boot</h3>
+      <p>
+	Nothing too complicated here: it will just be necessary to re-install the boot loader from the restored system, we
+	will describe that too.
+      </p>
+      <h2><a name="restoration">Restoration Process</a></h2>
+      <h3>Booting a pristine system</h3>
+      <p>
+	So you have done and tested your backup as usually and today you need to restore them on a brand-new computer.
+	The proposition is to use <a href="https://www.system-rescue.org/">System-rescueCD</a> for that. Do not be
+	confused by this name, it can make bootabe CD/DVD, but also bootable USB keys.
+	<a href="https://www.knopper.net/knoppix/index-en.html">Knoppix</a> is also an good alternative.
+      </p>
+      <p>
+	Once systemRescueCD has booted, you get to a shell prompt ready to interpret your commands.
+	For those not having US native keyboards, you can change its layout thanks to the <b>loadkeys</b> command
+	if you skipped the prompt that let you select it:
+      </p>
+      <code class=block>
 
 	[root@sysresccd ~]# loadkeys fr
 	[root@sysresccd ~]#
 
-    </code></div>
-    <h3>Accessing the backup from the host</h3>
-    <h4>Accessing the backup (DAS context)</h4>
-    <p>
-      In the case of DAS, we can use <b>lsblk</b> to identify the backup partition and or LVM volume, then we can <b>mount</b> it
-    </p>
-    <div><code>
+      </code>
+
+      <h3>Accessing the backup from the host</h3>
+      <h4>Accessing the backup (DAS context)</h4>
+      <p>
+	In the case of DAS, we can use <b>lsblk</b> to identify the backup partition and or LVM volume. Then we can <b>mount</b> it
+      </p>
+      <code class=block>
 
 	<b>[root@sysresccd ~]# lsblk -i</b>
 	NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
@@ -282,19 +294,19 @@
 	sr0     11:0    1   841M  0 rom  /run/archiso/bootmnt
 	<b>[root@sysresccd /mnt]#</b>
 
-    </code></div>
+      </code>
 
 
-    <h4>Creating a local temporary storage (NAS context without (S)FTP access)</h4>
-    <p>
-      In the case of Network Storage (NAS) without FTP or SFTP protocol support,
-      we need a local temporary file-system (removed at the end of the restoration
-      process). Here we use <b>lsblk</b> to list all disks,
-      then <b>gdisk</b> to create partitions and finally <b>mkfs</b> to format the file-system
-      and <b>mount</b> it to have it ready for use.<br/><br/>
-      In the below example we use a 32 GB USB key for temporary storage:
-    </p>
-    <div><code>
+      <h4>Creating a local temporary storage (NAS context without (S)FTP access)</h4>
+      <p>
+	In the case of Network Storage (NAS) without FTP or SFTP protocol support,
+	we need a local temporary file-system (removed at the end of the restoration
+	process). Here we use <b>lsblk</b> to list all disks,
+	then <b>gdisk</b> to create partition, <b>mkfs</b> to format the file-system
+	and <b>mount</b> it to have it ready for use.<br/><br/>
+	In the below example we use a 32 GB USB key for temporary storage:
+      </p>
+      <code class=block>
 
 	<b>[root@sysresccd ~]# lsblk</b>
 	NAME  MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
@@ -369,15 +381,14 @@
 	sr0     11:0    1   841M  0 rom  /run/archiso/bootmnt
 	<b>[root@sysresccd /mnt]#</b>
 
-    </code></div>
-    <p>
-      you can now fetch each slice dar would request into that /mnt/Backup directory and remove it afterward. Dar's -E option
-      may be of some use it to automate the process. Assuming you use sftp outside of dar to fetch the slices, you could use
-      the following to instruct <i>dar</i> where to obtain the slices from (for http or https you could usr curl to do
-      something equivalent):
-    </p>
-    <div>
-      <code>
+      </code>
+      <p>
+	you can now fetch each slice dar would request into that /mnt/Backup directory and remove them afterward. Dar's -E option
+	may be of some use it to automate the process. Assuming you use sftp outside of dar to fetch the slices, you could use
+	the following to instruct <i>dar</i> where to obtain the slices from (for http or https you could usr curl to do
+	something equivalent):
+      </p>
+      <code class=block>
 
 	<b>[root@sysresccd /mnt]# cat ~/.darrc &lt;&lt;EOF</b>
 	-E "rm -f /mnt/Backup/%b.*.%e ; sftp user@backup-host:/some/where/%b.%N.%e /mnt/Backup"
@@ -385,27 +396,30 @@
 	<b>[root@sysresccd /mnt]#</b>
 
       </code>
-    </div>
-    <p>
-      If you do not have or want to use a disk for this temporary storage, you can rely on your host memory thanks to a tmpfs file-system:
-    </p>
-    <div>
-      <code>
+
+      <p>
+	If you do not have or want to use a disk for this temporary storage, you can rely on your host memory thanks to a tmpfs file-system:
+      </p>
+      <code class=block>
 
 	<b>[root@sysresccd /mnt]# mkdir /mnt/Backup</b>
 	<b>[root@sysresccd /mnt]# mount -t tmpfs -o size=2G tmpfs /mnt/Backup</b>
 	<b>[root@sysresccd /mnt]# mkdir /mnt/Backup</b>
 
       </code>
-    </div>
 
-    <h4>NAS with FTP or SFTP</h4>
-    <p>
-      During the system-rescueCD boot process, you have been asked to provide network information, so we assume you did well and this volatile system
-      has an operational network access. If you plan to use FTP or SFTP embedded within <i>dar</i> you do not need to prepare any local temporary storage, just remains the network access
-      to the NAS to validate:
-    </p>
-    <div><code>
+      <h4>NAS with FTP or SFTP</h4>
+      <p>
+	During the system-rescueCD boot process, you have been asked to provide network information,
+	so we assume you did well and this volatile system
+	has an operational network access (DHCP or not does not import at this step,
+	whatever is the network
+	configuration of the system we are restoring). If you plan to use FTP or SFTP embedded
+	within <i>dar</i> you do not need to prepare any local temporary storage,
+	just remains the network access
+	to the NAS to validate:
+      </p>
+      <code class=block>
 
 	<b>[root@sysresccd ~]# ping 192.168.6.6</b>
 	PING 192.168.6.6 (192.168.6.6) 56(84) bytes of data.
@@ -417,27 +431,27 @@
 	rtt min/avg/max/mdev = 0.667/0.999/1.332/0.334 ms
 	<b>[root@sysresccd ~]#</b>
 
-    </code></div>
-    <p>
-      you may also validate the FTP or SFTP access availability with the associated credentials, using the CLI <b>ftp</b> and
-      <b>sftp</b> commands.
-    </p>
+      </code>
+      <p>
+	It is also possible to validate the FTP or SFTP access availability using the associated credentials with the CLI <b>ftp</b> or
+	<b>sftp</b> command.
+      </p>
 
-    <h3>Preparing partitions</h3>
-    <p>
-      You have a total freedom to create the same or a different partition layout,
-      it will not reduce or impact the ability to restore with dar. This may be
-      the opportunity to use LVM of RAID or SAN, LUKS ciphered volume, or at the opposite to get back to a plain old partition.
-      That's up to you to decide. In the
-      following we will first use plain partition with UEFI boot (and MBR boot), then revisit
-      the process using LVM and UEFI, then again with even more stuff: LUKS, LVM and UEFI.
-    </p>
-    <h4>the EFI partition</h4>
-    <p>
-      To boot in UEFI a small EFI partition has to be created and vfat formatted. Here we used a size of 1 MiB which is
-      large enough for a single Linux boot host (using grub), but you can find it having sometimes a size of 512 MiB.
-    </p>
-    <div><code>
+      <h3>Preparing partitions</h3>
+      <p>
+	As stated above, you have a total freedom to create the same or a different partition layout,
+	it will not reduce or impact the ability to restore with dar. This may be
+	the opportunity to use LVM of RAID or SAN, LUKS ciphered volume, or at the opposite to get back to a plain old partition.
+	That's up to you to decide. In the
+	following we will first use plain partition with UEFI boot (and MBR boot), then revisit
+	the process using LVM and UEFI, then again with even more stuff: LUKS, LVM and UEFI.
+      </p>
+      <h4>the EFI partition</h4>
+      <p>
+	To boot in UEFI a small EFI partition has to be created and <b>vfat</b> formatted. Here we used a size of 1 MiB which is
+	large enough for a single Linux boot host (using grub), but you can find it having sometimes a size of 512 MiB.
+      </p>
+      <code class=block>
 
 	<b>[root@sysresccd ~]# lsblk -i</b>
 	NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
@@ -479,35 +493,36 @@
 	Number  Start (sector)    End (sector)  Size       Code  Name
 	<e>1            2048            4095   1024.0 KiB  EF00  EFI System</e>
 
-	    <b>Command (? for help): w</b>
+	<b>Command (? for help): w</b>
 
-	    Final checks complete. About to write GPT data. THIS WILL OVERWRITE EXISTING
-	    PARTITIONS!!
+	Final checks complete. About to write GPT data. THIS WILL OVERWRITE EXISTING
+	PARTITIONS!!
 
-	    <b>Do you want to proceed? (Y/N): y</b>
-	    OK; writing new GUID partition table (GPT) to /dev/sda.
-	    The operation has completed successfully.
-	    <b>[root@sysresccd ~]# lsblk -i</b>
-	    NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
-	    loop0    7:0    0 788.8M  1 loop /run/archiso/sfs/airootfs
-	    sda      8:0    0   100G  0 disk
-	    <e>`-sda1   8:1    0     1M  0 part</e>
-	    sdb      8:16   0    32G  0 disk
-	    `-sdb1   8:17   0    32G  0 part /mnt/Backup
-	    sr0     11:0    1   841M  0 rom  /run/archiso/bootmnt
-	    <b>[root@sysresccd ~]#</b>
+	<b>Do you want to proceed? (Y/N): y</b>
+	OK; writing new GUID partition table (GPT) to /dev/sda.
+	The operation has completed successfully.
+	<b>[root@sysresccd ~]# lsblk -i</b>
+	NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+	loop0    7:0    0 788.8M  1 loop /run/archiso/sfs/airootfs
+	sda      8:0    0   100G  0 disk
+	<e>`-sda1   8:1    0     1M  0 part</e>
+	sdb      8:16   0    32G  0 disk
+	`-sdb1   8:17   0    32G  0 part /mnt/Backup
+	sr0     11:0    1   841M  0 rom  /run/archiso/bootmnt
+	<b>[root@sysresccd ~]#</b>
 
-    </code></div>
-    <h4>the root partition</h4>
-    <p>
-      Here we will use a single partition to restore the system to, but you are free
-      to use as many as you want (and also use LVM instead of partitions if you prefer, see at the end of this document,
-      though the EFI partition cannot be made of an LVM, but only of a partition), you will have to format them to the file-system of
-      your choice (not mandatorily the one of the original system) create the mount points
-      and mounts them accordingly to your need. We will see how below, taking the EFI partition
-      as an example.
-    </p>
-    <div><code>
+      </code>
+
+      <h4>The root partition</h4>
+      <p>
+	Here we will use a single partition to restore the system to, but you are free
+	to use as many as you want (and also use LVM instead of partitions if you prefer. See at the end of this document).
+	You will then have to format them to the file-system of
+	your choice (not mandatorily the one of the original system) create the mount points
+	and mounts them accordingly to your need. We will see how below, taking the EFI partition
+	as an example.
+      </p>
+      <code class=block>
 
 	<b>[root@sysresccd ~]# gdisk /dev/sda</b>
 	GPT fdisk (gdisk) version 1.0.4
@@ -562,14 +577,14 @@
 	sr0     11:0    1   841M  0 rom  /run/archiso/bootmnt
 	<b>[root@sysresccd ~]#</b>
 
-    </code></div>
-    <h4>A swap space</h4>
-    <p>
-      It is always a good idea to have a swap space, either as a swap file or
-      better as a swap partition (not especially a big one, depending on your needs).
-      Follows the creation of a 1&nbsp;GiB swap partition:
-    </p>
-    <div><code>
+      </code>
+      <h4>A swap space</h4>
+      <p>
+	It is always a good idea to have a swap space, either as a swap file or
+	better, as one or several swap partitions (not especially a big one, depending on your needs).
+	Follows the creation of a 1&nbsp;GiB swap partition:
+      </p>
+      <code class=block>
 
 	<b>[root@sysresccd ~]# lsblk -i</b>
 	NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
@@ -636,14 +651,14 @@
 	sr0     11:0    1   841M  0 rom  /run/archiso/bootmnt
 	<b>[root@sysresccd ~]#</b>
 
-    </code></div>
+      </code>
 
-    <h3>Formatting File-systems</h3>
-    <h4>swap partition</h4>
-    <p>
-      In order to be usable we have to format the swap partition:
-    </p>
-    <div><code>
+      <h3>Formatting File-systems</h3>
+      <h4>swap partition</h4>
+      <p>
+	In order to be usable we have to format the swap partition:
+      </p>
+      <code class=block>
 
 	<b>[root@sysresccd ~]# gdisk -l /dev/sda</b>
 	GPT fdisk (gdisk) version 1.0.4
@@ -674,12 +689,12 @@
 	no label, UUID=51f75caa-6cf3-421f-a18a-c58e77f61795
 	<b>[root@sysresccd ~]#</b>
 
-    </code></div>
-    <p>
-      In option we can even use this swap partition right now for the current rescue system, this may be interesting
-      especially if you used a <i>tmpfs</i> file-system as temporary local storage.
-    </p>
-    <div><code>
+      </code>
+      <p>
+	In option we can even use this swap partition right now for the current rescue system, this may be interesting
+	especially if you used a <i>tmpfs</i> file-system as temporary local storage:
+      </p>
+      <code class=block>
 
 	<b>[root@sysresccd ~]# free</b>
 	total        used        free      shared  buff/cache   available
@@ -692,13 +707,13 @@
 	<e>Swap:       1048572           0     1048572</e>
 	<b>[root@sysresccd ~]#</b>
 
-    </code></div>
+      </code>
 
-    <h4>Root file-system</h4>
-    <p>
-      Nothing tricky here:
-    </p>
-    <div><code>
+      <h4>Root file-system</h4>
+      <p>
+	Nothing tricky here:
+      </p>
+      <code class=block>
 
 	<b>[root@sysresccd ~]# gdisk -l /dev/sda</b>
 	GPT fdisk (gdisk) version 1.0.4
@@ -740,11 +755,12 @@
 
 	<b>[root@sysresccd ~]#</b>
 
-    </code></div>
-    <p>
-      We will mount this partition to be able to restore data into it
-    </p>
-    <div><code>
+      </code>
+
+      <p>
+	We will mount this partition to be able to restore data into it:
+      </p>
+      <code class=block>
 
 	<b>[root@sysresccd ~]# mkdir /mnt/R</b>
 	<b>[root@sysresccd ~]# mount /dev/sda2 /mnt/R</b>
@@ -760,19 +776,19 @@
 	sr0     11:0    1   841M  0 rom  /run/archiso/bootmnt
 	<b>[root@sysresccd ~]#</b>
 
-    </code></div>
+      </code>
 
-    <h4>EFI Partition</h4>
-    <p>
-      the EFI partition is a vfat partition that is usually mounted under /boot/efi
-      after the system has booted. So we will
-      format it and mount it there under /mnt/R, where we have now mounted the future root file-system.
-    </p>
-    <p>
-      If you use the legacy MBR booting process in your original system, you just have to skip this
-      EFI partition step: when reinstalling grub, the MBR will be setup as expected.
-    </p>
-    <div><code>
+      <h4>EFI Partition</h4>
+      <p>
+	the EFI partition is a vfat partition that is usually mounted under /boot/efi
+	after the system has booted. So we will
+	format it and mount it there under /mnt/R, where we have temporarily mounted the future root file-system.
+      </p>
+      <p>
+	If you use the legacy MBR booting process in your original system, you just have to skip this
+	EFI partition step: when reinstalling grub, the MBR will be setup as expected.
+      </p>
+      <code class=block>
 
 	<b>[root@sysresccd ~]# mkfs.vfat -n UEFI /dev/sda1</b>
 	mkfs.fat 4.1 (2017-01-24)
@@ -791,14 +807,14 @@
 	sr0     11:0    1   841M  0 rom  /run/archiso/bootmnt
 	<b>[root@sysresccd /mnt/R]#</b>
 
-    </code></div>
+      </code>
 
-    <h3>Restoring data with dar</h3>
-    <p>
-      All is ready to receive the data, so we run <i>dar</i>, here below in the case of a DAS
-      or NAS without (S)FTP protocols:
-    </p>
-    <div><code>
+      <h3>Restoring data with dar</h3>
+      <p>
+	All is ready to receive the data, so we run <i>dar</i>, here below in the case of a DAS
+	or NAS without (S)FTP protocols:
+      </p>
+      <code class=block>
 
 	<b>root@sysresccd ~]# cd /mnt/Backup</b>
 	<b>root@sysresccd /mnt/Backup]# ls -al</b>
@@ -808,7 +824,7 @@
 	-rwxr-xr-x 1 root root 4017928 Oct  4 14:49 dar_static
 	drwx------ 2 root root   16384 Oct  4 13:49 lost+found
 	drwxr-xr-x 2 root root    4096 Oct  4 15:00 soleil-full-2020-09-16
-	<b>[root@sysresccd /mnt/Backup]# ./dar_static -x soleil-full-2020-09-16/soleil-full-2020-09-16 -R /mnt/R -X "lost+found" -w</b>
+	<b>[root@sysresccd /mnt/Backup]# <e>./dar_static -x soleil-full-2020-09-16/soleil-full-2020-09-16 -R /mnt/R -X "lost+found" -w</e></b>
 	Archive soleil-full-2020-09-16 requires a password:
 	Warning, the archive soleil-full-2020-09-16 has been encrypted. A wrong key is not possible to detect, it would cause DAR to report the archive as corrupted
 
@@ -829,11 +845,11 @@
 	--------------------------------------------
 	<b>[root@sysresccd /mnt/Backup]#</b>
 
-    </code></div>
-    <p>
-      For a NAS with SFTP or FTP this is even simpler, though we have to download dar_static first
-    </p>
-    <div><code>
+      </code>
+      <p>
+	For a NAS with SFTP or FTP this is even simpler, though we have to download dar_static first
+      </p>
+      <code class=block>
 
 	<b>[root@sysresccd ~]# scp denis@192.168.6.6:/mnt/Backup/dar_static .</b>
 	The authenticity of host '192.168.6.6 (192.168.6.6)' can't be established.
@@ -842,7 +858,7 @@
 	Warning: Permanently added '192.168.6.6' (ECDSA) to the list of known hosts.
 	denis@192.168.6.6's password:
 	dar_static                                     100% 3924KB  72.7MB/s   00:00
-	<b>[root@sysresccd ~]# ./dar_static -x sftp://denis@192.168.6.6/mnt/Backup/Soleil/soleil-full-2020-09-16/soleil-full-2020-09-16 -R /mnt/R -X "lost+found" -w</b>
+	<b>[root@sysresccd ~]# <e>./dar_static -x sftp://denis@192.168.6.6/mnt/Backup/Soleil/soleil-full-2020-09-16/soleil-full-2020-09-16 -R /mnt/R -X "lost+found" -w</e></b>
 	Please provide the password for login denis at host 192.168.6.6:
 	Archive soleil-full-2020-09-16 requires a password:
 	Warning, the archive soleil-full-2020-09-16 has been encrypted. A wrong key is not possible to detect, it would cause DAR to report the archive as corrupted
@@ -864,44 +880,45 @@
 	--------------------------------------------
 	<b>[root@sysresccd /mnt/Backup]#</b>
 
-    </code></div>
+      </code>
 
-    <h3>Adaptation of the restored data</h3>
-    <p>
-      The UUID of the different filesystem and swap space have been recreated,
-      if the restored /etc/fstab points to file-system
-      based on their UUID we have to adapt it to their new UUID. The
-      <b>blkid</b> let you grab the UUID of file-system we created including
-      the swap partition, so we can edit <b>/mnt/R/etc/fstab</b>
-      (using <b>vi</b> or <b>joe</b> both available from systemrescueCD).
-    </p>
-    <p>
-      If your system is booting by mean of an initramfs, you should also check and eventually
-      edit the restored <b>/mnt/R/etc/initramfs-tools/conf.d/resume</b> with the new
-      UUID of the swap partition.
-    </p>
-    <p>
-      <i>
-	<u>Note:</u> that we can also look for the original UUID and when creating filesystems
-	(formating them) provide the same UUID as the one used on the backed up system for each of them.
-	This implies you have saved the information provided by <b>blkid</b> within the backup.
- 	See -i option of mkfs program to provide the UUID the filesystem should be created with.
-      </i>
-    </p>
-    <p>
-      If, like me, you like none of these editors but prefer <b>emacs</b> for example
-      for its ability to run a shell and copy&past between the shell running <i>blkid</i>
-      and the fstab file you are editing,
-      assuming you have it ready for use in the system under restoration, you can
-      delay this edition to the time we will have chrooted, see below.
-    </p>
-    <p>
-      Note that the root file-system UUID has no importance as we will regenerate
-      the ramdisk and grub configuration file based on its new UUID. However if you
-      have more partitions than the few we had in this example, /mnt/R/etc/fstab
-      should be updated with their new UUID or /dev/ path accordingly
-    </p>
-    <div><code>
+      <h3>Adaptation of the restored data</h3>
+      <p>
+	The UUID of the different filesystem and swap space have been recreated,
+	if the restored /etc/fstab points to file-system
+	based on their UUID we have to adapt it to their new UUID. The
+	<b>blkid</b> let you grab the UUID of file-system we created including
+	the swap partition, so we can edit <b>/mnt/R/etc/fstab</b>
+	(using <b>vi</b> or <b>joe</b> both available from systemrescueCD).
+      </p>
+      <p>
+	If your system is booting by mean of an initramfs, you should also check and eventually
+	edit the restored <b>/mnt/R/etc/initramfs-tools/conf.d/resume</b> with the new
+	UUID of the swap partition.
+      </p>
+      <p>
+	<i>
+	  <u>Note:</u> that we can also look for the original UUID and when creating filesystems
+	  (formating them) provide the same UUID as the one used on the backed up system for each of them.
+	  This implies you have saved the information provided by <b>blkid</b> within the backup.
+ 	  See <code>-i</code> option of mkfs program to provide the UUID the filesystem should be created with.
+	  Both methods are valid, the later does not then require to adapt the restored data.
+	</i>
+      </p>
+      <p>
+	If, like me, you like none of these editors but prefer <b>emacs</b> for example
+	for its ability to run an embedded shell and copy&past between the shell running <i>blkid</i>
+	and the fstab file you are editing,
+	assuming you have it ready for use in the system under restoration, you can
+	delay this edition of <code>fstab</code> to the time we will have chrooted, see below.
+      </p>
+      <p>
+	Note that the <b>root</b> file-system UUID has no importance as we will regenerate
+	the ramdisk and grub configuration file based on its new UUID. However if you
+	have more partitions than the few we had in this example, /mnt/R/etc/fstab
+	should be updated with their new UUID or /dev/ path accordingly
+      </p>
+      <code class=block>
 
 	<b>[root@sysresccd ~]# blkid</b>
 	/dev/sda1: SEC_TYPE="msdos" LABEL_FATBOOT="UEFI" LABEL="UEFI" <e>UUID="CB52-4920"</e> TYPE="vfat" PARTLABEL="<e>EFI System</e>" PARTUUID="edb894df-e58f-4590-a167-bf5b9025a691"
@@ -913,14 +930,17 @@
 	<b>[root@sysresccd ~]# vi /mnt/R/etc/fstab </b>
 	<b>[root@sysresccd ~]# vi /mnt/R/etc/initramfs-tools/conf.d/resume </b>
 
-    </code></div>
-    <p>
-      We will have to reinstall the boot loader (grub in our case). To achieve this goal
-      we will <b>chroot</b> into /mnt/R, but
-      first we need to access the /dev /proc and /sys and if using UEFI boot, the
-      /sys/firmware/efi/efivars file-system from within the chrooted environment:
-    </p>
-    <div><code>
+      </code>
+
+      <p>
+	Let's now reinstall the boot loader (grub in our case). To achieve this goal
+	we will <b>chroot</b> into <code>/mnt/R</code>, but as in this chrooted environement
+	we will also need to access the <code>/dev</code> <code>/proc</code> and
+	<code>/sys</code> and if using UEFI boot, the
+	<code>/sys/firmware/efi/efivars</code> file-system we will <code>bind-mount</code>
+	those inside <code>/mnt/R</code>:
+      </p>
+      <code class=block>
 
 	<b>[root@sysresccd ~]# mount</b>
 	<e>proc on /proc type proc (rw,nosuid,nodev,noexec,relatime)</e>
@@ -968,12 +988,13 @@
 	<b>[root@sysresccd /mnt/R]# chroot . /bin/bash</b>
 	<b>root@sysresccd:/#</b>
 
-    </code></div>
-    <p>
-      If not done previously you can now edit /etc/fstab with your favorite text editor available in the system under restoration.
-      Then we can reinstall grub and rebuild the initram (if used), and exit the chrooted environment.
-    </p>
-    <div><code>
+      </code>
+      <p>
+	If not done previously you can now edit <code>/etc/fstab</code> with your favorite text editor available in the system under restoration.
+	Then we can reinstall grub and rebuild the initram (if used), and exit the chrooted environment.
+      </p>
+
+      <code class=block>
 
 	<b>root@sysresccd:/# export PATH=/sbin:/usr/sbin:/bin:$PATH</b>
 	<b>root@sysresccd:/# update-grub</b>
@@ -992,56 +1013,61 @@
 	exit
 	<b>[root@sysresccd /mnt/R]#</b>
 
-    </code></div>
-    <h3>Checking the motherboard when rebooting</h3>
-    <p>
-      You can restart the host and remove the systemrescueCD boot device to be sure the hard disk
-      we restored will be used for booting. At the first boot, make a halt in the "BIOS" (Press F2
-      or "Del" key depending on the hardware) to check that the motherboard points to the correct
-      binary inside the EFI partition of the hard disk, or if using MBR booting process, that the
-      hard disk is in a correct place of boot device list.
-      <div><code>
+      </code>
 
-	  <b>root@sysresccd /mnt/R]# shutdown -r now</b>
+      <h3>Checking the motherboard when rebooting</h3>
+      <p>
+	You can restart the host and remove the systemrescueCD boot device to be sure the hard disk
+	we restored will be used for booting. At the first boot, make a halt in the "BIOS" (Press F2
+	"F9" or "Del" key depending on the hardware) to check that the motherboard points to the correct
+	binary inside the EFI partition of the hard disk, or if using MBR booting process instead, check
+	that the hard disk is in a correct place of boot device list.
+      </p>
 
-      </code></div>
-    </p>
-    <h3>Networking Interfaces</h3>
-    <p>
-      Now that the system is back running, the network interface name may have changed
-      depending on the nature of the hardware. You may have to edit <b>/etc/network/interfaces</b>
-      or equivalent configuration file (/etc/sysconfig/network-scripts/...) if not using
-      automatic tools like network-manager and DHCP protocol for example.
-    </p>
-    <center>
-      <b>
-      THIS ENDS THE RESTORATION PROCESS. WE WILL NOW SEE SOME VARIATIONS OF THIS PROCESS FOR
-      SOME MORE SPECIFIC CONTEXTS.
-      </b>
-    </center>
-    <hr/>
-    <br/>
-    <br/>
-    <br/>
-    <h2>Restoring to LVM volumes</h2>
-    <p>
-      You might prefer especially when using <a href="https://www.proxmox.com/en/proxmox-ve">Proxmox Virtual Environment</a> to restore
-      to an LVM file-system, having a Logical Volume for the root file-system (the proxmox
-      system) and its swap partition and allocating the rest of the space to a thin-pool
-      for VM to have their block storage.
-    </p>
-    <p>
-      Note that if you save the proxmox VE as a a normal Debian system, this is fine, but
-      this will not save the VM and containers you had running under <i>Proxmox</i>. However you can save the
-      <b>/var/lib/vz/dump</b> directory where resides the backups of your VM. This assumes
-      you have scheduled a backup process within proxmox VE for these VMs and containers.
-    </p>
-    <h3>Creating partitions and Logical Volumes</h3>
-    <p>
-      Compared to the previous restoration steps, what changes is that you will create only
-      two partitions, the EFI partition and a LVM partition:
-    </p>
-    <div><code>
+      <code class=block>
+
+	<b>root@sysresccd /mnt/R]# shutdown -r now</b>
+
+      </code>
+
+      <h3>Networking Interfaces</h3>
+      <p>
+	Now that the system is back running, the network interface name may have changed
+	depending on the nature of the hardware. You may have to edit <b>/etc/network/interfaces</b>
+	or equivalent configuration file (/etc/sysconfig/network-scripts/...) if not using
+	automatic tools like network-manager and DHCP protocol for example.
+      </p>
+      <br>
+      <br>
+      <center>
+	<b>
+	  THIS ENDS THE RESTORATION PROCESS. WE WILL NOW SEE SOME VARIATIONS OF THIS PROCESS FOR
+	  SOME MORE SPECIFIC CONTEXTS.
+	</b>
+      </center>
+      <hr/>
+      <br/>
+      <br/>
+      <br/>
+      <h2><a name="lvm">Restoring to LVM volumes</a></h2>
+      <p>
+	You might prefer especially when using <a href="https://www.proxmox.com/en/proxmox-ve">Proxmox Virtual Environment</a> to restore
+	to an LVM file-system, having a Logical Volume for the root file-system (the proxmox
+	system) and its swap partition and allocating the rest of the space to a thin-pool
+	for VM to have their block storage.
+      </p>
+      <p>
+	Note that if you save the proxmox VE as a a normal Debian system, this is fine, but
+	this will not save the VM and containers you had running under <i>Proxmox</i>. However you can save the
+	<b>/var/lib/vz/dump</b> directory where resides the backups of your VM. This assumes
+	you have scheduled a backup process within proxmox VE for these VMs and containers.
+      </p>
+      <h3>Creating partitions and Logical Volumes</h3>
+      <p>
+	Compared to the previous restoration steps, what changes is that you will create only
+	two partitions, the EFI partition and a LVM partition:
+      </p>
+      <code class=block>
 
 	<b>[root@sysresccd ~]# gdisk /dev/sda</b>
 	GPT fdisk (gdisk) version 1.0.4
@@ -1106,23 +1132,24 @@
 
 	<b>[root@sysresccd ~]#</b>
 
-    </code></div>
-    <h3>formatting the partitions and volumes</h3>
-    <p>
-      The formatting of the EFI partition has been seen, so we will not detail
-      it here, but it must be done now, in order for the following steps to succeed.
-    </p>
-    <p>
-      Remains the LVM related stuff to setup:
-    </p>
-    <ul>
-      <li>Physical Volume</li>
-      <li>Virtual Groups </li>
-      <li>Logical Volume (which corresponds to the partitions we created in the
-	non LVM context)</li>
-      <li>format these volumes as we did for partitions</li>
-    </ul>
-    <div><code>
+      </code>
+
+      <h3>formatting the partitions and volumes</h3>
+      <p>
+	The formatting of the <i>EFI</i> partition has been seen, so we will not detail
+	it here, but it must be done now, in order for the following steps to succeed.
+      </p>
+      <p>
+	Remains the LVM related stuff to setup:
+      </p>
+      <ul>
+	<li>Physical Volume</li>
+	<li>Virtual Groups </li>
+	<li>Logical Volume (which corresponds to the partitions we created in the
+	  non LVM context)</li>
+	<li>format these volumes as we did for partitions</li>
+      </ul>
+      <code class=block>
 
 	<b>[root@sysresccd ~]# lsblk -i</b>
 	NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
@@ -1160,12 +1187,12 @@
 
 	<b>[root@sysresccd ~]#</b>
 
-    </code></div>
-    <p>
-      Now that all partitions are created as previously, we can mount them
-      to get ready for dar restoration:
-    </p>
-    <div><code>
+      </code>
+      <p>
+	Now that all partitions are created as previously, we can mount them
+	to get ready for dar restoration:
+      </p>
+      <code class=block>
 
 	<b>[root@sysresccd ~]# cd /mnt</b>
 	<b>[root@sysresccd /mnt]# mkdir R</b>
@@ -1186,25 +1213,29 @@
 	sr0                11:0    1   841M  0 rom  /run/archiso/bootmnt
 	<b>[root@sysresccd /mnt/R]#</b>
 
-    </code></div>
-    <h3>Restoring the data with dar</h3>
-    <p>
-      By default in proxmox the /var/liv/vz is in the root filesystem.
-      we could restore as described above, but we will make differently here,
-      by creating a thing-pool and using a thin volume inside it for /var/lib/vz
-      in order to not saturate the proxmox system with backups while not
-      dedicating a whole partition for it, but sharing this space with VM volumes.
-    </p>
-    <h3>Creating a thin-pool</h3>
-    <p>
-      Creating a thin pool is done in three steps.
-      <ul>
-	<li>create a small Logical Volume for metadata</li>
-	<li>create a large Logical Volume for data</li>
-	<li>convert both Volumes as a thin-pool</li>
-      </ul>
-    </p>
-    <div><code>
+      </code>
+
+
+      <h3>Restoring the data with dar</h3>
+      <p>
+	By default in proxmox the <code>/var/liv/vz</code> is in the root filesystem.
+	we could restore as described above, but it may also be interesting to do else:
+	by creating a <b>thin-pool</b> and using a <b>thin-volume</b> inside it for
+	<code>/var/lib/vz</code>
+	in order to not saturate the proxmox system with backups while not
+	dedicating a whole partition for it, but sharing this space with VM volumes.
+      </p>
+
+      <h3>Creating a thin-pool</h3>
+      <p>
+	Creating a thin pool is done in three steps.
+	<ul>
+	  <li>create a small Logical Volume for metadata</li>
+	  <li>create a large Logical Volume for data</li>
+	  <li>convert both Volumes as a thin-pool</li>
+	</ul>
+      </p>
+      <code class=block>
 
 	<b>[root@sysresccd /mnt/R]# lvcreate -n metadata -L 300M soleil</b>
 	<e>Logical volume</e> "metadata" created.
@@ -1233,16 +1264,17 @@
 	sr0                        11:0    1   841M  0 rom  /run/archiso/bootmnt
 	<b>[root@sysresccd /mnt/R]#</b>
 
-    </code></div>
-    <h3>Using the thin-pool for /var/lib/vz</h3>
-    <p>
-      The thin-pool is created we can thus now use it to store a
-      <b>Virtual Logical Volume</b>, in other words a volume that consumes of the thin-pool data only what
-      it really needs and thus shares its free space with other thin volumes of the this
-      thin-pool (see also <b>discard</b> directive while mounting file-systems or the <b>fstrim</b>
-      system command).
-    </p>
-    <div><code>
+      </code>
+
+      <h3>Using the thin-pool for /var/lib/vz</h3>
+      <p>
+	The thin-pool is created we can thus now use it to create a
+	<b>Virtual Logical Volume</b>, in other words a volume that consumes of the thin-pool data only what
+	it really needs, sharing its free space with other thin volumes of the this
+	thin-pool (see also <b>discard</b> directive while mounting file-systems or the <b>fstrim</b>
+	system command).
+      </p>
+      <code class=block>
 
 	<b>[root@sysresccd /mnt/R]# lvcreate -n vz -V 20G --thinpool pooldata soleil</b>
 	<e>Logical volume</e> "vz" created.
@@ -1260,7 +1292,7 @@
 	Creating journal (32768 blocks): done
 	Writing superblocks and filesystem accounting information: done
 
-	<b>[root@sysresccd /mnt/R]# mkdir -p var/lib/vz</b>
+	<b>[root@sysresccd <e>/mnt/R</e>]# mkdir -p var/lib/vz</b>
 	[root@sysresccd /mnt/R]# mount /dev/mapper/soleil-vz var/lib/vz
 	<b>[root@sysresccd /mnt/R]# lsblk -i</b>
 	NAME                        MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
@@ -1283,70 +1315,81 @@
 	sr0                          11:0    1   841M  0 rom  /run/archiso/bootmnt
 	<b>[root@sysresccd /mnt/R]#</b>
 
-    </code></div>
-    <p>
-      Now we can restore using <b>dar</b> as we did above without LVM. The VM backup will go into the
-      thin volume and the rest of the proxmox system will be preserved in its logical
-      volume from the activity of the VM and their backups.
-    </p>
-    <p>
-      Once dar has completed you will have to adapt /mnt/R/etc/fstab for both UUID
-      if they were used, and /dev/sdX that may become /dev/mapper/&lt;vgname&gt;-&lt;volume-name&gt;,
-      if moving several partitions to LVM volumes.
-      Here we will also have to add a new line here for /var/lib/vz to be mounted at
-      system startup:
-    </p>
-    <div><code>
+      </code>
+      <p>
+	Now we can restore using <b>dar</b> the same as we did above without LVM. The VM backup will go into the
+	<i>thin-volume</i> and the rest of the proxmox system will be preserved in its logical
+	volume from the activity of the VM and their backups, while the content of the EFI partition will be also
+	restored.
+      </p>
 
-	<b>[root@sysresccd /mnt/R]# echo "/dev/mapper/soleil-vz /var/lib/vz ext4 default 0 2" >> /mnt/R/etc/fstab</b>
+      <code class=block>
+	<b>[root@sysresccd /mnt/R]# cd /mnt/Backup</b>
+	<b>[root@sysresccd /mnt/Backup]# <e>./dar_static -x soleil-full-2020-09-16/soleil-full-2020-09-16 -R /mnt/R -X "lost+found" -w</e></b>
+	<i>[...]</i>
+      </code>
 
-    </code></div>
-    <p>
-      The end of the process is the same as above, by chrooting and reinstalling grub.
-    </p>
+      <p>
+	Once dar has completed, you will have to adapt <code>/mnt/R/etc/fstab</code> for both UUID
+	if they were used, and <code>/dev/sdX</code> that may become <code>/dev/mapper/&lt;vgname&gt;-&lt;volume-name&gt;</code>,
+	if moving several partitions to LVM volumes or changing VG and LVM names.
+	Here as we split the content of <code>/var/lib/vz</code> to a dedicated thin-volume, we will have
+	to add a new line in <code>fstab</code> for this volume to be mounted at
+	system startup time:
+      </p>
+      <code class=block>
 
-    <h2>Proxmox Specific</h2>
-    <p>
-      As we did not saved nor restored the block devices of VM but just have their backup restored in /var/lib/vz/dump
-      we need to remove the VM referred in the proxmox database (but which do not exist anymore) and restore them from their backup
-    </p>
-    <div><code>
+	<b>[root@sysresccd /mnt/R]# echo <e>"/dev/mapper/soleil-vz /var/lib/vz ext4 default 0 2"</e> &gt;&gt; /mnt/R/etc/fstab</b>
+
+      </code>
+      <p>
+	The end of the process is the same as above, by chrooting and reinstalling grub.
+      </p>
+
+      <h2><a name="proxmox">Proxmox Specific</a></h2>
+      <p>
+	As we did not saved nor restored the block devices of VM (the thin-pool) but just have their backup restored in /var/lib/vz/dump
+	we need to remove the VM referred in the proxmox database (which do not exist anymore) and restore them from their backups
+      </p>
+      <code class=block>
 
 	<b>root@soleil:~# for vm in `qm list | sed -rn 's/\s+([0-9]+).*/\1/p'` ; do qm set $vm --protect no ; qm destroy $vm ; done</b>
 	...
 	<b>root@soleil:~# qm list</b>
 	<b>root@soleil:~#</b>
 
-    </code></div>
-    <p>
-      Now from the proxmox GUI you can restore all the VM and containers from their Backups. If not using LVM but Ceph or other shared
-      and distributed file-system, this task vanishes as the block storage of VM is still present in the distributed storage cluster.
-      How now to add the local storage to this Ceph cluster is out of the scope of this document.
-    </p>
+      </code>
+      <p>
+	Now from the proxmox GUI you can restore all the VM and containers from their Backups. If not using LVM but Ceph or other shared
+	and distributed file-system, this task vanishes as the block storage of VM is still present in the distributed storage cluster.
+	How now to add the local storage to this Ceph cluster is out of the scope of this document.
+      </p>
 
-    <h2>Restoring to a LUKS ciphered disk</h2>
-    <p>
-      When restoring with dar, you may take the opportunity to restore to a ciphered disk, even if the original system was not.
-      You may also have backed up a ciphered system so we end to the same point we will have to restore the system into a ciphered disk.
-    <p>
-      For simplicity we will restore an LVM inside a ciphered system, but the exercice is pretty similar to restore an LVM and have
-      some Logical Volume being LUKS ciphered "devices". The advantage of LVM inside LUKS is simplicity, the advantage of LUKS inside
-      LVM is performance when you do not want to have all volumes ciphered (for example a /var/spool/proxy which holds public data, does not worth
-      ciphering).
-    </p>
-    <p>
-      As seen previously, the EFI partition cannot be part of an LVM, it cannot thus be neither ciphered as to read a cipher volume, the kernel must
-      be loaded and running. The second consequence is that the kernel and the mandatory initramfs must not reside in a ciphered partition. If LUKS can
-      prevent your data from be exposed to a thief, however if someone has a physical access to your computer and if this later one is not running
-      24/7, LUKS alone cannot prevent one to modify the kernel and ramdisk image used to boot, introducing some keylogger or other spying
-      tool that will catch the secret key you need to enter at boot time and uncipher your LUKS disk. This is the role of the secure boot process,
-      which we will not describe here today (maybe in a future revision of this document) to detect and prevent such type of attack.
-    </p>
-    <p>
-      So we have to create an EFI partition, an unciphered <b>boot</b> partition and an partition that will be ciphered and which will contain
-      the LVM (root, home, swap space for example). With the same commands we usd above, here is what partitionning we should get:
-    </p>
-    <div><code>
+
+      <h2><a name="luks">Restoring a LUKS ciphered disk</a></h2>
+      <p>
+	When restoring with dar, you may take the opportunity to restore to a ciphered disk, even if the original system was not.
+	You may also have backed up a ciphered system so we end to the same point we will have to restore the system into a ciphered disk.
+      </p>
+      <p>
+	For simplicity we will restore an LVM inside a ciphered system, but the exercice is pretty similar to restore an LVM and have
+	some Logical Volume being LUKS ciphered "devices". The advantage of LVM inside LUKS is simplicity, the advantage of LUKS inside
+	LVM is performance when you do not want to have all volumes ciphered (for example a <code>/var/spool/proxy</code> which holds
+	public data, the content of a public ftp server, and so on, do not worth ciphering).
+      </p>
+      <p>
+	As seen previously, the EFI partition cannot be part of an LVM, it cannot be neither ciphered as to read a ciphered volume, the kernel must
+	be loaded and running. The second consequence is that the kernel and the mandatory initramfs must not reside in a ciphered partition. If LUKS can
+	prevent your data from be exposed to a thief, however if someone has a physical access to your computer and if this later one is not running
+	24/7, LUKS alone cannot prevent one to modify the kernel and ramdisk image used to boot, introducing some keylogger or other spying
+	tool that will catch the secret key you need to enter at boot time in order to uncipher your LUKS disk. This is the role of the secure boot process,
+	which we will not describe here today (maybe in a future revision of this document) to detect and prevent such type of attack.
+      </p>
+      <p>
+	So we have to create an EFI partition, an unciphered <b>boot</b> partition and an partition that will be ciphered and which will contain
+	the LVM (root, home, swap space for example). With the same commands we used above, here is what partitionning we should get:
+      </p>
+      <code class=block>
 
 	<b>root@sysresccd ~]# gdisk /dev/sda</b>
 	GPT fdisk (gdisk) version 1.0.4
@@ -1378,13 +1421,14 @@
 	Command (? for help): q
 	<b>[root@sysresccd ~]#</b>
 
-    </code></div>
-    <p>
-      We will format the EFI partition the same way we did above, format the Linux boot with an ext4 filesystem as we also did above.
-      What is new is the LUKS Device we have first to initialize as a LUKS volume. The volume contains some metadata (ciphered keys, token,...)
-      that have to be created first:
-    </p>
-    <code><div>
+      </code>
+      <p>
+	We will format the EFI partition the same way we did above, format the Linux boot with an ext4 filesystem as we also did above.
+	What is new here is the <b>LUKS Device</b> we have first to initialize as a <b>LUKS volume</b>.
+	The volume contains some metadata (ciphered keys, token,...)
+	that have to be created first (and only once):
+      </p>
+      <code class=block>
 	<b>[root@sysresccd ~]# <e>cryptsetup luksFormat /dev/sda3</e></b>
 
 	WARNING!
@@ -1396,14 +1440,14 @@
 	<e>Verify passphrase:</e>
 	<b>[root@sysresccd ~]#</b>
 
-    </div></code>
-    <p>
-      of course if you forget the provided passphrase, you will lose all data stored in that volume. Note that this key can be changed
-      without having to rebuild or recipher the whole volume, we will see that further. Now we can <i>open</i> the volume, which mean
-      have the Linux kernel aware of the master key and able to cipher/uncipher data written to or read from this device:
-    </p>
+      </code>
+      <p>
+	of course if you forget the provided passphrase, you will lose all data stored in that volume. Note that this key can be changed
+	without having to rebuild or recipher the whole volume, we will see that further. Now we can <i>open</i> the volume, which mean
+	have the Linux kernel aware of the master key and able to cipher/uncipher data written to or read from this device:
+      </p>
 
-    <code><div>
+      <code class=block>
 	<b>[root@sysresccd ~]# lsblk -i</b>
 	NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
 	loop0    7:0    0 788.8M  1 loop /run/archiso/sfs/airootfs
@@ -1412,7 +1456,7 @@
 	|-sda2   8:2    0   244M  0 part
 	<e>`-sda3   8:3    0  31.3G  0 part</e>
 	sr0     11:0    1   841M  0 rom  /run/archiso/bootmnt
-	<b>[root@sysresccd ~]# cryptsetup open /dev/sdb1 crypted_part</b>
+	<b>[root@sysresccd ~]# cryptsetup open /dev/sdb1 <e>crypted_part</e></b>
 	<e>Enter passphrase for /dev/sda3:</e>
 	<b>[root@sysresccd ~]# lsblk -i</b>
 	NAME             MAJ:MIN RM   SIZE RO TYPE  MOUNTPOINT
@@ -1421,17 +1465,16 @@
 	|-sda1             8:1    0   512M  0 part
 	|-sda2             8:2    0   244M  0 part
 	`-sda3             8:3    0  31.3G  0 part
- 	<e> `-crypted_part  254:0    0    32G  0 crypt</e>
+	<e> `-crypted_part  254:0    0    32G  0 crypt</e>
 	sr0               11:0    1   841M  0 rom   /run/archiso/bootmnt
 	<b>[root@sysresccd ~]#</b>
+      </code>
 
-    </div></code>
+      <p>
+	The rest is straight forward, we have now a <code>/dev/mapper/crypted_part</code> we can use as Physical Volume for LVM
+      </p>
 
-    <p>
-      The rest is straight forward, we have now a /dev/mapper/crypted_part we can use as Physical Volume for LVM
-    </p>
-
-    <code><div>
+      <code class=block>
 	<b>[root@sysresccd ~]# pvcreate /dev/mapper/crypted_part</b>
 	Physical volume "/dev/mapper/crypted_part" successfully created.
 	<b>[root@sysresccd ~]# vgcreate vgname /dev/mapper/crypted_part</b>
@@ -1461,60 +1504,63 @@
 	sr0                11:0    1   841M  0 rom   /run/archiso/bootmnt
 	<b>[root@sysresccd ~]#</b>
 
-    </div></code>
+      </code>
 
-    <p>
-      The following steps are almost identical to what we did earlier:
-    </p>
-    <ul>
-      <li>format the LVM with the filesystem of your choice, and use <b>mkswap</b> for the swap volume</li>
-      <li>mount <b>/dev/mapper/vgname-root</b> to /mnt/R directory</li>
-      <li>mount <b>/dev/sda2</b> to /mnt/R/boot</li>
-      <li>mount <b>/dev/sda1</b> to /mnt/R/boot/efi</li>
-      <li>mount <b>/dev/mapper/vgname-home</b> to /mnt/R/home</li>
-      <li>restore the data with <b>dar -R /mnt/R ....</b> as we did above</li>
-      <li>
-	edit <b>/mnt/R/etc/fstab</b> and <b>/mnt/R/etc/initramfs-tools/conf.d/resume</b> with the UUID
-	of the filesystem we created (get them using <b>blkid</b>)
-      </li>
-      <li>edit or create the /mnt/R/etc/crypttab file, we will zoom on that now:</li>
-    </ul>
+      <p>
+	The following steps are almost identical to what we did earlier:
+      </p>
+      <ul>
+	<li>format the LVM with the filesystem of your choice, and use <b>mkswap</b> for the swap volume</li>
+	<li>mount <b>/dev/mapper/vgname-root</b> to /mnt/R directory</li>
+	<li>mount <b>/dev/sda2</b> to /mnt/R/boot</li>
+	<li>mount <b>/dev/sda1</b> to /mnt/R/boot/efi</li>
+	<li>mount <b>/dev/mapper/vgname-home</b> to /mnt/R/home</li>
+	<li>restore the data with <b>dar -R /mnt/R ....</b> as we did above</li>
+	<li>
+	  edit <b>/mnt/R/etc/fstab</b> and <b>/mnt/R/etc/initramfs-tools/conf.d/resume</b> with the UUID
+	  of the filesystem we created (get them using <b>blkid</b>)
+	</li>
+	<li>and <e>edit or create the <code>/mnt/R/etc/crypttab</code> file</e>, we will zoom on that now:</li>
+      </ul>
 
-    <p>
-      In a linux system, the /etc/crypttab is read at startup (from the initramfs) to know
-      which volume should be "open" (<i>cryptsetup open <device></i> as we did above). This
-      will lead the system to ask the passphrase to access the ciphered volume. It contains
-      on each line 4 fields separated by space:
-    </p>
-    <ul>
-      <li>the name we will use for the unciphered volume (here we used crypted_part)</li>
-      <li>the UUID of the LUKS volume (here the UUID of /dev/sda3)</li>
-      <li>the passphrase, for root device we must use "none" for you get prompted for it</li>
-      <li>some flags, we will use "luks,discard" here (see crypttab man page for more).</li>
-    </ul>
+      <p>
+	In a linux system, the <code>/etc/crypttab</code> is read at startup (from the initramfs) to know
+	which volume should be "open" (<code>cryptsetup open <device></code> as we did above manually).
+	This will lead the system to ask the passphrase to access the ciphered volume.
+      </p>
+      <p>
+	The <code>/etc/crypttab</code> is structured per line and each one
+	contains 4 fields separated by space:
+      </p>
+      <ul>
+	<li>the <b>name</b> we will use for the unciphered volume (above we used <code>crypted_part</code>)</li>
+	<li>the <b>UUID</b> of the LUKS volume (here the UUID of <code>/dev/sda3</code>, retrievable using <code>blkid</code>)</li>
+	<li>the <b>passphrase</b>. For the root device we must use "none" for you get prompted for it</li>
+	<li>some <b>flags</b>, we will use "luks,discard" here (see crypttab man page for more).</li>
+      </ul>
 
-    <code><div>
-	<b>[root@sysresccd /mnt/R/etc]#</b> echo "crypted_part UUID=4d76e357-f136-4f7e-addc-030436f37682 none luks,discard" > /tmp/R/etc/crypttab
+      <code class=block>
+	<b>[root@sysresccd /mnt/R/etc]#</b> echo <e>"crypted_part UUID=4d76e357-f136-4f7e-addc-030436f37682 none luks,discard"</e> > /tmp/R/etc/crypttab
 	<b>[root@sysresccd /mnt/R/etc]#</b>
-    </div></code>
+      </code>
 
-    <p>
-      the rest is exactly the same as we did
-    </p>
+      <p>
+	the rest is exactly the same as we did:
+      </p>
 
-    <ul>
-      <li>resinstall grub using <b>update-grub</b> and <b>grub_install</b></li>
-      <li>regenerate the initramfs using <b>update-initramfs -u</b></li>
-    </ul>
+      <ul>
+	<li>resinstall grub using <b>update-grub</b> and <b>grub_install</b></li>
+	<li>regenerate the initramfs using <b>update-initramfs -u</b></li>
+      </ul>
 
-    <p>
-      Last, before rebooting you may want to close all that properly, there
-      is a pitfall about LVM on LUKS you have to be aware. To close the LUKS
-      volume the LVM must be disabled inside it else as the LUKS is busy by
-      LVM you won't be able to close it:
-    </p>
+      <p>
+	Last, before rebooting you may want to close all that properly, there
+	is a pitfall about LVM on LUKS you have to be aware. To close the LUKS
+	volume the LVM must be disabled inside it, else as the LUKS is busy by
+	LVM you won't be able to close it:
+      </p>
 
-    <code><div>
+      <code class=block>
 	<b>root@sysresccd:~# exit</b>    <u><i>exiting the chroot environment</i></u>
 	exit
 	<b>[root@sysresccd /mnt/R]#</b>
@@ -1543,12 +1589,7 @@
 	sr0     11:0    1   841M  0 rom  /run/archiso/bootmnt
 	<b>[root@sysresccd ~]# shutdown -r now</b>
 
-    </div></code>
-
-    <br/>
-    <br/>
-    <br/>
-    <br/>
-    <br/>
+      </code>
+    </div>
   </body>
 </html>
