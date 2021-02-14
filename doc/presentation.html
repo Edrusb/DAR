@@ -10,7 +10,7 @@
 
     <div class=top>
       <img alt="Dar Documentation" src="dar_s_doc.jpg" style="float:left;">
-      <h1>PRESENTATION</h1>
+      <h1>Dar Presentation</h1>
     </div>
 
     <h2>General Presentation</h2>
@@ -151,16 +151,24 @@
 
     <dl>
       <dt class=void>Backing up all the <code>/usr</code> directory:</dt><dd>
-	<code>dar -c my_backup -R / -g usr</code>
+	<code class=block>
+	  dar --create my_backup --fs-root / --go-into usr
+	</code>
       </dd>
       <dt class=void>Restoration (restoring <code>/usr</code> in a alternate directory):</dt><dd>
-	<code> dar -x my_backup -R /some/where/else</code>
+	<code class=block>
+	  dar --extract my_backup --fs-root /some/where/else
+	</code>
       </dd>
       <dt class=void>Testing backup sanity:</dt><dd>
-	<code>dar -t my_backup</code>
+	<code class=block>
+	  dar --test my_backup
+	</code>
       </dd>
       <dt class=void>Comparing a backup content with the existing filesystem:</dt><dd>
-	<code>dar -d my_backup -R /</code>
+	<code class=block>
+	  dar --diff my_backup --fs-root /
+	</code>
       </dd>
     </dl>
 
