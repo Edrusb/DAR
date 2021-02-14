@@ -42,7 +42,7 @@
       <p>
 	Restoration is usually the most tricky part of a backup process. The <i>backup process</i> designs the whole
 	process of creating backups, storing them in a secured place, protecting backup data against unauthorized access,
-	against corruption over time, rebuilding a whole system from scratch upon major failure,system corruption,security breach,...
+	against corruption over time, rebuilding a whole system from scratch upon major failure, system corruption, security breach,...
 	It may concern a single system (a host with its operating system, applications, configurations, user data),
 	a set of systems independent systems, but also "recursive systems" like an hypervisors and their many virtual possible machines.
 	(we will illustrate that later case also in this document).
@@ -50,15 +50,17 @@
       <p>
 	The second purpose of a <i>backup process</i> is to provide file history, in order to be able to restore a file
 	deleted by mistake (even long after the mistake was made), corrupted, or to get back this file(s) in the state
-	it has in a for a previous application version.
+	it had for a previous application version, which succeed when a software upgrade brakes a legacy feature you need
+	more than the new features.
       </p>
       <p>
 	But there is not a single backup process that matches the need of all. For example, syncing your local <b>data</b> in the cloud
-	is easy and may be suitable for personal use (well...). But as it also exposes all your data, values, proprietary software, patents,
+	is easy and may be suitable for personal use (well, depending on your privacy level of consideration...). But as it also exposes all your data, values, proprietary software, patents,
 	to the eye of the cloud provider, it may thus not be suitable for companies having production secrets, secret recipes that
 	constitute the source of their revenue. It may neither be suitable for a individual fighting for human
 	rights and for freedom in a country where these natural rights are banished. And last, it does not let you
-	rebuild your whole system: you will have to reinstall all applications and configurations you had done, as well
+	rebuild your whole system: Saving only your documents will have allow you to reinstall all applications
+	and their particular configurations you had adapted to your needs over time, as well
 	as eventually finding or rebuying the license keys to active the proprietary software you were using.
       </p>
       <p>
@@ -91,7 +93,8 @@
       <p>
 	<b>The drawbacks</b> are that you will have to manually recreate the disk partitions and format the file-system as you want,
 	in order to restore files into them. The objective of this document is thus to explain how to do that and let you see that this task
-	is not complex and brings a lot of freedom.
+	is not complex and brings a lot of freedom. In the <b>second part of this document</b>, the <i>variation</i> will let you see what
+	changes when considering LVM, LUKS and a <i>Proxmox VE</i> hypervisor.
       </p>
       <h2><a name="backup">Backup creation</a></h2>
       <h3>What to backup</h3>
@@ -107,7 +110,7 @@
       </p>
       <p>
 	Here is an example of configuration used on a <i>Proxmox</i> system (Debian based kvm hypervisor). For more details refer to the
-	man page, but in summary here is the options unsed and their meaning:
+	man page, but in summary here is the options used and their meaning:
       </p>
       <dl>
 	<dt class=void>-R option</dt><dd>
@@ -148,6 +151,10 @@
 	<dt class=void>-=</dt><dd>
 	  execute the provided command when saving a directory or file referred by -&lt; option</dd>
       </dl>
+      <p>
+	As the <b>backup</b> part of the process is recurrent, it is suitable to drop all these options in a configuration file
+	(here <i>/root/.darrc</i> for those option to be used by default):
+      </p>
       <code class=block>
 
 	root@soleil:~# cat .darrc
@@ -209,32 +216,32 @@
 	(in your head for a passphrase, or in a unciphered removable media for a private
 	key, for example).
 	<br/><br/>
-	The interest of ciphering backups is necessary when using a public cloud provider to store them,
-	or when your system itslef is stored on ciphered volumes (LUKS for example).
+	Ciphering backups becomes necessary when using a public cloud provider to store them,
+	or by coherence, when your system itslef is stored on ciphered volumes (LUKS for example).
       </p>
       <h3>Direct Attached Storage (DAS)</h3>
       <p>
 	For direct attached storage (DAS), like local disk, key, or legacy DVDs, there is no difficulties. You will
 	probably want to adapt the <code>-s/-S options</code> to a divisor of the media size, eventually adding parity data
-	for when low end media are used.
+	for when low end media are used. (just add the word <code>par2</code> on command-line or in <i>.darrc</i>)
       </p>
       <h3>Network Attached Storage (NAS)</h3>
       <p>
 	Of course a network access need to be setup before being able to restore your data. The rescue system must also support
 	one of the network protocols available with your NAS to access your backups. For protocols other than FTP and SFTP,
 	a temporary local storage may be needed and thus slicing dar backups (see <code>-s</code> option) will be very useful to be able
-	to perform a restoration without consuming a lot of disk. In addition you can automate the downloading of slices
-	from dar by mean of <code>-E</code> option. But, when using FTP or SFTP instead dar can read
-	the backup directly from the NAS and thus absolutely no local temporary storage is required for restoration.
+	to perform a restoration without requiring an very large temporary local disk. In addition you can automate the downloading of slices
+	from dar by mean of <code>-E</code> option. But, when using FTP or SFTP, <i>dar</i> can read
+	the backup directly from the NAS and thus absolutely no local temporary storage is required for restoration in that case.
       </p>
       <h3>Partitions</h3>
       <p>
 	Dar is partitions independent so we will have to recreate them before restoration starts: At no time you have to recreate
 	the exactly same layout of partitions: if you know some partitions were nearly saturated or oversized, you can take the
-	opportunity to review the partition sizes, or even reconsider a completely different
+	opportunity of the restoration to review the partition sizes, or even reconsider a completely different
 	partition/disk layout (for example, splitting <code>/var</code> from <code>/</code>
 	in a separated partition for example, or putting some partitions together if
-	it makes better sense).
+	it makes better sense), or go to encrypted LUKS disks, LVM, and so on.
       </p>
       <h3>UEFI Boot</h3>
       <p>
@@ -245,7 +252,8 @@
       </p>
       <h3>Legacy MBR boot</h3>
       <p>
-	Nothing too complicated here: it will just be necessary to re-install the boot loader from the restored system, we
+	Without UEFI, you stick to the legacy MBR boot process, but there is nothing too complicated here:
+	it will just be necessary to re-install the boot loader from the restored system, we
 	will describe that too.
       </p>
       <h2><a name="restoration">Restoration Process</a></h2>
@@ -263,15 +271,25 @@
       </p>
       <code class=block>
 
-	[root@sysresccd ~]# loadkeys fr
+	<b>[root@sysresccd ~]# loadkeys fr</b>
 	[root@sysresccd ~]#
 
       </code>
 
       <h3>Accessing the backup from the host</h3>
+      <p>
+	In the following we will detail three different ways to access the backup, choose the one best suits your context:
+      </p>
+      <ul>
+	<li>Direct Access Storage (DAS)</li>
+	<li>Network Access Storage (NAS) without FTP or SFTP protocols</li>
+	<li>Network Access Storage (NAS) accessed using FTP or SFTP protocols</li>
+      </ul>
+
       <h4>Accessing the backup (DAS context)</h4>
       <p>
-	In the case of DAS, we can use <b>lsblk</b> to identify the backup partition and or LVM volume. Then we can <b>mount</b> it
+	In the case of DAS (locak disk, tape, usb key/disk, CD/DVD, floppy(!),...),
+	we can use <b>lsblk</b> to identify the backup partition and or LVM volume. Then we can <b>mount</b> it
       </p>
       <code class=block>
 
@@ -296,7 +314,6 @@
 
       </code>
 
-
       <h4>Creating a local temporary storage (NAS context without (S)FTP access)</h4>
       <p>
 	In the case of Network Storage (NAS) without FTP or SFTP protocol support,
@@ -312,7 +329,7 @@
 	NAME  MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
 	loop0   7:0    0 788.8M  1 loop /run/archiso/sfs/airootfs
 	sda     8:0    0   100G  0 disk
-	sdb     8:16   0    32G  0 disk
+	<e>sdb     8:16   0    32G  0 disk</e>
 	sr0    11:0    1   841M  0 rom  /run/archiso/bootmnt
 	<b>[root@sysresccd ~]# gdisk /dev/sdb</b>
 	GPT fdisk (gdisk) version 1.0.4
@@ -383,27 +400,33 @@
 
       </code>
       <p>
-	you can now fetch each slice dar would request into that /mnt/Backup directory and remove them afterward. Dar's -E option
-	may be of some use it to automate the process. Assuming you use sftp outside of dar to fetch the slices, you could use
+	you can now fetch each slice dar would request and drop them into that temporary /mnt/Backup directory,
+	removin them afterward. Dar's -E option
+	may be of some use it to automate the process. Assuming you use <b>scp</b> to fetch the slices, you could use
 	the following to instruct <i>dar</i> where to obtain the slices from (for http or https you could usr curl to do
 	something equivalent):
       </p>
       <code class=block>
 
 	<b>[root@sysresccd /mnt]# cat ~/.darrc &lt;&lt;EOF</b>
-	-E "rm -f /mnt/Backup/%b.*.%e ; sftp user@backup-host:/some/where/%b.%N.%e /mnt/Backup"
+	-E <e>"rm -f /mnt/Backup/%b.*.%e ; scp user@backup-host:/some/where/%b.%N.%e /mnt/Backup"</e>
 	EOF
 	<b>[root@sysresccd /mnt]#</b>
 
       </code>
-
+      <p>
+	Not that <i>dar</i> will initially require <b>slice number zero</b>, meaning the last slice of the backup,
+	you can make complicated script to handle that, but you can also easily cope with that by
+	manually downloading the last slice in <code>/mnt/Backup</code>, before starting the restoration.
+	<i>dar</i> will find it and will not require it anymore.
+      </p>
       <p>
 	If you do not have or want to use a disk for this temporary storage, you can rely on your host memory thanks to a tmpfs file-system:
       </p>
       <code class=block>
 
 	<b>[root@sysresccd /mnt]# mkdir /mnt/Backup</b>
-	<b>[root@sysresccd /mnt]# mount -t tmpfs -o size=2G tmpfs /mnt/Backup</b>
+	<b>[root@sysresccd /mnt]# <e>mount -t tmpfs -o size=2G tmpfs /mnt/Backup</e></b>
 	<b>[root@sysresccd /mnt]# mkdir /mnt/Backup</b>
 
       </code>
@@ -412,7 +435,7 @@
       <p>
 	During the system-rescueCD boot process, you have been asked to provide network information,
 	so we assume you did well and this volatile system
-	has an operational network access (DHCP or not does not import at this step,
+	has an operational network access (DHCP or not does not matter at this step,
 	whatever is the network
 	configuration of the system we are restoring). If you plan to use FTP or SFTP embedded
 	within <i>dar</i> you do not need to prepare any local temporary storage,
@@ -423,8 +446,8 @@
 
 	<b>[root@sysresccd ~]# ping 192.168.6.6</b>
 	PING 192.168.6.6 (192.168.6.6) 56(84) bytes of data.
-	64 bytes from 192.168.6.6: icmp_seq=1 ttl=64 time=1.33 ms
-	64 bytes from 192.168.6.6: icmp_seq=2 ttl=64 time=0.667 ms
+	64 bytes from 192.168.6.6: <e>icmp_seq=1 ttl=64 time=1.33 ms</e>
+	64 bytes from 192.168.6.6: <e>icmp_seq=2 ttl=64 time=0.667 ms</e>
 	^C
 	--- 192.168.6.6 ping statistics ---
 	2 packets transmitted, 2 received, 0% packet loss, time 3ms
@@ -443,8 +466,9 @@
 	it will not reduce or impact the ability to restore with dar. This may be
 	the opportunity to use LVM of RAID or SAN, LUKS ciphered volume, or at the opposite to get back to a plain old partition.
 	That's up to you to decide. In the
-	following we will first use plain partition with UEFI boot (and MBR boot), then revisit
-	the process using LVM and UEFI, then again with even more stuff: LUKS, LVM and UEFI.
+	following we will first use plain partition with UEFI boot (and MBR boot), then in the <b>variations</b> part
+	of this document, we will revisit
+	the process using LVM and UEFI, then again with even more stuff: LUKS, LVM and UEFI all at the same time.
       </p>
       <h4>the EFI partition</h4>
       <p>
@@ -516,11 +540,8 @@
       <h4>The root partition</h4>
       <p>
 	Here we will use a single partition to restore the system to, but you are free
-	to use as many as you want (and also use LVM instead of partitions if you prefer. See at the end of this document).
-	You will then have to format them to the file-system of
-	your choice (not mandatorily the one of the original system) create the mount points
-	and mounts them accordingly to your need. We will see how below, taking the EFI partition
-	as an example.
+	to use as many as you want (and also use LVM instead of partitions if you prefer. See the <i>variations</i>
+	part at the end of this document).
       </p>
       <code class=block>
 
@@ -656,7 +677,7 @@
       <h3>Formatting File-systems</h3>
       <h4>swap partition</h4>
       <p>
-	In order to be usable we have to format the swap partition:
+	In order to be usable we have to format all the partitions we just created, let's start with the swap partition:
       </p>
       <code class=block>
 
@@ -997,8 +1018,10 @@
       <code class=block>
 
 	<b>root@sysresccd:/# export PATH=/sbin:/usr/sbin:/bin:$PATH</b>
+	<b>root@sysresccd:/#update-initramfs -u</b>
+	update-initramfs: <e>Generating /boot/initrd.img-4.15.18-21-pve</e>
 	<b>root@sysresccd:/# update-grub</b>
-	Generating grub configuration file ...
+	<e>Generating grub configuration file ...</e>
 	Found linux image: /boot/vmlinuz-4.15.18-21-pve
 	Found initrd image: /boot/initrd.img-4.15.18-21-pve
 	Found memtest86+ image: /boot/memtest86+.bin
@@ -1006,9 +1029,7 @@
 	done
 	<b>root@sysresccd:/# grub-install</b>
 	Installing for x86_64-efi platform.
-	Installation finished. No error reported.
-	<b>root@sysresccd:/#update-initramfs -u</b>
-	update-initramfs: Generating /boot/initrd.img-4.15.18-21-pve
+	<e>Installation finished. No error reported.</e>
 	<b>root@sysresccd:~# exit</b>
 	exit
 	<b>[root@sysresccd /mnt/R]#</b>
@@ -1017,23 +1038,26 @@
 
       <h3>Checking the motherboard when rebooting</h3>
       <p>
-	You can restart the host and remove the systemrescueCD boot device to be sure the hard disk
-	we restored will be used for booting. At the first boot, make a halt in the "BIOS" (Press F2
-	"F9" or "Del" key depending on the hardware) to check that the motherboard points to the correct
-	binary inside the EFI partition of the hard disk, or if using MBR booting process instead, check
-	that the hard disk is in a correct place of boot device list.
+	You can restart the system now and remove the systemrescueCD boot device we used for the restoration
+	process.
       </p>
-
       <code class=block>
 
 	<b>root@sysresccd /mnt/R]# shutdown -r now</b>
 
       </code>
+      <p>
+	At the first boot, make a halt in the "BIOS" (Press F2
+	"F9" or "Del" key depending on the hardware) to check that the motherboard points to the correct
+	binary inside the EFI partition of the hard disk, or if using MBR booting process instead, check
+	that the hard disk is in a correct place of boot device list.
+      </p>
+
 
       <h3>Networking Interfaces</h3>
       <p>
 	Now that the system is back running, the network interface name may have changed
-	depending on the nature of the hardware. You may have to edit <b>/etc/network/interfaces</b>
+	depending on the nature of the <b>new hardware</b>. You may have to edit <b>/etc/network/interfaces</b>
 	or equivalent configuration file (/etc/sysconfig/network-scripts/...) if not using
 	automatic tools like network-manager and DHCP protocol for example.
       </p>
