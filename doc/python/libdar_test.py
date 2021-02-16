@@ -102,7 +102,7 @@ def f0():
     x = libdar.infinint("122")
     #
     dy = libdar.deci("28")
-    y = dt.computer()
+    y = dy.computer()
     # which is equivalent to y = libdar.infinint("28")
 
     z = x / y # integer division
@@ -115,7 +115,7 @@ def f0():
     # passed in argument:
 
     res = libdar.euclide(x, y)
-    print("{} / {} = {} with a remain of {}".format(libdar.deci(x).human(),
+    print("{} / {} = {} with a remaining of {}".format(libdar.deci(x).human(),
                                                     dy.human(),
                                                     libdar.deci(res[0]).human(),
                                                     libdar.deci(res[1]).human()))
@@ -127,7 +127,7 @@ def i2str(infinint):
 # this is a example of routine that given an open libdar.archive
 # will provide its listing content. This call is recursive but
 # free to you to recurse or not upon user event (expanding a directory
-# in th current display for example).
+# in the current display for example).
 # Note that the method libdar.archive.get_children_in_table returns
 # a list of object of type libdar.list_entry which has a long
 # list of methods to provide a very much detailed information
