@@ -186,7 +186,7 @@ or
 login
 is optional, if not provided it defaults to
 .B anonymous.
-If the login string comports an @ it need to be escaped by \\\\ (a pair of backshashes) to avoid libdar considering it the hostname starting part. Exemple: login is me@here.com host is www.example.org gives: sftp://me\\\\@here.com@www.example.org/some/file. You may also need to escape the same way any other special characters like for exampl ecolumn (:) slash (/) if they are part of the login string.
+If the login string comports an @ it need to be escaped by \\\\ (a pair of backshashes) to avoid libdar considering it the hostname starting part. Example: login is me@here.com host is www.example.org gives: sftp://me\\\\@here.com@www.example.org/some/file. You may also need to escape the same way any other special characters like for exampl ecolumn (:) slash (/) if they are part of the login string.
 .TP 3
 password
 if login is provided, the associated password may be given after a column (:) but this exposes the secret password to other
