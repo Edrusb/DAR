@@ -227,7 +227,7 @@ namespace libdar
 	NLS_SWAP_OUT;
     }
 
-    void database::set_compression(compression algozip)
+    void database::set_compression(compression algozip) const
     {
 	NLS_SWAP_IN;
 	try

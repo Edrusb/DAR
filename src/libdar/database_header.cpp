@@ -57,6 +57,7 @@ extern "C"
 #include "fichier_local.hpp"
 #include "compressor.hpp"
 #include "pile.hpp"
+#include "macro_tools.hpp"
 
 using namespace std;
 
@@ -163,7 +164,10 @@ namespace libdar
 	    h.set_compression(algozip);
 	    h.write(*stack);
 
-	    comp = new (nothrow) compressor(algozip, *(stack->top()));
+	    comp = macro_tools_build_streaming_compressor(algozip,
+							  *(stack->top()),
+							  9, // always using 9 for now
+							  2); // using 2 workers at most
 	    if(comp == nullptr)
 		throw Ememory("database_header_create");
 
@@ -210,7 +214,10 @@ namespace libdar
 	    db_version = h.get_version();
 	    algozip = h.get_compression();
 
-	    tmp = new (nothrow) compressor(h.get_compression(), *(stack->top()));
+	    tmp = macro_tools_build_streaming_compressor(algozip,
+							 *(stack->top()),
+							 9, // not used for decompression (here)
+							 2); // using 2 workers at most
 	    if(tmp == nullptr)
 		throw Ememory("database_header_open");
 

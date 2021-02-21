@@ -23,6 +23,16 @@
     /// \brief this file holds the options for database operations
     /// \ingroup API
 
+    ///. class database_open_options
+    ///. class database_dump_options
+    ///. class database_add_options
+    ///. class database_remove_options
+    ///. class database_change_basename_options
+    ///. class database_change_path_options
+    ///. class database_restore_options
+    ///. class database_used_options
+
+
 #ifndef DATABASE_OPTIONS_HPP
 #define DATABASE_OPTIONS_HPP
 

@@ -156,7 +156,7 @@ namespace libdar
 	void set_dar_path(const std::string & chemin);
 
 	    /// change compression to use when storing base on file
-	void set_compression(compression algozip);
+	void set_compression(compression algozip) const;
 
 
 	    // "GETTINGS"

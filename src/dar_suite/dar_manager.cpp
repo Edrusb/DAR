@@ -89,6 +89,7 @@ static bool command_line(shell_interaction & dialog,
 			 bool & even_when_removed,
 			 bool & check_order,
 			 compression & algozip,
+			 bool & change_compression,
 			 bool recursive); // true if called from op_batch
 static void show_usage(shell_interaction & dialog, const char *command);
 static void show_version(shell_interaction & dialog, const char *command);
@@ -126,9 +127,20 @@ static database *read_base(shared_ptr<user_interaction> & dialog,
 			   bool partial,
 			   bool partial_read_only,
 			   bool check_order);
-static void write_base(shared_ptr<user_interaction> & dialog, const string & filename, const database *base, bool overwrite);
+static void write_base(shared_ptr<user_interaction> & dialog,
+		       const string & filename,
+		       const database *base,
+		       bool overwrite,
+		       bool change_compression,
+		       compression new_compression);
 static vector<string> read_vector(shared_ptr<user_interaction> & dialog);
-static void finalize(shared_ptr<user_interaction> & dialog, operation op, database *dat, const string & base, bool info_details);
+static void finalize(shared_ptr<user_interaction> & dialog,
+		     operation op,
+		     database *dat,
+		     const string & base,
+		     bool info_details,
+		     bool change_compression,
+		     compression new_compression);
 static void action(shared_ptr<user_interaction> & dialog,
 		   operation op,
 		   database *dat,
@@ -175,6 +187,7 @@ S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * const ar
     bool even_when_removed;
     bool check_order;
     compression algozip;
+    bool change_compression;
     shell_interaction *shelli = dynamic_cast<shell_interaction *>(dialog.get());
 
     if(!dialog)
@@ -199,6 +212,7 @@ S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * const ar
 		     even_when_removed,
 		     check_order,
 		     algozip,
+		     change_compression,
 		     false))
 	return EXIT_SYNTAX;
 
@@ -223,12 +237,16 @@ S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * const ar
 	break;
     case listing:
 	partial_read_only = true;
+	if(change_compression)
+	    throw Erange("little_main", gettext("Cannot change compression when the requested operation is a read operation"));
 	break;
     case chbase:
     case where:
     case options:
     case dar:
 	partial_read = true;
+	if(change_compression)
+	    throw Erange("little_main", gettext("Cannot change compression when the requested operation only modifies the database header"));
 	break;
     default:
 	throw SRC_BUG;
@@ -251,12 +269,12 @@ S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * const ar
 	    try
 	    {
 		action(dialog, op, dat, arg, num, rest, num2, date, base, info_details, true, ignore_dat_options, even_when_removed);
-		finalize(dialog, op, dat, base, info_details);
+		finalize(dialog, op, dat, base, info_details, change_compression, algozip);
 	    }
 	    catch(Edata & e)
 	    {
 		dialog->message(string(gettext("Error met while processing operation: ")) + e.get_message());
-		finalize(dialog, op, dat, base, info_details);
+		finalize(dialog, op, dat, base, info_details, change_compression, algozip);
 		throw;
 	    }
 	}
@@ -287,6 +305,7 @@ static bool command_line(shell_interaction & dialog,
 			 bool & even_when_removed,
 			 bool & check_order,
 			 compression & algozip,
+			 bool & change_compression,
 			 bool recursive)
 {
     S_I lu, min;
@@ -304,6 +323,7 @@ static bool command_line(shell_interaction & dialog,
     even_when_removed = false;
     check_order = true;
     algozip = compression::gzip;
+    change_compression = false;
     string extra = "";
 
     try
@@ -507,6 +527,7 @@ static bool command_line(shell_interaction & dialog,
 		    if(optarg == nullptr)
 			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
 		    algozip = string2compression(optarg);
+		    change_compression = true;
 		    break;
 		case ':':
 		    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(optopt)));
@@ -637,13 +658,12 @@ static void op_create(shared_ptr<user_interaction> & dialog, const string & base
 {
     database dat(dialog); // created empty;
 
-    dat.set_compression(algozip);
     if(info_details)
     {
         dialog->message(gettext("Creating file..."));
         dialog->message(gettext("Formatting file as an empty database..."));
     }
-    write_base(dialog, base, &dat, false);
+    write_base(dialog, base, &dat, false, true, algozip);
     if(info_details)
         dialog->message(gettext("Database has been successfully created empty."));
 }
@@ -923,7 +943,7 @@ static void show_usage(shell_interaction & dialog, const char *command)
     dialog.printf(gettext("   -m <number>\t   move an archive within a given database.\n"));
     dialog.printf(gettext("   -i\t\t   user interactive mode\n"));
     dialog.printf(gettext("   -c\t\t   check database for dates order\n"));
-    dialog.printf(gettext("   -L <filename>   execute on a given database a batch of action as defined by\n"));
+    dialog.printf(gettext("   -@ <filename>   execute on a given database a batch of action as defined by\n"));
     dialog.printf(gettext("\t\t   the provided file.\n"));
     dialog.printf(gettext("   -h\t\t   displays this help information\n"));
     dialog.printf(gettext("   -V\t\t   displays software version\n"));
@@ -1020,12 +1040,19 @@ static database *read_base(shared_ptr<user_interaction> & dialog, const string &
     return ret;
 }
 
-static void write_base(shared_ptr<user_interaction> & dialog, const string & filename, const database *base, bool overwrite)
+static void write_base(shared_ptr<user_interaction> & dialog,
+		       const string & filename,
+		       const database *base,
+		       bool overwrite,
+		       bool change_compression,
+		       compression algozip)
 {
     thread_cancellation thr;
     database_dump_options dat_opt;
 
     dat_opt.set_overwrite(overwrite);
+    if(change_compression)
+	base->set_compression(algozip);
     thr.block_delayed_cancellation(true);
     base->dump(filename, dat_opt);
     thr.block_delayed_cancellation(false);
@@ -1042,6 +1069,8 @@ static void op_interactive(shared_ptr<user_interaction> & dialog, database *dat,
     string input, input2;
     archive *arch = nullptr;
     vector <string> vectinput;
+    bool change_compression = false;
+    compression zipname;
     U_I more = 25;
     database_change_basename_options opt_change_name;
     database_change_path_options opt_change_path;
@@ -1075,8 +1104,8 @@ static void op_interactive(shared_ptr<user_interaction> & dialog, database *dat,
 	    dialog->printf(gettext(" p : modify path of archives \t b : modify basename of archives\n"));
 	    dialog->printf(gettext(" d : path to dar             \t o : options to dar\n"));
 	    dialog->printf(gettext(" w : write changes to file   \t s : database statistics\n"));
-	    dialog->printf(gettext(" a : Save as                 \t n : pause each 'n' line (zero for no pause)\n"));
-	    dialog->printf(gettext(" c : check date order\n\n"));
+	    dialog->printf(gettext(" c : check date order        \t z : change compression algorithm\n"));
+	    dialog->printf(gettext(" a : Save as                 \t n : pause each 'n' line (zero for no pause)\n\n"));
 	    dialog->printf(gettext(" q : quit\n\n"));
 	    dialog->printf(gettext(" Choice: "));
 
@@ -1119,15 +1148,22 @@ static void op_interactive(shared_ptr<user_interaction> & dialog, database *dat,
 		dat->set_dar_path(input);
 		saved = false;
 		break;
+	    case 'z':
+		input = dialog->get_string(gettext("New compression algorithm to use (none, gzip, bzip2, lzo, xz, zstd, lz4...)? "), true);
+		zipname = string2compression(input);
+		dialog->message(gettext("Note: the new compression algorithm will be used when saving the database"));
+		change_compression = true;
+		saved = false;
+		break;
 	    case 'w':
 		dialog->message(gettext("Compressing and writing back database to file..."));
-		write_base(dialog, base, dat, true);
+		write_base(dialog, base, dat, true, change_compression, zipname);
 		saved = true;
 		break;
 	    case 'a':
 		input = dialog->get_string(gettext("New database name: "), true);
 		dialog->message(gettext("Compressing and writing back database to file..."));
-		write_base(dialog, input, dat, false);
+		write_base(dialog, input, dat, false, change_compression, zipname);
 		base = input;
 		saved = true;
 		break;
@@ -1295,7 +1331,8 @@ static void op_batch(shared_ptr<user_interaction> & dialog, database *dat, const
     bool ignore_dat_options;
     bool even_when_removed;
     bool check_order; // not used here
-    compression algozip; // not used here neither
+    compression algozip; // not used here neither but at the level of the function that called op_batch
+    bool change_compression; // not used here neither but at the level of the function that called op_batch
     shell_interaction *shelli = dynamic_cast<shell_interaction *>(dialog.get());
 
     if(shelli == nullptr)
@@ -1354,6 +1391,7 @@ static void op_batch(shared_ptr<user_interaction> & dialog, database *dat, const
 			     even_when_removed,
 			     check_order,
 			     algozip,
+			     change_compression,
 			     true))
 		throw Erange("op_batch", tools_printf(gettext("Syntax error in batch file: %S"), &line));
 
@@ -1394,7 +1432,13 @@ static vector<string> read_vector(shared_ptr<user_interaction> & dialog)
     return ret;
 }
 
-static void finalize(shared_ptr<user_interaction> & dialog, operation op, database *dat, const string & base, bool info_details)
+static void finalize(shared_ptr<user_interaction> & dialog,
+		     operation op,
+		     database *dat,
+		     const string & base,
+		     bool info_details,
+		     bool change_compression,
+		     compression new_compression)
 {
     switch(op)
     {
@@ -1417,7 +1461,12 @@ static void finalize(shared_ptr<user_interaction> & dialog, operation op, databa
     case batch:
 	if(info_details)
 	    dialog->message(gettext("Compressing and writing back database to file..."));
-	write_base(dialog, base, dat, true);
+	write_base(dialog,
+		   base,
+		   dat,
+		   true, // overwriting
+		   change_compression,
+		   new_compression);
 	break;
     default:
 	throw SRC_BUG;

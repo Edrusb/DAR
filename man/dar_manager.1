@@ -42,15 +42,16 @@ dar_manager -V
 
 .SH DESCRIPTION
 .B dar_manager
-is part of the Disk Archive suite. Its purpose is to simplify the restoration of a set of few files present in many backup, full or differential. This is achieved by gathering the catalogue of each archive (this has to be done once). At any time you just have to give the relative path to the files you want to restore, dar_manager will call dar with the proper options and restore the last version of each file (or the last version before given date). Note that dar_manager is especially interesting when you have removed some files by accident some time ago and wish to recover them from a set of full and differential backups. It is thus not really adapted/efficient to restore the state a directory tree had at a given time, in particular when some files have to be removed. For that you would better use dar directly with the corresponding archive(s) up to the date for which you wish to restore the state of a whole directory tree.
+is part of the Disk Archive suite. Its purpose is to simplify the restoration of a set of files present in many backup, full or differential, eventually composed of a set of binary delta patches. This is achieved by gathering the catalogue of each archive (this has to be done once). Then, at any time you just have to give the relative path to the files you want to restore, dar_manager will call dar with the proper options and restore the last version of each file (or the last version before given date). Note that dar_manager is especially interesting when you have removed some files by accident some time ago and wish to recover them from a set of full and differential backups. It is thus not really adapted/efficient to restore the state a full system had at a given time, in particular when some files have to be removed. For that you would better use dar directly with the corresponding archive(s) up to the date for which you wish to restore the state of your Unix system.
 .PP
 You can restore any file by hand without
 .B dar_manager
-, but if you have a lot of differential backups, you may spend a long time to find the archive that contains the last version of your files, as dar will not save it if it has not changed since previous backup.
+, but if you have a lot of differential backups, you may spend a long time to find the archive that contains the last version of your files.
 .B
 dar_manager
-simplify the process by looking in its internal database, built from archive "catalogues" (= table of contents).
-.SH OPTIONS
+simplify the process by looking in its internal database, built from archive "catalogues" (= table of contents) it has been fed with.
+
+.SH COMMANDS
 .TP 20
 -C, --create [<path>/]<database>
 creates an empty database that will collect information about several archives. The <database> is a filename that is required for -B option. To destroy a <database> just remove the file.
@@ -148,7 +149,7 @@ avoid dar_manager to issue a warning for each file not following a chronological
 allows you to do several operations on a given database. All operations are defined in the provided <filename> and refer to the same database as defined by the -B switch on command line. This batch file, must thus not contain neither -B, -C, -i or -ai option (-ai are global to the batch operation). The batch file expected layout is one command per line, thus several arguments (like -l -v for example) may take place on a given line of the file (-v can be found both on command line for verbose output about the batch operation steps, as well as inside the batch file for verbose output of a particular batched command). Arguments are separated by spaces or tabs, other characters are passed as-is. In consequence, you should only need to use quotes (using " or ') if you intend to use an argument containing space. Last, comments may be placed on any line beginning by a hash character (#).
 .TP 20
 -z, --compression <algo>
-Only available while creating a database (-C option), this option let you set the compression algorithm used to store the database in file. By default gzip is use, but you can use "none" for no compression, "bzip2", "xz" and "lzo" for other compression algorithm. Compression level selection may be added in the future (level 9 is used internally).
+Available creating or modifying a database content (-C, -A, -D, -m, -i, -L options), this option let you set the compression algorithm used to store the database in file. By default gzip is use, but you can use "none" for no compression, "bzip2", "xz" and "lzo" and other compression algorithm (see -z option in dar's man page for an up to date list of available algorithms). Compression level selection may be added in the future (level 9 is used internally).
 .TP 20
 -Q
 Do not display any message on stderr when not launched from a terminal (for example when launched from an at job or crontab). Remains that any question to the user will be assumed a 'no' answer, which most of the time will abort the program.

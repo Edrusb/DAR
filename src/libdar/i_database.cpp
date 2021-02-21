@@ -165,7 +165,7 @@ namespace libdar
     }
 
     void database::i_database::dump(const std::string & filename,
-			const database_dump_options & opt) const
+				    const database_dump_options & opt) const
     {
 	if(files == nullptr && data_files == nullptr)
 	    throw Erange("database::i_database::dump", gettext("Cannot write down a read-only database"));
