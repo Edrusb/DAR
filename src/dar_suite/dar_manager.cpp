@@ -89,6 +89,7 @@ static bool command_line(shell_interaction & dialog,
 			 bool & even_when_removed,
 			 bool & check_order,
 			 compression & algozip,
+			 U_I & compression_level,
 			 bool & change_compression,
 			 bool recursive); // true if called from op_batch
 static void show_usage(shell_interaction & dialog, const char *command);
@@ -97,7 +98,7 @@ static void show_version(shell_interaction & dialog, const char *command);
 #if HAVE_GETOPT_LONG
 static const struct option *get_long_opt();
 #endif
-static void op_create(shared_ptr<user_interaction> & dialog, const string & base, compression algozip, bool info_details);
+static void op_create(shared_ptr<user_interaction> & dialog, const string & base, compression algozip, U_I compr_level, bool info_details);
 static void op_add(shared_ptr<user_interaction> & dialog, database *dat, const string &arg, string fake, const infinint & min_digits, bool info_details);
 static void op_listing(shell_interaction & dialog, const database *dat, bool info_details);
 static void op_del(shared_ptr<user_interaction> & dialog, database *dat, S_I min, archive_num max, bool info_details);
@@ -132,7 +133,8 @@ static void write_base(shared_ptr<user_interaction> & dialog,
 		       const database *base,
 		       bool overwrite,
 		       bool change_compression,
-		       compression new_compression);
+		       compression new_compression,
+		       U_I compression_level);
 static vector<string> read_vector(shared_ptr<user_interaction> & dialog);
 static void finalize(shared_ptr<user_interaction> & dialog,
 		     operation op,
@@ -140,7 +142,8 @@ static void finalize(shared_ptr<user_interaction> & dialog,
 		     const string & base,
 		     bool info_details,
 		     bool change_compression,
-		     compression new_compression);
+		     compression new_compression,
+		     U_I compression_level);
 static void action(shared_ptr<user_interaction> & dialog,
 		   operation op,
 		   database *dat,
@@ -187,6 +190,7 @@ S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * const ar
     bool even_when_removed;
     bool check_order;
     compression algozip;
+    U_I compression_level;
     bool change_compression;
     shell_interaction *shelli = dynamic_cast<shell_interaction *>(dialog.get());
 
@@ -212,6 +216,7 @@ S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * const ar
 		     even_when_removed,
 		     check_order,
 		     algozip,
+		     compression_level,
 		     change_compression,
 		     false))
 	return EXIT_SYNTAX;
@@ -253,7 +258,7 @@ S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * const ar
     }
 
     if(op == create)
-	op_create(dialog, base, algozip, info_details);
+	op_create(dialog, base, algozip, compression_level, info_details);
     else
     {
 	if(info_details)
@@ -269,12 +274,12 @@ S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * const ar
 	    try
 	    {
 		action(dialog, op, dat, arg, num, rest, num2, date, base, info_details, true, ignore_dat_options, even_when_removed);
-		finalize(dialog, op, dat, base, info_details, change_compression, algozip);
+		finalize(dialog, op, dat, base, info_details, change_compression, algozip, compression_level);
 	    }
 	    catch(Edata & e)
 	    {
 		dialog->message(string(gettext("Error met while processing operation: ")) + e.get_message());
-		finalize(dialog, op, dat, base, info_details, change_compression, algozip);
+		finalize(dialog, op, dat, base, info_details, change_compression, algozip, compression_level);
 		throw;
 	    }
 	}
@@ -305,11 +310,13 @@ static bool command_line(shell_interaction & dialog,
 			 bool & even_when_removed,
 			 bool & check_order,
 			 compression & algozip,
+			 U_I & compression_level,
 			 bool & change_compression,
 			 bool recursive)
 {
     S_I lu, min;
     U_I max;
+    U_I compr_bs; // block compression is not used in dar_manager
     enum { date_not_set, date_set_by_w, date_set_by_9 } date_set = date_not_set;
 
     base = arg = "";
@@ -526,7 +533,12 @@ static bool command_line(shell_interaction & dialog,
 		case 'z':
 		    if(optarg == nullptr)
 			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
-		    algozip = string2compression(optarg);
+
+		    line_tools_split_compression_algo(optarg,
+						      1,         // no prefix (used for block anyway)
+						      algozip,
+						      compression_level,
+						      compr_bs); // we ignore this in dar_manager
 		    change_compression = true;
 		    break;
 		case ':':
@@ -654,7 +666,7 @@ static bool command_line(shell_interaction & dialog,
     return true;
 }
 
-static void op_create(shared_ptr<user_interaction> & dialog, const string & base, compression algozip, bool info_details)
+static void op_create(shared_ptr<user_interaction> & dialog, const string & base, compression algozip, U_I compr_level, bool info_details)
 {
     database dat(dialog); // created empty;
 
@@ -663,7 +675,7 @@ static void op_create(shared_ptr<user_interaction> & dialog, const string & base
         dialog->message(gettext("Creating file..."));
         dialog->message(gettext("Formatting file as an empty database..."));
     }
-    write_base(dialog, base, &dat, false, true, algozip);
+    write_base(dialog, base, &dat, false, true, algozip, compr_level);
     if(info_details)
         dialog->message(gettext("Database has been successfully created empty."));
 }
@@ -1045,14 +1057,18 @@ static void write_base(shared_ptr<user_interaction> & dialog,
 		       const database *base,
 		       bool overwrite,
 		       bool change_compression,
-		       compression algozip)
+		       compression algozip,
+		       U_I compression_level)
 {
     thread_cancellation thr;
     database_dump_options dat_opt;
 
     dat_opt.set_overwrite(overwrite);
     if(change_compression)
+    {
 	base->set_compression(algozip);
+	base->set_compression_level(compression_level);
+    }
     thr.block_delayed_cancellation(true);
     base->dump(filename, dat_opt);
     thr.block_delayed_cancellation(false);
@@ -1071,6 +1087,7 @@ static void op_interactive(shared_ptr<user_interaction> & dialog, database *dat,
     vector <string> vectinput;
     bool change_compression = false;
     compression zipname;
+    U_I compr_level = 9;
     U_I more = 25;
     database_change_basename_options opt_change_name;
     database_change_path_options opt_change_path;
@@ -1151,19 +1168,24 @@ static void op_interactive(shared_ptr<user_interaction> & dialog, database *dat,
 	    case 'z':
 		input = dialog->get_string(gettext("New compression algorithm to use (none, gzip, bzip2, lzo, xz, zstd, lz4...)? "), true);
 		zipname = string2compression(input);
-		dialog->message(gettext("Note: the new compression algorithm will be used when saving the database"));
+		input = dialog->get_string(gettext("Compression level to use (usually an integer from 1 to 9)? "), true);
+		tmp_si = line_tools_str2signed_int(input);
+		if(tmp_si < 1)
+		    throw Erange("op_interactive", gettext("Compression level must be strictly positive"));
+		compr_level = (U_I)tmp_si;
+		dialog->message(gettext("Note: the new compression algorithm/level will be used when saving the database"));
 		change_compression = true;
 		saved = false;
 		break;
 	    case 'w':
 		dialog->message(gettext("Compressing and writing back database to file..."));
-		write_base(dialog, base, dat, true, change_compression, zipname);
+		write_base(dialog, base, dat, true, change_compression, zipname, compr_level);
 		saved = true;
 		break;
 	    case 'a':
 		input = dialog->get_string(gettext("New database name: "), true);
 		dialog->message(gettext("Compressing and writing back database to file..."));
-		write_base(dialog, input, dat, false, change_compression, zipname);
+		write_base(dialog, input, dat, false, change_compression, zipname, compr_level);
 		base = input;
 		saved = true;
 		break;
@@ -1332,6 +1354,7 @@ static void op_batch(shared_ptr<user_interaction> & dialog, database *dat, const
     bool even_when_removed;
     bool check_order; // not used here
     compression algozip; // not used here neither but at the level of the function that called op_batch
+    U_I compression_level; // not used here neither but at the level of the function that called op_batch
     bool change_compression; // not used here neither but at the level of the function that called op_batch
     shell_interaction *shelli = dynamic_cast<shell_interaction *>(dialog.get());
 
@@ -1391,6 +1414,7 @@ static void op_batch(shared_ptr<user_interaction> & dialog, database *dat, const
 			     even_when_removed,
 			     check_order,
 			     algozip,
+			     compression_level,
 			     change_compression,
 			     true))
 		throw Erange("op_batch", tools_printf(gettext("Syntax error in batch file: %S"), &line));
@@ -1438,7 +1462,8 @@ static void finalize(shared_ptr<user_interaction> & dialog,
 		     const string & base,
 		     bool info_details,
 		     bool change_compression,
-		     compression new_compression)
+		     compression new_compression,
+		     U_I compression_level)
 {
     switch(op)
     {
@@ -1466,7 +1491,8 @@ static void finalize(shared_ptr<user_interaction> & dialog,
 		   dat,
 		   true, // overwriting
 		   change_compression,
-		   new_compression);
+		   new_compression,
+		   compression_level);
 	break;
     default:
 	throw SRC_BUG;

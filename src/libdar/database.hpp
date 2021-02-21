@@ -155,9 +155,11 @@ namespace libdar
 	    /// \note this method *is* available with partially extracted databases, but with partial_read_only ones
 	void set_dar_path(const std::string & chemin);
 
-	    /// change compression to use when storing base on file
+	    /// change compression to use when storing base in file
 	void set_compression(compression algozip) const;
 
+	    /// change the compression level to use when storing base in file
+	void set_compression_level(U_I compr_level) const;
 
 	    // "GETTINGS"
 
@@ -175,6 +177,9 @@ namespace libdar
 
 	    /// returns the compression algorithm used on filesystem
 	compression get_compression() const;
+
+	    /// returns the compression level used on file
+	U_I get_compression_level() const;
 
 	    /// return the database format version
 	std::string get_database_version() const;

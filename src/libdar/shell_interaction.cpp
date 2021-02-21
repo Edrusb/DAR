@@ -308,14 +308,16 @@ namespace libdar
 	    string opt = tools_concat_vector(" ", ref.get_options());
 	    string road, base;
 	    string compr = compression2string(ref.get_compression());
+	    U_I compr_lvl = ref.get_compression_level();
 	    string dar_path = ref.get_dar_path();
 	    string db_version = ref.get_database_version();
 
 	    message("");
-	    printf(gettext("dar path        : %S"), &dar_path);
-	    printf(gettext("dar options     : %S"), &opt);
-	    printf(gettext("database version: %S"), &db_version);
-	    printf(gettext("compression used: %S"), &compr);
+	    printf(gettext("dar path         : %S"), &dar_path);
+	    printf(gettext("dar options      : %S"), &opt);
+	    printf(gettext("database version : %S"), &db_version);
+	    printf(gettext("compression used : %S"), &compr);
+	    printf(gettext("compression level: %d"), compr_lvl);
 	    message("");
 	    printf(gettext("archive #   |    path      |    basename"));
 	    printf("------------+--------------+---------------");

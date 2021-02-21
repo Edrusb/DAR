@@ -242,6 +242,20 @@ namespace libdar
 	NLS_SWAP_OUT;
     }
 
+        void database::set_compression_level(U_I compr_level) const
+    {
+	NLS_SWAP_IN;
+	try
+	{
+	    pimpl->set_compression_level(compr_level);
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
+    }
 
     database_archives_list database::get_contents() const
     {
@@ -308,6 +322,25 @@ namespace libdar
 	try
 	{
 	    ret = pimpl->get_compression();
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
+
+	return ret;
+    }
+
+    U_I database::get_compression_level() const
+    {
+	U_I ret;
+
+	NLS_SWAP_IN;
+	try
+	{
+	    ret = pimpl->get_compression_level();
 	}
 	catch(...)
 	{

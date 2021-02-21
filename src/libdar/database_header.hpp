@@ -50,7 +50,8 @@ namespace libdar
     extern generic_file *database_header_create(const std::shared_ptr<user_interaction> & dialog,
 						const std::string & filename,
 						bool overwrite,
-						compression algozip);
+						compression algozip,
+						U_I compr_level);
 
 	/// read the header of a dar_manager database
 
@@ -62,7 +63,8 @@ namespace libdar
     extern generic_file *database_header_open(const std::shared_ptr<user_interaction> & dialog,
 					      const std::string & filename,
 					      unsigned char & db_version,
-					      compression & algozip);
+					      compression & algozip,
+					      U_I & compr_level);
 
     extern const unsigned char database_header_get_supported_version();
 

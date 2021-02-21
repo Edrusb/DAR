@@ -64,7 +64,7 @@ using namespace std;
 namespace libdar
 {
 
-    static const unsigned char database_version = 5;
+    static const unsigned char database_version = 6;
 
 #define HEADER_OPTION_NONE 0x00
 #define HEADER_OPTION_COMPRESSOR 0x01
@@ -76,7 +76,7 @@ namespace libdar
     class database_header
     {
     public:
-	database_header() { version = database_version; options = HEADER_OPTION_NONE; algo = compression::gzip; };
+	database_header() { version = database_version; options = HEADER_OPTION_NONE; algo = compression::gzip; compression_level = 9; };
 	database_header(const database_header & ref) = default;
 	database_header(database_header && ref) noexcept = default;
 	database_header & operator = (const database_header & ref) = default;
@@ -86,15 +86,17 @@ namespace libdar
 	void read(generic_file & f);
 	void write(generic_file & f);
 
-	void set_compression(compression algozip);
+	void set_compression(compression algozip, U_I level);
 
 	U_I get_version() const { return version; };
 	compression get_compression() const { return algo; };
+	U_I get_compression_level() const { return compression_level; };
 
     private:
 	unsigned char version;
 	unsigned char options;
 	compression algo;
+	U_I compression_level;
     };
 
     void database_header::read(generic_file & f)
@@ -110,9 +112,19 @@ namespace libdar
 	    char tmp;
 	    f.read(&tmp, 1);
 	    algo = char2compression(tmp);
+	    if(version > 5) // must read the compression level too
+	    {
+		infinint tmp(f); // reading an infinint from f
+
+		compression_level = 0;
+		tmp.unstack(compression_level);
+	    }
 	}
 	else
+	{
 	    algo = compression::gzip; // was the default before choice was available
+	    compression_level = 9;
+	}
     }
 
     void database_header::write(generic_file & f)
@@ -123,13 +135,15 @@ namespace libdar
 	{
 	    char tmp = compression2char(algo);
 	    f.write(&tmp, 1);
+	    infinint(compression_level).dump(f);
 	}
     }
 
-    void database_header::set_compression(compression algozip)
+    void database_header::set_compression(compression algozip, U_I level)
     {
 	algo = algozip;
-	if(algo != compression::gzip)
+	compression_level = level;
+	if(algo != compression::gzip || level != 9)
 	    options |= HEADER_OPTION_COMPRESSOR;
 	else
 	    options &= ~HEADER_OPTION_COMPRESSOR;
@@ -138,7 +152,8 @@ namespace libdar
     generic_file *database_header_create(const shared_ptr<user_interaction> & dialog,
 					 const string & filename,
 					 bool overwrite,
-					 compression algozip)
+					 compression algozip,
+					 U_I compr_level)
     {
 	pile* stack = new (nothrow) pile();
 	generic_file *tmp = nullptr;
@@ -161,12 +176,12 @@ namespace libdar
 
 	    stack->push(tmp); // now the fichier_local is managed by stack
 
-	    h.set_compression(algozip);
+	    h.set_compression(algozip, compr_level);
 	    h.write(*stack);
 
 	    comp = macro_tools_build_streaming_compressor(algozip,
 							  *(stack->top()),
-							  9, // always using 9 for now
+							  compr_level,
 							  2); // using 2 workers at most
 	    if(comp == nullptr)
 		throw Ememory("database_header_create");
@@ -185,7 +200,8 @@ namespace libdar
     generic_file *database_header_open(const shared_ptr<user_interaction> & dialog,
 				       const string & filename,
 				       unsigned char & db_version,
-				       compression & algozip)
+				       compression & algozip,
+				       U_I & compr_level)
     {
 	pile *stack = new (nothrow) pile();
 	generic_file *tmp = nullptr;
@@ -213,10 +229,11 @@ namespace libdar
 	    h.read(*stack);
 	    db_version = h.get_version();
 	    algozip = h.get_compression();
+	    compr_level = h.get_compression_level();
 
 	    tmp = macro_tools_build_streaming_compressor(algozip,
 							 *(stack->top()),
-							 9, // not used for decompression (here)
+							 compr_level, // not used for decompression (here)
 							 2); // using 2 workers at most
 	    if(tmp == nullptr)
 		throw Ememory("database_header_open");

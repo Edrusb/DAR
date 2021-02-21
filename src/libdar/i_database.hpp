@@ -104,8 +104,13 @@ namespace libdar
             /// change compression to use when storing base on file
         void set_compression(compression algozip) const { algo = algozip; };
 
+	    /// change the compression level to use when storing base in file
+	void set_compression_level(U_I level) const { compr_level = level; };
 
+	    ////////////////////////
+	    //
             // "GETTINGS"
+	    //
 
             /// provides the list of archive used to build the database
         database_archives_list get_contents() const;
@@ -118,6 +123,9 @@ namespace libdar
 
             /// returns the compression algorithm used on filesystem
         compression get_compression() const { return algo; };
+
+	    /// returns the compression level used on file
+	U_I get_compression_level() const { return compr_level; };
 
             /// return the database format version
         std::string get_database_version() const { return tools_uint2str(cur_db_version); };
@@ -175,6 +183,7 @@ namespace libdar
 	bool check_order_asked;                      ///< whether order check has been asked
 	unsigned char cur_db_version;                ///< current db version (for informational purposes)
 	mutable compression algo;                    ///< compression used/to use when writing down the base to file
+	mutable U_I compr_level;                     ///< the compression level to use
 
 	void build(generic_file & f, bool partial, bool read_only, unsigned char db_version);  ///< used by constructors
 	archive_num get_real_archive_num(archive_num num, bool revert) const;

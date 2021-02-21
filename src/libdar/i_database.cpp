@@ -69,6 +69,7 @@ namespace libdar
 	check_order_asked = true;
 	cur_db_version = database_header_get_supported_version();
 	algo = compression::gzip;   // stays the default algorithm for new databases
+	compr_level = 9; // stays the default compression level for new databases
     }
 
     database::i_database::i_database(const shared_ptr<user_interaction> & dialog, const string & base, const database_open_options & opt): mem_ui(dialog)
@@ -76,7 +77,8 @@ namespace libdar
 	generic_file *f = database_header_open(dialog,
 					       base,
 					       cur_db_version,
-					       algo);
+					       algo,
+					       compr_level);
 
 	if(f == nullptr)
 	    throw Ememory("database::i_database::database");
@@ -173,7 +175,8 @@ namespace libdar
 	generic_file *f = database_header_create(get_pointer(),
 						 filename,
 						 opt.get_overwrite(),
-						 algo);
+						 algo,
+						 compr_level);
 	if(f == nullptr)
 	    throw Ememory("database::i_database::dump");
 
