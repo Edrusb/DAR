@@ -437,6 +437,14 @@ extern std::deque<std::string> line_tools_substract_from_deque(const std::deque<
     /// \note throws Erange in case of error
 extern delta_sig_block_size::fs_function_t line_tools_string_to_sig_block_size_function(const std::string & funname);
 
+extern void line_tools_split_compression_algo(const char *arg,     ///< input string to analyse
+					      U_I base,            ///< base value for number suffix
+					      compression & algo,  ///< returned compression algorithm
+					      U_I & level,         ///< returned compression level
+					      U_I & block_size     ///< returned compression block size
+    );
+
+
     /// @}
 
 #endif

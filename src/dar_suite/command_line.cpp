@@ -129,12 +129,6 @@ static void show_license(user_interaction & dialog);
 static void show_warranty(user_interaction & dialog);
 static void show_version(user_interaction & dialog, const char *command_name);
 static void usage(user_interaction & dialog, const char *command_name);
-static void split_compression_algo(const char *arg,     ///< input string to analyse
-				   U_I base,            ///< base value for number suffix
-				   compression & algo,  ///< returned compression algorithm
-				   U_I & level,         ///< returned compression level
-				   U_I & block_size     ///< returned compression block size
-    );
 static fsa_scope string_to_fsa(const string & arg);
 
 #if HAVE_GETOPT_LONG
@@ -1024,11 +1018,11 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case 'z':
                 if(optarg != nullptr)
-                    split_compression_algo(optarg,
-					   rec.suffix_base,
-					   p.algo,
-					   p.compression_level,
-					   p.compression_block_size);
+                    line_tools_split_compression_algo(optarg,
+						      rec.suffix_base,
+						      p.algo,
+						      p.compression_level,
+						      p.compression_block_size);
                 else
                     if(p.algo == compression::none)
                         p.algo = compression::gzip;
@@ -3293,81 +3287,6 @@ static mask *make_unordered_mask(deque<pre_mask> & listing, mask *(*make_include
     }
 
     return ret_mask;
-}
-
-static void split_compression_algo(const char *arg, U_I base, compression & algo, U_I & level, U_I & block_size)
-{
-    if(arg == nullptr)
-        throw SRC_BUG;
-    else
-    {
-        string working = arg;
-	deque<string> split;
-	infinint tmp;
-
-	line_tools_split(working, ':', split);
-
-	switch(split.size())
-	{
-	case 1:
-	    if(!tools_my_atoi(working.c_str(), level))
-            {
-                    // argument to -z is not an integer, testing whether this is an algorithm
-                try
-                {
-                    algo = string2compression(working.c_str());
-                    level = 9; // argument is a compression algo, level is 9 by default
-                }
-                catch(Erange & e)
-                {
-                    throw Erange("split_compression_algo", tools_printf(gettext("%s does not name a compression \"[algorithm][:][level]\" , like for examples \"gzip\", \"lzo\", \"bzip2\", \"lzo:3\", \"gzip:2\", \"8\" or \"1\". Please review the man page about -z option"), working.c_str()));
-                }
-            }
-            else // argument is a compression level, algorithm is gzip by default
-                algo = compression::gzip;
-
-	    block_size = 0;
-	    break;
-	case 2:
-	    if(split[0] != "")
-		algo = string2compression(split[0]);
-	    else
-		algo = compression::gzip; // default algorithm
-
-	     if(split[1] != "")
-	    {
-		if(!tools_my_atoi(split[1].c_str(), level) || (level > 9 && algo != compression::zstd) || level < 1)
-		    throw Erange("split_compression_algo", gettext("Compression level must be between 1 and 9, included"));
-	    }
-	    else
-		level = 9; // default compression level
-
-	    block_size = 0;
-	    break;
-	case 3:
-	    if(split[0] != "")
-		algo = string2compression(split[0]);
-	    else
-		algo = compression::gzip;
-
-	    if(split[1] != "")
-	    {
-		if(!tools_my_atoi(split[1].c_str(), level) || (level > 9 && algo != compression::zstd) || level < 1)
-		    throw Erange("split_compression_algo", gettext("Compression level must be between 1 and 9, included"));
-	    }
-	    else
-		level = 9;
-
-	    tmp = tools_get_extended_size(split[2], base);
-	    block_size = 0;
-	    tmp.unstack(block_size);
-	    if(!tmp.is_zero())
-		throw Erange("split_compression_algo", gettext("Compression block size too large for this operating system"));
-	    break;
-	default:
-	    throw Erange("split_compression_algo", gettext("invalid argument given for compression scheme"));
-	}
-    }
 }
 
 static fsa_scope string_to_fsa(const string & arg)

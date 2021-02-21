@@ -39,6 +39,8 @@ from 2.6.x to 2.7.0
   algorithm.
 - new implementation of the libcurl API use for more efficient reuse of
   established sessions.
+- new feature: dar_manager can now change the compression algorithm of
+  an existing database
 
 from 2.6.13 to 2.6.14
 - script used to build dar windows binary have been fixed to have the
