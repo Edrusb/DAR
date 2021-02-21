@@ -127,9 +127,6 @@ namespace libdar
 	/// create a compress_module based on the provided arguments
     static unique_ptr<compress_module> make_compress_module_ptr(compression algo, U_I compression_level = 9);
 
-	/// create a compressor* (streaming compression) based on the provided arguments
-    static proto_compressor* build_streaming_compressor(compression algo, generic_file & base, U_I compression_level = 9, U_I num_workers = 1);
-
     catalogue *macro_tools_get_catalogue_from(const shared_ptr<user_interaction> & dialog,
 					      pile & stack,
 					      const header_version & ver,
@@ -884,10 +881,10 @@ namespace libdar
 
 	    if(ver.get_compression_block_size().is_zero())
 	    {
-		tmp = build_streaming_compressor(ver.get_compression_algo(),
-						 *(stack.top()),
-						 9, // not used for decompression
-						 multi_threaded_compress);
+		tmp = macro_tools_build_streaming_compressor(ver.get_compression_algo(),
+							     *(stack.top()),
+							     9, // not used for decompression
+							     multi_threaded_compress);
 
 		if(info_details)
 		    dialog->message(tools_printf(gettext("streamed compression layer open (single threaded)")));
@@ -901,30 +898,14 @@ namespace libdar
 		if(!ibs.is_zero())
 		    throw Erange("macro_tools_open_layers", gettext("compression block size used in the archive exceed integer capacity of the current system"));
 
-		if(multi_threaded_compress > 1)
-		{
-#if LIBTHREADAR_AVAILABLE
-		    tmp = new (nothrow) parallel_block_compressor(multi_threaded_compress,
-								  make_compress_module_ptr(ver.get_compression_algo()),
-								  *(stack.top()),
-								  compr_bs);
-
-		    if(info_details)
-			dialog->message(tools_printf(gettext("multi-threaded block compression layer open with %d worker thread(s)"), multi_threaded_compress));
-
-#else
-		    throw Ecompilation(gettext("libthreadar is required at compilation time in order to use more than one thread for block compression"));
-#endif
-		}
-		else
-		{
-		    tmp = new (nothrow) block_compressor(move(make_compress_module_ptr(ver.get_compression_algo(), 9)), // compression level is not used here
+		tmp = macro_tools_build_block_compressor(ver.get_compression_algo(),
 							 *(stack.top()),
+							 9, // not used for decompression
+							 multi_threaded_compress,
 							 compr_bs);
-		    if(info_details)
-			dialog->message(tools_printf(gettext("single-threaded block compression layer open")));
-		}
 
+		if(info_details)
+		    dialog->message(tools_printf(gettext("block compression layer open with %d worker thread(s)"), multi_threaded_compress));
 	    }
 
 	    if(tmp == nullptr)
@@ -1668,33 +1649,20 @@ namespace libdar
 		if(info_details && algo != compression::none)
 		    dialog->message(gettext("Adding a new layer on top: compression..."));
 		if(compression_block_size == 0)
-		    tmp = build_streaming_compressor(algo, *(layers.top()), compression_level, multi_threaded_compress);
+		{
+		    tmp = macro_tools_build_streaming_compressor(algo, *(layers.top()), compression_level, multi_threaded_compress);
+		    if(info_details)
+			dialog->message(tools_printf(gettext("Adding a streamed compression layer")));
+		}
 		else
 		{
-		    if(multi_threaded_compress > 1)
-		    {
-#if LIBTHREADAR_AVAILABLE
-			tmp = new (nothrow) parallel_block_compressor(multi_threaded_compress,
-								      move(make_compress_module_ptr(algo, compression_level)),
-								      *(layers.top()),
-								      compression_block_size);
-
-			if(info_details)
-			    dialog->message(tools_printf(gettext("multi-threaded compression layer open, with %d worker thread(s)"), multi_threaded_compress));
-
-#else
-			throw Ecompilation(gettext("libthreadar is required at compilation time in order to use more than one thread for block compression"));
-#endif
-		    }
-		    else
-		    {
-			tmp = new (nothrow) block_compressor(move(make_compress_module_ptr(algo, compression_level)), // compression level is not used here
+		    tmp = macro_tools_build_block_compressor(algo,
 							     *(layers.top()),
+							     compression_level,
+							     multi_threaded_compress,
 							     compression_block_size);
-
-			if(info_details)
-			    dialog->message(tools_printf(gettext("single-threaded compression layer open")));
-		    }
+		    if(info_details)
+			dialog->message(tools_printf(gettext("Adding block compression layer, with %d worker thread(s)"), multi_threaded_compress));
 		}
 
 		if(tmp == nullptr)
@@ -2200,6 +2168,87 @@ namespace libdar
         }
     }
 
+    proto_compressor* macro_tools_build_streaming_compressor(compression algo,
+							     generic_file & base,
+							     U_I compression_level,
+							     U_I num_workers)
+    {
+	proto_compressor* ret;
+
+	switch(algo)
+	{
+	case compression::none:
+	case compression::gzip:
+	case compression::bzip2:
+	case compression::xz:
+	    ret = new (nothrow) compressor(algo, base, compression_level);
+	    break;
+	case compression::lzo:
+	case compression::lzo1x_1_15:
+	case compression::lzo1x_1:
+	case compression::lz4:
+	    if(num_workers > 1)
+	    {
+#if LIBTHREADAR_AVAILABLE
+		ret = new (nothrow) parallel_block_compressor(num_workers,
+							      make_compress_module_ptr(algo, compression_level),
+							      base,
+							      PRE_2_7_0_LZO_BLOCK_SIZE);
+#else
+		throw Ecompilation(gettext("libthreadar is required at compilation time in order to use more than one thread for block compression"));
+#endif
+	    }
+	    else
+		ret = new (nothrow) block_compressor(make_compress_module_ptr(algo, compression_level),
+						     base,
+						     PRE_2_7_0_LZO_BLOCK_SIZE);
+	    break;
+	case compression::zstd:
+	    ret = new (nothrow) compressor_zstd(base, compression_level);
+	    break;
+	default:
+	    throw SRC_BUG;
+	}
+
+	if(ret == nullptr)
+	    throw Ememory("macro_tools_build_streaming_compressor");
+
+	return ret;
+    }
+
+
+    proto_compressor* macro_tools_build_block_compressor(compression algo,
+							 generic_file & base,
+							 U_I compression_level,
+							 U_I num_workers,
+							 U_I block_size)
+    {
+	proto_compressor* ret = nullptr;
+
+	if(num_workers > 1)
+	{
+#if LIBTHREADAR_AVAILABLE
+	    ret = new (nothrow) parallel_block_compressor(num_workers,
+							  make_compress_module_ptr(algo, compression_level),
+							  base,
+							  block_size);
+#else
+	    throw Ecompilation(gettext("libthreadar is required at compilation time in order to use more than one thread for block compression"));
+#endif
+	}
+	else
+	{
+	    ret = new (nothrow) block_compressor(move(make_compress_module_ptr(algo, compression_level)), // compression level is not used here
+						 base,
+						 block_size);
+	}
+
+	if(ret == nullptr)
+	    throw Ememory("macro_tools_build_block_compressor");
+
+	return ret;
+    }
+
 
 	//////////// STATIC FUNCTIONS //////////////////////////////////////////
 
@@ -2286,51 +2335,6 @@ namespace libdar
 	return ret;
     }
 
-
-    static proto_compressor* build_streaming_compressor(compression algo, generic_file & base, U_I compression_level, U_I num_workers)
-    {
-	proto_compressor* ret;
-
-	switch(algo)
-	{
-	case compression::none:
-	case compression::gzip:
-	case compression::bzip2:
-	case compression::xz:
-	    ret = new (nothrow) compressor(algo, base, compression_level);
-	    break;
-	case compression::lzo:
-	case compression::lzo1x_1_15:
-	case compression::lzo1x_1:
-	case compression::lz4:
-	    if(num_workers > 1)
-	    {
-#if LIBTHREADAR_AVAILABLE
-		ret = new (nothrow) parallel_block_compressor(num_workers,
-							      make_compress_module_ptr(algo, compression_level),
-							      base,
-							      PRE_2_7_0_LZO_BLOCK_SIZE);
-#else
-		throw Ecompilation(gettext("libthreadar is required at compilation time in order to use more than one thread for block compression"));
-#endif
-	    }
-	    else
-		ret = new (nothrow) block_compressor(make_compress_module_ptr(algo, compression_level),
-						     base,
-						     PRE_2_7_0_LZO_BLOCK_SIZE);
-	    break;
-	case compression::zstd:
-	    ret = new (nothrow) compressor_zstd(base, compression_level);
-	    break;
-	default:
-	    throw SRC_BUG;
-	}
-
-	if(ret == nullptr)
-	    throw Ememory("build_compressor");
-
-	return ret;
-    }
 
 
 } // end of namespace
