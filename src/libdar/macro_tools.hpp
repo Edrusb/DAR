@@ -323,10 +323,10 @@ namespace libdar
 	/// \param[in,out] base the layer to read from or write to compressed data
 	/// \param[in] compression_level the compression level to use (when compressing data)
 	/// \param[in] num_workers for the few algorithm that allow multi-thread compression (lz4 actually)
-    proto_compressor* macro_tools_build_streaming_compressor(compression algo,
-							     generic_file & base,
-							     U_I compression_level,
-							     U_I num_workers);
+    extern proto_compressor* macro_tools_build_streaming_compressor(compression algo,
+								    generic_file & base,
+								    U_I compression_level,
+								    U_I num_workers);
 
 	/// return a proto_compressor object realizing the desired (de)compression level/algo on to of "base" in block mode
 
@@ -335,11 +335,11 @@ namespace libdar
 	/// \param[in] compression_level the compression level to use (when compressing data)
 	/// \param[in] num_workers for the few algorithm that allow multi-thread compression (lz4 actually)
 	/// \param[in] block_size size of the data block
-    proto_compressor* macro_tools_build_block_compressor(compression algo,
-							 generic_file & base,
-							 U_I compression_level,
-							 U_I num_workers,
-							 U_I block_size);
+    extern proto_compressor* macro_tools_build_block_compressor(compression algo,
+								generic_file & base,
+								U_I compression_level,
+								U_I num_workers,
+								U_I block_size);
 
         /// @}
 
