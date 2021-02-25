@@ -23,11 +23,12 @@
     /// \brief remote control between dar and dar_slave.
     /// \ingroup Private
     ///
-    /// Two classes are defined in this module
+    /// Two objects communicate through a paire of pipes:
     /// - zapette is the dar side master class
     /// - slave_zapette dar_slave side
     /// .
-    /// these two classes communicate throw a pair pipes
+    /// they form a communication channel between dar/libdar (zapette side)
+    /// and dar_slave/libdar (dar_slave side)
 
 #ifndef ZAPETTE_HPP
 #define ZAPETTE_HPP
