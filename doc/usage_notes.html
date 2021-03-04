@@ -8,29 +8,38 @@
   </head>
   <body>
 
+    <a name="top">&nbsp;</a>
     <div class=top>
       <img alt="Dar Documentation" src="dar_s_doc.jpg" style="float:left;">
       <h1>Command-line Usage Notes</h1>
     </div>
 
-    <div class=menuitem>
-      <a href="#dar_remote">Dar and remote backup server</a><br/>
-      <a href="#netcat">dar and netcat</a><br/>
-      <a href="#ssh">dar and ssh</a><br/>
-      <a href="#remote">Comparing the different way to perform remote backup</a><br/>
-      <a href="#bytes_bits_kilo">Bytes, bits, kilo, mega etc.</a><br/>
-      <a href="#background">Running DAR in background</a><br/>
-      <a href="#extensions_used">Files' extension used</a><br/>
-      <a href="#command_from_dar">Running command or scripts from DAR</a><br/>
-      <a href="#DUC_convention">Convention for DUC files</a><br/>
-      <a href="#DBP_convention">Convention for DBP files</a><br/>
-      <a href="#user_targets">User target in DCF</a><br/>
-      <a href="#Parchive">Using data protection with DAR &amp; Parchive</a><br/>
-      <a href="#filtering">Examples of file filtering</a><br/>
-      <a href="#Decremental_Backup">Decremental Backup</a><br/>
-      <a href="#door">Door inodes (Solaris)</a><br/>
-      <a href="#delta">How to use "delta compression", "binary diff" or "rsync like increment" with dar</a><br/>
-      <a href="#Multi_recipient_signed_archive_weakness">Multi recipient signed archive weakness</a><br/>
+    <div class=jump>
+      <div class=menuitem>
+	<a href="#top">Back to top</a>
+      </div>
+    </div>
+
+    <div class=menu>
+      <div class=menuitem>
+	<a href="#dar_remote">Dar and remote backup server</a><br/>
+	<a href="#netcat">dar and netcat</a><br/>
+	<a href="#ssh">dar and ssh</a><br/>
+	<a href="#remote">Comparing the different way to perform remote backup</a><br/>
+	<a href="#bytes_bits_kilo">Bytes, bits, kilo, mega etc.</a><br/>
+	<a href="#background">Running DAR in background</a><br/>
+	<a href="#extensions_used">Files' extension used</a><br/>
+	<a href="#command_from_dar">Running command or scripts from DAR</a><br/>
+	<a href="#DUC_convention">Convention for DUC files</a><br/>
+	<a href="#DBP_convention">Convention for DBP files</a><br/>
+	<a href="#user_targets">User target in DCF</a><br/>
+	<a href="#Parchive">Using data protection with DAR &amp; Parchive</a><br/>
+	<a href="#filtering">Examples of file filtering</a><br/>
+	<a href="#Decremental_Backup">Decremental Backup</a><br/>
+	<a href="#door">Door inodes (Solaris)</a><br/>
+	<a href="#delta">How to use "delta compression", "binary diff" or "rsync like increment" with dar</a><br/>
+	<a href="#Multi_recipient_signed_archive_weakness">Multi recipient signed archive weakness</a><br/>
+      </div>
     </div>
 
     <h2>Introduction</h2>
@@ -85,7 +94,7 @@
     </p>
 
     <code class=block>
-	dar -c - -R / -z | some_program
+      dar -c - -R / -z | some_program
     </code>
     <p>
       or
@@ -213,7 +222,7 @@
       mkfifo /tmp/todar /tmp/toslave
       dar_slave <e>-o /tmp/todar -i /tmp/toslave</e> backup_name
       some_program_remote < /tmp/todar
-      some_other_program_remote > /tmp/toslave
+			    some_other_program_remote > /tmp/toslave
     </code>
     <p>
       we assume <code>some_program_remote</code> to read the data <code>/tmp/todar</code>
@@ -519,194 +528,196 @@
       the objective here is to clarify the pro and cons of each method.
     </p>
 
-    <table>
-      <tr>
-        <th>Operation</th>
-        <th>dar + dar_slave/dar_xform through ssh</th>
-        <th>dar alone</th>
-	<th>embedded sftp/ftp in dar</th>
-      </tr>
-      <tr>
-	<th>
-	  Underlying mode of operation
-	</th>
-	<td>
-	  direct access mode
-	</td>
-	<td>
-	  sequential read mode
-	</td>
-	<td>
-	  direct access mode
-	</td>
-      </tr>
-      <tr>
-	<th>Backup</th>
-	<td>
-          <ul>
-            <li>
-	      best solution if you want to keep a local copy of the
-	      backup or if you want to push the resulting archive to several
-	      destinations
-	    </li>
-            <li>if sftp not available, only ssh is</li>
-            <li>
-	      on-fly hash file is written locally (where is
-	      dar_xform ran) and is thus computed by dar_xform
-	      which cannot see network transmission errors
-            </li>
-          </ul>
-        </td>
-        <td>
-          <ul>
-            <li>
-	      efficient but does not support slicing,
-	      for the rest this is an as good solution as with dar_xform
-            </li>
-          </ul>
-        </td>
-	<td>
-          <ul>
-            <li>best solution if you do not have space on local disks to store the resulting backup</li>
-            <li>requires on-fly isolation to local disk if you want to feed a local dar_manager database with the new archive</li>
-            <li>if ssh not available, only sftp is</li>
-            <li>
-	      on-fly hash file is written to the remote directory beside the slice but calculated
-	      locally, which can be used to detect network transmission error
-            </li>
-          </ul>
-        </td>
-      </tr>
-      <tr>
-        <th>
-	  Testing<br/>
-	  Diffing<br/>
-	  Listing
-        </th>
-        <td>
-          <ul>
-            <li>workaround if you hit the sftp <a href="Limitations.html">known_hosts limitation</a></li>
-            <li>sftp not available only ssh</li>
-            <li>
-	      relies on dar &lt;-&gt; dar_slave exchanges which
-	      protocol is not designed for high latency exchanges and may give slow
-	      network performances in that situation
-            </li>
-          </ul>
-        </td>
-        <td>
-          <ul>
-            <li>very slow as it requires reading the whole archive</li>
-          </ul>
-        </td>
-	<td>
-          <ul>
-            <li>maybe a simpler command line to execute</li>
-            <li>best solution if filtering a few files from a large archive dar will fetch over the network only the necessary data.</li>
-            <li>ssh not available only sftp</li>
-          </ul>
-        </td>
-      </tr>
-      <tr>
-        <th>Restoration</th>
-        <td>
-          <ul>
-	    <li>
-	      workaround if you hit the sftp
-	      <a href="Limitations.html">known_hosts limitation</a>
-	    </li>
-	    <li>sftp not available only ssh</li>
-          </ul>
-        </td>
-        <td>
-          <ul>
-            <li>very slow as it requires reading the whole archive</li>
-          </ul>
-        </td>
-	<td>
-          <ul>
-            <li>efficient and simple</li>
-            <li>ssh not available only sftp</li>
-          </ul>
-        </td>
-      </tr>
-      <tr>
-        <th>
-	  Merging<br/>
-          <i>(should be done locally rather than over network if possible!!!)</i>
-	</th>
-        <td>
-          <ul>
-            <li>complicated with the many pipes to setup</li>
-          </ul>
-        </td>
-        <td>
-          <ul>
-            <li>not supported!</li>
-          </ul>
-        </td>
-	<td>
-          <ul>
-            <li>
-	      not adapted if you need to feed the merging result to
-	      a local dar_manager database (on-fly isolation not
-	      available with merging with dar)
-            </li>
-          </ul>
-        </td>
-      </tr>
-      <tr>
-        <th>Isolation</th>
-        <td>
-          <ul>
-	    <li>
-	      workaround if you hit the sftp
-	      <a href="Limitations.html">known_hosts limitation</a>
-	    </li>
-	    <li>sftp not available only ssh</li>
-          </ul>
-        </td>
-        <td>
-          <ul>
-            <li>very slow as it requires reading the whole archive</li>
-          </ul>
-        </td>
-	<td>
-          <ul>
-	    <li>
-	      efficient and simple, transfers
-	      the less possible data over the network
-	    </li>
-	    <li>ssh not available only sftp</li>
-          </ul>
-        </td>
-      </tr>
-      <tr>
-        <th>
-	  Repairing<br/>
-          <i>(should be done locally rather than over network if possible!!!)</i>
-	</th>
-        <td>
-          <ul>
-            <li>not supported!</li>
-          </ul>
-        </td>
-        <td>
-          <ul>
-            <li>
-	      propably the best way to repaire remotely
-	      for efficiency, as this operation uses
-	      sequential reading
-            </li>
-          </ul>
-        </td>
-	<td>
-          <ul>
-            <li>ssh not available only sftp</li>
-          </ul>
-        </td>
-      </tr>
-    </table>
+    <div class=table>
+      <table>
+	<tr>
+          <th>Operation</th>
+          <th>dar + dar_slave/dar_xform through ssh</th>
+          <th>dar alone</th>
+	  <th>embedded sftp/ftp in dar</th>
+	</tr>
+	<tr>
+	  <th>
+	    Underlying mode of operation
+	  </th>
+	  <td>
+	    direct access mode
+	  </td>
+	  <td>
+	    sequential read mode
+	  </td>
+	  <td>
+	    direct access mode
+	  </td>
+	</tr>
+	<tr>
+	  <th>Backup</th>
+	  <td>
+            <ul>
+              <li>
+		best solution if you want to keep a local copy of the
+		backup or if you want to push the resulting archive to several
+		destinations
+	      </li>
+              <li>if sftp not available, only ssh is</li>
+              <li>
+		on-fly hash file is written locally (where is
+		dar_xform ran) and is thus computed by dar_xform
+		which cannot see network transmission errors
+              </li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li>
+		efficient but does not support slicing,
+		for the rest this is an as good solution as with dar_xform
+              </li>
+            </ul>
+          </td>
+	  <td>
+            <ul>
+              <li>best solution if you do not have space on local disks to store the resulting backup</li>
+              <li>requires on-fly isolation to local disk if you want to feed a local dar_manager database with the new archive</li>
+              <li>if ssh not available, only sftp is</li>
+              <li>
+		on-fly hash file is written to the remote directory beside the slice but calculated
+		locally, which can be used to detect network transmission error
+              </li>
+            </ul>
+          </td>
+	</tr>
+	<tr>
+          <th>
+	    Testing<br/>
+	    Diffing<br/>
+	    Listing
+          </th>
+          <td>
+            <ul>
+              <li>workaround if you hit the sftp <a href="Limitations.html">known_hosts limitation</a></li>
+              <li>sftp not available only ssh</li>
+              <li>
+		relies on dar &lt;-&gt; dar_slave exchanges which
+		protocol is not designed for high latency exchanges and may give slow
+		network performances in that situation
+              </li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li>very slow as it requires reading the whole archive</li>
+            </ul>
+          </td>
+	  <td>
+            <ul>
+              <li>maybe a simpler command line to execute</li>
+              <li>best solution if filtering a few files from a large archive dar will fetch over the network only the necessary data.</li>
+              <li>ssh not available only sftp</li>
+            </ul>
+          </td>
+	</tr>
+	<tr>
+          <th>Restoration</th>
+          <td>
+            <ul>
+	      <li>
+		workaround if you hit the sftp
+		<a href="Limitations.html">known_hosts limitation</a>
+	      </li>
+	      <li>sftp not available only ssh</li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li>very slow as it requires reading the whole archive</li>
+            </ul>
+          </td>
+	  <td>
+            <ul>
+              <li>efficient and simple</li>
+              <li>ssh not available only sftp</li>
+            </ul>
+          </td>
+	</tr>
+	<tr>
+          <th>
+	    Merging<br/>
+            <i>(should be done locally rather than over network if possible!!!)</i>
+	  </th>
+          <td>
+            <ul>
+              <li>complicated with the many pipes to setup</li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li>not supported!</li>
+            </ul>
+          </td>
+	  <td>
+            <ul>
+              <li>
+		not adapted if you need to feed the merging result to
+		a local dar_manager database (on-fly isolation not
+		available with merging with dar)
+              </li>
+            </ul>
+          </td>
+	</tr>
+	<tr>
+          <th>Isolation</th>
+          <td>
+            <ul>
+	      <li>
+		workaround if you hit the sftp
+		<a href="Limitations.html">known_hosts limitation</a>
+	      </li>
+	      <li>sftp not available only ssh</li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li>very slow as it requires reading the whole archive</li>
+            </ul>
+          </td>
+	  <td>
+            <ul>
+	      <li>
+		efficient and simple, transfers
+		the less possible data over the network
+	      </li>
+	      <li>ssh not available only sftp</li>
+            </ul>
+          </td>
+	</tr>
+	<tr>
+          <th>
+	    Repairing<br/>
+            <i>(should be done locally rather than over network if possible!!!)</i>
+	  </th>
+          <td>
+            <ul>
+              <li>not supported!</li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li>
+		propably the best way to repaire remotely
+		for efficiency, as this operation uses
+		sequential reading
+              </li>
+            </ul>
+          </td>
+	  <td>
+            <ul>
+              <li>ssh not available only sftp</li>
+            </ul>
+          </td>
+	</tr>
+      </table>
+    </div>
 
     <h2><a name="bytes_bits_kilo">Bytes, bits, kilo, mega etc.</a></h2>
     <p>
