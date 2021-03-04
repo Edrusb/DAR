@@ -1759,104 +1759,107 @@
       please contact libdar developer if you thing an additional class
       should take place beside the following ones:
     </p>
-    <table>
-      <tr>
-	<th>
-	  class name
-	</th>
-	<th>
-	  behavior
-	</th>
-      </tr>
-      <tr>
-	<td>
-	  class libdar::bool_mask
-	</td>
-	<td>
-	  boolean mask, either always true
-	  or false (depending on the boolean passed
-	  at its constructor), it matches either all
-	  or none of the submitted strings
-	</td>
-      </tr>
-      <tr>
-	<td>
-	  class libdar::simple_mask
-	</td>
-	<td>
-	  matches strings as done by the shell on the command
-	  lines (see "man 7 glob")
-	</td>
-      </tr>
-      <tr>
-	<td>
-	  class libdar::regular_mask
-	</td>
-	<td>
-	  matches regular expressions (see "man 7 regex")
-	</td>
-      </tr>
-      <tr>
-	<td>
-	  class libdar::not_mask
-	</td>
-	<td>
-	  negation of another mask (the mask given
-	  at construction time)
-	</td>
-      </tr>
-      <tr>
-	<td>
-	  class libdar::et_mask
-	</td>
-	<td>makes an *AND* operator between
-	  two or more masks
-	</td>
-      </tr>
-      <tr>
-	<td>
-	  class libdar::ou_mask
-	</td>
-	<td>
-	  makes the *OR* operator between two or more masks
-	</td>
-      </tr>
-      <tr>
-	<td>
-	  class lbdar::simple_path_mask
-	</td>
-	<td>
-	  matches whether the string to evaluate
-	  is subdirectory of, or is the directory itself
-	  that has been given at construction time.
-	</td>
-      </tr>
-      <tr>
-	<td>
-	  class libdar::same_path_mask
-	</td>
-	<td>
-	  matches if the string is exactly the
-	  given mask (no wild card expression)
-	</td>
-      </tr>
-      <tr>
-	<td>
-	  class libdar::exclude_dir_mask
-	</td>
-	<td>
-	  matches if string is the given
-	  string or a sub directory of it
-	</td>
-      </tr>
-      <tr>
-	<td>class libdar::mask_list
-	</td>
-	<td>
-	  matches a list of files defined in a given file
-	</td>
-      </tr>
-    </table>
+
+    <div class=table>
+      <table>
+	<tr>
+	  <th>
+	    class name
+	  </th>
+	  <th>
+	    behavior
+	  </th>
+	</tr>
+	<tr>
+	  <td>
+	    class libdar::bool_mask
+	  </td>
+	  <td>
+	    boolean mask, either always true
+	    or false (depending on the boolean passed
+	    at its constructor), it matches either all
+	    or none of the submitted strings
+	  </td>
+	</tr>
+	<tr>
+	  <td>
+	    class libdar::simple_mask
+	  </td>
+	  <td>
+	    matches strings as done by the shell on the command
+	    lines (see "man 7 glob")
+	  </td>
+	</tr>
+	<tr>
+	  <td>
+	    class libdar::regular_mask
+	  </td>
+	  <td>
+	    matches regular expressions (see "man 7 regex")
+	  </td>
+	</tr>
+	<tr>
+	  <td>
+	    class libdar::not_mask
+	  </td>
+	  <td>
+	    negation of another mask (the mask given
+	    at construction time)
+	  </td>
+	</tr>
+	<tr>
+	  <td>
+	    class libdar::et_mask
+	  </td>
+	  <td>makes an *AND* operator between
+	    two or more masks
+	  </td>
+	</tr>
+	<tr>
+	  <td>
+	    class libdar::ou_mask
+	  </td>
+	  <td>
+	    makes the *OR* operator between two or more masks
+	  </td>
+	</tr>
+	<tr>
+	  <td>
+	    class lbdar::simple_path_mask
+	  </td>
+	  <td>
+	    matches whether the string to evaluate
+	    is subdirectory of, or is the directory itself
+	    that has been given at construction time.
+	  </td>
+	</tr>
+	<tr>
+	  <td>
+	    class libdar::same_path_mask
+	  </td>
+	  <td>
+	    matches if the string is exactly the
+	    given mask (no wild card expression)
+	  </td>
+	</tr>
+	<tr>
+	  <td>
+	    class libdar::exclude_dir_mask
+	  </td>
+	  <td>
+	    matches if string is the given
+	    string or a sub directory of it
+	  </td>
+	</tr>
+	<tr>
+	  <td>class libdar::mask_list
+	  </td>
+	  <td>
+	    matches a list of files defined in a given file
+	  </td>
+	</tr>
+      </table>
+    </div>
 
     <p>
       Let's play with some masks:
