@@ -304,339 +304,341 @@
       <a name="configure_options">Options for the <code>configure</code> script</a>
     </h2>
 
-    <table class="lean left">
-      <tr>
-	<th colspan=2 class=center>
-	  Available options for the configure script
-	</th>
-      </tr>
-      <tr>
-	<td>
-	  <br>
-	</td>
-	<td>
-	</td>
-      </tr>
-      <tr>
-	<th style="width: 33%;">
-	  Optimization option:
-	</th>
-	<td>
-	</td>
-    </tr>
-    <tr>
-      <td class=desc>
-	--enable-mode
-      </td>
-      <td>
-	<p>
-	  --enable-mode=32 or --enable-mode=infinint
-	</p>
-	<p>
-	  if set,replace 64 bits integers used by default by 32 bits
-	  integers or "infinint" integers (limitless integers). Before
-	  release 2.6.0 the default integer used was infinint and this
-	  option was added for speed optimization at the cost of some
-	  limitations (See the
-	  <a href="Limitations.html#Integers">limitations</a> for more).
-	</p>
-	<p>
-	  Since release 2.6.0, the default is 64 bits integers (limitations
-	  stay the same) instead of infinint. But if you hit the 64 bits
-	  integer limitations you can still use infinint which overcome
-	  this at the cost of slower performance and increase memory
-	  requirement.
-	</p>
-      </td>
-    </tr>
-    <tr>
-      <th>
-	Deactivation options:
-      </th>
-      <td>
-      </td>
-    </tr>
-      <tr>
-	<td class=desc>
-	  --disable-largefile
-	</td>
-	<td>
-	  Whatever your system is, dar
-	  will not be able to handle file of size larger than 4GB
-	</td>
-      </tr>
-      <tr>
-	<td class=desc>
-	  --disable-ea-support
-	</td>
-	<td>
-	  Whatever your system is, dar
-	  will not be able to save or restore Extended Attributes (see the Notes
-	  paragraphs<a href="Notes.html#I"> I</a> and <a href="Notes.html#V">V</a>)
-	</td>
-      </tr>
-    <tr>
-      <td class=desc>--disable-nodump-flag
-      </td>
-      <td>
-	Whatever your system is, dar
-	will not be able to take care of the nodump-flag (thanks to the
-	--nodump option)
-      </td>
-    </tr>
-    <tr>
-      <td class=desc>
-	--disable-linux-statx
-      </td>
-      <td>
-	Even if your system provides the statx() system call, dar
-	will ignore it and will not save birthtime of files as Linux FSA. At restoration time you will
-	not be bothered by the warning telling you that birthime is not possible to be restored
-	under Linux, if you still want to restore other Linux FSA.
-      </td>
-    </tr>
-      <tr>
-      <td class=desc>--disable-dar-static
-      </td>
-      <td>
-	dar_static binary (statically linked version of dar) will not be built
-      </td>
-    </tr>
-    <tr>
-      <td class=desc>--disable-special-alloc
-      </td>
-      <td>
-	dar uses a
-	special allocation scheme by default (gather the many small allocations
-	in big fewer ones), this improves dar's execution speed
-      </td>
-    </tr>
-      <tr>
-	<td class=desc>--disable-upx
-	</td>
-	<td>
-	  If <i>upx</i> is found in the PATH, binary
-	  are upx compressed at installation step. This can be disabled by this
-	  option, when upx is available and you don't want compressed binaries.
-	</td>
-      </tr>
-      <tr>
-	<td class=desc>--disable-gnugetopt
-	</td>
-	<td>on non GNU systems
-	  (Solaris, etc.) configure looks for libgnugetopt to have the long
-	  options support thanks to the gnu getopt_long() call, this can be
-	  disabled.
-	</td>
-      </tr>
-      <tr>
-	<td class=desc>--disable-thread-safe
-	</td>
-	<td>
-	  libdar
-	  may need <i>POSIX mutex</i> to be
-	  thread safe. If you don't want libdar relaying on
-	  <i>POSIX mutex</i> even if they are
-	  available, use this option. The resulting library may not be thread
-	  safe. But it will always be thread safe if you use
-	  --disable-special-alloc, and it will never be thread safe if
-	  --enable-test-memory is used.
-	</td>
-      </tr>
-      <tr>
-	<td class=desc>--disable-libdl-linking
-	</td>
-	<td>
-	  Ignore any libdl library and avoid linking with it
-	</td>
-      </tr>
-      <tr>
-	<td class=desc>--disable-libz-linking
-	</td>
-	<td>
-	  Disable linking to libz, thus
-	  -zgzip:* option (gzip compression) will not be available
-	</td>
-      </tr>
-      <tr>
-	<td class=desc>--disable-libbz2-linking
-      </td>
-	<td>
-	  Disable linking to libbz2, thus
-	  -zbzip2:* option (libbz2 compression) will not be available
-	</td>
-      </tr>
-      <tr>
-	<td class=desc>--disable-liblzo2-linking
-	</td>
-	<td>
-	  Disable linking to liblzo2, thus
-	  -zlzo:* option (lzo compression) will not be available
-	</td>
-      </tr>
-      <tr>
-	<td class=desc>--disable-libxz-linking
-	</td>
-	<td>
-	  Disable linking to liblzma5 this -zxz:* option (xz compression) will not be available
-	</td>
-      </tr>
-      <tr>
-	<td class=desc>--disable-libgcrypt-linking
-	</td>
-	<td>
-	  Disable
-	  linking with libgcrypt library. Strong encryption will not be
-	  available neither a hashing of generated slices.
-	</td>
-      </tr>
-      <tr>
-	<td class=desc>--disable-gpgme-linking
-	</td>
-	<td>
-	  Disable
-	  linking with gpgme library. Asymetric strong encryption algorithms will not be available
-	</td>
-      </tr>
-      <tr>
-	<td class=desc>--disable-build-html
-	</td>
-	<td>
-	  Do not build API documentation
-	  reference with Doxygen (when it is available)
-	</td>
-      </tr>
-      <tr>
-	<td class=desc>--disable-furtive-read
-	</td>
-	<td>
-	  Do not try to detect whether the
-	  system does support furtive read mode. This will lead furtive read
-	  mode to stay disabled in any case.
-	</td>
-      </tr>
-      <tr>
-	<td class=desc>--disable-fast-dir
-	</td>
-	<td>
-	  Disable optimization for large
-	  directories, doing so has a little positive impact on memory
-	  requirement but a huge drawback on execution time
-	</td>
-      </tr>
-      <tr>
-	<td class=desc>--disable-execinfo
-	</td>
-	<td>
-	  Disable reporting stack
-	  information on self diagnostic bugs even
-	</td>
-      </tr>
-      <tr>
-	<td class=desc>--disable-threadar
-	</td>
-	<td>Avoid linking with libthreadar even if available, libdar will not create threads
-	</td>
-      </tr>
-      <tr>
-	<td class=desc>--disable-birthtime
-	</td>
-	<td>Disable the HFS+ Filesystem Specific Attribute support
-	</td>
-      </tr>
-      <tr>
-	<td class=desc>--disable-librsync-linking
-	</td>
-	<td>
-	  Disable linking with librsync, thus delta binary will not be available
-	</td>
-      </tr>
-      <tr>
-	<td class=desc>--disable-libcurl-linking
-	</td>
-	<td>
-	  Disable linking with libcurl, thus remote repository support using ftp or sftp will not be available
-	</td>
-      </tr>
-      <tr>
-	<td class=desc>--enable-limit-time-accuracy={s|us|ns}
-	</td>
-	<td>
-	  Limit the timestamp precision of files to seconds, microseconds (lowercase U
-	  not the &mu; greek letter for &mu;s)  and nanoseconds respectively,
-	  by default dar uses the maximum time precision supported by the operating system.
-	</td>
-      </tr>
-      <tr>
-	<th>
-	  Troubleshooting option:
-	</th>
-	<td>
-	</td>
-      </tr>
-      <tr>
-	<td class=desc>
-	  --enable-os-bits
-	</td>
-	<td>
-	  If set, dar
-	  uses the given argument (32 or 64) to determine which integer type to
-	  use. This much match your CPU register size. By default dar uses the
-	  system &lt;stdint.h&gt; file to determine the correct integer type to
-	  use
-	</td>
-      </tr>
-      <tr>
-	<th>
-	  Debugging options:
-	</th>
-	<td>
-	</td>
-      </tr>
-      <tr>
-	<td class=desc>
-	  --enable-examples
-	</td>
-	<td>
-	  If set, example programs based on infinint will also be built
-	</td>
-      </tr>
-      <tr>
-	<td class=desc>
-	  --enable-debug
-	</td>
-	<td>
-	  If set, use debug compilation
-	  option, and if possible statically link binaries
-	</td>
-      </tr>
-      <tr>
-	<td class=desc>
-	  --enable-pedantic
-	</td>
-	<td>
-	  If set,
-	  transmits the -pedantic option to the compiler
-	</td>
-      </tr>
-      <tr>
-	<td class=desc>--enable-profiling</td>
-	<td>Enable executable profiling</td>
-      </tr>
-      <tr>
-	<td class=desc>--enable-debug-memory</td>
-	<td>
-	  If set, logs all memory
-	  allocations and releases to
-	  <code>/tmp/dar_debug_mem_allocation.txt</code>.
-	  The resulting executable is expected to be very
-	  slow
-	</td>
-      </tr>
-    </table>
+    <div class=table>
+      <table class="lean left">
+	<tr>
+	  <th colspan=2 class=center>
+	    Available options for the configure script
+	  </th>
+	</tr>
+	<tr>
+	  <td>
+	    <br>
+	  </td>
+	  <td>
+	  </td>
+	</tr>
+	<tr>
+	  <th style="width: 33%;">
+	    Optimization option:
+	  </th>
+	  <td>
+	  </td>
+	</tr>
+	<tr>
+	  <td class=desc>
+	    --enable-mode
+	  </td>
+	  <td>
+	    <p>
+	      --enable-mode=32 or --enable-mode=infinint
+	    </p>
+	    <p>
+	      if set,replace 64 bits integers used by default by 32 bits
+	      integers or "infinint" integers (limitless integers). Before
+	      release 2.6.0 the default integer used was infinint and this
+	      option was added for speed optimization at the cost of some
+	      limitations (See the
+	      <a href="Limitations.html#Integers">limitations</a> for more).
+	    </p>
+	    <p>
+	      Since release 2.6.0, the default is 64 bits integers (limitations
+	      stay the same) instead of infinint. But if you hit the 64 bits
+	      integer limitations you can still use infinint which overcome
+	      this at the cost of slower performance and increase memory
+	      requirement.
+	    </p>
+	  </td>
+	</tr>
+	<tr>
+	  <th>
+	    Deactivation options:
+	  </th>
+	  <td>
+	  </td>
+	</tr>
+	<tr>
+	  <td class=desc>
+	    --disable-largefile
+	  </td>
+	  <td>
+	    Whatever your system is, dar
+	    will not be able to handle file of size larger than 4GB
+	  </td>
+	</tr>
+	<tr>
+	  <td class=desc>
+	    --disable-ea-support
+	  </td>
+	  <td>
+	    Whatever your system is, dar
+	    will not be able to save or restore Extended Attributes (see the Notes
+	    paragraphs<a href="Notes.html#I"> I</a> and <a href="Notes.html#V">V</a>)
+	  </td>
+	</tr>
+	<tr>
+	  <td class=desc>--disable-nodump-flag
+	  </td>
+	  <td>
+	    Whatever your system is, dar
+	    will not be able to take care of the nodump-flag (thanks to the
+	    --nodump option)
+	  </td>
+	</tr>
+	<tr>
+	  <td class=desc>
+	    --disable-linux-statx
+	  </td>
+	  <td>
+	    Even if your system provides the statx() system call, dar
+	    will ignore it and will not save birthtime of files as Linux FSA. At restoration time you will
+	    not be bothered by the warning telling you that birthime is not possible to be restored
+	    under Linux, if you still want to restore other Linux FSA.
+	  </td>
+	</tr>
+	<tr>
+	  <td class=desc>--disable-dar-static
+	  </td>
+	  <td>
+	    dar_static binary (statically linked version of dar) will not be built
+	  </td>
+	</tr>
+	<tr>
+	  <td class=desc>--disable-special-alloc
+	  </td>
+	  <td>
+	    dar uses a
+	    special allocation scheme by default (gather the many small allocations
+	    in big fewer ones), this improves dar's execution speed
+	  </td>
+	</tr>
+	<tr>
+	  <td class=desc>--disable-upx
+	  </td>
+	  <td>
+	    If <i>upx</i> is found in the PATH, binary
+	    are upx compressed at installation step. This can be disabled by this
+	    option, when upx is available and you don't want compressed binaries.
+	  </td>
+	</tr>
+	<tr>
+	  <td class=desc>--disable-gnugetopt
+	  </td>
+	  <td>on non GNU systems
+	    (Solaris, etc.) configure looks for libgnugetopt to have the long
+	    options support thanks to the gnu getopt_long() call, this can be
+	    disabled.
+	  </td>
+	</tr>
+	<tr>
+	  <td class=desc>--disable-thread-safe
+	  </td>
+	  <td>
+	    libdar
+	    may need <i>POSIX mutex</i> to be
+	    thread safe. If you don't want libdar relaying on
+	    <i>POSIX mutex</i> even if they are
+	    available, use this option. The resulting library may not be thread
+	    safe. But it will always be thread safe if you use
+	    --disable-special-alloc, and it will never be thread safe if
+	    --enable-test-memory is used.
+	  </td>
+	</tr>
+	<tr>
+	  <td class=desc>--disable-libdl-linking
+	  </td>
+	  <td>
+	    Ignore any libdl library and avoid linking with it
+	  </td>
+	</tr>
+	<tr>
+	  <td class=desc>--disable-libz-linking
+	  </td>
+	  <td>
+	    Disable linking to libz, thus
+	    -zgzip:* option (gzip compression) will not be available
+	  </td>
+	</tr>
+	<tr>
+	  <td class=desc>--disable-libbz2-linking
+	  </td>
+	  <td>
+	    Disable linking to libbz2, thus
+	    -zbzip2:* option (libbz2 compression) will not be available
+	  </td>
+	</tr>
+	<tr>
+	  <td class=desc>--disable-liblzo2-linking
+	  </td>
+	  <td>
+	    Disable linking to liblzo2, thus
+	    -zlzo:* option (lzo compression) will not be available
+	  </td>
+	</tr>
+	<tr>
+	  <td class=desc>--disable-libxz-linking
+	  </td>
+	  <td>
+	    Disable linking to liblzma5 this -zxz:* option (xz compression) will not be available
+	  </td>
+	</tr>
+	<tr>
+	  <td class=desc>--disable-libgcrypt-linking
+	  </td>
+	  <td>
+	    Disable
+	    linking with libgcrypt library. Strong encryption will not be
+	    available neither a hashing of generated slices.
+	  </td>
+	</tr>
+	<tr>
+	  <td class=desc>--disable-gpgme-linking
+	  </td>
+	  <td>
+	    Disable
+	    linking with gpgme library. Asymetric strong encryption algorithms will not be available
+	  </td>
+	</tr>
+	<tr>
+	  <td class=desc>--disable-build-html
+	  </td>
+	  <td>
+	    Do not build API documentation
+	    reference with Doxygen (when it is available)
+	  </td>
+	</tr>
+	<tr>
+	  <td class=desc>--disable-furtive-read
+	  </td>
+	  <td>
+	    Do not try to detect whether the
+	    system does support furtive read mode. This will lead furtive read
+	    mode to stay disabled in any case.
+	  </td>
+	</tr>
+	<tr>
+	  <td class=desc>--disable-fast-dir
+	  </td>
+	  <td>
+	    Disable optimization for large
+	    directories, doing so has a little positive impact on memory
+	    requirement but a huge drawback on execution time
+	  </td>
+	</tr>
+	<tr>
+	  <td class=desc>--disable-execinfo
+	  </td>
+	  <td>
+	    Disable reporting stack
+	    information on self diagnostic bugs even
+	  </td>
+	</tr>
+	<tr>
+	  <td class=desc>--disable-threadar
+	  </td>
+	  <td>Avoid linking with libthreadar even if available, libdar will not create threads
+	  </td>
+	</tr>
+	<tr>
+	  <td class=desc>--disable-birthtime
+	  </td>
+	  <td>Disable the HFS+ Filesystem Specific Attribute support
+	  </td>
+	</tr>
+	<tr>
+	  <td class=desc>--disable-librsync-linking
+	  </td>
+	  <td>
+	    Disable linking with librsync, thus delta binary will not be available
+	  </td>
+	</tr>
+	<tr>
+	  <td class=desc>--disable-libcurl-linking
+	  </td>
+	  <td>
+	    Disable linking with libcurl, thus remote repository support using ftp or sftp will not be available
+	  </td>
+	</tr>
+	<tr>
+	  <td class=desc>--enable-limit-time-accuracy={s|us|ns}
+	  </td>
+	  <td>
+	    Limit the timestamp precision of files to seconds, microseconds (lowercase U
+	    not the &mu; greek letter for &mu;s)  and nanoseconds respectively,
+	    by default dar uses the maximum time precision supported by the operating system.
+	  </td>
+	</tr>
+	<tr>
+	  <th>
+	    Troubleshooting option:
+	  </th>
+	  <td>
+	  </td>
+	</tr>
+	<tr>
+	  <td class=desc>
+	    --enable-os-bits
+	  </td>
+	  <td>
+	    If set, dar
+	    uses the given argument (32 or 64) to determine which integer type to
+	    use. This much match your CPU register size. By default dar uses the
+	    system &lt;stdint.h&gt; file to determine the correct integer type to
+	    use
+	  </td>
+	</tr>
+	<tr>
+	  <th>
+	    Debugging options:
+	  </th>
+	  <td>
+	  </td>
+	</tr>
+	<tr>
+	  <td class=desc>
+	    --enable-examples
+	  </td>
+	  <td>
+	    If set, example programs based on infinint will also be built
+	  </td>
+	</tr>
+	<tr>
+	  <td class=desc>
+	    --enable-debug
+	  </td>
+	  <td>
+	    If set, use debug compilation
+	    option, and if possible statically link binaries
+	  </td>
+	</tr>
+	<tr>
+	  <td class=desc>
+	    --enable-pedantic
+	  </td>
+	  <td>
+	    If set,
+	    transmits the -pedantic option to the compiler
+	  </td>
+	</tr>
+	<tr>
+	  <td class=desc>--enable-profiling</td>
+	  <td>Enable executable profiling</td>
+	</tr>
+	<tr>
+	  <td class=desc>--enable-debug-memory</td>
+	  <td>
+	    If set, logs all memory
+	    allocations and releases to
+	    <code>/tmp/dar_debug_mem_allocation.txt</code>.
+	    The resulting executable is expected to be very
+	    slow
+	  </td>
+	</tr>
+      </table>
+    </div>
 
-<h2><a name="GIT">GIT</a></h2>
-<h3>Presentation</h3>
+    <h2><a name="GIT">GIT</a></h2>
+    <h3>Presentation</h3>
     <p>
       To manage its source code
       versions DAR uses GIT (it used CVS up to Q1 2012 and even the older RCS
