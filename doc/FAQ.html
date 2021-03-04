@@ -8,6 +8,7 @@
   </head>
   <body>
 
+    <a name="top">&nbsp;</a>
     <div class=top>
       <img alt="Dar Documentation" src="dar_s_doc.jpg" style="float:left;">
       <h1>DAR's - Frequently Asked Questions</h1>
@@ -15,79 +16,87 @@
 
     <h2>Questions:</h2>
 
-    <b>
-      <a href="#A1">
-	I restore/save all files but dar reported some files have been ignored,
-	what are those ignored files?
-      </a><br>
-      <a href="#A2">Dar hangs when using it with pipes, why?</a><br>
-      <a href="#A3">Why, when I restore 1 file, dar report 3 files have been restored?</a><br>
-      <a href="#libattr">While compiling dar I get the following message :
-	<code>g++: /lib/libattr.a: No such file or directory</code>, what can I do?</a><br>
-      <a href="#A4">I cannot find the binary package for my distro, where to look for?</a><br>
-      <a href="#A6">
-	Can I use different filters between a full backup and a
-	differential backup? Would not dar consider some file not included in
-	the filter to be deleted?
-      </a><br>
-      <a href="#A7">
-	Once in action dar
-	makes all the system slower and slower, then it stops with the message
-	"killed"! How to overcome this problem?
-      </a><br>
-      <a href="#A8">I have a backup I want to change the size of slices?</a><br>
-      <a href="#A9">
-	I have a backup in one slice, how can I split it in several
-	slices?
-      </a><br>
-      <a href="#A10">
-	I have a backup in several slice, how can I stick all them
-	in a single file?
-      </a><br>
-      <a href="#A11">I have a backup, how can I change its encryption scheme?</a><br>
-      <a href="#A12">I have a backup, how can I change its compression algorithm?</a><br>
-      <a href="#A13">Which options can I use with which options?</a><br>
-      <a href="#A14">Why dar reports corruption for the backup I have transfered with FTP?</a><br>
-      <a href="#UIDGID">Why DAR does save UID/GID instead of plain usernames and usergroups?</a><br>
-      <a href="#Dar_Manager_encrypted">Dar_Manager does not accept encrypted backups, how to workaround this?</a><br>
-      <a href="#staticOSX">How to overcome the lack of static linking on MacOS X?</a><br>
-      <a href="#single_slice">Why cannot I test, extract file, list the contents of a given slice from a backup?</a><br>
-      <a href="#merge_two_isolated">Why cannot I merge two isolated catalogues?</a><br>
-      <a href="#parallel">How to use the full power of my multi-processor computer?</a><br>
-      <a href="#threadsafe">Is libdar thread-safe, which way do you mean it is?</a><br>
-      <a href="#How_to_solve_configure:_error:_Cannot">How to solve <code>configure: error: Cannot find size_t type</code>"?</a><br>
-      <a href="#slow_2_4_0">Why dar became much slower since release 2.4.0?</a><br>
-      <a href="#slow_2_5_0">Why dar became yet slower since release 2.5.0?</a><br>
-      <a href="#search_for_questions">How to search for questions (and their answers) about known problems similar to mines?</a><br>
-      <a href="#open_failed_excluded">Why dar tells me that he failed to open a directory, while I have excluded this directory?</a><br>
-      <a href="#security">Dar reports a <code>SECURITY WARNING! SUSPICIOUS FILE</code> what does that mean!?</a><br>
-      <a href="#copy">Can dar help copy a large directory tree?</a><br>
-      <a href="#compression">Does dar compress per file or the whole backup?</a><br>
-      <a href="#sizes">What slice size can I use with dar?</a><br>
-      <a href="#fuse">Is there a dar fuse filesystem?</a><br>
-      <a href="#tar">how dar compares to tar or rsync?</a><br>
-      <a href="#diff">Why when comparing a backup with filesystem, dar does not report new files found on filesystem?</a><br>
-      <a href="#delta">Why dar does not automatically perform delta difference (aka rsync increment)?</a><br>
-      <a href="#cyrillic">Why do dar reports truncated filenames under Windows, especially with cyrillic filenames?</a><br>
-      <a href="#win32">I have a 32 bits windows system, which binary package can I to use?</a><br>
-      <a href="#lzop_vs_dar">lzo compression is slower with dar than with lzop, why?</a><br>
-      <a href="#libthreadar">what is libthreadar and why libdar relies on it?</a><br>
-      <a href="#sftppubkey">I have sftp pubkey authentication working with ssh/sftp, how to have dar using too this public key authentication for sftp?</a><br>
-      <a href="#libssh2">I Cannot get dar to connect to remote server using SFTP, it fails with "<code>SSL peer certificate or SSH remote key was not OK</code>"</a><br>
-      <a href="#too_large"><code>Cannot open catalogue: Cannot handle such a too large integer.</code> What to do?</a><br>
-      <a href="#sftppubkey">I have sftp pubkey authentication working with ssh/sftp, how to have dar using too this public key authentication for sftp?</a><br>
-      <a href="#full-from-diff">I have a diff/incremental backup and I want to convert it to a full backup, how to do that?</a><br>
-    </b>
+    <div class=jump>
+      <div class=menuitem>
+	<a href="#top">Back to top</a>
+      </div>
+    </div>
+
+    <div class=menu>
+      <div class=menuitem>
+	<a href="#A1">
+	  I restore/save all files but dar reported some files have been ignored,
+	  what are those ignored files?
+	</a><br/>
+	<a href="#A2">Dar hangs when using it with pipes, why?</a><br/>
+	<a href="#A3">Why, when I restore 1 file, dar report 3 files have been restored?</a><br/>
+	<a href="#libattr">While compiling dar I get the following message :
+	  <code>g++: /lib/libattr.a: No such file or directory</code>, what can I do?</a><br/>
+	<a href="#A4">I cannot find the binary package for my distro, where to look for?</a><br/>
+	<a href="#A6">
+	  Can I use different filters between a full backup and a
+	  differential backup? Would not dar consider some file not included in
+	  the filter to be deleted?
+	</a><br/>
+	<a href="#A7">
+	  Once in action dar
+	  makes all the system slower and slower, then it stops with the message
+	  "killed"! How to overcome this problem?
+	</a><br/>
+	<a href="#A8">I have a backup I want to change the size of slices?</a><br/>
+	<a href="#A9">
+	  I have a backup in one slice, how can I split it in several
+	  slices?
+	</a><br/>
+	<a href="#A10">
+	  I have a backup in several slice, how can I stick all them
+	  in a single file?
+	</a><br/>
+	<a href="#A11">I have a backup, how can I change its encryption scheme?</a><br/>
+	<a href="#A12">I have a backup, how can I change its compression algorithm?</a><br/>
+	<a href="#A13">Which options can I use with which options?</a><br/>
+	<a href="#A14">Why dar reports corruption for the backup I have transfered with FTP?</a><br/>
+	<a href="#UIDGID">Why DAR does save UID/GID instead of plain usernames and usergroups?</a><br/>
+	<a href="#Dar_Manager_encrypted">Dar_Manager does not accept encrypted backups, how to workaround this?</a><br/>
+	<a href="#staticOSX">How to overcome the lack of static linking on MacOS X?</a><br/>
+	<a href="#single_slice">Why cannot I test, extract file, list the contents of a given slice from a backup?</a><br/>
+	<a href="#merge_two_isolated">Why cannot I merge two isolated catalogues?</a><br/>
+	<a href="#parallel">How to use the full power of my multi-processor computer?</a><br/>
+	<a href="#threadsafe">Is libdar thread-safe, which way do you mean it is?</a><br/>
+	<a href="#How_to_solve_configure:_error:_Cannot">How to solve <code>configure: error: Cannot find size_t type</code>"?</a><br/>
+	<a href="#slow_2_4_0">Why dar became much slower since release 2.4.0?</a><br/>
+	<a href="#slow_2_5_0">Why dar became yet slower since release 2.5.0?</a><br/>
+	<a href="#search_for_questions">How to search for questions (and their answers) about known problems similar to mines?</a><br/>
+	<a href="#open_failed_excluded">Why dar tells me that he failed to open a directory, while I have excluded this directory?</a><br/>
+	<a href="#security">Dar reports a <code>SECURITY WARNING! SUSPICIOUS FILE</code> what does that mean!?</a><br/>
+	<a href="#copy">Can dar help copy a large directory tree?</a><br/>
+	<a href="#compression">Does dar compress per file or the whole backup?</a><br/>
+	<a href="#sizes">What slice size can I use with dar?</a><br/>
+	<a href="#fuse">Is there a dar fuse filesystem?</a><br/>
+	<a href="#tar">how dar compares to tar or rsync?</a><br/>
+	<a href="#diff">Why when comparing a backup with filesystem, dar does not report new files found on filesystem?</a><br/>
+	<a href="#delta">Why dar does not automatically perform delta difference (aka rsync increment)?</a><br/>
+	<a href="#cyrillic">Why do dar reports truncated filenames under Windows, especially with cyrillic filenames?</a><br/>
+	<a href="#win32">I have a 32 bits windows system, which binary package can I to use?</a><br/>
+	<a href="#lzop_vs_dar">lzo compression is slower with dar than with lzop, why?</a><br/>
+	<a href="#libthreadar">what is libthreadar and why libdar relies on it?</a><br/>
+	<a href="#sftppubkey">I have sftp pubkey authentication working with ssh/sftp, how to have dar using too this public key authentication for sftp?</a><br/>
+	<a href="#libssh2">I Cannot get dar to connect to remote server using SFTP, it fails with "<code>SSL peer certificate or SSH remote key was not OK</code>"</a><br/>
+	<a href="#too_large"><code>Cannot open catalogue: Cannot handle such a too large integer.</code> What to do?</a><br/>
+	<a href="#sftppubkey">I have sftp pubkey authentication working with ssh/sftp, how to have dar using too this public key authentication for sftp?</a><br/>
+	<a href="#full-from-diff">I have a diff/incremental backup and I want to convert it to a full backup, how to do that?</a><br/>
+      </div>
+    </div>
 
     <h2>Answers:</h2>
-    <a name="A1"><b>I restore/save all files but dar reported some files have been ignored, what are those ignored files?</b></a><br>
+    <a name="A1"><b>I restore/save all files but dar reported some files have been ignored, what are those ignored files?</b></a><br/>
     <p>
       When restoring/saving, all files are considered by default. But if you specify some files to restore or
       save, all other files are "ignored", this is the case when using -P -X
       -I, -g -[ or -] options
     </p>
 
-    <a name="A2" id="A2"><b>Dar hangs when using it with pipes, why?</b></a><br>
+    <a name="A2" id="A2"><b>Dar hangs when using it with pipes, why?</b></a><br/>
     <p>
       Dar can produce backups on its
       standard output, if you give '-' as
@@ -101,7 +110,7 @@
       precisely <a href="usage_notes.html#netcat_ssh">dar and ssh note</a>.
     </p>
 
-    <a name="A3" id="A3"><b>Why, when I restore 1 file, dar report 3 files have been restored?</b></a><br>
+    <a name="A3" id="A3"><b>Why, when I restore 1 file, dar report 3 files have been restored?</b></a><br/>
     <p>
       if you restore for example the file usr/bin/emacs dar will first
       restore usr (if the directory already exists, it will get its date and
@@ -111,7 +120,7 @@
       Thus 3 inodes have been
       restored or modified while only one file has been asked for restoration.
     </p>
-    <a name="libattr"><b>While compiling dar I get the following message: <code>g++: /lib/libattr.a: No such file or directory</code>, what can I do?</b></a><br>
+    <a name="libattr"><b>While compiling dar I get the following message: <code>g++: /lib/libattr.a: No such file or directory</code>, what can I do?</b></a><br/>
     <p>
       The problem comes from an
       incoherence in your distro (Redhat and Slackware seem(ed) concerned at
@@ -126,9 +135,9 @@
     <code class=block>
       ln -s /usr/lib/libattr.a /lib/libattr.a
     </code>
-    <br>
+    <br/>
 
-    <a name="A4" id="A4"><b>I cannot find the binary package for my distro, where to look for?</b></a><br>
+    <a name="A4" id="A4"><b>I cannot find the binary package for my distro, where to look for?</b></a><br/>
     <p>
       For any
       binary package, ask
@@ -139,7 +148,7 @@
 
     <a name="A6" id="A6"><b>Can I use different filters between a full backup and a
       differential backup? Would not dar consider some file not included in
-	the filter to be deleted?</b></a><br>
+	the filter to be deleted?</b></a><br/>
     <p>
       Yes, you
       can. No, there is no
@@ -161,7 +170,7 @@
     </p>
 
     <a name="A7" id="A7"><b>Once in action, dar makes all the system slower and slower, then it stops with the message
-	"killed"! How to overcome this problem?</b></a><br>
+	"killed"! How to overcome this problem?</b></a><br/>
     <p>
       Dar needs
       virtual memory to
@@ -216,7 +225,7 @@
       several differential backups concerning different set of files.
     </p>
 
-    <a name="A8" id="A8"><b>I have a backup I want to change the size of slices?</b></a><br>
+    <a name="A8" id="A8"><b>I have a backup I want to change the size of slices?</b></a><br/>
     <p>
       <code>dar_xform</code> is your friend!
     </p>
@@ -232,7 +241,7 @@
 	man page</a> for more.
       </p>
 
-    <a name="A9" id="A9"><b>I have a backup in one slice, how can I split it in several slices?</b></a><br>
+    <a name="A9" id="A9"><b>I have a backup in one slice, how can I split it in several slices?</b></a><br/>
     <p>
       <code>dar_xform</code> is your friend!
     </p>
@@ -240,7 +249,7 @@
       see just above.
     </p>
 
-    <a name="A10" id="A10"><b>I have a backup in several slice, how can I stick all them in a single file?</b></a><br>
+    <a name="A10" id="A10"><b>I have a backup in several slice, how can I stick all them in a single file?</b></a><br/>
     <p>
       <code>dar_xform</code> is your friend!
       </p>
@@ -252,7 +261,7 @@
       See <a href="man/index.html">dar_xform man page</a> for more.
     </p>
 
-    <a name="A11" id="A11"><b>I have a backup, how can I change its encryption scheme?</b></a><br>
+    <a name="A11" id="A11"><b>I have a backup, how can I change its encryption scheme?</b></a><br/>
     <p>
       The merging feature let you do
       that. The merging has two roles, putting
@@ -290,9 +299,9 @@
     <code class=block>
       dar -+ new_backup -A original_backup -K ":" -ak -s 1G
     </code>
-    <br>
+    <br/>
 
-    <a name="A12" id="A12"><b>I have a backup, how can I change its compression algorithm?</b></a><br>
+    <a name="A12" id="A12"><b>I have a backup, how can I change its compression algorithm?</b></a><br/>
     <p>
       Same thing as above: we will use the merging feature:
     </p>
@@ -321,7 +330,7 @@
     <code class=block>
       dar -+ new_backup -A original_backup
     </code>
-    <br>
+    <br/>
 
     <p>
       Note that you can also change encryption scheme and slicing at the same
@@ -331,9 +340,9 @@
     <code class=block>
       dar -+ new_backup -A original_backup -zbzip2 -K ":" -J ":" -s 1G
     </code>
-    <br>
+    <br/>
 
-    <a name="A13"><b>Which options can I use with which options?</b></a><br>
+    <a name="A13"><b>Which options can I use with which options?</b></a><br/>
 
     <p>
       DAR provides seven commands:
@@ -352,1310 +361,1312 @@
     <p>
       For each command listed above, here follows the available options (those marked OK):
     </p>
-    <table class=center>
-      <tr>
-	<th>short option</th>
-	<th>long option</th>
-	<th>-c</th>
-	<th>-x</th>
-	<th>-l</th>
-	<th>-d</th>
-	<th>-t</th>
-	<th>-C</th>
-	<th>-+</th>
-	<th>-y</th>
-      </tr>
-
-      <tr>
-	<td>-v</td>
-	<td>--verbose</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-      </tr>
-
-      <tr>
-	<td>-vs</td>
-	<td>--verbose=s</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>OK</td>
-      </tr>
-
-      <tr>
-	<td>-b</td>
-	<td>--beep</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-      </tr>
-
-      <tr>
-	<td>-n</td>
-	<td>--no-overwrite</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-      </tr>
-
-      <tr>
-	<td>-w</td>
-	<td>--no-warn</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-      </tr>
-
-      <tr>
-	<td>-wa</td>
-	<td>--no-warn=all</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-A</td>
-	<td>--ref</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-      </tr>
-
-      <tr>
-	<td>-R</td>
-	<td>--fs-root</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-X</td>
-	<td>--exclude</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-I</td>
-	<td>--include</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-P</td>
-	<td>--prune</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-g</td>
-	<td>--go-into</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-]</td>
-	<td>--exclude-from-file</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-[</td>
-	<td>--include-from-file</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-u</td>
-	<td>--exclude-ea</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-U</td>
-	<td>--include-ea</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-i</td>
-	<td>--input</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-o</td>
-	<td>--output</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-O</td>
-	<td>--comparison-field</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-H</td>
-	<td>--hour</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-E</td>
-	<td>--execute</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-      </tr>
-
-      <tr>
-	<td>-F</td>
-	<td>--ref-execute</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-      </tr>
-
-      <tr>
-	<td>-K</td>
-	<td>--key</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-      </tr>
-
-      <tr>
-	<td>-J</td>
-	<td>--ref-key</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-      </tr>
-
-      <tr>
-	<td>-#</td>
-	<td>--crypto-block</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-      </tr>
-
-      <tr>
-	<td>-*</td>
-	<td>--ref-crypto-block</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-      </tr>
-
-      <tr>
-	<td>-B</td>
-	<td>--batch</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-      </tr>
-
-      <tr>
-	<td>-N</td>
-	<td>--noconf</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-      </tr>
-
-      <tr>
-	<td>-e</td>
-	<td>--empty</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-      </tr>
-
-      <tr>
-	<td>-aSI</td>
-	<td>--alter=SI</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-      </tr>
-
-      <tr>
-	<td>-abinary</td>
-	<td>--alter=binary</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-      </tr>
-
-      <tr>
-	<td>-Q</td>
-	<td></td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-      </tr>
-
-      <tr>
-	<td>-aa</td>
-	<td>--alter=atime</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-ac</td>
-	<td>--alter=ctime</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-am</td>
-	<td>--alter=mask</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-an</td>
-	<td>--alter=no-case</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-acase</td>
-	<td>--alter=case</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-ar</td>
-	<td>--alter=regex</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-ag</td>
-	<td>--alter=glob</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-z</td>
-	<td>--compression</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-s</td>
-	<td>--slice</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-      </tr>
-
-      <tr>
-	<td>-S</td>
-	<td>--first-slice</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-      </tr>
-
-      <tr>
-	<td>-p</td>
-	<td>--pause</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-      </tr>
-
-      <tr>
-	<td>-@</td>
-	<td>--aux</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-$</td>
-	<td>--aux-key</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-~</td>
-	<td>--aux-execute</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-%</td>
-	<td>--aux-crypto-block</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-D</td>
-	<td>--empty-dir</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-Z</td>
-	<td>--exclude-compression</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-Y</td>
-	<td>--include-compression</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-m</td>
-	<td>--mincompr</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-ak</td>
-	<td>--alter=keep-compressed</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-af</td>
-	<td>--alter=fixed-date</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td></td>
-	<td>--nodump</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-M</td>
-	<td>--no-mount-points</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-,</td>
-	<td>--cache-directory-tagging</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-k</td>
-	<td>--deleted</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-r</td>
-	<td>--recent</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-f</td>
-	<td>--flat</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-ae</td>
-	<td>--alter=erase_ea</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-T</td>
-	<td>--list-format</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-as</td>
-	<td>--alter=saved</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-ad</td>
-	<td>--alter=decremental</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-q</td>
-	<td>--quiet</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-      </tr>
-
-      <tr>
-	<td>-/</td>
-	<td>--overwriting-policy</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-&lt;</td>
-	<td>--backup-hook-include</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-&gt;</td>
-	<td>--backup-hook-exclude</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-=</td>
-	<td>--backup-hook-execute</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-ai</td>
-	<td>--alter=ignore-unknown-inode-type</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-at</td>
-	<td>--alter=tape-marks</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-0</td>
-	<td>--sequential-read</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-;</td>
-	<td>--min-digits</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-      </tr>
-
-      <tr>
-	<td>-1</td>
-	<td>--sparse-file-min-size</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-ah</td>
-	<td>--alter=hole-recheck</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-^</td>
-	<td>--slice-mode</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-      </tr>
-
-      <tr>
-	<td>-_</td>
-	<td>--retry-on-change</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-asecu</td>
-	<td>--alter=secu</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-.</td>
-	<td>--user-comment</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-3</td>
-	<td>--hash</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-      </tr>
-
-      <tr>
-	<td>-2</td>
-	<td>--dirty-behavior</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-al</td>
-	<td>--alter=lax</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-      </tr>
-
-      <tr>
-	<td>-alist-ea</td>
-	<td>--alter=list-ea</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-4</td>
-	<td>--fsa-scope</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-5</td>
-	<td>--exclude-by-ra</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-7</td>
-	<td>--sign</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-      </tr>
-
-      <tr>
-	<td>-'</td>
-	<td>--modified-data-detection</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-{</td>
-	<td>--include-delta-sig</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-}</td>
-	<td>--exclude-delta-sig</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-8</td>
-	<td>--delta</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-6</td>
-	<td>--delta-sig-min-size</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-az</td>
-	<td>--alter=zeroing-negative-dates</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-\</td>
-	<td>--ignored-as-symlink</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-T</td>
-	<td>--kdf-param</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>--aduc</td>
-	<td>--alter=duc</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-      </tr>
-
-      <tr>
-	<td>-G</td>
-	<td>--multi-thread</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-      </tr>
-
-      <tr>
-	<td>-j</td>
-	<td>--network-retry-delay</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-afile-auth</td>
-	<td>--alter=file-authentication</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-ab</td>
-	<td>--alter=blind-to-signatures</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>OK</td>
-	<td>--</td>
-      </tr>
-
-      <tr>
-	<td>-aheader</td>
-	<td>--alter=header</td>
-	<td>--</td>
-	<td>--</td>
-	<td>OK</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-	<td>--</td>
-      </tr>
-    </table>
-    <br>
-
-    <a name="A14"><b><span>Why dar reports corruption of the backup I have transfered with FTP?</b></a><br>
+    <div class=table>
+      <table class=center>
+	<tr>
+	  <th>short option</th>
+	  <th>long option</th>
+	  <th>-c</th>
+	  <th>-x</th>
+	  <th>-l</th>
+	  <th>-d</th>
+	  <th>-t</th>
+	  <th>-C</th>
+	  <th>-+</th>
+	  <th>-y</th>
+	</tr>
+
+	<tr>
+	  <td>-v</td>
+	  <td>--verbose</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	</tr>
+
+	<tr>
+	  <td>-vs</td>
+	  <td>--verbose=s</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	</tr>
+
+	<tr>
+	  <td>-b</td>
+	  <td>--beep</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	</tr>
+
+	<tr>
+	  <td>-n</td>
+	  <td>--no-overwrite</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	</tr>
+
+	<tr>
+	  <td>-w</td>
+	  <td>--no-warn</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	</tr>
+
+	<tr>
+	  <td>-wa</td>
+	  <td>--no-warn=all</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-A</td>
+	  <td>--ref</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	</tr>
+
+	<tr>
+	  <td>-R</td>
+	  <td>--fs-root</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-X</td>
+	  <td>--exclude</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-I</td>
+	  <td>--include</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-P</td>
+	  <td>--prune</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-g</td>
+	  <td>--go-into</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-]</td>
+	  <td>--exclude-from-file</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-[</td>
+	  <td>--include-from-file</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-u</td>
+	  <td>--exclude-ea</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-U</td>
+	  <td>--include-ea</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-i</td>
+	  <td>--input</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-o</td>
+	  <td>--output</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-O</td>
+	  <td>--comparison-field</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-H</td>
+	  <td>--hour</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-E</td>
+	  <td>--execute</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	</tr>
+
+	<tr>
+	  <td>-F</td>
+	  <td>--ref-execute</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	</tr>
+
+	<tr>
+	  <td>-K</td>
+	  <td>--key</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	</tr>
+
+	<tr>
+	  <td>-J</td>
+	  <td>--ref-key</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	</tr>
+
+	<tr>
+	  <td>-#</td>
+	  <td>--crypto-block</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	</tr>
+
+	<tr>
+	  <td>-*</td>
+	  <td>--ref-crypto-block</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	</tr>
+
+	<tr>
+	  <td>-B</td>
+	  <td>--batch</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	</tr>
+
+	<tr>
+	  <td>-N</td>
+	  <td>--noconf</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	</tr>
+
+	<tr>
+	  <td>-e</td>
+	  <td>--empty</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	</tr>
+
+	<tr>
+	  <td>-aSI</td>
+	  <td>--alter=SI</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	</tr>
+
+	<tr>
+	  <td>-abinary</td>
+	  <td>--alter=binary</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	</tr>
+
+	<tr>
+	  <td>-Q</td>
+	  <td></td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	</tr>
+
+	<tr>
+	  <td>-aa</td>
+	  <td>--alter=atime</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-ac</td>
+	  <td>--alter=ctime</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-am</td>
+	  <td>--alter=mask</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-an</td>
+	  <td>--alter=no-case</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-acase</td>
+	  <td>--alter=case</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-ar</td>
+	  <td>--alter=regex</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-ag</td>
+	  <td>--alter=glob</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-z</td>
+	  <td>--compression</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-s</td>
+	  <td>--slice</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	</tr>
+
+	<tr>
+	  <td>-S</td>
+	  <td>--first-slice</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	</tr>
+
+	<tr>
+	  <td>-p</td>
+	  <td>--pause</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	</tr>
+
+	<tr>
+	  <td>-@</td>
+	  <td>--aux</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-$</td>
+	  <td>--aux-key</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-~</td>
+	  <td>--aux-execute</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-%</td>
+	  <td>--aux-crypto-block</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-D</td>
+	  <td>--empty-dir</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-Z</td>
+	  <td>--exclude-compression</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-Y</td>
+	  <td>--include-compression</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-m</td>
+	  <td>--mincompr</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-ak</td>
+	  <td>--alter=keep-compressed</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-af</td>
+	  <td>--alter=fixed-date</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td></td>
+	  <td>--nodump</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-M</td>
+	  <td>--no-mount-points</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-,</td>
+	  <td>--cache-directory-tagging</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-k</td>
+	  <td>--deleted</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-r</td>
+	  <td>--recent</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-f</td>
+	  <td>--flat</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-ae</td>
+	  <td>--alter=erase_ea</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-T</td>
+	  <td>--list-format</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-as</td>
+	  <td>--alter=saved</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-ad</td>
+	  <td>--alter=decremental</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-q</td>
+	  <td>--quiet</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	</tr>
+
+	<tr>
+	  <td>-/</td>
+	  <td>--overwriting-policy</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-&lt;</td>
+	  <td>--backup-hook-include</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-&gt;</td>
+	  <td>--backup-hook-exclude</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-=</td>
+	  <td>--backup-hook-execute</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-ai</td>
+	  <td>--alter=ignore-unknown-inode-type</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-at</td>
+	  <td>--alter=tape-marks</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-0</td>
+	  <td>--sequential-read</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-;</td>
+	  <td>--min-digits</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	</tr>
+
+	<tr>
+	  <td>-1</td>
+	  <td>--sparse-file-min-size</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-ah</td>
+	  <td>--alter=hole-recheck</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-^</td>
+	  <td>--slice-mode</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	</tr>
+
+	<tr>
+	  <td>-_</td>
+	  <td>--retry-on-change</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-asecu</td>
+	  <td>--alter=secu</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-.</td>
+	  <td>--user-comment</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-3</td>
+	  <td>--hash</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	</tr>
+
+	<tr>
+	  <td>-2</td>
+	  <td>--dirty-behavior</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-al</td>
+	  <td>--alter=lax</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	</tr>
+
+	<tr>
+	  <td>-alist-ea</td>
+	  <td>--alter=list-ea</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-4</td>
+	  <td>--fsa-scope</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-5</td>
+	  <td>--exclude-by-ra</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-7</td>
+	  <td>--sign</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	</tr>
+
+	<tr>
+	  <td>-'</td>
+	  <td>--modified-data-detection</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-{</td>
+	  <td>--include-delta-sig</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-}</td>
+	  <td>--exclude-delta-sig</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-8</td>
+	  <td>--delta</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-6</td>
+	  <td>--delta-sig-min-size</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-az</td>
+	  <td>--alter=zeroing-negative-dates</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-\</td>
+	  <td>--ignored-as-symlink</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-T</td>
+	  <td>--kdf-param</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>--aduc</td>
+	  <td>--alter=duc</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	</tr>
+
+	<tr>
+	  <td>-G</td>
+	  <td>--multi-thread</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	</tr>
+
+	<tr>
+	  <td>-j</td>
+	  <td>--network-retry-delay</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-afile-auth</td>
+	  <td>--alter=file-authentication</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-ab</td>
+	  <td>--alter=blind-to-signatures</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>OK</td>
+	  <td>--</td>
+	</tr>
+
+	<tr>
+	  <td>-aheader</td>
+	  <td>--alter=header</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>OK</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	  <td>--</td>
+	</tr>
+      </table>
+    </div>
+    <br/>
+
+    <a name="A14"><b><span>Why dar reports corruption of the backup I have transfered with FTP?</b></a><br/>
     <p>
       Dar backups
       are binary files,
@@ -1685,7 +1696,7 @@
 
 
     <a name="UIDGID"><b> Why DAR does save UID/GID
-	instead of plain usernames and usergroups?</b></a><br>
+	instead of plain usernames and usergroups?</b></a><br/>
     <p>In each file property is
       not present the name of the owner nor the name of the group owner, but
       instead are present two numbers, the user ID and the group ID (UID
@@ -1798,14 +1809,14 @@
 	    </code>
 	    The first command will let you
 	    remap an UID to another for all files
-	    under the /path/to/restored/backup directory<br>
+	    under the /path/to/restored/backup directory<br/>
 	    The second command will let you remap a GID to another for all files
 	    under the /path/to/restored/backup directory
       </li>
     </ul>
 
 
-      <u>Example on how to globally modify ownership of a directory tree user by user</u><br>
+      <u>Example on how to globally modify ownership of a directory tree user by user</u><br/>
 
     <p>
       For example, you have on the <i>source</i> system three users: Pierre
@@ -1855,7 +1866,7 @@
       to use some of dar's feature like for example only restore files that
       are more recent than those present on filesystem.
     </p>
-    <a name="Dar_Manager_encrypted"><b>Dar_Manager does not accept encrypted backups, how to workaround this?</b></a><br>
+    <a name="Dar_Manager_encrypted"><b>Dar_Manager does not accept encrypted backups, how to workaround this?</b></a><br/>
     <p>
       Yes, that's true, dar_manager
       does not accept encrypted backups. The
@@ -1932,7 +1943,7 @@ on dar_manager's command-line and on dar's command-line.
       </li>
     </ol>
 
-    <a name="staticOSX"><b>How to overcome the lack of static linking on MacOS X?</b></a><br>
+    <a name="staticOSX"><b>How to overcome the lack of static linking on MacOS X?</b></a><br/>
 
     <p>
       The answer comes from Dave
@@ -1993,7 +2004,7 @@ on dar_manager's command-line and on dar's command-line.
 	</li>
     </div>
 
-    <a name="single_slice"><b>Why cannot I test, extract file, list the contents of a given slice from a backup?</b></a><br>
+    <a name="single_slice"><b>Why cannot I test, extract file, list the contents of a given slice from a backup?</b></a><br/>
 
     <p>
       Well this is due to dar's design. However you can list a whole backup and see
@@ -2011,9 +2022,9 @@ on dar_manager's command-line and on dar's command-line.
       -----
       <b>#</b>
     </code>
-    <br>
+    <br/>
 
-    <a name="merge_two_isolated"><b>Why cannot I merge two isolated catalogues?</b></a><br>
+    <a name="merge_two_isolated"><b>Why cannot I merge two isolated catalogues?</b></a><br/>
     <p>
       Since version 2.4.0, isolated catalogues can also be used to rescue an
       corrupted internal catalogue of the backup it has been isolated from.
@@ -2024,7 +2035,7 @@ on dar_manager's command-line and on dar's command-line.
       used as reference for a differential backup.
     </p>
 
-    <a name="parallel"><b>How to use the full power of my multi-processor computer?</b></a><br>
+    <a name="parallel"><b>How to use the full power of my multi-processor computer?</b></a><br/>
     <p>
       Since release 2.7.0 it is possible to have dar efficiently using many threads at two independent levels:
     </p>
@@ -2057,7 +2068,7 @@ on dar_manager's command-line and on dar's command-line.
       compression thread, as well as the compression block size to use.
     </p>
 
-    <a name="threadsafe"><b>Is libdar thread-safe, which way do you mean it is?</b></a><br>
+    <a name="threadsafe"><b>Is libdar thread-safe, which way do you mean it is?</b></a><br/>
 
     <p>
       libdar is the part of dar's
@@ -2080,7 +2091,7 @@ on dar_manager's command-line and on dar's command-line.
     </p>
 
     <a name="How_to_solve_configure:_error:_Cannot"><b>How to solve
-      <code>configure: error: Cannot find size_t type</code>?</b></a><br>
+      <code>configure: error: Cannot find size_t type</code>?</b></a><br/>
     <p>
       This error shows when you lack support for C++ compilation. Check the
       gcc compiler has been compiled with C++ support activated, or if you
@@ -2088,7 +2099,7 @@ on dar_manager's command-line and on dar's command-line.
       C++ support for gcc.
     </p>
 
-    <a name="slow_2_4_0"><b>Why dar became much slower since release 2.4.0?</b></a><br>
+    <a name="slow_2_4_0"><b>Why dar became much slower since release 2.4.0?</b></a><br/>
 
     <p>
       This is the drawback of new features!
@@ -2121,7 +2132,7 @@ on dar_manager's command-line and on dar's command-line.
       execution time becomes back the same as the one of dar 2.3.x releases.
     </p>
 
-    <a name="slow_2_5_0"><b>Why dar became yet slower since release 2.5.0?</b></a><br>
+    <a name="slow_2_5_0"><b>Why dar became yet slower since release 2.5.0?</b></a><br/>
 
     <p>
       This is again the drawback of new features!
@@ -2159,14 +2170,14 @@ on dar_manager's command-line and on dar's command-line.
     </p>
 
 
-    <a name="search_for_questions"><b>How to search for questions (and their answers) about known problems similar to mines?</b></a><br>
+    <a name="search_for_questions"><b>How to search for questions (and their answers) about known problems similar to mines?</b></a><br/>
 
     <p>
       Have a look a the <a href="https://sourceforge.net/p/dar/mailman/search/?mail_list=dar-support">dar-support mailing-list archive</a>
       and if you cannot find any answer to your problem feel free to send an email to this mailing-list describing your problem/need.
     </p>
 
-    <a name="open_failed_excluded"><b>Why dar tells me that he failed to open a directory, while I have excluded this directory?</b></a><br>
+    <a name="open_failed_excluded"><b>Why dar tells me that he failed to open a directory, while I have excluded this directory?</b></a><br/>
 
     <p>
       Reading the contents of a
@@ -2200,7 +2211,7 @@ on dar_manager's command-line and on dar's command-line.
 
     <a name="security"><b>Dar reports a
 	<code>SECURITY WARNING! SUSPICIOUS FILE</code> what does that mean!?</b>
-    </a><br>
+    </a><br/>
 
     <p>
       When dar reports the following message:
@@ -2334,7 +2345,7 @@ on dar_manager's command-line and on dar's command-line.
 	  is mounted with relatime or noatime option.
       </p>
 
-      <a name="copy"><b>Can dar help copy a large directory tree?</b></a><br>
+      <a name="copy"><b>Can dar help copy a large directory tree?</b></a><br/>
 
       <p>
 	The answer is "yes" and even for more than one reason:
@@ -2420,7 +2431,7 @@ be done using:
       this documentation!
     </p>
 
-    <a name="compression"><b>Does dar compress per file or the whole backup?</b></a><br>
+    <a name="compression"><b>Does dar compress per file or the whole backup?</b></a><br/>
     <p>
       Dar uses compression (gzip, lzo, bzip2, xz/lzma, zstd, lz4, ...) with different level of
       compression (1 for quick but
@@ -2485,7 +2496,7 @@ be done using:
       <i>glob expressions</i> in masks.
     </p>
 
-    <a name="sizes"><b>What slice size can I use with dar?</b></a><br>
+    <a name="sizes"><b>What slice size can I use with dar?</b></a><br/>
 
     <p>
       The <b>minimum slice size is around 20 bytes</b>,
@@ -2510,12 +2521,12 @@ be done using:
       Last point dar/libdar can be compiled using the --enable-mode=64 option
       given to ./configure while building dar (this is the default since release 2.6.0).
       This replaces the "infinint" type by 64 bits integers, for better performances and reduced memory usage.
-      However this has some drawback on backup size and dates. See the <a href="Limitations.html">limitations</a> for more details.<br>
+      However this has some drawback on backup size and dates. See the <a href="Limitations.html">limitations</a> for more details.<br/>
       Since release 2.6.0 the default being the 64 bits mode, to have dar/libdar using <i>infinint</i>
       one need to use the following option <code>./configure --enable-mode=infinint</code>.
     </p>
 
-    <a name="fuse"><b>Is there a dar <a href="http://fuse.sourceforge.net/">fuse</a> filesystem?</b></a><br>
+    <a name="fuse"><b>Is there a dar <a href="http://fuse.sourceforge.net/">fuse</a> filesystem?</b></a><br/>
 
     <p>
       You can find several applications
@@ -2528,7 +2539,7 @@ be done using:
       of backups and remote directories just like local files.
     </p>
 
-    <a name="tar"><b>how dar compares to tar or rsync</b></a><br>
+    <a name="tar"><b>how dar compares to tar or rsync</b></a><br/>
 
     <p>
       All depends on the use case you want to address. A <a href="benchmark.html">benchmark</a> has
@@ -2536,7 +2547,7 @@ be done using:
       regard to a set of common use cases. Hopefully this will help you answer this question.
     </p>
 
-    <a name="diff"><b>Why when comparing a backup with filesystem, dar does not report new files found on filesystem?</b></a><br>
+    <a name="diff"><b>Why when comparing a backup with filesystem, dar does not report new files found on filesystem?</b></a><br/>
 
     <p>
       Backup comparison (<code>-d</code> option) is
@@ -2558,7 +2569,7 @@ be done using:
       as follows:
     </p>
     <code class=block>
-      dar -c - -A &lt;ref backup&gt; -@ &lt;isolated&gt; ... other options ... &gt; /dev/null</span><br>
+      dar -c - -A &lt;ref backup&gt; -@ &lt;isolated&gt; ... other options ... &gt; /dev/null</span><br/>
     </code>
 
     <p>
@@ -2591,7 +2602,7 @@ be done using:
     </p>
 
 
-    <a name="delta"><b>Why dar does not automatically perform delta difference (aka rsync increment)?</b></a><br>
+    <a name="delta"><b>Why dar does not automatically perform delta difference (aka rsync increment)?</b></a><br/>
 
     <p>
       Because delta different is subject in theory to checksum collision (but it is very
@@ -2599,10 +2610,10 @@ be done using:
       the same as an older one while some changes took place in it. A second
       reason is to take care of users preference, that do not want
       having this feature activated by default. Well, now, activating delta
-      difference with dar is quite simple and flexible, see <a href="usage_notes.html#delta">note</a>.<br>
+      difference with dar is quite simple and flexible, see <a href="usage_notes.html#delta">note</a>.<br/>
     </p>
 
-    <a name="cyrillic"><b>Why do dar reports truncated filenames under Windows, especially with cyrillic filenames?</b></a><br>
+    <a name="cyrillic"><b>Why do dar reports truncated filenames under Windows, especially with cyrillic filenames?</b></a><br/>
 
     <p>
       Dar/libdar has been first
@@ -2634,7 +2645,7 @@ be done using:
       that it will be ignored.
     </p>
 
-    <a name="win32"><b>I have a 32 bits windows system, which binary package can I to use?</b></a><br>
+    <a name="win32"><b>I have a 32 bits windows system, which binary package can I to use?</b></a><br/>
 
     <p>
       Up to release 2.4.15 (including)
@@ -2672,7 +2683,7 @@ be done using:
       <li>librsync-devel (starting future release 2.6.0)</li>
       <li>make</li>
       <li>tcsh</li>
-      <li>zip<br>
+      <li>zip<br/>
       </li>
       <li>upx</li>
     </ul>
@@ -2719,7 +2730,7 @@ be done using:
       if you enconter any problem building dar binary for windows, this FAQ will be updated accordingly.
     </p>
 
-    <a name="lzop_vs_dar"><b>lzo compression is slower with dar than with lzop, why?</b></a><br>
+    <a name="lzop_vs_dar"><b>lzo compression is slower with dar than with lzop, why?</b></a><br/>
 
     <p>
       when using the "lzo" compression algorithm, <i>dar/libdar</i> always uses the algorithm
@@ -2750,149 +2761,151 @@ be done using:
       will not change dar behavior.
     </p>
 
-    <table class=center>
-      <tr>
-        <th>compression level<br>for lzop</th>
-        <th>algorithm for dar</th>
-        <th>compression level<br>for dar</th>
-        <th>lzo algorith used</th>
-      </tr>
-      <tr>
-        <td>1</td>
-        <td>lzop-1<br>
-        </td>
-        <td>-<br>
-        </td>
-        <td>lzo1x_1_15<br>
-        </td>
-      </tr>
-      <tr>
-        <td>2<br>
-        </td>
-        <td>lzop-3<br>
-        </td>
-        <td>-<br>
-        </td>
-        <td>lzo1x_1<br>
-        </td>
-      </tr>
-      <tr>
-        <td>3<br>
-        </td>
-        <td>lzop-3</td>
-        <td>-<br>
-        </td>
-        <td>lzo1x_1</td>
-      </tr>
-      <tr>
-        <td>4<br>
-        </td>
-        <td>lzop-3</td>
-        <td>-<br>
-        </td>
-        <td>lzo1x_1</td>
-      </tr>
-      <tr>
-        <td>5<br>
-        </td>
-        <td>lzop-3</td>
-        <td>-<br>
-        </td>
-        <td>lzo1x_1</td>
-      </tr>
-      <tr>
-        <td>6<br>
-        </td>
-        <td>lzop-3</td>
-        <td>-<br>
-        </td>
-        <td>lzo1x_1</td>
-      </tr>
-      <tr>
-        <td>-<br>
-        </td>
-        <td>lzo<br>
-        </td>
-        <td>1<br>
-        </td>
-        <td>lzo1x_999</td>
-      </tr>
-      <tr>
-        <td>-<br>
-        </td>
-        <td>lzo<br>
-        </td>
-        <td>2<br>
-        </td>
-        <td>lzo1x_999</td>
-      </tr>
-      <tr>
-        <td>-<br>
-        </td>
-        <td>lzo<br>
-        </td>
-        <td>3<br>
-        </td>
-        <td>lzo1x_999</td>
-      </tr>
-      <tr>
-        <td>-<br>
-        </td>
-        <td>lzo<br>
-        </td>
-        <td>4<br>
-        </td>
-        <td>lzo1x_999</td>
-      </tr>
-      <tr>
-        <td>-<br>
-        </td>
-        <td>lzo<br>
-        </td>
-        <td>5<br>
-        </td>
-        <td>lzo1x_999</td>
-      </tr>
-      <tr>
-        <td>-<br>
-        </td>
-        <td>lzo<br>
-        </td>
-        <td>6<br>
-        </td>
-        <td>lzo1x_999</td>
-      </tr>
-      <tr>
-        <td>7<br>
-        </td>
-        <td>lzo<br>
-        </td>
-        <td>7<br>
-        </td>
-        <td>lzo1x_999</td>
-      </tr>
-      <tr>
-        <td>8<br>
-        </td>
-        <td>lzo<br>
-        </td>
-        <td>8<br>
-        </td>
-        <td>lzo1x_999</td>
-      </tr>
-      <tr>
-        <td>9<br>
-        </td>
-        <td>lzo<br>
-        </td>
-        <td>9<br>
-        </td>
-        <td>lzo1x_999</td>
-      </tr>
-    </table>
-    <br>
+    <div class=table>
+      <table class=center>
+	<tr>
+          <th>compression level<br/>for lzop</th>
+          <th>algorithm for dar</th>
+          <th>compression level<br/>for dar</th>
+          <th>lzo algorith used</th>
+	</tr>
+	<tr>
+          <td>1</td>
+          <td>lzop-1<br/>
+          </td>
+          <td>-<br/>
+          </td>
+          <td>lzo1x_1_15<br/>
+          </td>
+	</tr>
+	<tr>
+          <td>2<br/>
+          </td>
+          <td>lzop-3<br/>
+          </td>
+          <td>-<br/>
+          </td>
+          <td>lzo1x_1<br/>
+          </td>
+	</tr>
+	<tr>
+          <td>3<br/>
+          </td>
+          <td>lzop-3</td>
+          <td>-<br/>
+          </td>
+          <td>lzo1x_1</td>
+	</tr>
+	<tr>
+          <td>4<br/>
+          </td>
+          <td>lzop-3</td>
+          <td>-<br/>
+          </td>
+          <td>lzo1x_1</td>
+	</tr>
+	<tr>
+          <td>5<br/>
+          </td>
+          <td>lzop-3</td>
+          <td>-<br/>
+          </td>
+          <td>lzo1x_1</td>
+	</tr>
+	<tr>
+          <td>6<br/>
+          </td>
+          <td>lzop-3</td>
+          <td>-<br/>
+          </td>
+          <td>lzo1x_1</td>
+	</tr>
+	<tr>
+          <td>-<br/>
+          </td>
+          <td>lzo<br/>
+          </td>
+          <td>1<br/>
+          </td>
+          <td>lzo1x_999</td>
+	</tr>
+	<tr>
+          <td>-<br/>
+          </td>
+          <td>lzo<br/>
+          </td>
+          <td>2<br/>
+          </td>
+          <td>lzo1x_999</td>
+	</tr>
+	<tr>
+          <td>-<br/>
+          </td>
+          <td>lzo<br/>
+          </td>
+          <td>3<br/>
+          </td>
+          <td>lzo1x_999</td>
+	</tr>
+	<tr>
+          <td>-<br/>
+          </td>
+          <td>lzo<br/>
+          </td>
+          <td>4<br/>
+          </td>
+          <td>lzo1x_999</td>
+	</tr>
+	<tr>
+          <td>-<br/>
+          </td>
+          <td>lzo<br/>
+          </td>
+          <td>5<br/>
+          </td>
+          <td>lzo1x_999</td>
+	</tr>
+	<tr>
+          <td>-<br/>
+          </td>
+          <td>lzo<br/>
+          </td>
+          <td>6<br/>
+          </td>
+          <td>lzo1x_999</td>
+	</tr>
+	<tr>
+          <td>7<br/>
+          </td>
+          <td>lzo<br/>
+          </td>
+          <td>7<br/>
+          </td>
+          <td>lzo1x_999</td>
+	</tr>
+	<tr>
+          <td>8<br/>
+          </td>
+          <td>lzo<br/>
+          </td>
+          <td>8<br/>
+          </td>
+          <td>lzo1x_999</td>
+	</tr>
+	<tr>
+          <td>9<br/>
+          </td>
+          <td>lzo<br/>
+          </td>
+          <td>9<br/>
+          </td>
+          <td>lzo1x_999</td>
+	</tr>
+      </table>
+    </div>
+    <br/>
 
-    <a name="libthreadar"><b>What is libthreadar and why libdar relies on it?</b></a><br>
+    <a name="libthreadar"><b>What is libthreadar and why libdar relies on it?</b></a><br/>
 
     <p>
       libthreadar is a wrapping library of the Posix C threads. It was originally part of
@@ -2962,7 +2975,7 @@ be done using:
       <a href="http://libthreadar.sourceforge.net/">here</a>
     </p>
 
-    <a name="sftppubkey"><b>I have sftp pubkey authentication working with ssh/sftp, how to have dar using too this public key authentication for sftp?</b></a><br>
+    <a name="sftppubkey"><b>I have sftp pubkey authentication working with ssh/sftp, how to have dar using too this public key authentication for sftp?</b></a><br/>
 
     <p>
       The answer is as simply as adding the following option while calling dar: <code><b>-afile-auth</b></code>
@@ -2982,7 +2995,7 @@ be done using:
       ~/.darrc and forget about it).
     </p>
 
-    <a name="libssh2"><b>I Cannot get dar to connect to remote server using SFTP, it fails with <code>SSL peer certificate or SSH remote key was not OK</code></b></a><br>
+    <a name="libssh2"><b>I Cannot get dar to connect to remote server using SFTP, it fails with <code>SSL peer certificate or SSH remote key was not OK</code></b></a><br/>
 
     <p>
       This may be due to several well known reasons:
@@ -3121,7 +3134,7 @@ be done using:
       </li>
     </ol>
 
-    <a name="too_large"><b><code>Cannot open catalogue: Cannot handle such a too large integer.</code> What to do?</b></a><br>
+    <a name="too_large"><b><code>Cannot open catalogue: Cannot handle such a too large integer.</code> What to do?</b></a><br/>
 
     <p>
       Unless using dar/libdar built in 32 bits mode, you should not meet this
@@ -3208,7 +3221,7 @@ be done using:
       without user interaction.
     </p>
 
-    <a name="full-from-diff"><b>I have a diff/incremental backup and I want to convert it to a full backup, how to do that?</b></a><br>
+    <a name="full-from-diff"><b>I have a diff/incremental backup and I want to convert it to a full backup, how to do that?</b></a><br/>
 
     <p>
       it is possible to convert a differential backup if you also have the full
