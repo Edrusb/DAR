@@ -78,88 +78,90 @@
 
     <h3>Completness of backup and restoration</h3>
 
-    <table class=center>
-      <tr>
-	<th>Software</th>
-	<th>plain file</th>
-	<th>symlink</th>
-	<th>hardlinked files</th>
-	<th>hardlinked sockets</th>
-	<th>hardlinked pipes</th>
-	<th>user</th>
-	<th>group</th>
-	<th>perm.</th>
-	<th>ACL</th>
-	<th>Extended Attributes</th>
-	<th>FS Attributes</th>
-	<th>atime</th>
-	<th>mtime</th>
-	<th>ctime</th>
-	<th>btime</th>
-	<th>Spares File</th>
-	<th>Disk usage optimization</th>
-      </tr>
-      <tr>
-	<td>Dar</td>
-	<td>yes</td>
-	<td>yes</td>
-	<td>yes</td>
-	<td>yes</td>
-	<td>yes</td>
-	<td>yes</td>
-	<td>yes</td>
-	<td>yes</td>
-	<td>yes</td>
-	<td>yes</td>
-	<td>yes</td>
-	<td>yes</td>
-	<td>yes</td>
-	<td>-</td>
-	<td>yes(1)</td>
-	<td>yes</td>
-	<td>yes</td>
-      </tr>
-      <tr>
-	<td>Rsync</td>
-	<td>yes</td>
-	<td>yes</td>
-	<td>yes</td>
-	<td>yes</td>
-	<td>yes</td>
-	<td>yes</td>
-	<td>yes</td>
-	<td>yes</td>
-	<td>yes(4)</td>
-	<td>yes(5)</td>
-	<td>-</td>
-	<td>-</td>
-	<td>yes</td>
-	<td>-</td>
-	<td>yes(1)</td>
-	<td>yes(6)</td>
-	<td>yes(6)</td>
-      </tr>
-      <tr>
-	<td>Tar</td>
-	<td>yes</td>
-	<td>yes</td>
-	<td>yes</td>
-	<td>- <i>(2)</i></td>
-	<td>-</td>
-	<td>yes</td>
-	<td>yes</td>
-	<td>yes</td>
-	<td>yes(7)</td>
-	<td>yes(8)</td>
-	<td>-</td>
-	<td>-</td>
-	<td>yes(3)</td>
-	<td>-</td>
-	<td>yes(1)</td>
-	<td>yes(6)</td>
-	<td>-</td>
-      </tr>
-    </table>
+    <div class=table>
+      <table class=center>
+	<tr>
+	  <th>Software</th>
+	  <th>plain file</th>
+	  <th>symlink</th>
+	  <th>hardlinked files</th>
+	  <th>hardlinked sockets</th>
+	  <th>hardlinked pipes</th>
+	  <th>user</th>
+	  <th>group</th>
+	  <th>perm.</th>
+	  <th>ACL</th>
+	  <th>Extended Attributes</th>
+	  <th>FS Attributes</th>
+	  <th>atime</th>
+	  <th>mtime</th>
+	  <th>ctime</th>
+	  <th>btime</th>
+	  <th>Spares File</th>
+	  <th>Disk usage optimization</th>
+	</tr>
+	<tr>
+	  <td>Dar</td>
+	  <td>yes</td>
+	  <td>yes</td>
+	  <td>yes</td>
+	  <td>yes</td>
+	  <td>yes</td>
+	  <td>yes</td>
+	  <td>yes</td>
+	  <td>yes</td>
+	  <td>yes</td>
+	  <td>yes</td>
+	  <td>yes</td>
+	  <td>yes</td>
+	  <td>yes</td>
+	  <td>-</td>
+	  <td>yes(1)</td>
+	  <td>yes</td>
+	  <td>yes</td>
+	</tr>
+	<tr>
+	  <td>Rsync</td>
+	  <td>yes</td>
+	  <td>yes</td>
+	  <td>yes</td>
+	  <td>yes</td>
+	  <td>yes</td>
+	  <td>yes</td>
+	  <td>yes</td>
+	  <td>yes</td>
+	  <td>yes(4)</td>
+	  <td>yes(5)</td>
+	  <td>-</td>
+	  <td>-</td>
+	  <td>yes</td>
+	  <td>-</td>
+	  <td>yes(1)</td>
+	  <td>yes(6)</td>
+	  <td>yes(6)</td>
+	</tr>
+	<tr>
+	  <td>Tar</td>
+	  <td>yes</td>
+	  <td>yes</td>
+	  <td>yes</td>
+	  <td>- <i>(2)</i></td>
+	  <td>-</td>
+	  <td>yes</td>
+	  <td>yes</td>
+	  <td>yes</td>
+	  <td>yes(7)</td>
+	  <td>yes(8)</td>
+	  <td>-</td>
+	  <td>-</td>
+	  <td>yes(3)</td>
+	  <td>-</td>
+	  <td>yes(1)</td>
+	  <td>yes(6)</td>
+	  <td>-</td>
+	</tr>
+      </table>
+    </div>
     <ul>
       <li>(1) "Yes" under MACoS X, FreeBSD and BSD systems. As of today (year 2020), Linux has no way to set the <i>btime</i> aka <i>birthtime</i> or yet <i>creation time</i></li>
       <li>(2) <i>tar</i> does even not save and restore plain normal sockets, but that's not a big issue in fact as Unix sockets should be recreated by the applications that provide corresponding service</li>
@@ -439,188 +441,190 @@
 
     </dl>
 
-    <table class=center>
-      <tr class=center>
-	<th width="40%">Feature</th>
-	<th width="20%">Dar</th>
-	<th width="20%">Rsync</th>
-	<th width="20%">Tar</th>
-      <tr>
-      <tr>
-	<th class=left>Historization</th>
-	<td>Yes</td>
-	<td>-</td>
-	<td>Yes</td>
-      </tr>
-      <tr>
-	<th class=left>Data filtering by directory</th>
-	<td>Yes</td>
-	<td>Yes</td>
-	<td>Yes</td>
-      </tr>
-      <tr>
-	<th class=left>Data filtering by filename</th>
-	<td>Yes</td>
-	<td>Yes</td>
-	<td>limited</td>
-      </tr>
-      <tr>
-	<th class=left>Data filtering by filesystem</th>
-	<td>Yes</td>
-	<td>limited</td>
-	<td>limited</td>
-      </tr>
-      <tr>
-	<th class=left>Data filtering by tag</th>
-	<td>limited</td>
-	<td>-</td>
-	<td>-</td>
-      </tr>
-      <tr>
-	<th class=left>Data filtering by files listing</th>
-	<td>Yes</td>
-	<td>yes</td>
-	<td>limited</td>
-      </tr>
-      <tr>
-	<th class=left>Slicing/multi-volume</th>
-	<td>Yes</td>
-	<td>-</td>
-	<td>limited</td>
-      </tr>
-      <tr>
-	<th class=left>Symmetric encryption</th>
-	<td>Yes</td>
-	<td>-</td>
-	<td>Yes</td>
-      </tr>
-      <tr>
-	<th class=left>Asymmetric encryption</th>
-	<td>Yes</td>
-	<td>-</td>
-	<td>Yes</td>
-      </tr>
-      <tr>
-	<th class=left>Plain-text attack protection</th>
-	<td>Yes</td>
-	<td>-</td>
-	<td>-</td>
-      </tr>
-      <tr>
-	<th class=left>PBKDF2 Key Derivation Function</th>
-	<td>Yes</td>
-	<td>-</td>
-	<td>-</td>
-      </tr>
-      <tr>
-	<th class=left>ARGON2 Key Derivation Function</th>
-	<td>Yes</td>
-	<td>-</td>
-	<td>-</td>
-      </tr>
-      <tr>
-	<th class=left>File change detection</th>
-	<td>Yes</td>
-	<td>-</td>
-	<td>limited</td>
-      </tr>
-      <tr>
-	<th class=left>Multi-level backup</th>
-	<td>Yes</td>
-	<td>-</td>
-	<td>Yes</td>
-      </tr>
-      <tr>
-	<th class=left>Binary delta</th>
-	<td>Yes</td>
-	<td>Yes</td>
-	<td>-</td>
-      </tr>
-      <tr>
-	<th class=left>Detecting suspicious modifications</th>
-	<td>Yes</td>
-	<td>-</td>
-	<td>-</td>
-      </tr>
-      <tr>
-	<th class=left>Snapshot for diff/incr. backup</th>
-	<td>Yes</td>
-	<td>-</td>
-	<td>Yes</td>
-      </tr>
-      <tr>
-	<th class=left>Snapshot for comparing</th>
-	<td>Yes</td>
-	<td>-</td>
-	<td>-</td>
-      </tr>
-      <tr>
-	<th class=left>Snapshot for redundancy</th>
-	<td>Yes</td>
-	<td>-</td>
-	<td>-</td>
-      </tr>
-      <tr>
-	<th class=left>On-fly hashing</th>
-	<td>Yes</td>
-	<td>-</td>
-	<td>-</td>
-      </tr>
-      <tr>
-	<th class=left>Run custom command during operation</th>
-	<td>Yes</td>
-	<td>-</td>
-	<td>limited</td>
-      </tr>
-      <tr>
-	<th class=left>Dry-run execution</th>
-	<td>Yes</td>
-	<td>Yes</td>
-	<td>-</td>
-      </tr>
-      <tr>
-	<th class=left>User message within backup</th>
-	<td>Yes</td>
-	<td>-</td>
-	<td>-</td>
-      </tr>
-      <tr>
-	<th class=left>Backup sanity test</th>
-	<td>Yes</td>
-	<td>-</td>
-	<td>Yes</td>
-      </tr>
-      <tr>
-	<th class=left>Comparing with original data</th>
-	<td>Yes</td>
-	<td>-</td>
-	<td>Yes</td>
-      </tr>
-      <tr>
-	<th class=left>Tunable verbosity</th>
-	<td>Yes</td>
-	<td>Yes</td>
-	<td>limited</td>
-      </tr>
-      <tr>
-	<th class=left>Modify the backup's content</th>
-	<td>Yes</td>
-	<td>Yes</td>
-	<td>limited</td>
-      </tr>
-      <tr>
-	<th class=left>Stdin/stdout backup read/write</th>
-	<td>Yes</td>
-	<td>-</td>
-	<td>Yes</td>
-      </tr>
-      <tr>
-	<th class=left>Remote network storage</th>
-	<td>Yes</td>
-	<td>limited</td>
-	<td>Yes</td>
-      </tr>
-    </table>
+    <div class=table>
+      <table class=center>
+	<tr class=center>
+	  <th width="40%">Feature</th>
+	  <th width="20%">Dar</th>
+	  <th width="20%">Rsync</th>
+	  <th width="20%">Tar</th>
+	<tr>
+	<tr>
+	  <th class=left>Historization</th>
+	  <td>Yes</td>
+	  <td>-</td>
+	  <td>Yes</td>
+	</tr>
+	<tr>
+	  <th class=left>Data filtering by directory</th>
+	  <td>Yes</td>
+	  <td>Yes</td>
+	  <td>Yes</td>
+	</tr>
+	<tr>
+	  <th class=left>Data filtering by filename</th>
+	  <td>Yes</td>
+	  <td>Yes</td>
+	  <td>limited</td>
+	</tr>
+	<tr>
+	  <th class=left>Data filtering by filesystem</th>
+	  <td>Yes</td>
+	  <td>limited</td>
+	  <td>limited</td>
+	</tr>
+	<tr>
+	  <th class=left>Data filtering by tag</th>
+	  <td>limited</td>
+	  <td>-</td>
+	  <td>-</td>
+	</tr>
+	<tr>
+	  <th class=left>Data filtering by files listing</th>
+	  <td>Yes</td>
+	  <td>yes</td>
+	  <td>limited</td>
+	</tr>
+	<tr>
+	  <th class=left>Slicing/multi-volume</th>
+	  <td>Yes</td>
+	  <td>-</td>
+	  <td>limited</td>
+	</tr>
+	<tr>
+	  <th class=left>Symmetric encryption</th>
+	  <td>Yes</td>
+	  <td>-</td>
+	  <td>Yes</td>
+	</tr>
+	<tr>
+	  <th class=left>Asymmetric encryption</th>
+	  <td>Yes</td>
+	  <td>-</td>
+	  <td>Yes</td>
+	</tr>
+	<tr>
+	  <th class=left>Plain-text attack protection</th>
+	  <td>Yes</td>
+	  <td>-</td>
+	  <td>-</td>
+	</tr>
+	<tr>
+	  <th class=left>PBKDF2 Key Derivation Function</th>
+	  <td>Yes</td>
+	  <td>-</td>
+	  <td>-</td>
+	</tr>
+	<tr>
+	  <th class=left>ARGON2 Key Derivation Function</th>
+	  <td>Yes</td>
+	  <td>-</td>
+	  <td>-</td>
+	</tr>
+	<tr>
+	  <th class=left>File change detection</th>
+	  <td>Yes</td>
+	  <td>-</td>
+	  <td>limited</td>
+	</tr>
+	<tr>
+	  <th class=left>Multi-level backup</th>
+	  <td>Yes</td>
+	  <td>-</td>
+	  <td>Yes</td>
+	</tr>
+	<tr>
+	  <th class=left>Binary delta</th>
+	  <td>Yes</td>
+	  <td>Yes</td>
+	  <td>-</td>
+	</tr>
+	<tr>
+	  <th class=left>Detecting suspicious modifications</th>
+	  <td>Yes</td>
+	  <td>-</td>
+	  <td>-</td>
+	</tr>
+	<tr>
+	  <th class=left>Snapshot for diff/incr. backup</th>
+	  <td>Yes</td>
+	  <td>-</td>
+	  <td>Yes</td>
+	</tr>
+	<tr>
+	  <th class=left>Snapshot for comparing</th>
+	  <td>Yes</td>
+	  <td>-</td>
+	  <td>-</td>
+	</tr>
+	<tr>
+	  <th class=left>Snapshot for redundancy</th>
+	  <td>Yes</td>
+	  <td>-</td>
+	  <td>-</td>
+	</tr>
+	<tr>
+	  <th class=left>On-fly hashing</th>
+	  <td>Yes</td>
+	  <td>-</td>
+	  <td>-</td>
+	</tr>
+	<tr>
+	  <th class=left>Run custom command during operation</th>
+	  <td>Yes</td>
+	  <td>-</td>
+	  <td>limited</td>
+	</tr>
+	<tr>
+	  <th class=left>Dry-run execution</th>
+	  <td>Yes</td>
+	  <td>Yes</td>
+	  <td>-</td>
+	</tr>
+	<tr>
+	  <th class=left>User message within backup</th>
+	  <td>Yes</td>
+	  <td>-</td>
+	  <td>-</td>
+	</tr>
+	<tr>
+	  <th class=left>Backup sanity test</th>
+	  <td>Yes</td>
+	  <td>-</td>
+	  <td>Yes</td>
+	</tr>
+	<tr>
+	  <th class=left>Comparing with original data</th>
+	  <td>Yes</td>
+	  <td>-</td>
+	  <td>Yes</td>
+	</tr>
+	<tr>
+	  <th class=left>Tunable verbosity</th>
+	  <td>Yes</td>
+	  <td>Yes</td>
+	  <td>limited</td>
+	</tr>
+	<tr>
+	  <th class=left>Modify the backup's content</th>
+	  <td>Yes</td>
+	  <td>Yes</td>
+	  <td>limited</td>
+	</tr>
+	<tr>
+	  <th class=left>Stdin/stdout backup read/write</th>
+	  <td>Yes</td>
+	  <td>-</td>
+	  <td>Yes</td>
+	</tr>
+	<tr>
+	  <th class=left>Remote network storage</th>
+	  <td>Yes</td>
+	  <td>limited</td>
+	  <td>Yes</td>
+	</tr>
+      </table>
+    </div>
 
     <p>
       The presented results above is a synthesis of the <a href="benchmark_logs.html#features">test logs</a>
@@ -638,36 +642,38 @@
       will behave even worse when larger portion of data corruption will be met.
     </p>
 
-    <table class=center>
-      <tr>
-	<th style="min-width:30%">Behavior</th>
-	<th style="min-width:10%">Dar</th>
-	<th style="min-width:10%">Rsync</th>
-	<th style="min-width:10%">Tar alone</th>
-	<th style="min-width:10%">Tar + gzip</th>
-      </tr>
-      <tr>
-	<th class=left>Detects backup corruption</th>
-	<td>Yes</td>
-	<td>-</td>
-	<td>-</td>
-	<td>Yes</td>
-      </tr>
-      <tr>
-	<th class=left>Warn or avoid restoring corrupted data</th>
-	<td>Yes</td>
-	<td>-</td>
-	<td>-</td>
-	<td>Yes</td>
-      <tr>
-      <tr>
-	<th class=left>Able to restore all files not concerned by the corruption</th>
-	<td>Yes</td>
-	<td>Yes</td>
-	<td>Yes</td>
-	<td>-</td>
-      </tr>
-    </table>
+    <div class=table>
+      <table class=center>
+	<tr>
+	  <th style="min-width:30%">Behavior</th>
+	  <th style="min-width:10%">Dar</th>
+	  <th style="min-width:10%">Rsync</th>
+	  <th style="min-width:10%">Tar alone</th>
+	  <th style="min-width:10%">Tar + gzip</th>
+	</tr>
+	<tr>
+	  <th class=left>Detects backup corruption</th>
+	  <td>Yes</td>
+	  <td>-</td>
+	  <td>-</td>
+	  <td>Yes</td>
+	</tr>
+	<tr>
+	  <th class=left>Warn or avoid restoring corrupted data</th>
+	  <td>Yes</td>
+	  <td>-</td>
+	  <td>-</td>
+	  <td>Yes</td>
+	<tr>
+	<tr>
+	  <th class=left>Able to restore all files not concerned by the corruption</th>
+	  <td>Yes</td>
+	  <td>Yes</td>
+	  <td>Yes</td>
+	  <td>-</td>
+	</tr>
+      </table>
+    </div>
 
     <p>
       To protect your data, you can go one step further computing data redundancy with <a href="https://github.com/Parchive/par2cmdline">Parchive</a>
@@ -748,28 +754,30 @@
       Things we can summarize as follows:
     </p>
 
-    <table class=center>
-      <tr>
-	<th>Operation</th>
-	<th>Best Choice</th>
-	<th>Alternative</th>
-      </tr>
-      <tr>
-	<th class=left>Local copy</th>
-	<td>cp</td>
-	<td>tar</td>
-      </tr>
-      <tr>
-	<th class=left>One-time remote copy</th>
-	<td>dar</td>
-	<td>rsync</td>
-      </tr>
-      <tr>
-	<th class=left>recurrent remote copy</th>
-	<td>rsync</td>
-	<td>dar</td>
-      </tr>
-    </table>
+    <div class=table>
+      <table class=center>
+	<tr>
+	  <th>Operation</th>
+	  <th>Best Choice</th>
+	  <th>Alternative</th>
+	</tr>
+	<tr>
+	  <th class=left>Local copy</th>
+	  <td>cp</td>
+	  <td>tar</td>
+	</tr>
+	<tr>
+	  <th class=left>One-time remote copy</th>
+	  <td>dar</td>
+	  <td>rsync</td>
+	</tr>
+	<tr>
+	  <th class=left>recurrent remote copy</th>
+	  <td>rsync</td>
+	  <td>dar</td>
+	</tr>
+      </table>
+    </div>
 
     <p>
       See the corresponding <a href="benchmark_logs.html#copy_perf">test logs</a> for more details
@@ -1102,219 +1110,221 @@
 
     <h3>Criteria for the different use cases</h3>
 
-    <table>
-      <tr>
-	<th>Use Cases</th>
-	<th>Key Point</th>
-	<th>Optional interesting features</th>
-      </tr>
-      <tr>
-	<th>Local directory copy</th>
-	<td>
-	  <ul>
-	    <li>execution speed</li>
-	  </ul>
-	</td>
-	<td>
-	  <ul>
-	    <li>completness of copied data and metadata</li>
-	  </ul>
-	</td>
-      </tr>
-      <tr>
-	<th>remote directory copy - wide network</th>
-	<td>
-	  <ul>
-	    <li>execution speed</li>
-	  </ul>
-	</td>
-	<td>
-	  <ul>
-	    <li>completness of copied data and metadata</li>
-	    <li>on wire ciphering</li>
-	  </ul>
-	</td>
-      </tr>
-      <tr>
-	<th>remote directory copy - narrow network</th>
-	<td>
-	  <ul>
-	    <li>execution speed</li>
-	    <li>data reduction on wire</li>
-	  </ul>
-	</td>
-	<td>
-	  <ul>
-	    <li>completness of copied data and metadata</li>
-	    <li>on wire ciphering</li>
-	  </ul>
-	</td>
-      </tr>
-      <tr>
-	<th>Full backups only</th>
-	<td>
-	  <ul>
-	    <li>completness of backed up data and metadata</li>
-	    <li>data reduction on storage</li>
-	  </ul>
-	</td>
-	<td>
-	  <ul>
-	    <li>fast restoration of a few files</li>
-	    <li>fast restoration of a whole backup</li>
-	  </ul>
-	</td>
-      </tr>
-      <tr>
-	<th>full+diff/incr. backup</th>
-	<td>
-	  <ul>
-	    <li>completness of backed up data and metadata</li>
-	    <li>data reduced on storage</li>
-	  </ul>
-	</td>
-	<td>
-	  <ul>
-	    <li>fast restoration of a few files</li>
-	    <li>fast restoration of a whole backup</li>
-	    <li>managing tool of backups rotation</li>
-	  </ul>
-	</td>
-      </tr>
-      <tr>
-	<th>Archiving of private data</th>
-	<td>
-	  <ul>
-	    <li>data reduction on storage</li>
-	    <li>robustness of the archive</li>
-	  </ul>
-	</td>
-	<td>
-	  <ul>
-	    <li>ciphering</li>
-	    <li>redundancy data</li>
-	  </ul>
-	</td>
-      </tr>
-      <tr>
-	<th>Archiving of public data</th>
-	<td>
-	  <ul>
-	    <li>data reduction on storage</li>
-	    <li>robustness of the archive</li>
-	  </ul>
-	</td>
-	<td>
-	  <ul>
-	    <li>signing</li>
-	    <li>fast decompression algorithm</li>
-	  </ul>
-	</td>
-      </tr>
-      <tr>
-	<th>Private data exchange over Internet</th>
-	<td>
-	  <ul>
-	    <li>data reduction over the network</li>
-	    <li>asymmetric encryption and signing</li>
-	  </ul>
-	</td>
-	<td>
-	  <ul>
-	    <li>redundancy data</li>
-	    <li>multi-volume backup/archive</li>
-	    <li>integrated network protocols in backup tool</li>
-	  </ul>
-	</td>
-      </tr>
-      <tr>
-	<th>Public data exchange over Internet</th>
-	<td>
-	  <ul>
-	    <li>data reduction over the network</li>
-	  </ul>
-	</td>
-	<td>
-	  <ul>
-	    <li>hashing</li>
-	    <li>sigining</li>
-	    <li>integrated network protocols in backup tool</li>
-	  </ul>
-	</td>
-      </tr>
-    </table>
-
+    <div class=table>
+      <table>
+	<tr>
+	  <th>Use Cases</th>
+	  <th>Key Point</th>
+	  <th>Optional interesting features</th>
+	</tr>
+	<tr>
+	  <th>Local directory copy</th>
+	  <td>
+	    <ul>
+	      <li>execution speed</li>
+	    </ul>
+	  </td>
+	  <td>
+	    <ul>
+	      <li>completness of copied data and metadata</li>
+	    </ul>
+	  </td>
+	</tr>
+	<tr>
+	  <th>remote directory copy - wide network</th>
+	  <td>
+	    <ul>
+	      <li>execution speed</li>
+	    </ul>
+	  </td>
+	  <td>
+	    <ul>
+	      <li>completness of copied data and metadata</li>
+	      <li>on wire ciphering</li>
+	    </ul>
+	  </td>
+	</tr>
+	<tr>
+	  <th>remote directory copy - narrow network</th>
+	  <td>
+	    <ul>
+	      <li>execution speed</li>
+	      <li>data reduction on wire</li>
+	    </ul>
+	  </td>
+	  <td>
+	    <ul>
+	      <li>completness of copied data and metadata</li>
+	      <li>on wire ciphering</li>
+	    </ul>
+	  </td>
+	</tr>
+	<tr>
+	  <th>Full backups only</th>
+	  <td>
+	    <ul>
+	      <li>completness of backed up data and metadata</li>
+	      <li>data reduction on storage</li>
+	    </ul>
+	  </td>
+	  <td>
+	    <ul>
+	      <li>fast restoration of a few files</li>
+	      <li>fast restoration of a whole backup</li>
+	    </ul>
+	  </td>
+	</tr>
+	<tr>
+	  <th>full+diff/incr. backup</th>
+	  <td>
+	    <ul>
+	      <li>completness of backed up data and metadata</li>
+	      <li>data reduced on storage</li>
+	    </ul>
+	  </td>
+	  <td>
+	    <ul>
+	      <li>fast restoration of a few files</li>
+	      <li>fast restoration of a whole backup</li>
+	      <li>managing tool of backups rotation</li>
+	    </ul>
+	  </td>
+	</tr>
+	<tr>
+	  <th>Archiving of private data</th>
+	  <td>
+	    <ul>
+	      <li>data reduction on storage</li>
+	      <li>robustness of the archive</li>
+	    </ul>
+	  </td>
+	  <td>
+	    <ul>
+	      <li>ciphering</li>
+	      <li>redundancy data</li>
+	    </ul>
+	  </td>
+	</tr>
+	<tr>
+	  <th>Archiving of public data</th>
+	  <td>
+	    <ul>
+	      <li>data reduction on storage</li>
+	      <li>robustness of the archive</li>
+	    </ul>
+	  </td>
+	  <td>
+	    <ul>
+	      <li>signing</li>
+	      <li>fast decompression algorithm</li>
+	    </ul>
+	  </td>
+	</tr>
+	<tr>
+	  <th>Private data exchange over Internet</th>
+	  <td>
+	    <ul>
+	      <li>data reduction over the network</li>
+	      <li>asymmetric encryption and signing</li>
+	    </ul>
+	  </td>
+	  <td>
+	    <ul>
+	      <li>redundancy data</li>
+	      <li>multi-volume backup/archive</li>
+	      <li>integrated network protocols in backup tool</li>
+	    </ul>
+	  </td>
+	</tr>
+	<tr>
+	  <th>Public data exchange over Internet</th>
+	  <td>
+	    <ul>
+	      <li>data reduction over the network</li>
+	    </ul>
+	  </td>
+	  <td>
+	    <ul>
+	      <li>hashing</li>
+	      <li>sigining</li>
+	      <li>integrated network protocols in backup tool</li>
+	    </ul>
+	  </td>
+	</tr>
+      </table>
+    </div>
 
     <h3>Complementary criteria depending on the storage type</h3>
     <p>
       And depending on the target storage, the following adds on top:
     </p>
 
-    <table>
-      <tr>
-	<th>Use Cases</th>
-	<th>Key Point</th>
-	<th>Optional interesting features</th>
-      </tr>
-      <th>Local disk</th>
-      <td>
-	<ul>
-	  <li>execution speed</li>
-	</ul>
-      </td>
-      <td>
-	<ul>
-	  <li>hashing</li>
-	</ul>
-      </td>
-      <tr>
-	<th>Data stored on private NAS</th>
+    <div class=table>
+      <table>
+	<tr>
+	  <th>Use Cases</th>
+	  <th>Key Point</th>
+	  <th>Optional interesting features</th>
+	</tr>
+	<th>Local disk</th>
 	<td>
 	  <ul>
-	    <li>data reduction on storage</li>
+	    <li>execution speed</li>
 	  </ul>
 	</td>
 	<td>
 	  <ul>
-	    <li>multi-volume backup</li>
-	    <li>integrated network protocols in backup tool</li>
-	    <li>ciphering</li>
+	    <li>hashing</li>
 	  </ul>
 	</td>
-      </tr>
-      <tr>
-	<th>Data stored on public cloud</th>
-	<td>
-	  <ul>
-	    <li>data reduction on storage and on wire</li>
-	    <li>ciphering</li>
-	  </ul>
-	</td>
-	<td>
-	  <ul>
-	    <li>multi-volumes backup</li>
-	    <li>integrated network protocols in backup tool</li>
-	  </ul>
-	</td>
-      </tr>
-      <tr>
-	<th>Data stored on removable media (incl. tapes)</th>
-	<td>
-	  <ul>
-	    <li>multi-volume backup</li>
-	    <li>data reduction on storage</li>
-	    <li>on-fly hashing</li>
-	  </ul>
-	</td>
-	<td>
-	  <ul>
-	    <li>ciphering</li>
-	    <li>redundancy data</li>
-	  </ul>
-	</td>
-      </tr>
-    </table>
-
+	<tr>
+	  <th>Data stored on private NAS</th>
+	  <td>
+	    <ul>
+	      <li>data reduction on storage</li>
+	    </ul>
+	  </td>
+	  <td>
+	    <ul>
+	      <li>multi-volume backup</li>
+	      <li>integrated network protocols in backup tool</li>
+	      <li>ciphering</li>
+	    </ul>
+	  </td>
+	</tr>
+	<tr>
+	  <th>Data stored on public cloud</th>
+	  <td>
+	    <ul>
+	      <li>data reduction on storage and on wire</li>
+	      <li>ciphering</li>
+	    </ul>
+	  </td>
+	  <td>
+	    <ul>
+	      <li>multi-volumes backup</li>
+	      <li>integrated network protocols in backup tool</li>
+	    </ul>
+	  </td>
+	</tr>
+	<tr>
+	  <th>Data stored on removable media (incl. tapes)</th>
+	  <td>
+	    <ul>
+	      <li>multi-volume backup</li>
+	      <li>data reduction on storage</li>
+	      <li>on-fly hashing</li>
+	    </ul>
+	  </td>
+	  <td>
+	    <ul>
+	      <li>ciphering</li>
+	      <li>redundancy data</li>
+	    </ul>
+	  </td>
+	</tr>
+      </table>
+    </div>
 
     <h3>Essential <a name="oil">oil</a> drop</h3>
     <p>
@@ -1330,228 +1340,232 @@
       We can summarize the best software to put in front of each particular use case:
     </p>
 
-    <table class=center>
-      <tr>
-	<th>Use Cases</th>
-	<th>Local disk storage</th>
-	<th>Private NAS</th>
-	<th>Public Cloud</th>
-	<th>Removable media</th>
-      </tr>
-      <tr>
-	<th>Local directory copy</th>
-	<td>
-	  <div class=optimum>cp</div>
-	  <div class="limited tooltip">dar <span class=text>not the fastest</span></div>
-	  <div class="limited tooltip">rsync <span class=text>not the fastest</span></div>
-	  <div class="ideal tooltip">tar <span class=text>not the fastest</span></div>
-	</td>
-	<td>
-	  -
-	</td>
-	<td>
-	  -
-	</td>
-	<td>
-	  -
-	</td>
-      </tr>
-      <tr>
-	<th>One time remote directory copy</th>
-	<td>
-	  -
-	</td>
-	<td>
-	  <div class=optimum>dar</div>
-	  <div class="ideal tooltip">rsync<span class=text>not the fastest</span></div>
-	  <div class="limited tooltip">tar<span class=text>no network protocol embedded</span><br/>
-	</td>
-	<td>
-	  <div class=optimum>dar</div>
-	  <div class="ideal tooltip">rsync<span class=text>not the fastest</span></div>
-	  <div class="limited tooltip">tar<span class=text>no network protocol embedded</span></div>
-	</td>
-	<td>
+    <div class=table>
+      <table class=center>
+	<tr>
+	  <th>Use Cases</th>
+	  <th>Local disk storage</th>
+	  <th>Private NAS</th>
+	  <th>Public Cloud</th>
+	  <th>Removable media</th>
+	</tr>
+	<tr>
+	  <th>Local directory copy</th>
+	  <td>
+	    <div class=optimum>cp</div>
+	    <div class="limited tooltip">dar <span class=text>not the fastest</span></div>
+	    <div class="limited tooltip">rsync <span class=text>not the fastest</span></div>
+	    <div class="ideal tooltip">tar <span class=text>not the fastest</span></div>
+	  </td>
+	  <td>
+	    -
+	  </td>
+	  <td>
+	    -
+	  </td>
+	  <td>
+	    -
+	  </td>
+	</tr>
+	<tr>
+	  <th>One time remote directory copy</th>
+	  <td>
+	    -
+	  </td>
+	  <td>
 	    <div class=optimum>dar</div>
 	    <div class="ideal tooltip">rsync<span class=text>not the fastest</span></div>
 	    <div class="limited tooltip">tar<span class=text>no network protocol embedded</span></div>
-	</td>
-      </tr>
-      <tr>
-	<th>Recurrent remote directory copy</th>
-	<td>
-	  -
-	</td>
-	<td>
-	  <div class="ideal tooltip">dar<span class=text>fastest but automation is a bit less straight forward than using <i>rsync</i></span></div>
-	  <div class="optimum">rsync</div>
-	  <div class="limited tooltip">tar<span class=text>no network protocol embedded</span></div>
-	</td>
-	<td>
-	  <div class="ideal tooltip">dar<span class=text>fastest but automation is a bit less straight forward than using <i>rsync</i></span></div>
-	  <div class=optimum>rsync</div>
-	  <div class="limited tooltip">tar<span class=text>no network protocol embedded</span></div>
-	</td>
-	<td>
-	  <div class="ideal tooltip">dar<span class=text>fastest but automation is a bit less straight forward than using <i>rsync</i></span></div>
-	  <div class=optimum>rsync</div>
-	  <div class="limited tooltip">tar<span class=text>no network protocol embedded</span></div>
-	</td>
-      </tr>
-      <tr>
-	<th>
-	  Full backups only<br/>
-	  (private data)
-	</th>
-	<td>
-	  <div class="optimum tooltip">dar<span class=text>has the advantage to provide long historization of backups</span></div>
-	  <div class="ideal tooltip">rsync<span class=text>no data reduction on storage, slow to restore a whole filesystem</span></div>
-	  <div class="ideal tooltip">tar<span class=text>not saving all file attributes and inode types, slow to restore a few files</span></div>
-	</td>
-	<td>
-	  <div class=optimum>dar</div>
-	  <div class="limited tooltip">rsync<span class=text>no data reduction on storage</span></div>
-	  <div class="ideal tooltip">tar<span class=text>not saving all file attributes and inode types, slow to restore a few files, no network protocol embedded</span></div>
-	</td>
-	<td>
-	  <div class=optimum>dar</div>
-	  <div class="noway tooltip">rsync<span class=text>no data ciphering and no reduction on storage</span></div>
-	  <div class="limited tooltip">tar<span class=text>not embedded ciphering, not the strongest data encryption, not saving all file attributes and inode types, slow to restore a few files, no network protocol embedded</span></div>
-	</td>
-	<td>
-	  <div class=optimum>dar</div>
-	  <div class="limited tooltip">rsync<span class=text>no multi-volume support, no data ciphering and no reduction on storage</span></div>
-	  <div class="limited tooltip">tar<span class=text>compression and multi-volume are not supported at the same time, not saving all file attributes and inode types, not embedded ciphering, not the strongest data encryption</span></div>
-	</td>
-      </tr>
-      <tr>
-	<th>
-	  full+diff/incr. backups<br/>
-	  (priate data)
-	</th>
-	<td>
-	  <div class=optimum>dar</div>
-	  <div class="noway tooltip">rsync<span class=text>differential backup not supported, full backup is overwritten</span></div>
-	  <div class="ideal tooltip">tar<span class=text>not saving all file attributes and inode types, slow to restore a few files</span></div>
-	</td>
-	<td>
-	  <div class=optimum>dar</div>
-	  <div class="noway tooltip">rsync<span class=text>differential backup not supported, full backup is overwritten</span></div>
-	  <div class="ideal tooltip">tar<span class=text>not saving all file attributes and inode types, slow to restore a few files, no network protocol embedded</span></div>
-	</td>
-	<td>
-	  <div class=optimum>dar</div>
-	  <div class="noway tooltip">rsync<span class=text>differential backup not supported, full backup is overwritten</span></div>
-	  <div class="limited tooltip">tar<span class=text>not embedded ciphering, not the strongest data encryption, not saving all file attributes and inode types, slow to restore a few files, no network protocol embedded</span></div>
-	</td>
-	<td>
-	  <div class=optimum>dar</div>
-	  <div class="noway tooltip">rsync<span class=text>differential backup not supported, full backup is overwritten, no support for multi-volime, no data reduction, no ciphering</span></div>
-	  <div class="limited tooltip">tar<span class=text>compression and multi-volume are not supported at the same time, not saving all file attributes and inode types, not embedded ciphering, not the strongest data encryption</span></div>
-	</td>
-      </tr>
-      <tr>
-	<th>Archiving of private data</th>
-	<td>
-	  <div class=optimum>dar</div>
-	  <div class="limited tooltip">rsync<span class=text>no data reduction on storage, no detection of data corruption, complex parity data addition</span></div>
-	  <div class="ideal tooltip">tar<span class=text>no detection of data corruption or loss of all data after the first corruption met</span></div>
-	</td>
-	<td>
-	  <div class=optimum>dar</div>
-	  <div class="limited tooltip">rsync<span class=text>no data reduction, no detection of data corruption, complex parity data addition</span></div>
-	  <div class="ideal tooltip">tar<span class=text>no detection of data corruption or loss of all data after the first corruption met</span></div>
-	</td>
-	<td>
-	  <div class=optimum>dar</div>
-	  <div class="noway tooltip">rsync<span class=text>no ciphering, no data reduction, no detection of data corruption, complex parity data addition</span></div>
-	  <div class="limited tooltip">tar<span class=text>no detection of data corruption or loss of all data after the first corruption met, no embedded ciphering, no protection against plain-text attack</span></div>
-	</td>
-	<td>
-	  <div class=optimum>dar</div>
-	  <div class="noway tooltip">rsync<span class=text>no data reduction, no multi-volume, no ciphering, no detection of data corruption, complex parity data addition</span></div>
-	  <div class="noway tooltip">tar<span class=text>compression and multi-volume are not supported at the same time, no detection of data corruption or loss of all data after the first corruption met, no ciphering</span></div>
-	</td>
-      </tr>
-      <tr>
-	<th>Archiving of public data</th>
-	<td>
-	  <div class="ideal tooltip">dar<span class=text>most robust format but not as standard as <i>tar</i>'s</span></div>
-	  <div class="limited tooltip">rsync<span class=text>no reduction on storage</span></div>
-	  <div class=optimum>tar</div>
-	</td>
-	<td>
-	  <div class="ideal tooltip">dar<span class=text>most robust archive format but not as standard as <i>tar</i>'s</span></div>
-	  <div class="noway tooltip">rsync<span class=text>no reduction on storage, complicated to download a directory tree and files from other protocols than rsync</span></div>
-	  <div class=optimum>tar</div>
-	</td>
-	<td>
-	  <div class="ideal tooltip">dar<span class=text>most robust archive format but not as standard as <i>tar</i></span></div>
-	  <div class="noway tooltip">rsync<span class=text>no reduction on storage, complicated to download a directory tree and files from other protocols than rsync</span></div>
-	  <div class=optimum>tar</div>
-	</td>
-	<td>
-	  <div class=optimum>dar</div>
-	  <div class="noway tooltip">rsync<span class=text>no reduction on storage, no multi-volume, no detection of data corruption, complex parity data addition</span></div>
-	  <div class="limited tooltip">tar<span class=text>compression and multi-volume are not supported at the same time</span></div>
-	</td>
-      </tr>
-      <tr>
-	<th>Private data exchange over Internet</th>
-	<td>
-	  <div class=optimum>dar</div>
-	  <div class="limited tooltip">rsync<span class=text>not the best data reduction over the network</span></div>
-	  <div class="ideal tooltip">tar<span class=text>best data reduction on network but no embedded ciphering, no integrated network protocols</span></div>
-	</td>
-	<td>
-	  <div class=optimum>dar</div>
-	  <div class="limited tooltip">rsync<span class=text>no data reduction on storage, not the best data reduction over the network</span></div>
-	  <div class="ideal tooltip">tar<span class=text>best data reduction on network, but lack of embedded ciphering, lack of integrated network protocols</span></div>
-	</td>
-	<td>
-	  <div class=optimum>dar</div>
-	  <div class="noway tooltip">rsync<span class=text>no ciphering and no data reduction on storage</span></div>
-	  <div class="limited tooltip">tar<span class=text>no embedded ciphering, no integrated network protocols, no protection against plain-text attack, only old KDF functions supported, complex and error prone use of openssl to cipher the archive</span></div>
-	</td>
-	<td>
-	  -
-	</td>
-      </tr>
-      <tr>
-	<th>Public data exchange over Internet</th>
-	<td>
-	  <div class="ideal tooltip">dar<span class=text>not the best data reduction over the network</span></div>
-	  <div class="ideal tooltip">rsync<span class=text>not the best data reduction over the network</span></div>
-	  <div class=optimum>tar</div>
-	</td>
-	<td>
-	  <div class="ideal tooltip">dar<span class=text>not the best data reduction over the network</span></div>
-	  <div class="limited tooltip">rsync<span class=text>no data reduction on storage, not the best data reduction over the network</span></div>
-	  <div class=optimum>tar</div>
-	</td>
-	<td>
-	  <div class="ideal tooltip">dar<span class=text>not the best data reduction over the network</span></div>
-	  <div class="limited tooltip">rsync<span class=text>no data reduction on storage, not the best data reduction over the network</span></div>
-	  <div class=optimum>tar</div>
-	</td>
-	<td>
-	  -
-	</td>
-      </tr>
-    </table>
+	  </td>
+	  <td>
+	    <div class=optimum>dar</div>
+	    <div class="ideal tooltip">rsync<span class=text>not the fastest</span></div>
+	    <div class="limited tooltip">tar<span class=text>no network protocol embedded</span></div>
+	  </td>
+	  <td>
+	    <div class=optimum>dar</div>
+	    <div class="ideal tooltip">rsync<span class=text>not the fastest</span></div>
+	    <div class="limited tooltip">tar<span class=text>no network protocol embedded</span></div>
+	  </td>
+	</tr>
+	<tr>
+	  <th>Recurrent remote directory copy</th>
+	  <td>
+	    -
+	  </td>
+	  <td>
+	    <div class="ideal tooltip">dar<span class=text>fastest but automation is a bit less straight forward than using <i>rsync</i></span></div>
+	    <div class="optimum">rsync</div>
+	    <div class="limited tooltip">tar<span class=text>no network protocol embedded</span></div>
+	  </td>
+	  <td>
+	    <div class="ideal tooltip">dar<span class=text>fastest but automation is a bit less straight forward than using <i>rsync</i></span></div>
+	    <div class=optimum>rsync</div>
+	    <div class="limited tooltip">tar<span class=text>no network protocol embedded</span></div>
+	  </td>
+	  <td>
+	    <div class="ideal tooltip">dar<span class=text>fastest but automation is a bit less straight forward than using <i>rsync</i></span></div>
+	    <div class=optimum>rsync</div>
+	    <div class="limited tooltip">tar<span class=text>no network protocol embedded</span></div>
+	  </td>
+	</tr>
+	<tr>
+	  <th>
+	    Full backups only<br/>
+	    (private data)
+	  </th>
+	  <td>
+	    <div class="optimum tooltip">dar<span class=text>has the advantage to provide long historization of backups</span></div>
+	    <div class="ideal tooltip">rsync<span class=text>no data reduction on storage, slow to restore a whole filesystem</span></div>
+	    <div class="ideal tooltip">tar<span class=text>not saving all file attributes and inode types, slow to restore a few files</span></div>
+	  </td>
+	  <td>
+	    <div class=optimum>dar</div>
+	    <div class="limited tooltip">rsync<span class=text>no data reduction on storage</span></div>
+	    <div class="ideal tooltip">tar<span class=text>not saving all file attributes and inode types, slow to restore a few files, no network protocol embedded</span></div>
+	  </td>
+	  <td>
+	    <div class=optimum>dar</div>
+	    <div class="noway tooltip">rsync<span class=text>no data ciphering and no reduction on storage</span></div>
+	    <div class="limited tooltip">tar<span class=text>not embedded ciphering, not the strongest data encryption, not saving all file attributes and inode types, slow to restore a few files, no network protocol embedded</span></div>
+	  </td>
+	  <td>
+	    <div class=optimum>dar</div>
+	    <div class="limited tooltip">rsync<span class=text>no multi-volume support, no data ciphering and no reduction on storage</span></div>
+	    <div class="limited tooltip">tar<span class=text>compression and multi-volume are not supported at the same time, not saving all file attributes and inode types, not embedded ciphering, not the strongest data encryption</span></div>
+	  </td>
+	</tr>
+	<tr>
+	  <th>
+	    full+diff/incr. backups<br/>
+	    (priate data)
+	  </th>
+	  <td>
+	    <div class=optimum>dar</div>
+	    <div class="noway tooltip">rsync<span class=text>differential backup not supported, full backup is overwritten</span></div>
+	    <div class="ideal tooltip">tar<span class=text>not saving all file attributes and inode types, slow to restore a few files</span></div>
+	  </td>
+	  <td>
+	    <div class=optimum>dar</div>
+	    <div class="noway tooltip">rsync<span class=text>differential backup not supported, full backup is overwritten</span></div>
+	    <div class="ideal tooltip">tar<span class=text>not saving all file attributes and inode types, slow to restore a few files, no network protocol embedded</span></div>
+	  </td>
+	  <td>
+	    <div class=optimum>dar</div>
+	    <div class="noway tooltip">rsync<span class=text>differential backup not supported, full backup is overwritten</span></div>
+	    <div class="limited tooltip">tar<span class=text>not embedded ciphering, not the strongest data encryption, not saving all file attributes and inode types, slow to restore a few files, no network protocol embedded</span></div>
+	  </td>
+	  <td>
+	    <div class=optimum>dar</div>
+	    <div class="noway tooltip">rsync<span class=text>differential backup not supported, full backup is overwritten, no support for multi-volime, no data reduction, no ciphering</span></div>
+	    <div class="limited tooltip">tar<span class=text>compression and multi-volume are not supported at the same time, not saving all file attributes and inode types, not embedded ciphering, not the strongest data encryption</span></div>
+	  </td>
+	</tr>
+	<tr>
+	  <th>Archiving of private data</th>
+	  <td>
+	    <div class=optimum>dar</div>
+	    <div class="limited tooltip">rsync<span class=text>no data reduction on storage, no detection of data corruption, complex parity data addition</span></div>
+	    <div class="ideal tooltip">tar<span class=text>no detection of data corruption or loss of all data after the first corruption met</span></div>
+	  </td>
+	  <td>
+	    <div class=optimum>dar</div>
+	    <div class="limited tooltip">rsync<span class=text>no data reduction, no detection of data corruption, complex parity data addition</span></div>
+	    <div class="ideal tooltip">tar<span class=text>no detection of data corruption or loss of all data after the first corruption met</span></div>
+	  </td>
+	  <td>
+	    <div class=optimum>dar</div>
+	    <div class="noway tooltip">rsync<span class=text>no ciphering, no data reduction, no detection of data corruption, complex parity data addition</span></div>
+	    <div class="limited tooltip">tar<span class=text>no detection of data corruption or loss of all data after the first corruption met, no embedded ciphering, no protection against plain-text attack</span></div>
+	  </td>
+	  <td>
+	    <div class=optimum>dar</div>
+	    <div class="noway tooltip">rsync<span class=text>no data reduction, no multi-volume, no ciphering, no detection of data corruption, complex parity data addition</span></div>
+	    <div class="noway tooltip">tar<span class=text>compression and multi-volume are not supported at the same time, no detection of data corruption or loss of all data after the first corruption met, no ciphering</span></div>
+	  </td>
+	</tr>
+	<tr>
+	  <th>Archiving of public data</th>
+	  <td>
+	    <div class="ideal tooltip">dar<span class=text>most robust format but not as standard as <i>tar</i>'s</span></div>
+	    <div class="limited tooltip">rsync<span class=text>no reduction on storage</span></div>
+	    <div class=optimum>tar</div>
+	  </td>
+	  <td>
+	    <div class="ideal tooltip">dar<span class=text>most robust archive format but not as standard as <i>tar</i>'s</span></div>
+	    <div class="noway tooltip">rsync<span class=text>no reduction on storage, complicated to download a directory tree and files from other protocols than rsync</span></div>
+	    <div class=optimum>tar</div>
+	  </td>
+	  <td>
+	    <div class="ideal tooltip">dar<span class=text>most robust archive format but not as standard as <i>tar</i></span></div>
+	    <div class="noway tooltip">rsync<span class=text>no reduction on storage, complicated to download a directory tree and files from other protocols than rsync</span></div>
+	    <div class=optimum>tar</div>
+	  </td>
+	  <td>
+	    <div class=optimum>dar</div>
+	    <div class="noway tooltip">rsync<span class=text>no reduction on storage, no multi-volume, no detection of data corruption, complex parity data addition</span></div>
+	    <div class="limited tooltip">tar<span class=text>compression and multi-volume are not supported at the same time</span></div>
+	  </td>
+	</tr>
+	<tr>
+	  <th>Private data exchange over Internet</th>
+	  <td>
+	    <div class=optimum>dar</div>
+	    <div class="limited tooltip">rsync<span class=text>not the best data reduction over the network</span></div>
+	    <div class="ideal tooltip">tar<span class=text>best data reduction on network but no embedded ciphering, no integrated network protocols</span></div>
+	  </td>
+	  <td>
+	    <div class=optimum>dar</div>
+	    <div class="limited tooltip">rsync<span class=text>no data reduction on storage, not the best data reduction over the network</span></div>
+	    <div class="ideal tooltip">tar<span class=text>best data reduction on network, but lack of embedded ciphering, lack of integrated network protocols</span></div>
+	  </td>
+	  <td>
+	    <div class=optimum>dar</div>
+	    <div class="noway tooltip">rsync<span class=text>no ciphering and no data reduction on storage</span></div>
+	    <div class="limited tooltip">tar<span class=text>no embedded ciphering, no integrated network protocols, no protection against plain-text attack, only old KDF functions supported, complex and error prone use of openssl to cipher the archive</span></div>
+	  </td>
+	  <td>
+	    -
+	  </td>
+	</tr>
+	<tr>
+	  <th>Public data exchange over Internet</th>
+	  <td>
+	    <div class="ideal tooltip">dar<span class=text>not the best data reduction over the network</span></div>
+	    <div class="ideal tooltip">rsync<span class=text>not the best data reduction over the network</span></div>
+	    <div class=optimum>tar</div>
+	  </td>
+	  <td>
+	    <div class="ideal tooltip">dar<span class=text>not the best data reduction over the network</span></div>
+	    <div class="limited tooltip">rsync<span class=text>no data reduction on storage, not the best data reduction over the network</span></div>
+	    <div class=optimum>tar</div>
+	  </td>
+	  <td>
+	    <div class="ideal tooltip">dar<span class=text>not the best data reduction over the network</span></div>
+	    <div class="limited tooltip">rsync<span class=text>no data reduction on storage, not the best data reduction over the network</span></div>
+	    <div class=optimum>tar</div>
+	  </td>
+	  <td>
+	    -
+	  </td>
+	</tr>
+      </table>
+    </div>
 
     <p>
       In each cell of the previous table, the different softwares are listed in alphabetical order, they get colorized according to the following code:
     </p>
-    <table class=center>
-      <tr>
-	<th style="width: 20%; padding: 10px">Color codes</th>
-	<td style="width: 10%; padding: 10px"><div class=optimum>best solution</div></td>
-	<td style="width: 10%; padding: 10px"><div class=ideal>good solution</div></td>
-	<td style="width: 10%; padding: 10px"><div class=limited>not optimal</div></td>
-	<td style="width: 10%; padding: 10px"><div class=noway>not adapted</div></td>
-      </tr>
-    </table>
+    <div class=table>
+      <table class=center>
+	<tr>
+	  <th style="width: 20%; padding: 10px">Color codes</th>
+	  <td style="width: 10%; padding: 10px"><div class=optimum>best solution</div></td>
+	  <td style="width: 10%; padding: 10px"><div class=ideal>good solution</div></td>
+	  <td style="width: 10%; padding: 10px"><div class=limited>not optimal</div></td>
+	  <td style="width: 10%; padding: 10px"><div class=noway>not adapted</div></td>
+	</tr>
+      </table>
+    </div>
     <p>
       Hovering the mouse on a particular item gives more details about the reason it has not been selected as the best solution for a particular need.
     </p>
