@@ -1341,7 +1341,7 @@
       <tr>
 	<th>Local directory copy</th>
 	<td>
-	  <div class=top>cp</div>
+	  <div class=optimum>cp</div>
 	  <div class="limited tooltip">dar <span class=text>not the fastest</span></div>
 	  <div class="limited tooltip">rsync <span class=text>not the fastest</span></div>
 	  <div class="ideal tooltip">tar <span class=text>not the fastest</span></div>
@@ -1362,19 +1362,19 @@
 	  -
 	</td>
 	<td>
-	  <div class=top>dar</div>
-	  <div class="ideal tooltip">rsync<span class=text>not the fastest</wwspan></div>
+	  <div class=optimum>dar</div>
+	  <div class="ideal tooltip">rsync<span class=text>not the fastest</span></div>
 	  <div class="limited tooltip">tar<span class=text>no network protocol embedded</span><br/>
 	</td>
 	<td>
-	  <div class=top>dar</div>
+	  <div class=optimum>dar</div>
 	  <div class="ideal tooltip">rsync<span class=text>not the fastest</span></div>
 	  <div class="limited tooltip">tar<span class=text>no network protocol embedded</span></div>
 	</td>
 	<td>
-	    <div class=top>dar</div>
+	    <div class=optimum>dar</div>
 	    <div class="ideal tooltip">rsync<span class=text>not the fastest</span></div>
-	    <div class="limited tooltip">tar<span class=text>no network protocol embedded</div>
+	    <div class="limited tooltip">tar<span class=text>no network protocol embedded</span></div>
 	</td>
       </tr>
       <tr>
@@ -1384,88 +1384,91 @@
 	</td>
 	<td>
 	  <div class="ideal tooltip">dar<span class=text>fastest but automation is a bit less straight forward than using <i>rsync</i></span></div>
-	  <div class="top">rsync</div>
+	  <div class="optimum">rsync</div>
 	  <div class="limited tooltip">tar<span class=text>no network protocol embedded</span></div>
 	</td>
 	<td>
 	  <div class="ideal tooltip">dar<span class=text>fastest but automation is a bit less straight forward than using <i>rsync</i></span></div>
-	  <div class=top>rsync</div>
+	  <div class=optimum>rsync</div>
 	  <div class="limited tooltip">tar<span class=text>no network protocol embedded</span></div>
 	</td>
 	<td>
 	  <div class="ideal tooltip">dar<span class=text>fastest but automation is a bit less straight forward than using <i>rsync</i></span></div>
-	  <div class=top>rsync</div>
+	  <div class=optimum>rsync</div>
 	  <div class="limited tooltip">tar<span class=text>no network protocol embedded</span></div>
 	</td>
       </tr>
       <tr>
-	<th>Full backups only<br/>
-	  (private data)</th>
+	<th>
+	  Full backups only<br/>
+	  (private data)
+	</th>
 	<td>
-	  <div class="top tooltip">dar<span class=text>has the advantage to provide long historization of backups</span></div>
+	  <div class="optimum tooltip">dar<span class=text>has the advantage to provide long historization of backups</span></div>
 	  <div class="ideal tooltip">rsync<span class=text>no data reduction on storage, slow to restore a whole filesystem</span></div>
-	  <div class="ideal tooltip">tar<span class=text>not saving all file attributes and inode types, slow to restore a few files</span><br/>
+	  <div class="ideal tooltip">tar<span class=text>not saving all file attributes and inode types, slow to restore a few files</span></div>
 	</td>
 	<td>
-	  <div class=top>dar</div>
+	  <div class=optimum>dar</div>
 	  <div class="limited tooltip">rsync<span class=text>no data reduction on storage</span></div>
 	  <div class="ideal tooltip">tar<span class=text>not saving all file attributes and inode types, slow to restore a few files, no network protocol embedded</span></div>
 	</td>
 	<td>
-	  <div class=top>dar</div>
+	  <div class=optimum>dar</div>
 	  <div class="noway tooltip">rsync<span class=text>no data ciphering and no reduction on storage</span></div>
-	  <div class="limited tooltip">tar<span class=text>not embedded ciphering, not the strongest data encryption, not saving all file attributes and inode types, slow to restore a few files, no network protocol embedded</wwspan></div>
+	  <div class="limited tooltip">tar<span class=text>not embedded ciphering, not the strongest data encryption, not saving all file attributes and inode types, slow to restore a few files, no network protocol embedded</span></div>
 	</td>
 	<td>
-	  <div class=top>dar</div>
+	  <div class=optimum>dar</div>
 	  <div class="limited tooltip">rsync<span class=text>no multi-volume support, no data ciphering and no reduction on storage</span></div>
-	  <div class="limited tooltip">tar<span class=text>compression and multi-volume are not supported at the same time, not saving all file attributes and inode types, not embedded ciphering, not the strongest data encryption, </span></div>
+	  <div class="limited tooltip">tar<span class=text>compression and multi-volume are not supported at the same time, not saving all file attributes and inode types, not embedded ciphering, not the strongest data encryption</span></div>
 	</td>
       </tr>
       <tr>
-	<th>full+diff/incr. backups<br/>
+	<th>
+	  full+diff/incr. backups<br/>
 	  (priate data)
 	</th>
 	<td>
-	  <div class=top>dar</div>
+	  <div class=optimum>dar</div>
 	  <div class="noway tooltip">rsync<span class=text>differential backup not supported, full backup is overwritten</span></div>
 	  <div class="ideal tooltip">tar<span class=text>not saving all file attributes and inode types, slow to restore a few files</span></div>
 	</td>
 	<td>
-	  <div class=top>dar</div>
+	  <div class=optimum>dar</div>
 	  <div class="noway tooltip">rsync<span class=text>differential backup not supported, full backup is overwritten</span></div>
 	  <div class="ideal tooltip">tar<span class=text>not saving all file attributes and inode types, slow to restore a few files, no network protocol embedded</span></div>
 	</td>
 	<td>
-	  <div class=top>dar</div>
+	  <div class=optimum>dar</div>
 	  <div class="noway tooltip">rsync<span class=text>differential backup not supported, full backup is overwritten</span></div>
 	  <div class="limited tooltip">tar<span class=text>not embedded ciphering, not the strongest data encryption, not saving all file attributes and inode types, slow to restore a few files, no network protocol embedded</span></div>
 	</td>
 	<td>
-	  <div class=top>dar</div>
+	  <div class=optimum>dar</div>
 	  <div class="noway tooltip">rsync<span class=text>differential backup not supported, full backup is overwritten, no support for multi-volime, no data reduction, no ciphering</span></div>
-	  <div class="limited tooltip">tar<span class=text>compression and multi-volume are not supported at the same time, not saving all file attributes and inode types, not embedded ciphering, not the strongest data encryption, </span></div>
+	  <div class="limited tooltip">tar<span class=text>compression and multi-volume are not supported at the same time, not saving all file attributes and inode types, not embedded ciphering, not the strongest data encryption</span></div>
 	</td>
       </tr>
       <tr>
 	<th>Archiving of private data</th>
 	<td>
-	  <div class=top>dar</div>
+	  <div class=optimum>dar</div>
 	  <div class="limited tooltip">rsync<span class=text>no data reduction on storage, no detection of data corruption, complex parity data addition</span></div>
 	  <div class="ideal tooltip">tar<span class=text>no detection of data corruption or loss of all data after the first corruption met</span></div>
 	</td>
 	<td>
-	  <div class=top>dar</div>
+	  <div class=optimum>dar</div>
 	  <div class="limited tooltip">rsync<span class=text>no data reduction, no detection of data corruption, complex parity data addition</span></div>
 	  <div class="ideal tooltip">tar<span class=text>no detection of data corruption or loss of all data after the first corruption met</span></div>
 	</td>
 	<td>
-	  <div class=top>dar</div>
+	  <div class=optimum>dar</div>
 	  <div class="noway tooltip">rsync<span class=text>no ciphering, no data reduction, no detection of data corruption, complex parity data addition</span></div>
 	  <div class="limited tooltip">tar<span class=text>no detection of data corruption or loss of all data after the first corruption met, no embedded ciphering, no protection against plain-text attack</span></div>
 	</td>
 	<td>
-	  <div class=top>dar</div>
+	  <div class=optimum>dar</div>
 	  <div class="noway tooltip">rsync<span class=text>no data reduction, no multi-volume, no ciphering, no detection of data corruption, complex parity data addition</span></div>
 	  <div class="noway tooltip">tar<span class=text>compression and multi-volume are not supported at the same time, no detection of data corruption or loss of all data after the first corruption met, no ciphering</span></div>
 	</td>
@@ -1475,20 +1478,20 @@
 	<td>
 	  <div class="ideal tooltip">dar<span class=text>most robust format but not as standard as <i>tar</i>'s</span></div>
 	  <div class="limited tooltip">rsync<span class=text>no reduction on storage</span></div>
-	  <div class=top>tar</div>
+	  <div class=optimum>tar</div>
 	</td>
 	<td>
 	  <div class="ideal tooltip">dar<span class=text>most robust archive format but not as standard as <i>tar</i>'s</span></div>
 	  <div class="noway tooltip">rsync<span class=text>no reduction on storage, complicated to download a directory tree and files from other protocols than rsync</span></div>
-	  <div class=top>tar</div>
+	  <div class=optimum>tar</div>
 	</td>
 	<td>
 	  <div class="ideal tooltip">dar<span class=text>most robust archive format but not as standard as <i>tar</i></span></div>
 	  <div class="noway tooltip">rsync<span class=text>no reduction on storage, complicated to download a directory tree and files from other protocols than rsync</span></div>
-	  <div class=top>tar</div>
+	  <div class=optimum>tar</div>
 	</td>
 	<td>
-	  <div class=top>dar</div>
+	  <div class=optimum>dar</div>
 	  <div class="noway tooltip">rsync<span class=text>no reduction on storage, no multi-volume, no detection of data corruption, complex parity data addition</span></div>
 	  <div class="limited tooltip">tar<span class=text>compression and multi-volume are not supported at the same time</span></div>
 	</td>
@@ -1496,17 +1499,17 @@
       <tr>
 	<th>Private data exchange over Internet</th>
 	<td>
-	  <div class=top>dar</div>
+	  <div class=optimum>dar</div>
 	  <div class="limited tooltip">rsync<span class=text>not the best data reduction over the network</span></div>
 	  <div class="ideal tooltip">tar<span class=text>best data reduction on network but no embedded ciphering, no integrated network protocols</span></div>
 	</td>
 	<td>
-	  <div class=top>dar</div>
+	  <div class=optimum>dar</div>
 	  <div class="limited tooltip">rsync<span class=text>no data reduction on storage, not the best data reduction over the network</span></div>
 	  <div class="ideal tooltip">tar<span class=text>best data reduction on network, but lack of embedded ciphering, lack of integrated network protocols</span></div>
 	</td>
 	<td>
-	  <div class=top>dar</div>
+	  <div class=optimum>dar</div>
 	  <div class="noway tooltip">rsync<span class=text>no ciphering and no data reduction on storage</span></div>
 	  <div class="limited tooltip">tar<span class=text>no embedded ciphering, no integrated network protocols, no protection against plain-text attack, only old KDF functions supported, complex and error prone use of openssl to cipher the archive</span></div>
 	</td>
@@ -1519,17 +1522,17 @@
 	<td>
 	  <div class="ideal tooltip">dar<span class=text>not the best data reduction over the network</span></div>
 	  <div class="ideal tooltip">rsync<span class=text>not the best data reduction over the network</span></div>
-	  <div class=top>tar</div>
+	  <div class=optimum>tar</div>
 	</td>
 	<td>
 	  <div class="ideal tooltip">dar<span class=text>not the best data reduction over the network</span></div>
 	  <div class="limited tooltip">rsync<span class=text>no data reduction on storage, not the best data reduction over the network</span></div>
-	  <div class=top>tar</div>
+	  <div class=optimum>tar</div>
 	</td>
 	<td>
 	  <div class="ideal tooltip">dar<span class=text>not the best data reduction over the network</span></div>
 	  <div class="limited tooltip">rsync<span class=text>no data reduction on storage, not the best data reduction over the network</span></div>
-	  <div class=top>tar</div>
+	  <div class=optimum>tar</div>
 	</td>
 	<td>
 	  -
@@ -1543,12 +1546,15 @@
     <table class=center>
       <tr>
 	<th style="width: 20%; padding: 10px">Color codes</th>
-	<td style="width: 10%; padding: 10px"><div class=top>best solution</div></td>
+	<td style="width: 10%; padding: 10px"><div class=optimum>best solution</div></td>
 	<td style="width: 10%; padding: 10px"><div class=ideal>good solution</div></td>
 	<td style="width: 10%; padding: 10px"><div class=limited>not optimal</div></td>
 	<td style="width: 10%; padding: 10px"><div class=noway>not adapted</div></td>
       </tr>
     </table>
+    <p>
+      Hovering the mouse on a particular item gives more details about the reason it has not been selected as the best solution for a particular need.
+    </p>
 
   </body>
 </html>
