@@ -1539,7 +1539,7 @@
 	-rwxr-xr-x 1 root   root        <e>39M</e> Sep  5  2019 emacs-gtk
 	total 430M
 	<b>root@terre:/mnt/memdisk#</b>
-    </div></code>
+    </code>
 
     <h5>Dar</h5>
 
@@ -1694,48 +1694,48 @@
       between each volume as <i>tar</i> does:
     </p>
     <code class=block>
-	<b>terre:/mnt/memdisk# <e>dar</e> -c backup -R /usr/bin -z6 -s 20M <e class=green>-E "echo writing volume %N to tape"</e> <e>-E "cat < %p/%b.%N.%e > /dev/mt"</e> <e class=blue>-p</e></b>
-	class=green>writing volume 1 to tape
-	Finished writing to file 1, ready to continue ?  [return = YES | Esc = NO]
-	Continuing...
-	writing volume 2 to tape
-	Finished writing to file 2, ready to continue ?  [return = YES | Esc = NO]
-	Continuing...
-	writing volume 3 to tape
-	Finished writing to file 3, ready to continue ?  [return = YES | Esc = NO]
-	Continuing...
-	writing volume 4 to tape
-	Finished writing to file 4, ready to continue ?  [return = YES | Esc = NO]
-	Continuing...
-	writing volume 5 to tape
-	Finished writing to file 5, ready to continue ?  [return = YES | Esc = NO]
-	Continuing...
-	writing volume 6 to tape
-	Finished writing to file 6, ready to continue ?  [return = YES | Esc = NO]
-	Continuing...
-	writing volume 7 to tape
-	Finished writing to file 7, ready to continue ?  [return = YES | Esc = NO]
-	Continuing...
-	writing volume 8 to tape
+      <b>terre:/mnt/memdisk# <e>dar</e> -c backup -R /usr/bin -z6 -s 20M <e class=green>-E "echo writing volume %N to tape"</e> <e>-E "cat &lt; %p/%b.%N.%e &gt; /dev/mt"</e> <e class=blue>-p</e></b>
+      class=green>writing volume 1 to tape
+      Finished writing to file 1, ready to continue ?  [return = YES | Esc = NO]
+      Continuing...
+      writing volume 2 to tape
+      Finished writing to file 2, ready to continue ?  [return = YES | Esc = NO]
+      Continuing...
+      writing volume 3 to tape
+      Finished writing to file 3, ready to continue ?  [return = YES | Esc = NO]
+      Continuing...
+      writing volume 4 to tape
+      Finished writing to file 4, ready to continue ?  [return = YES | Esc = NO]
+      Continuing...
+      writing volume 5 to tape
+      Finished writing to file 5, ready to continue ?  [return = YES | Esc = NO]
+      Continuing...
+      writing volume 6 to tape
+      Finished writing to file 6, ready to continue ?  [return = YES | Esc = NO]
+      Continuing...
+      writing volume 7 to tape
+      Finished writing to file 7, ready to continue ?  [return = YES | Esc = NO]
+      Continuing...
+      writing volume 8 to tape
 
 
-	--------------------------------------------
-	2592 inode(s) saved
-	including 5 hard link(s) treated
-	0 inode(s) changed at the moment of the backup and could not be saved properly
-	0 byte(s) have been wasted in the archive to resave changing files
-	0 inode(s) with only metadata changed
-	0 inode(s) not saved (no inode/file change)
-	0 inode(s) failed to be saved (filesystem error)
-	0 inode(s) ignored (excluded by filters)
-	0 inode(s) recorded as deleted from reference backup
-	--------------------------------------------
-	Total number of inode(s) considered: 2592
-	--------------------------------------------
-	EA saved for 3 inode(s)
-	FSA saved for 2152 inode(s)
-	--------------------------------------------
-	<b>terre:/mnt/memdisk#</b>
+      --------------------------------------------
+      2592 inode(s) saved
+      including 5 hard link(s) treated
+      0 inode(s) changed at the moment of the backup and could not be saved properly
+      0 byte(s) have been wasted in the archive to resave changing files
+      0 inode(s) with only metadata changed
+      0 inode(s) not saved (no inode/file change)
+      0 inode(s) failed to be saved (filesystem error)
+      0 inode(s) ignored (excluded by filters)
+      0 inode(s) recorded as deleted from reference backup
+      --------------------------------------------
+      Total number of inode(s) considered: 2592
+      --------------------------------------------
+      EA saved for 3 inode(s)
+      FSA saved for 2152 inode(s)
+      --------------------------------------------
+      <b>terre:/mnt/memdisk#</b>
     </code>
 
     <h4>Symmetric encryption</h4>
@@ -2097,15 +2097,15 @@
     <h5>Dar</h5>
 
     <code class=block>
-	<b>devuan:/mnt/memdisk# time dar -c backup -K "aes256:hello world!" -at -1 0 -R SRC -q -w</b>
-	9.782u 3.413s <e>0:06.28</e> 210.0%    0+0k 0+0io 0pf+0w
-	<b>devuan:/mnt/memdisk# la backup.1.dar</b>
-	-rw-r--r-- 1 root root 1572<e>706497</e> Nov  9 14:50 backup.1.dar
-	<b>devuan:/mnt/memdisk# time dar -c backup -K "aes256:hello world!" -at -1 0 -R SRC -q -w</b>
-	9.173u 2.845s <e>0:05.50</e> 218.3%    0+0k 0+0io 0pf+0w
-	<b>devuan:/mnt/memdisk# la backup.1.dar</b>
-	-rw-r--r-- 1 root root 1572<e>655217</e> Nov  9 14:50 backup.1.dar
-	<b>devuan:/mnt/memdisk#</b>
+      <b>devuan:/mnt/memdisk# time dar -c backup -K "aes256:hello world!" -at -1 0 -R SRC -q -w</b>
+      9.782u 3.413s <e>0:06.28</e> 210.0%    0+0k 0+0io 0pf+0w
+      <b>devuan:/mnt/memdisk# la backup.1.dar</b>
+      -rw-r--r-- 1 root root 1572<e>706497</e> Nov  9 14:50 backup.1.dar
+      <b>devuan:/mnt/memdisk# time dar -c backup -K "aes256:hello world!" -at -1 0 -R SRC -q -w</b>
+      9.173u 2.845s <e>0:05.50</e> 218.3%    0+0k 0+0io 0pf+0w
+      <b>devuan:/mnt/memdisk# la backup.1.dar</b>
+      -rw-r--r-- 1 root root 1572<e>655217</e> Nov  9 14:50 backup.1.dar
+      <b>devuan:/mnt/memdisk#</b>
     </code>
 
     <p>
@@ -2125,19 +2125,21 @@
     </p>
 
     <h5>Tar</h5>
+
     <code class=block>
-	<b>devuan:/mnt/memdisk/SRC# time ../tar.backup ../backup.tar.crypted usr</b>
+      <b>devuan:/mnt/memdisk/SRC# time ../tar.backup ../backup.tar.crypted usr</b>
       4.112u 2.343s 0:04.72 136.6%    0+0k 0+0io 0pf+0w
-	<b>devuan:/mnt/memdisk/SRC# ls -l ../bac</b>
+      <b>devuan:/mnt/memdisk/SRC# ls -l ../bac</b>
       backup.1.dar        backup.tar.crypted
-	<b>devuan:/mnt/memdisk/SRC# ls -l ../backup.tar.crypted</b>
+      <b>devuan:/mnt/memdisk/SRC# ls -l ../backup.tar.crypted</b>
       -rw-r--r-- 1 root root <e>1603594272</e> Nov  9 14:56 ../backup.tar.crypted
-	<b>devuan:/mnt/memdisk/SRC# time ../tar.backup ../backup.tar.crypted usr</b>
+      <b>devuan:/mnt/memdisk/SRC# time ../tar.backup ../backup.tar.crypted usr</b>
       3.952u 2.564s 0:04.79 135.9%    0+0k 0+0io 0pf+0w
-	<b>devuan:/mnt/memdisk/SRC# ls -l ../backup.tar.crypted</b>
+      <b>devuan:/mnt/memdisk/SRC# ls -l ../backup.tar.crypted</b>
       -rw-r--r-- 1 root root <e>1603594272</e> Nov  9 14:56 ../backup.tar.crypted
-	<b>devuan:/mnt/memdisk/SRC#</b>
+      <b>devuan:/mnt/memdisk/SRC#</b>
     </code>
+
     <p>
       <i>tar</i> by itself does not provide any ciphering mechanism, however you can
       cipher the <i>tar</i> generated backups with external tool (for example <i>openssl</i>
@@ -5167,6 +5169,11 @@
 
     <h2><a name="scripts">Scripts</a> used in this benchmark</h2>
 
+    <p>
+      The following scripts are also available for download
+      from the <a href="Benchmark_tools"> directory</a>
+    </p>
+
     <h3><a name="historization_feature"><i>historization_feature</i></a> script</h3>
     <code class=block>
 	#!/bin/bash
@@ -5319,6 +5326,5 @@
 	touch -d "$mtime" "$1"
 	touch -a -d "$atime" "$1"
     </code>
-
   </body>
 </html>

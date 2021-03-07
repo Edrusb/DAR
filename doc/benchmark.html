@@ -16,19 +16,21 @@
     <p>
       This document has for objective to compare common backup tools under Unix
       (Linux, FreeBSD, MACOS X...), among the most commonly available today.
-      <ul>
-	<li>
-	  The <b>first target</b> we want to address is being able to copy a directory tree and files
-	  with the best fidelity,
-	</li>
-	<li>
-	  The <b>second target</b> is being able to backup and restore a whole system
-	  from a minimal environment without assistance of an already existing local server (disaster context).
-	</li>
-	<li>
-	  The <b>third target</b> is being able to securely keep for the long term an archived data. Securely here means having the ability to detect data corruption and limit its impact on the rest of the archive.
-	</li>
-      </ul>
+    </p>
+    <ul>
+      <li>
+	The <b>first target</b> we want to address is being able to copy a directory tree and files
+	with the best fidelity,
+      </li>
+      <li>
+	The <b>second target</b> is being able to backup and restore a whole system
+	from a minimal environment without assistance of an already existing local server (disaster context).
+      </li>
+      <li>
+	The <b>third target</b> is being able to securely keep for the long term an archived data. Securely here means having the ability to detect data corruption and limit its impact on the rest of the archive.
+      </li>
+    </ul>
+    <p>
       Depending on the targets we may need compression and/or ciphering inside backup,
       but also denpending on the context (public cloud storage, removable media, ...), limited storage space.
     </p>
@@ -43,7 +45,7 @@
       Partition cloning systems (<i>clonezilla</i>, <i>MondoRescue</i>, <i>RescueZilla</i>,
       <i>partclone</i>, <i>dump</i> and consorts) are targetted at block copy and as such cannot backup a live system:
       you have to shutdown and boot on a CD/USB key or run in single user-mode in order to "backup". This cannot
-      be automated and has a strongly impact on the user as she/he has to interrupt her/his work during the whole
+      be automated and has a strong impact on the user as she/he has to interrupt her/his work during the whole
       backup operation.
     <p>
       Looking at the remaining backup tools, with or without Graphical User Interface, most of them
