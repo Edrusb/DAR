@@ -1,286 +1,279 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
   <head>
-    <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>Dar - Scripts and Examples</title></head><body style="background-color: rgb(221, 221, 221); color: rgb(0, 0, 170);" alink="#ff0000" link="#0000ff" vlink="#000055">
-    <center>
-      <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
-	<tbody>
-	  <tr>
-	    <td style="vertical-align: top; width: 161px;"><a href="../index.html"><img style="border: 0px solid ; width: 160px; height: 120px;" alt="Dar Documentation" src="../dar_s_doc.jpg"></a><br>
-	    </td>
-	    <td style="vertical-align: top;">
-	      <h1 style="text-align: center;"><br>
-	      </h1>
-	      <h1 style="text-align: center;">Scripts and Examples<br>
-	      </h1>
-	    </td>
-	  </tr>
-	</tbody>
-      </table>
-      <br>
-      <br>
-      <hr style="width: 100%; height: 2px;"><br>
-      <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
-	<tbody>
-	  <tr>
-	    <td style="vertical-align: top;">
-	      <div style="text-align: justify;">In this page you can find
-		several script and configuration files, that have been sent by dar
-		users. They should all work, if some do not, see them as illustration
-		or examples that let you have a base to your own configuration scripts.<br>
-	      </div>
-	      <br>
-	      <div style="text-align: justify;">You will here both DUC files (<a href="../usage_notes.html#extensions_used">Dar User Commands</a>) that can be launched
-		from dar thanks to its -E or -F options as well as scripts from where
-		dar is launched:<br>
-	      </div>
-	      <br>
-	    </td>
-	  </tr>
-	</tbody>
-      </table>
-      <br>
-      <table style="width: 90%; text-align: left; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
-	<tbody>
-	  <tr>
-	    <td style="vertical-align: top; width: 40%; text-align: center; font-weight: bold;">Description<br>
-	    </td>
-	    <td style="vertical-align: top; width: 20%; text-align: center; font-weight: bold;">Author<br>
-	    </td>
-	    <td style="vertical-align: top; width: 20%; text-align: center; font-weight: bold;">Type<br>
-	    </td>
-	    <td style="vertical-align: top; width: 20%; text-align: center; font-weight: bold;">Download<br>
-	    </td>
-	  </tr>
-	  <tr>
-	    <td style="vertical-align: top; width: 40%;">&nbsp;script that
-	      use dar to make full or differential backup to CDR<br>
-	    </td>
-	    <td style="vertical-align: top; width: 20%;">stef at hardco.de<br>
-	    </td>
-	    <td style="vertical-align: top; width: 20%;">Script<br>
-	    </td>
-	    <td style="vertical-align: top; width: 20%;"><a href="cdbackup.sh">cdbackup.sh</a><br>
-	    </td>
-	  </tr>
-	  <tr>
-	    <td style="vertical-align: top;">sample /etc/darrc or ~/.darrc
-	      file<br>
-	    </td>
-	    <td style="vertical-align: top;">"(me)"<br>
-	    </td>
-	    <td style="vertical-align: top;"><a href="../usage_notes.html#extensions_used">DCF</a><br>
-	    </td>
-	    <td style="vertical-align: top;"><a href="darrc_sample">darrc_sample</a><br>
-	    </td>
-	  </tr>
-	  <tr>
-	    <td style="vertical-align: top;">&nbsp;for those who like to
-	      learn with examples (a rich one) ;-)<br>
-	    </td>
-	    <td style="vertical-align: top;">Henrik Ingo<br>
-	    </td>
-	    <td style="vertical-align: top;"><a href="../usage_notes.html#extensions_used">DCF</a><br>
-	    </td>
-	    <td style="vertical-align: top;"><a href="sample1.txt">sample1.txt</a><br>
-	    </td>
-	  </tr>
-	  <tr>
-	    <td style="vertical-align: top;">script to create PAR redundancy
-	      data for protection against media corruption<br>
-	    </td>
-	    <td style="vertical-align: top;">Denis Corbin<br>
-	    </td>
-	    <td style="vertical-align: top;"><a href="../usage_notes.html#extensions_used">DUC</a><br>
-	    </td>
-	    <td style="vertical-align: top;"><a href="dar_par_create.duc">dar_par_create.duc</a><br>
-	    </td>
-	  </tr>
-	  <tr>
-	    <td style="vertical-align: top;">&nbsp;script to test and repair
-	      slice with redundancy data<br>
-	    </td>
-	    <td style="vertical-align: top;">Denis Corbin<br>
-	    </td>
-	    <td style="vertical-align: top;"><a href="../usage_notes.html#extensions_used">DUC</a></td>
-	    <td style="vertical-align: top;"><a href="dar_par_test.duc">dar_par_test.duc</a><br>
-	    </td>
-	  </tr>
-	  <tr>
-	    <td style="vertical-align: top;">dar config files for
-	      dar_par_create and dar_par_test.duc<br>
-	    </td>
-	    <td style="vertical-align: top;"><br>
-	    </td>
-	    <td style="vertical-align: top;"><a href="../usage_notes.html#extensions_used">DCF</a><br>
-	    </td>
-	    <td style="vertical-align: top;"><a href="dar_par.dcf">dar_par.dcf</a><br>
-	    </td>
-	  </tr>
-	  <tr>
-	    <td style="vertical-align: top;">pause every N slice instead of
-	      every&nbsp; slice when creating an archive&nbsp; [This is now obsolete
-	      as the -p option can now receive an argument to tell every how much
-	      slice to pause]<br>
-	    </td>
-	    <td style="vertical-align: top;">Denis Corbin<br>
-	    </td>
-	    <td style="vertical-align: top;"><a href="../usage_notes.html#extensions_used">DCF</a><br>
-	    </td>
-	    <td style="vertical-align: top;"><a href="pause_every_n_slice.duc">pause_every_n_slice.duc</a><br>
-	    </td>
-	  </tr>
-	  <tr>
-	    <td style="vertical-align: top;">automatic full/differential
-	      backup script, with automatic mounting unmount see comments inside
-	      automatic_backup.txt for more info, see also this <a href="automatic_backup.txt">documentation file</a> (same Author).<br>
-	    </td>
-	    <td style="vertical-align: top;">Manuel Iglesias<br>
-	    </td>
-	    <td style="vertical-align: top;">Script<br>
-	    </td>
-	    <td style="vertical-align: top;"><a href="automatic_backup">automatic_backup</a><br>
-	    </td>
-	  </tr>
-	  <tr>
-	    <td style="vertical-align: top;">perl script wrapping:
-	      dar+parchive+growisofs<br>
-	    </td>
-	    <td style="vertical-align: top;"><a href="http://www.mattcaron.net/linux/scripts/dar_backup">Matthew Caron</a><br>
-	    </td>
-	    <td style="vertical-align: top;">Script<br>
-	    </td>
-	    <td style="vertical-align: top;"><a href="dar_backup">dar_backup</a><br>
-	    </td>
-	  </tr>
-	  <tr>
-	    <td style="vertical-align: top;">&nbsp;bash script for Linux
-	      users to have raw estimation of the required amount of virtual memory
-	      to use to be able to save the whole system.<br>
-	    </td>
-	    <td style="vertical-align: top;">Bob Barry<br>
-	    </td>
-	    <td style="vertical-align: top;">Script<br>
-	    </td>
-	    <td style="vertical-align: top;"><a href="dar_rqck.bash">dar_rqck.bash</a><br>
-	    </td>
-	  </tr>
-	  <tr>
-	    <td style="vertical-align: top;">To save your home directory
-	      without worry (skip trash directory, make full or differential backup),
-	      all is explain by the author in this <a href="JH-readme.txt">tiny
-		document</a>.<br>
-	    </td>
-	    <td style="vertical-align: top;">Jakub Holy<br>
-	    </td>
-	    <td style="vertical-align: top;">Script<br>
-	      <a href="../usage_notes.html#extensions_used">DCF</a><br>
-	      <a href="../usage_notes.html#extensions_used">DCF</a><br>
-	    </td>
-	    <td style="vertical-align: top;"><a href="JH-dar-make_user_backup.sh">JH-dar-make_user_backup.sh</a><br>
-	      <a href="JH_darrc">JH_darrc</a><br>
-	      <a href="JH_dar_archiver.options">JH_dar_archiver.options</a><br>
-	    </td>
-	  </tr>
-	  <tr>
-	    <td style="vertical-align: top;">Local or remote backup script
+    <link href="../style.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+    <title>Dar - Scripts and Examples</title>
+  </head>
+  <body>
+    <div class=top>
+      <img alt="Dar Documentation" src="../dar_s_doc.jpg" style="float:left;">
+      <h1 style="text-align: center;">Scripts and Examples</h1>
+    </div>
+
+    <p>In this page you can find
+      several script and configuration files, that have been sent by dar
+      users. They should all work, if some do not, see them as illustration
+      or examples that let you have a base to your own configuration scripts.
+    </p>
+    <p>
+      You will here both DUC files
+      (<a href="../usage_notes.html#extensions_used">Dar User Commands</a>)
+      that can be launched
+      from dar thanks to its -E or -F options as well as scripts from where
+      dar is launched:
+
+      <table>
+	<tr>
+	  <th>Description</th>
+	  <th>Author</th>
+	  <th>Type</th>
+	  <th>Download</th>
+	</tr>
+	<tr>
+	  <td>
+	    Script that
+	    use dar to make full or
+	    differential backup to CDR
+	  </td>
+	  <td>
+	    stef at hardco.de
+	  </td>
+	  <td>Script</td>
+	  <td>
+	    <a href="cdbackup.sh">cdbackup.sh</a>
+	  </td>
+	</tr>
+	<tr>
+	  <td>
+	    Sample /etc/darrc or ~/.darrc
+	    file
+	  </td>
+	  <td>"(me)"</td>
+	  <td>
+	    <a href="../usage_notes.html#extensions_used">DCF</a>
+	  </td>
+	  <td><a href="darrc_sample">darrc_sample</a></td>
+	</tr>
+	<tr>
+	  <td>
+	    For those who like to
+	    learn with examples (a rich one) ;-)
+	  </td>
+	  <td>Henrik Ingo</td>
+	  <td><a href="../usage_notes.html#extensions_used">DCF</a></td>
+	  <td><a href="sample1.txt">sample1.txt</a></td>
+	</tr>
+	<tr>
+	  <td>
+	    Script to create PAR redundancy
+	    data for protection against media corruption
+	  </td>
+	  <td>Denis Corbin</td>
+	  <td><a href="../usage_notes.html#extensions_used">DUC</a></td>
+	  <td><a href="dar_par_create.duc">dar_par_create.duc</a></td>
+	</tr>
+	<tr>
+	  <td>
+	    Script to test and repair
+	    slice with redundancy data
+	  </td>
+	  <td>Denis Corbin</td>
+	  <td><a href="../usage_notes.html#extensions_used">DUC</a></td>
+	  <td><a href="dar_par_test.duc">dar_par_test.duc</a></td>
+	</tr>
+	<tr>
+	  <td>
+	    Dar config files for
+	    dar_par_create and dar_par_test.duc
+	  </td>
+	  <td>
+	  </td>
+	  <td><a href="../usage_notes.html#extensions_used">DCF</a></td>
+	  <td><a href="dar_par.dcf">dar_par.dcf</a></td>
+	</tr>
+	<tr>
+	  <td>
+	    let dar pause every N slice instead of
+	    every slice when creating an archive [This is now obsolete
+	    as the -p option can now receive an argument to tell every how much
+	    slice to pause]
+	  </td>
+	  <td>Denis Corbin</td>
+	  <td><a href="../usage_notes.html#extensions_used">DCF</a></td>
+	  <td><a href="pause_every_n_slice.duc">pause_every_n_slice.duc</a></td>
+	</tr>
+	<tr>
+	  <td>
+	    Automatic full/differential
+	    backup script, with automatic mounting unmount see comments inside
+	    automatic_backup.txt for more info, see also this
+	    <a href="automatic_backup.txt">documentation file</a> (same Author).
+	  </td>
+	  <td>Manuel Iglesias</td>
+	  <td>Script</td>
+	  <td><a href="automatic_backup">automatic_backup</a>
+	  </td>
+	</tr>
+	<tr>
+	  <td>
+	    Perl script wrapping:
+	    dar+parchive+growisofs
+	  </td>
+	  <td>
+	    <a href="http://www.mattcaron.net/linux/scripts/dar_backup">Matthew Caron</a>
+	  </td>
+	  <td>Script</td>
+	  <td><a href="dar_backup">dar_backup</a></td>
+	</tr>
+	<tr>
+	  <td>
+	    Bash script for Linux
+	    users to have raw estimation of the required
+	    amount of virtual memory
+	    to use to be able to save the whole system.
+	  </td>
+	  <td>Bob Barry</td>
+	  <td>Script</td>
+	  <td><a href="dar_rqck.bash">dar_rqck.bash</a></td>
+	</tr>
+	<tr>
+	  <td>
+	    To save your home directory
+	    without worry (skip trash directory, make full or differential backup),
+	    all is explain by the author in this
+	    <a href="JH-readme.txt">tiny document</a>.
+	  </td>
+	  <td>Jakub Holy</td>
+	  <td>Script
+	    <a href="../usage_notes.html#extensions_used">DCF</a><br/>
+	    <a href="../usage_notes.html#extensions_used">DCF</a>
+	  </td>
+	  <td><a href="JH-dar-make_user_backup.sh">JH-dar-make_user_backup.sh</a><br/>
+	    <a href="JH_darrc">JH_darrc</a><br/>
+	    <a href="JH_dar_archiver.options">JH_dar_archiver.options</a>
+	  </td>
+	</tr>
+	<tr>
+	  <td>
+	    Local or remote backup script
 	      (using scp) to be launched from a cron, doing automatic decision
-	      whether the backup has to be full or incremental<br>
-	    </td>
-	    <td style="vertical-align: top;">Roi Rodriguez Mendez &amp; Mauro
-	      Silvosa Rivera (Cluster Digital S.L.)<br>
-	    </td>
-	    <td style="vertical-align: top;">Script<br>
-	    </td>
-	    <td style="vertical-align: top;"><a href="cluster_digital_backups.sh">cluster_digital_backups.sh</a><br>
-	    </td>
-	  </tr>
-	  <tr>
-	    <td style="vertical-align: top;">Shell script to backup to an FTP
-	      server</td>
-	    <td style="vertical-align: top;"><a href="http://patrick-nagel.net/scripts/ftpbackup/">Patrick Nagel</a></td>
-	    <td style="vertical-align: top;">Script</td>
-	    <td style="vertical-align: top;">
-	      <p><a href="Patrick_Nagel_Note.txt">Note.txt</a><br>
-		<a href="PN_ftpbackup.sh">ftpbackup.sh</a><br>
-		<a href="PN_backup-root.sh">backup-root.sh</a><br>
-		<a href="PN_backup-root.options">backup-root.options</a><br>
-		<a href="PN_backup-storage.sh">backup-storage.sh</a><br>
-		<a href="PN_backup-storage.options">backup-storage.options</a></p>
-	    </td>
-	  </tr>
-	  <tr>
-	    <td style="vertical-align: top;">Enhanced version of the Script done by Roi and Mauro&nbsp; (see cluster_digital_backups.sh) above</td>
-	    <td style="vertical-align: top;">Jason Lewis</td>
-	    <td style="vertical-align: top;">Script</td>
-	    <td style="vertical-align: top;"><a href="dar_backups.sh">dar_backups.sh</a></td>
-	  </tr>
-	  <tr>
-	    <td style="vertical-align: top; text-align: justify;">A very complete script that:<br>
-	      <ul>
-		<li>can perform Logging <br>
-		</li>
-		<li>uses configuration files (see attached sample including usage comments)</li>
-		<li>can use Snapshots (if fs_root is on an LVM volume) <br>
-		</li>
-		<li>do DVD formatting <br>
-		</li>
-		<li>can write create a dar archive to DVD.</li>
-	      </ul>
-	      The design requires that each backup job fits on a single DVD, optionally writing a directory and contents to DVD.  This allows:<br>
-	      <ul>
-		<li> copying system documentation to DVD for reference during system recovery</li>
-		<li>Writing dar_static to DVD for potential use during system recovery </li>
-		<li>Writing /etc/lvm and contents to DVD for potential use during </li>
-		<li>system recovery
-		</li><li>Options to restart failed DVD operations by skipping to DVD
-		</li><li>writing and to DVD verification
- 		</li><li>Extensive error trapping</li></ul>The script contains itself a very detailed user information.<br>
-	    </td>
-	    <td style="vertical-align: top;">Charles<br>
-	    </td>
-	    <td style="vertical-align: top;">Script<br>
-	    </td>
-	    <td style="vertical-align: top;"><a href="MyBackup.sh.tar.gz">MyBackup.sh.tar.gz</a><br>
-	    </td>
-	  </tr>
-	  <tr>
-	    <td style="vertical-align: top;">A shell script to replace -p
-	      option when one need to pause before dar lacks space to add a new slice
-	      on the disk. This may be of some use when using support of different
-	      sizes to store a given archive. You then need to&nbsp; choose the size
-	      of slices (-s option) as the biggest common divisor of all slice sizes
-	      to let dar handle this situation quite nicely.<br>
-	    </td>
-	    <td style="vertical-align: top;">Denis Corbin<br>
-	    </td>
-	    <td style="vertical-align: top;"><a href="../usage_notes.html#extensions_used">DUC</a></td>
-	    <td style="vertical-align: top;"><a href="available_space.duc">available_space.duc</a><br>
-	    </td>
-	  </tr>
-	  <tr>
-	    <td style="vertical-align: top;">
+	      whether the backup has to be full or incremental
+	  </td>
+	  <td>
+	    Roi Rodriguez Mendez &amp; Mauro
+	    Silvosa Rivera (Cluster Digital S.L.)
+	  </td>
+	  <td>Script</td>
+	  <td>
+	    <a href="cluster_digital_backups.sh">cluster_digital_backups.sh</a>
+	  </td>
+	</tr>
+	<tr>
+	  <td>
+	    Shell script to backup to an FTP
+	    server
+	  </td>
+	  <td>
+	    <a href="http://patrick-nagel.net/scripts/ftpbackup/">Patrick Nagel</a>
+	  </td>
+	  <td>Script</td>
+	  <td>
+	    <p>
+	      <a href="Patrick_Nagel_Note.txt">Note.txt</a><br/>
+	      <a href="PN_ftpbackup.sh">ftpbackup.sh</a><br/>
+	      <a href="PN_backup-root.sh">backup-root.sh</a><br/>
+	      <a href="PN_backup-root.options">backup-root.options</a><br/>
+	      <a href="PN_backup-storage.sh">backup-storage.sh</a><br/>
+	      <a href="PN_backup-storage.options">backup-storage.options</a>
+	    </p>
+	  </td>
+	</tr>
+	<tr>
+	  <td>
+	    Enhanced version of the Script done by Roi and Mauro&nbsp;
+	    (see cluster_digital_backups.sh) above
+	  </td>
+	  <td>Jason Lewis</td>
+	  <td>Script</td>
+	  <td>
+	    <a href="dar_backups.sh">dar_backups.sh</a>
+	  </td>
+	</tr>
+	<tr>
+	  <td>
+	    <p>
+	      A very complete script that:
+	    </p>
+	    <ul>
+	      <li>can perform Logging</li>
+	      <li>
+		uses configuration files
+		(see attached sample including usage comments)
+	      </li>
+	      <li>
+		can use Snapshots (if fs_root is on an LVM volume)
+	      </li>
+	      <li>do DVD formatting</li>
+	      <li>can write create a dar archive to DVD.</li>
+	    </ul>
+	    <p>
+	      The design requires that each backup job fits
+	      on a single DVD, optionally writing a directory
+	      and contents to DVD. This allows:
+	    </p>
+	    <ul>
+	      <li> copying system documentation to DVD for reference during system recovery</li>
+	      <li>Writing dar_static to DVD for potential use during system recovery </li>
+	      <li>Writing /etc/lvm and contents to DVD for potential use during </li>
+	      <li>system recovery</li>
+	      <li>Options to restart failed DVD operations by skipping to DVD</li>
+	      <li>writing and to DVD verification</li>
+	      <li>Extensive error trapping</li>
+	    </ul>
+	    <p>
+	      The script contains itself a very detailed user information.
+	    </p>
+	  </td>
+	  <td>Charles</td>
+	  <td>Script</td>
+	  <td><a href="MyBackup.sh.tar.gz">MyBackup.sh.tar.gz</a></td>
+	</tr>
+	<tr>
+	  <td>
+	    A shell script to replace <code>-p</code>
+	    option when one need to pause before dar lacks space to add a new slice
+	    on the disk. This may be of some use when using support of different
+	    sizes to store a given archive. You then need to choose the size
+	    of slices (-s option) as the biggest common divisor of all slice sizes
+	    to let dar handle this situation quite nicely.
+	  </td>
+	  <td>Denis Corbin</td>
+	  <td><a href="../usage_notes.html#extensions_used">DUC</a></td>
+	  <td><a href="available_space.duc">available_space.duc</a></td>
+	</tr>
+	<tr>
+	  <td>
+	    <p>
 	      Auxiliary script to use when calling dar to only backup files
 	      that have changed in the last N days, where N is an integer
 	      number given as argument to this script.
-	      <p>
-		usage: dar -c backup -af -A `./date_past_N_days 3` &lt;other options to dar...&gt;
-	      </p>
-	    </td>
-	    <td style="vertical-align: top;">
-	      Denis Corbin
-	    </td>
-	    <td style="vertical-align: top;">
-	      Script
-	    </td>
-	    <td style="vertical-align: top;">
-	      <a href="date_past_N_days">date_past_N_days</a>
-	    </td>
-	  </tr>
-	</tbody>
+	    </p>
+	    <p>
+	      usage: <code>dar -c backup -af -A `./date_past_N_days 3` &lt;other options to dar...&gt;</code>
+	    </p>
+	  </td>
+	  <td>
+	    Denis Corbin
+	  </td>
+	  <td>
+	    Script
+	  </td>
+	  <td>
+	    <a href="date_past_N_days">date_past_N_days</a>
+	  </td>
+	</tr>
       </table>
-      <br>
-      <br>
-    </center>
   </body>
 </html>
