@@ -100,6 +100,8 @@ namespace libdar
         generic_file *compressed;  ///< where to read from/write to compressed data
         compression algo;          ///< compression algorithm used
 	bool suspended;            ///< whether compression is temporary suspended
+
+	void flush_write();        ///< drop all pending write and reset compression engine
     };
 
 	/// @}

@@ -339,7 +339,20 @@ namespace libdar
 		}
 
 		if(compr->wrap.get_next_out() != compr->buffer)
-		    compressed->write(compr->buffer, (char *)compr->wrap.get_next_out() - compr->buffer);
+		{
+		    try
+		    {
+			compressed->write(compr->buffer, (char *)compr->wrap.get_next_out() - compr->buffer);
+		    }
+		    catch(...)
+		    {
+			    // write failed we drop all
+			    // that could not be written
+			    // and propagate the exception
+			flush_write();
+			throw;
+		    }
+		}
 	    }
 	}
     }
@@ -402,6 +415,37 @@ namespace libdar
 	compr->wrap.set_avail_in(0);
     }
 
+    void compressor::flush_write()
+    {
+	S_I ret;
+
+	compr->wrap.set_avail_in(0);
+	do
+	{
+	    compr->wrap.set_next_out(compr->buffer);
+	    compr->wrap.set_avail_out(compr->size);
+	    ret = compr->wrap.compress(WR_FINISH);
+
+	    switch(ret)
+	    {
+	    case WR_OK:
+	    case WR_STREAM_END:
+		    // just ignore the data put by the compression engine
+		    // into compr->buffer
+		break;
+	    case WR_BUF_ERROR :
+		throw SRC_BUG;
+	    case WR_STREAM_ERROR :
+		throw SRC_BUG;
+	    default :
+		throw SRC_BUG;
+	    }
+	}
+	while(ret != WR_STREAM_END);
+
+	if(compr->wrap.compressReset() != WR_OK)
+	    throw SRC_BUG;
+    }
 
 	////////////////////////
 	// xfer methods
