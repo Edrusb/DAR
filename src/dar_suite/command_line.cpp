@@ -809,7 +809,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
             //
             //
 
-	if(p.compression_block_size == 0 && p.multi_threaded_compress > 1)
+	if(p.compression_block_size == 0 && p.multi_threaded_compress > 1 && p.algo != compression::none)
 	    p.compression_block_size = 240 * 1024;
 
 	if(compile_time::libthreadar() && p.multi_threaded_crypto == 0)
