@@ -82,7 +82,7 @@ namespace libdar
 	    set_offset(offset + siz);
 	};
 
-	virtual void inherited_truncate(const infinint & pos) override {};
+	virtual void inherited_truncate(const infinint & pos) override { if(pos < offset) offset = pos; };
 	virtual void inherited_sync_write() override {};
 	virtual void inherited_flush_read() override {};
 	virtual void inherited_terminate() override {};
