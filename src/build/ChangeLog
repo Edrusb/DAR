@@ -7,7 +7,7 @@ from 2.6.13 to 2.6.14
 - fixed bug in cache layer met when writing sliced backup to a remote
   ftp or sftp repository
 - enhancement to the -[ and -] options to work as expected when "DOS"
-  formated text file is provided as a file listing.
+  formatted text file is provided as a file listing.
 
 from 2.6.12 to 2.6.13
 - fixed compilation warning in testing routine (outside libdar and dar)
