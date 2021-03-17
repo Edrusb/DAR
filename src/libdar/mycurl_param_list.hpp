@@ -132,13 +132,14 @@ namespace libdar
     {
     public:
 	mycurl_param_list() {};
+
+#if LIBCURL_AVAILABLE
+
 	mycurl_param_list(const mycurl_param_list & ref) { copy_from(ref); };
 	mycurl_param_list(mycurl_param_list && ref) noexcept = default;
 	mycurl_param_list & operator = (const mycurl_param_list & ref) { element_list.clear(); copy_from(ref); reset_read(); return *this; };
 	mycurl_param_list & operator = (mycurl_param_list && ref) = default;
 	~mycurl_param_list() = default;
-
-#if LIBCURL_AVAILABLE
 
 	    // operations with the list
 

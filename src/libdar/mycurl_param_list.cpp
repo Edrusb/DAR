@@ -32,6 +32,7 @@ using namespace std;
 namespace libdar
 {
 
+#if LIBCURL_AVAILABLE
 
     void mycurl_param_list::clear(CURLoption opt)
     {
@@ -99,5 +100,6 @@ namespace libdar
 	reset_read();
     }
 
+#endif
 
 } // end of namespace
