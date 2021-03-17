@@ -101,7 +101,7 @@ namespace libdar
 	/// read the birthtime of target inode
 
 	/// \param[in] target the path the the inode to read the birthtime of
-	/// \param[out] the birthtime (only valid if the call returned true)
+	/// \param[out] val the birthtime (only valid if the call returned true)
 	/// \return true if the birthtime could be read with linux specific systemcall
     bool filesystem_tools_read_linux_birthtime(const std::string & target, datetime & val);
 	/// @}

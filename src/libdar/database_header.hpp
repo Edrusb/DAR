@@ -45,6 +45,7 @@ namespace libdar
 	/// \param[in] filename is the file's name to create/overwrite
 	/// \param[in] overwrite set to true to allow file overwriting (else generates an error if file exists)
 	/// \param[in] algozip compression algorithm used for the database
+	/// \param[in] compr_level compression level
 	/// \return the database header has been read and checked the database can now be read from the returned generic_file pointed by the returned value
 	/// then it must be destroyed with the delete operator.
     extern generic_file *database_header_create(const std::shared_ptr<user_interaction> & dialog,
@@ -59,6 +60,7 @@ namespace libdar
 	/// \param[in] filename is the filename to read from
 	/// \param[out] db_version version of the database
 	/// \param[out] algozip compression algorithm used in the database
+	/// \param[out] compr_level compression level used in the database
 	/// \return the generic_file where the database header has been put
     extern generic_file *database_header_open(const std::shared_ptr<user_interaction> & dialog,
 					      const std::string & filename,
