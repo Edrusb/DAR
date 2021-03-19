@@ -101,7 +101,7 @@ namespace libdar
 	    {
 		    // generate a salt if not provided and pkcs5 is needed
 
-		if(salt.empty() && use_pkcs5)
+		if(salt.empty() && use_pkcs5 && reading_version >= 10)
 		    sel = generate_salt(max_key_len(xalgo));
 		else
 		    sel = salt;
