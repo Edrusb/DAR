@@ -758,9 +758,8 @@ namespace libdar
 			case fsan_unset:
 			    throw SRC_BUG;
 			case fsan_creation_date:
-#if HAVE_STATX_SYSCALL
-			    ui.printf(gettext("Warning: birthtime for %s is not possible to restore under Linux (today), but can be restored by libdar under BSD systems like MACOS X"), target.c_str());
-#endif
+				// note birthtime is not possible to restore under Linux (today),
+				// but can be restored by libdar under BSD systems like MACOS X
 			    break; // nothing to do here, this attribute will be set by tools_make_date()
 			case fsan_append_only:
 			    if(set_immutable)
