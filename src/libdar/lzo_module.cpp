@@ -145,7 +145,7 @@ namespace libdar
     {
 #if LIBLZO2_AVAILABLE
 	if(compression_level > 9 || compression_level < 1)
-	    throw Erange("lzo_module::lzo_module", tools_printf(gettext("out of range LZO compression_level: %d"), compression_level));
+	    throw Erange("lzo_module::lzo_module", tools_printf(gettext("out of range LZO compression level: %d"), compression_level));
 	level = compression_level;
 
 	if(algo != compression::lzo

@@ -41,7 +41,7 @@ namespace libdar
     {
 #if LIBZ_AVAILABLE
 	if(compression_level > 9 || compression_level < 1)
-	    throw Erange("gzip_module::gzip_module", tools_printf(gettext("out of range GZIP compression_level: %d"), compression_level));
+	    throw Erange("gzip_module::gzip_module", tools_printf(gettext("out of range GZIP compression level: %d"), compression_level));
 	level = compression_level;
 #else
 	throw Ecompilation(gettext("gzip compression"));

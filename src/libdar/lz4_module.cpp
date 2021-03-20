@@ -42,7 +42,7 @@ namespace libdar
     {
 #if LIBLZ4_AVAILABLE
 	if(compression_level > 9 || compression_level < 1)
-	    throw Erange("lz4_module::lz4_module", tools_printf(gettext("out of range LZ4 compression_level: %d"), compression_level));
+	    throw Erange("lz4_module::lz4_module", tools_printf(gettext("out of range LZ4 compression level: %d"), compression_level));
 	acceleration = 10 - compression_level;
 
 	state = new (nothrow) char[LZ4_sizeofState()];

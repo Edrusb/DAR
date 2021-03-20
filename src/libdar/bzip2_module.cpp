@@ -41,7 +41,7 @@ namespace libdar
     {
 #if LIBBZ2_AVAILABLE
 	if(compression_level > 9 || compression_level < 1)
-	    throw Erange("bzip2_module::bzip2_module", tools_printf(gettext("out of range BZIP2 compression_level: %d"), compression_level));
+	    throw Erange("bzip2_module::bzip2_module", tools_printf(gettext("out of range BZIP2 compression level: %d"), compression_level));
 	level = compression_level;
 #else
 	throw Ecompilation(gettext("bzip2 compression"));

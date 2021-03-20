@@ -275,7 +275,7 @@ namespace libdar
 
 	tmp_pos.unstack(offset);
 	if(!tmp_pos.is_zero())
-	    throw Erange("fichier_local::inherited_truncate", gettext("File too large for the operating system to be truncate it at the needed position"));
+	    throw Erange("fichier_local::inherited_truncate", gettext("File too large for the operating system to be truncate at the requested position"));
 
 	if(offset >= get_eof_offset())
 	    return; // will not expand the file size

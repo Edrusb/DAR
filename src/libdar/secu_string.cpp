@@ -162,7 +162,7 @@ namespace libdar
 	if(size > get_allocated_size())
 	    throw Erange("secu_string::expand_string_size_to", gettext("Cannot expand secu_string size past its allocation size"));
 	if(size < *string_size)
-	    throw Erange("secu_stering::expand_string_size_to", gettext("Cannot expand a secu_string below its current size"));
+	    throw Erange("secu_stering::expand_string_size_to", gettext("Cannot shrink a secu_string"));
 
 	memset(mem + *string_size, '\0', size - *string_size);
 	*string_size = size;
@@ -181,7 +181,7 @@ namespace libdar
     void secu_string::set_size(U_I size)
     {
 	if(size > get_allocated_size())
-	    throw Erange("secu_string::set_size", gettext("secu_string set_size() exceeds storage capacity"));
+	    throw Erange("secu_string::set_size", gettext("exceeding storage capacity while requesting secu_string::set_size()"));
 	*string_size = size;
     }
 

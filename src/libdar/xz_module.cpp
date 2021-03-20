@@ -43,7 +43,7 @@ namespace libdar
 #if LIBLZMA_AVAILABLE
 	if(compression_level > 9 || compression_level < 1)
 	    throw Erange("xz_module::xz_module",
-			 tools_printf(gettext("out of range XZ compression_level: %d"), compression_level));
+			 tools_printf(gettext("out of range XZ compression level: %d"), compression_level));
 	setup(compression_level);
 #else
 	throw Ecompilation(gettext("xz/lzma compression"));

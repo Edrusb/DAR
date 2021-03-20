@@ -42,7 +42,7 @@ namespace libdar
 #if LIBZSTD_AVAILABLE
 	if(compression_level > (U_I)ZSTD_maxCLevel() || compression_level < 1)
 	    throw Erange("zstd_module::zstd_module",
-			 tools_printf(gettext("out of range ZSTD compression_level: %d"), compression_level));
+			 tools_printf(gettext("out of range ZSTD compression level: %d"), compression_level));
 	level = compression_level;
 #else
 	throw Ecompilation(gettext("zstd compression"));
