@@ -330,6 +330,7 @@ static bool command_line(shell_interaction & dialog,
     even_when_removed = false;
     check_order = true;
     algozip = compression::gzip;
+    compression_level = 9;
     change_compression = false;
     string extra = "";
 
