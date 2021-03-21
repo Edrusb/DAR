@@ -6,12 +6,12 @@
 ## modify it under the terms of the GNU General Public License
 ## as published by the Free Software Foundation; either version 2
 ## of the License, or (at your option) any later version.
-## 
+##
 ## This program is distributed in the hope that it will be useful,
 ## but WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ## GNU General Public License for more details.
-## 
+##
 ## You should have received a copy of the GNU General Public License
 ## along with this program; if not, write to the Free Software
 ## Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -38,7 +38,7 @@ MAN_DIR = man
 ### note that you have to call "make install-doc" to install doc there
 DOC_DIR = doc/dar-$(DAR_VERSION)
 
-### if you want Extended Attributes (EA) Support uncomment the following 
+### if you want Extended Attributes (EA) Support uncomment the following
 # EA_SUPPORT = "yes"
 
 ### if you need large file support uncomment the following (files > 2 GB)
@@ -58,23 +58,27 @@ CXX = g++
 
 # OPTIMIZATION = -g # debugging options
 # OPTIMIZATION = -ggdb3
-OPTIMIZATION = -O # -pg 
+OPTIMIZATION = -O # -pg
 
 ifndef OPTIMIZATION
-OPTIMIZATION = 
+OPTIMIZATION =
 endif
 
 ifndef FILEOFFSET
 FILEOFFSET=
 endif
 
-CPPFLAGS_COMMON = $(OPTIMIZATION) $(FILEOFFSET) -Wall # -pedantic # -DTEST_MEMORY 
+CPPFLAGS_COMMON = -std=c++98 $(OPTIMIZATION) $(FILEOFFSET) -Wall # -pedantic # -DTEST_MEMORY
+OPTIMIZATION = -O
+
+CPPFLAGS =  $(OPTIMIZATION) -Wall # -DTEST_MEMORY
 # the -DTEST_MEMORY option is for memory leakage detection.
 # It makes the execution very slow, so don't add it for normal use
+CXXFLAGS=${CPPFLAGS}
 
 LDFLAGS = $(OPTIMIZATION) $(FILEOFFSET) -Wall -static
 # note : static link has been chosen to be able to restore an achive
-# in a very simple environment, without having to look for 
+# in a very simple environment, without having to look for
 # a particular dynamic library and version. This makes of course the
 # binary a bit bigger but not much than that.
 LIBS_COMMON =  -lstdc++ -lz
@@ -119,7 +123,7 @@ install-doc: BUGS CHANGES INSTALL LICENSE NOTES README TODO TUTORIAL
 	install -g root -o root -d $(INSTALL_ROOT_DIR)/$(DOC_DIR)
 	install -g root -o root -m 0444 BUGS CHANGES INSTALL LICENSE NOTES README TODO TUTORIAL $(INSTALL_ROOT_DIR)/$(DOC_DIR)
 
-uninstall : 
+uninstall :
 	cd $(INSTALL_ROOT_DIR)/$(BIN_DIR); rm -f $(CIBLE) dar_xfer
 	cd $(INSTALL_ROOT_DIR)/$(MAN_DIR); rm -f dar.1 dar_xform.1 dar_slave.1 dar_fer.1
 	if [ -d $(INSTALL_ROOT_DIR)/$(DOC_DIR) ] ; then cd $(INSTALL_ROOT_DIR)/$(DOC_DIR); rm -f BUGS CHANGES INSTALL LICENSE NOTES README TODO TUTORIAL; fi
@@ -177,10 +181,10 @@ test_tuyau : test_tuyau.o infinint.o storage.o path.o generic_file.o erreurs.o t
 	$(CXX) $(LDFLAGS) infinint.o storage.o path.o generic_file.o test_tuyau.o erreurs.o tools.o user_interaction.o deci.o tuyau.o dar_suite.o test_memory.o $(LIBS) -o $@
 
 
-dar_xform : $(OBJ_XFER) 
+dar_xform : $(OBJ_XFER)
 	$(CXX) $(LDFLAGS) $(OBJ_XFER) $(LIBS_XFER) -o $@
 
-dar_slave : $(OBJ_SLAVE) 
+dar_slave : $(OBJ_SLAVE)
 	$(CXX) $(LDFLAGS) $(OBJ_SLAVE) $(LIBS_SLAVE) -o $@
 
 # DO NOT DELETE
