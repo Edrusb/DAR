@@ -432,3 +432,83 @@ dt.void::before
     visibility: visible;
 }
 
+/* color codes for Dev Cycle */
+
+td.release
+{
+    width: 33%;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.dc-dev1
+{
+    background-color: rgb(255,255,255);
+    color: rgb(0,0,0);
+}
+
+.dc-dev2
+{
+    background-color: rgb(255,204,204);
+    color: rgb(0,0,0);
+}
+
+.dc-dev3
+{
+    background-color: rgb(255,102,102);
+    color: rgb(0,0,0);
+}
+
+.dc-dev4
+{
+    background-color: rgb(255,0,0);
+    color: rgb(0,0,0);
+}
+
+.dc-dev5
+{
+    background-color: rgb(204,0,0);
+    color: rgb(0,0,0);
+}
+
+.dc-frozen
+{
+    background-color: rgb(255,204,0);
+    color: rgb(0,0,0);
+}
+
+.dc-pre-release
+{
+    background-color: rgb(255,255,51);
+    color: rgb(0,0,0);
+}
+
+.dc-rel1
+{
+    background-color: rgb(153,255,153);
+    color: rgb(0,0,0);
+}
+
+.dc-rel2
+{
+    background-color: rgb(51,255,51);
+    color: rgb(0,0,0);
+}
+
+.dc-rel3
+{
+    background-color: rgb(51,204,0);
+    color: rgb(0,0,0);
+}
+
+.dc-ending-soon
+{
+    background-color: rgb(51,153,153);
+    color: rgb(0,0,0);
+}
+
+.dc-ended
+{
+    background-color: rgb(151,153,153);
+    color: rgb(0,0,0);
+}
