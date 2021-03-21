@@ -59,6 +59,7 @@ using namespace libdar;
 static string build(string::iterator a, string::iterator b);
 static bool is_a_slice_available(user_interaction & ui, const string & base, const string & extension);
 static string retreive_basename(const string & base, const string & extension);
+static string retreive_basename2(const string & base);
 static void tools_localtime(const time_t & timep, struct tm *result);
 
 ////
@@ -1448,42 +1449,58 @@ void line_tools_check_basename(user_interaction & dialog, const path & loc, stri
     NLS_SWAP_IN;
     try
     {
-	regular_mask suspect(string(".+\\.[0-9][0-9]*\\.")+extension, true);
+	regular_mask suspect(string(".+\\.[0-9]+\\.")+extension+string("$"), true);
+	regular_mask suspect2(string("\\.0*$"), true);
 	string old_path = (loc.append(base)).display();
-
-	    // is basename is suspect ?
-	if(!suspect.is_covered(base))
-	    return; // not a suspect basename
 
 	    // is there a slice available ?
 	if(is_a_slice_available(dialog, old_path, extension))
 	    return; // yes, thus basename is not a mistake
 
-	    // removing the suspicious end (.<number>.extension)
-	    // and checking the avaibility of such a slice
+	    // is basename is suspect
+	if(suspect.is_covered(base)) // full slice name
+	{
+		// removing the suspicious end (.<number>.extension)
+		// and checking the avaibility of such a slice
 
-	string new_base = retreive_basename(base, extension);
-	string new_path = (loc.append(new_base)).display();
-	if(is_a_slice_available(dialog, new_path, extension))
-	{
-	    dialog.message(tools_printf(gettext("Warning, no archive exist with \"%S\" as basename, however a slice part of an archive which basename is \"%S\" exists. Assuming a shell completion occurred and using that basename instead"), &base, &new_base));
-	    base = new_base;
-	}
-	else // no slice exist neither with that slice name
-	{
-	    try
+	    string new_base = retreive_basename(base, extension);
+	    string new_path = (loc.append(new_base)).display();
+
+	    if(is_a_slice_available(dialog, new_path, extension))
 	    {
-		if(create)
+		dialog.message(tools_printf(gettext("Warning, no archive exist with \"%S\" as basename, however a slice part of an archive which basename is \"%S\" exists. Assuming a shell completion occurred and using that basename instead"), &base, &new_base));
+		base = new_base;
+	    }
+	    else // no slice exist neither with that slice name
+	    {
+		try
 		{
-		    dialog.pause(tools_printf(gettext("Warning, the provided basename \"%S\" may lead to confusion as it looks like a slice name. It is advise to rather use \"%S\" as basename instead. Do you want to change the basename accordingly?"), &base, &new_base));
+		    if(create)
+		    {
+			dialog.pause(tools_printf(gettext("Warning, the provided basename \"%S\" may lead to confusion as it looks like a slice name. It is advise to rather use \"%S\" as basename instead. Do you want to change the basename accordingly?"), &base, &new_base));
+			base = new_base;
+		    }
+		}
+		catch(Euser_abort & e)
+		{
+		    dialog.message(tools_printf(gettext("OK, keeping %S as basename"), &base));
+		}
+	    }
+	}
+	else
+	    if(suspect2.is_covered(base))
+	    {
+		    // shell completed up to the slice number in a file
+
+		string new_base = retreive_basename2(base); // removing the ending dot eventually followed by zeros
+		string new_path = (loc.append(new_base)).display();
+
+		if(is_a_slice_available(dialog, new_path, extension))
+		{
+		    dialog.message(tools_printf(gettext("Warning, no archive exist with \"%S\" as basename, however a slice part of an archive which basename is \"%S\" exists. Assuming a shell completion occurred and using that basename instead"), &base, &new_base));
 		    base = new_base;
 		}
 	    }
-	    catch(Euser_abort & e)
-	    {
-		dialog.message(tools_printf(gettext("OK, keeping %S as basename"), &base));
-	    }
-	}
     }
     catch(...)
     {
@@ -1832,6 +1849,17 @@ static string retreive_basename(const string & base, const string & extension)
     index = new_base.find_last_not_of(string(".")+extension);
     new_base = string(new_base.begin(), new_base.begin()+index);
     index = new_base.find_last_not_of("0123456789");
+    new_base = string(new_base.begin(), new_base.begin()+index);
+
+    return new_base;
+}
+
+static string retreive_basename2(const string & base)
+{
+    string new_base = base;
+    S_I index;
+
+    index = new_base.find_last_not_of(string("0")); // this will point before the last dot preceeding the zeros
     new_base = string(new_base.begin(), new_base.begin()+index);
 
     return new_base;
