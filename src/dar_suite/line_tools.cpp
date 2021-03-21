@@ -1844,7 +1844,7 @@ static bool is_a_slice_available(user_interaction & ui, const string & base, con
 	try
 	{
 	    etage contents = etage(ui, chem->display().c_str(), datetime(0), datetime(0), false, false);  // we don't care the dates here so we set them to zero
-	    regular_mask slice = regular_mask(rest + "\\.[1-9][0-9]*\\."+ extension, true);
+	    regular_mask slice = regular_mask(rest + "\\.[0-9]+\\."+ extension, true);
 
 	    while(!ret && contents.read(rest))
 		ret = slice.is_covered(rest);

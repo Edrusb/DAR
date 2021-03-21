@@ -6,6 +6,8 @@ from 2.6.x to 2.7.0
 - improved slice name versus base name error, now substiting (rather than
   just asking the user) the first by the later when else it would lead
   to an execution error.
+- auto-detecting min-digits at reading time in complement of the feature
+  listed just above
 - added the possibility to specify a gnupg key by mean of its keyid in
   addition to the email address it may be associated to, both for
   asymmetrical encryption and archive signing.
