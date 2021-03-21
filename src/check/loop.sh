@@ -24,7 +24,13 @@
 for archive in Old_format/* ; do
   basename=`echo "$archive" | sed -r -e "s/\.[0-9]+\.dar//"`
   echo "Testing ascendant compatibility with $basename"
-  if ! ../dar_suite/dar -q -Q -t "$basename" ; then
+  crypto=`echo "$basename.1.dar" | grep _crypto_| wc -l`
+  if [ $crypto -gt 0 ] ; then
+      KEY="-K bf:test"
+  else
+      KEY="-q"
+  fi
+  if ! ../dar_suite/dar -q -Q -t "$basename" $KEY ; then
      echo "FAILED TESTING OLD ARCHIVE FORMAT: $basename"
      exit 1
   fi
