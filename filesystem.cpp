@@ -32,6 +32,7 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <list>
+#include <sys/sysmacros.h>
 #include "tools.hpp"
 #include "erreurs.hpp"
 #include "filesystem.hpp"

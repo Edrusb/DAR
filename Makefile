@@ -6,12 +6,12 @@
 ## modify it under the terms of the GNU General Public License
 ## as published by the Free Software Foundation; either version 2
 ## of the License, or (at your option) any later version.
-## 
+##
 ## This program is distributed in the hope that it will be useful,
 ## but WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ## GNU General Public License for more details.
-## 
+##
 ## You should have received a copy of the GNU General Public License
 ## along with this program; if not, write to the Free Software
 ## Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -38,15 +38,16 @@ MAN_DIR = man
 CC = g++
 
 # OPTIMIZATION = -g # debugging options
-OPTIMIZATION = -O  
+OPTIMIZATION = -O
 
-CPPFLAGS = $(OPTIMIZATION) -Wall # -DTEST_MEMORY 
-# the -DTEST_MEMORY option is for memory leakage detection. 
+CPPFLAGS = -std=c++98 $(OPTIMIZATION) -Wall # -DTEST_MEMORY
+# the -DTEST_MEMORY option is for memory leakage detection.
 # It makes the execution very slow, so don't add it for normal use
+CXXFLAGS=${CPPFLAGS}
 
-LDFLAGS = $(OPTIMIZATION) -Wall -static 
+LDFLAGS = $(OPTIMIZATION) -Wall -static
 # note : static link has been chosen to be abe to restore an achive
-# in a very simple environment, without having to look for 
+# in a very simple environment, without having to look for
 # a particular dynamic library and version. This makes of course the
 #  binary a bit bigger but not much than that.
 
@@ -65,7 +66,7 @@ install : $(CIBLE)
 	install -g root -o root -d $(INSTALL_ROOT_DIR)/$(MAN_DIR)/man1
 	install -g root -o root -m 0444 $(CIBLE).1 $(INSTALL_ROOT_DIR)/$(MAN_DIR)/man1
 
-uninstall : 
+uninstall :
 	rm -f $(INSTALL_ROOT_DIR)/$(BIN_DIR)/$(CIBLE)
 	rm -f $(INSTALL_ROOT_DIR)/$(MAN_DIR)/$(CIBLE).1
 
@@ -98,7 +99,7 @@ test_sar : sar.o test_sar.o erreurs.o storage.o infinint.o generic_file.o path.o
 test_path : test_path.o erreurs.o storage.o infinint.o generic_file.o path.o tools.o user_interaction.o test_memory.o
 	$(CC) $(LDFLAGS) erreurs.o storage.o infinint.o generic_file.o path.o tools.o test_path.o user_interaction.o test_memory.o $(LIBS) -o $@
 
-test_mask : mask.o test_mask.o erreurs.o storage.o infinint.o generic_file.o path.o tools.o user_interaction.o 
+test_mask : mask.o test_mask.o erreurs.o storage.o infinint.o generic_file.o path.o tools.o user_interaction.o
 	$(CC) $(LDFLAGS) mask.o erreurs.o storage.o infinint.o generic_file.o path.o tools.o test_mask.o user_interaction.o $(LIBS) -o $@
 
 test_tronc : tronc.o erreurs.o storage.o infinint.o generic_file.o path.o tools.o test_tronc.o deci.o user_interaction.o
@@ -128,7 +129,7 @@ compressor.o : compressor.cpp compressor.hpp erreurs.hpp
 user_interaction.o : user_interaction.cpp user_interaction.hpp erreurs.hpp
 header.o : header.cpp header.hpp
 tools.o : tools.cpp tools.hpp erreurs.hpp
-path.o : path.cpp path.hpp 
+path.o : path.cpp path.hpp
 mask.o : mask.cpp mask.hpp tools.hpp erreurs.hpp path.hpp
 tronc.o : tronc.cpp tronc.hpp
 catalogue.o : catalogue.cpp catalogue.hpp tools.hpp tronc.hpp user_interaction.hpp
