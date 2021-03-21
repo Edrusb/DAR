@@ -1510,6 +1510,33 @@ void line_tools_check_basename(user_interaction & dialog, const path & loc, stri
     NLS_SWAP_OUT;
 }
 
+void line_tools_check_min_digits(user_interaction & dialog, const path & loc, const string & base, const string & extension, infinint & num_digits)
+{
+    bool found = false;
+    string cur;
+
+    etage contents(dialog, loc.display().c_str(), datetime(0), datetime(0), false, false);
+
+    regular_mask slice = regular_mask(base + "\\.0*1\\." + extension, true);
+
+    while(!found && contents.read(cur))
+    {
+	found = slice.is_covered(cur);
+	if(found)
+	{
+		// extract the number of digits from the slice name
+	    S_I index_last = cur.find_last_not_of(string(".")+extension);
+	    cur = string(cur.begin(), cur.begin() + index_last + 1);
+	    S_I index_first = cur.find_last_not_of("0123456789");
+	    if(num_digits.is_zero() && index_last - index_first > 1)
+	    {
+		num_digits = index_last - index_first;
+		dialog.printf(gettext("Auto detecting min-digits to be %i"), &num_digits);
+	    }
+	}
+    }
+}
+
 string line_tools_getcwd()
 {
     const U_I step = 1024;

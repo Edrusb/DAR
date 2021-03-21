@@ -277,6 +277,20 @@ extern void line_tools_check_basename(user_interaction & dialog,
 				      const std::string & extension,
 				      bool create);
 
+    /// if a slice number 1 is met with the provided basename, set the num_digits accordingly
+
+    /// \param[in,out] dialog for user interaction
+    /// \param[in] loc the path where are expected the slices to be present
+    /// \param[in] base the basename of the archive
+    /// \param[in] extension the extension of dar's slices
+    /// \param[in,out] num_digits the min width of slice number (0 padded numbers)
+void line_tools_check_min_digits(user_interaction & dialog,
+				 const path & loc,
+				 const std::string & base,
+				 const std::string & extension,
+				 infinint & num_digits);
+
+
     /// from a string with a range notation (min-max) extract the range values
 
     /// \param[in] s the string to parse
