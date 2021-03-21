@@ -130,7 +130,7 @@ else
 BUILD_STATIC =
 endif
 
-CPPFLAGS_COMMON = $(OPTIMIZATION) $(FILEOFFSET) $(USE_SYS_SIGLIST) $(FORCE_OS_BITS) -Wall # -pedantic -DTEST_MEMORY
+CPPFLAGS_COMMON = -std=c++98 $(OPTIMIZATION) $(FILEOFFSET) $(USE_SYS_SIGLIST) $(FORCE_OS_BITS) -Wall # -pedantic -DTEST_MEMORY
 # the -DTEST_MEMORY option is for memory leakage detection.
 # It makes the execution very slow, so don't add it for normal use
 

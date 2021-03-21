@@ -654,7 +654,7 @@ string sar::hook_substitute(const string & path, const string & basename, const 
 		{
 		    user_interaction_pause("last char of user command-line to execute is '%', (use '%%' instead to avoid this message). Ignore it and continue ?");
 		}
-		catch(Euser_abort)
+		catch(Euser_abort & e)
 		{
 		    throw Escript("sar::hook_substitute","unknown substitution string at end of string: %");
 		}

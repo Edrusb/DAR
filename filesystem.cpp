@@ -32,6 +32,7 @@
 #include <sys/un.h>
 #include <map>
 #include <ctype.h>
+#include <sys/sysmacros.h>
 #include "tools.hpp"
 #include "erreurs.hpp"
 #include "filesystem.hpp"
