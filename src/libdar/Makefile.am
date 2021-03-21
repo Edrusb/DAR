@@ -1,15 +1,15 @@
 if BUILD_MODE32
     MYLIB=libdar32.la
-    AM_CPPFLAGS=-DLIBDAR_MODE=32
+    AM_CPPFLAGS=-DLIBDAR_MODE=32 -std=c++98
     VER_SRC=limitint.o
 else
 if BUILD_MODE64
     MYLIB=libdar64.la
-    AM_CPPFLAGS=-DLIBDAR_MODE=64
+    AM_CPPFLAGS=-DLIBDAR_MODE=64 -std=c++98
     VER_SRC=limitint.o
 else
     MYLIB=libdar.la
-    AM_CPPFLAGS=
+    AM_CPPFLAGS=-std=c++98
     VER_SRC=real_infinint.o
 endif
 endif

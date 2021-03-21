@@ -33,14 +33,14 @@ endif
 
 if BUILD_MODE32
     MYLIB=dar32
-    AM_CPPFLAGS=-DLIBDAR_MODE=32 -I../libdar
+    AM_CPPFLAGS=-DLIBDAR_MODE=32 -I../libdar -std=c++98
 else
 if BUILD_MODE64
     MYLIB=dar64
-    AM_CPPFLAGS=-DLIBDAR_MODE=64 -I../libdar
+    AM_CPPFLAGS=-DLIBDAR_MODE=64 -I../libdar -std=c++98
 else
     MYLIB=dar
-    AM_CPPFLAGS=-I../libdar
+    AM_CPPFLAGS=-I../libdar -std=c++98
 endif
 endif
 
