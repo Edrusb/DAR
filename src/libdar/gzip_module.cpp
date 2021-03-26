@@ -80,15 +80,21 @@ namespace libdar
     {
 #if LIBZ_AVAILABLE
 	S_I ret;
+	uLong zip_buf_size_ulong = zip_buf_size;
 
 	if(normal_size > get_max_compressing_size())
 	    throw Erange("gzip_module::compress_data", "oversized uncompressed data given to GZIP compression engine");
 
 	ret = compress2((Bytef*)zip_buf,
-			&zip_buf_size,
+			&zip_buf_size_ulong,
 			(const Bytef*)normal,
 			normal_size,
 			level);
+
+	zip_buf_size = (U_I)(zip_buf_size_ulong);
+	if((uLong)zip_buf_size != zip_buf_size_ulong)
+	    throw SRC_BUG; // integer overflow occured
+
 	switch(ret)
 	{
 	case Z_OK:
@@ -115,7 +121,13 @@ namespace libdar
 				    U_I normal_size) const
     {
 #if LIBZ_AVAILABLE
-	S_I ret = uncompress((Bytef*)normal, &normal_size, (const Bytef*)zip_buf, zip_buf_size);
+	uLongf normal_size_ulong = normal_size;
+
+	S_I ret = uncompress((Bytef*)normal, &normal_size_ulong, (const Bytef*)zip_buf, zip_buf_size);
+
+	normal_size = normal_size_ulong;
+	if((uLongf)(normal_size) != normal_size_ulong)
+	    throw SRC_BUG; // integer overflow occured
 
 	switch(ret)
 	{
