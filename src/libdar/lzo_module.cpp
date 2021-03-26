@@ -64,21 +64,26 @@ namespace libdar
     {
 #if LIBLZO2_AVAILABLE
 	S_I status;
+	lzo_uint zip_buf_size_lzo = zip_buf_size;
 
 	switch(lzo_algo)
 	{
 	case compression::lzo:
-	    status = lzo1x_999_compress_level((lzo_bytep)normal, normal_size, (lzo_bytep)zip_buf, &zip_buf_size, wrkmem_compr.get(), nullptr, 0, nullptr, level);
+	    status = lzo1x_999_compress_level((lzo_bytep)normal, normal_size, (lzo_bytep)zip_buf, &zip_buf_size_lzo, wrkmem_compr.get(), nullptr, 0, nullptr, level);
 	    break;
 	case compression::lzo1x_1_15:
-	    status = lzo1x_1_15_compress((lzo_bytep)normal, normal_size, (lzo_bytep)zip_buf, &zip_buf_size, wrkmem_compr.get());
+	    status = lzo1x_1_15_compress((lzo_bytep)normal, normal_size, (lzo_bytep)zip_buf, &zip_buf_size_lzo, wrkmem_compr.get());
 	    break;
 	case compression::lzo1x_1:
-	    status = lzo1x_1_compress((lzo_bytep)normal, normal_size, (lzo_bytep)zip_buf, &zip_buf_size, wrkmem_compr.get());
+	    status = lzo1x_1_compress((lzo_bytep)normal, normal_size, (lzo_bytep)zip_buf, &zip_buf_size_lzo, wrkmem_compr.get());
 	    break;
 	default:
 	    throw SRC_BUG;
 	}
+
+	zip_buf_size = zip_buf_size_lzo;
+	if((lzo_uint)(zip_buf_size) != zip_buf_size_lzo)
+	    throw SRC_BUG;
 
 	switch(status)
 	{
@@ -103,8 +108,13 @@ namespace libdar
     {
 #if LIBLZO2_AVAILABLE
 	S_I status;
+	lzo_uint normal_size_lzo = normal_size;
 
-	status = lzo1x_decompress_safe((lzo_bytep)zip_buf, zip_buf_size, (lzo_bytep)normal, & normal_size, wrkmem_decompr.get());
+	status = lzo1x_decompress_safe((lzo_bytep)zip_buf, zip_buf_size, (lzo_bytep)normal, & normal_size_lzo, wrkmem_decompr.get());
+
+	normal_size = normal_size_lzo;
+	if((lzo_uint)(normal_size) != normal_size_lzo)
+	    throw SRC_BUG; // integer overflow occured
 
 	switch(status)
 	{
