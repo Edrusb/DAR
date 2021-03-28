@@ -296,6 +296,9 @@ namespace libdar
             /// end threads taking into account the fact they may be suspended on the barrier
         void stop_threads();
 
+	    /// call by join_threads() below just code simplification around exception handling
+	void join_workers_only();
+
             /// wait for threads to finish and eventually rethrow their exceptions in current thread
         void join_threads();
 
@@ -444,6 +447,7 @@ namespace libdar
 	    workers(from_workers),
 	    waiting(waiter),
 	    num_w(num_workers),
+	    cur_num_w(0),
 	    encrypted(encrypted_side),
 	    tas(xtas),
 	    error(false)
@@ -458,6 +462,7 @@ namespace libdar
 	std::shared_ptr<libthreadar::ratelier_gather<crypto_segment> > workers;
 	std::shared_ptr<libthreadar::barrier> waiting;
 	U_I num_w;
+	U_I cur_num_w;
 	generic_file* encrypted; ///< the encrypted data
 	std::shared_ptr<heap<crypto_segment> > tas;
 	bool error;

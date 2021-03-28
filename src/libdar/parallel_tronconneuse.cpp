@@ -512,7 +512,7 @@ namespace libdar
 	    throw SRC_BUG;
 
 	if(t_status == thread_status::dead)
-	    throw SRC_BUG;
+	    run_threads();
 
 
 	while(wrote < size)
@@ -1191,21 +1191,32 @@ namespace libdar
 	    send_write_order(tronco_flags::die);
     }
 
-
-    void parallel_tronconneuse::join_threads()
+    void parallel_tronconneuse::join_workers_only()
     {
 	deque<crypto_worker>::iterator it = travailleur.begin();
 
-	if(get_mode() == gf_read_only)
-	    crypto_reader->join(); // may propagate exception thrown in child thread
-	else
-	    crypto_writer->join(); // may propagate exception thrown in child thread
-
 	while(it != travailleur.end())
 	{
-	    it->join(); // may propagate exception thrown in child thread
+	    it->join();
 	    ++it;
 	}
+    }
+
+    void parallel_tronconneuse::join_threads()
+    {
+	try
+	{
+	    if(get_mode() == gf_read_only)
+		crypto_reader->join(); // may propagate exception thrown in child thread
+	    else
+		crypto_writer->join(); // may propagate exception thrown in child thread
+	}
+	catch(...)
+	{
+	    join_workers_only();
+	    throw;
+	}
+	join_workers_only();
 
 	t_status = thread_status::dead;
     }
@@ -1424,6 +1435,7 @@ namespace libdar
     void write_below::inherited_run()
     {
 	error = false;
+	cur_num_w = num_w;
 	try
 	{
 	    if(!waiting || !workers)
@@ -1480,11 +1492,11 @@ namespace libdar
 		break;
 	    case tronco_flags::stop:
 		if(!error)
-		    throw SRC_BUG; // all data should be able to be compressed (even with no gain)
+		    throw SRC_BUG;
 		break;
 	    case tronco_flags::eof:
 		if(!error)
-		    throw SRC_BUG; // all data should be able to be compressed (even with no gain)
+		    throw SRC_BUG;
 		break;
 	    case tronco_flags::data_error:
 		    // error reported by a worker while encrypting
@@ -1493,8 +1505,8 @@ namespace libdar
 		break;
 	    case tronco_flags::die:
 		    // read num dies and push them back to tas
-		--num_w;
-		if(num_w == 0)
+		--cur_num_w;
+		if(cur_num_w == 0)
 		    end = true;
 		break;
 	    case tronco_flags::exception_below:
