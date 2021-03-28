@@ -519,9 +519,31 @@ namespace libdar
 	{
 	    if(crypto_writer->exception_pending())
 	    {
-		stop_threads();
-		join_threads();
-		throw SRC_BUG; // if join did not through an exception
+		try
+		{
+		    stop_threads();
+		    join_threads();
+		    throw SRC_BUG; // if join did not through an exception
+		}
+		catch(...)
+		{
+			// we have to reset the object position
+			// to where the error took place
+		    block_num = crypto_writer->get_error_block();
+		    current_position = block_num*clear_block_size;
+			// truncate below if possible
+		    try
+		    {
+			encrypted->truncate(initial_shift
+					    + block_num*crypto->encrypted_block_size_for(clear_block_size));
+		    }
+		    catch(...)
+		    {
+			encrypted->skip(initial_shift
+					+ block_num*crypto->encrypted_block_size_for(clear_block_size));
+		    }
+		    throw;
+		}
 	    }
 
 	    if(!tempo_write) // no crypto_segment pointed to by tempo_write
@@ -1214,10 +1236,10 @@ namespace libdar
 	catch(...)
 	{
 	    join_workers_only();
+	    t_status = thread_status::dead;
 	    throw;
 	}
 	join_workers_only();
-
 	t_status = thread_status::dead;
     }
 
@@ -1435,6 +1457,7 @@ namespace libdar
     void write_below::inherited_run()
     {
 	error = false;
+	error_block = 0;
 	cur_num_w = num_w;
 	try
 	{
@@ -1486,6 +1509,7 @@ namespace libdar
 	    case tronco_flags::normal:
 		if(!error)
 		{
+		    error_block = ones.front()->block_index;
 		    encrypted->write(ones.front()->crypted_data.get_addr(),
 				     ones.front()->crypted_data.get_data_size());
 		}

@@ -450,10 +450,12 @@ namespace libdar
 	    cur_num_w(0),
 	    encrypted(encrypted_side),
 	    tas(xtas),
-	    error(false)
+	    error(false),
+	    error_block(0)
 	{ if(encrypted == nullptr) throw SRC_BUG; };
 
 	bool exception_pending() const { return error; };
+	const infinint & get_error_block() const { return error_block; };
 
     protected:
 	virtual void inherited_run() override;
@@ -466,6 +468,7 @@ namespace libdar
 	generic_file* encrypted; ///< the encrypted data
 	std::shared_ptr<heap<crypto_segment> > tas;
 	bool error;
+	infinint error_block; // last crypto block before error
 	std::deque<std::unique_ptr<crypto_segment> >ones;
 	std::deque<signed int> flags;
 
