@@ -1517,7 +1517,7 @@ void line_tools_check_min_digits(user_interaction & dialog, const path & loc, co
 
     etage contents(dialog, loc.display().c_str(), datetime(0), datetime(0), false, false);
 
-    regular_mask slice = regular_mask(base + "\\.0*1\\." + extension, true);
+    regular_mask slice = regular_mask(base + "\\.0*1\\." + extension + "$", true);
 
     while(!found && contents.read(cur))
     {
