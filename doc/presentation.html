@@ -151,24 +151,32 @@
 
     <dl>
       <dt class=void>Backing up all the <code>/usr</code> directory:</dt><dd>
+	<br/>
 	<code class=block>
 	  dar --create my_backup --fs-root / --go-into usr
 	</code>
+	<br/>
       </dd>
       <dt class=void>Restoration (restoring <code>/usr</code> in a alternate directory):</dt><dd>
+	<br/>
 	<code class=block>
 	  dar --extract my_backup --fs-root /some/where/else
 	</code>
+	<br/>
       </dd>
       <dt class=void>Testing backup sanity:</dt><dd>
+	<br/>
 	<code class=block>
 	  dar --test my_backup
 	</code>
+	<br/>
       </dd>
       <dt class=void>Comparing a backup content with the existing filesystem:</dt><dd>
+	<br/>
 	<code class=block>
 	  dar --diff my_backup --fs-root /
 	</code>
+	<br/>
       </dd>
     </dl>
 
