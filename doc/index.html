@@ -18,7 +18,7 @@
 	<a href="#presentation">Presentation</a>
       </div>
       <div class=menuitem>
-	<a href="#obtaining">Obtaing dar/libdar</a>
+	<a href="#obtaining">Building dar/libdar</a>
       </div>
       <div class=menuitem>
 	<a href="#command_line">Dar documentation</a>
@@ -44,15 +44,9 @@
 	<li><a href="benchmark.html">Dar benchmark</a></li>
       </ul>
 
-      <h2><a name="obtaining">Obtaining dar/libdar</a></h2>
+      <h2><a name="obtaining">Building dar/libdar</a></h2>
 
       <ul>
-	<li><a href="downloading.html">Obtaining Packages signature</a></li>
-	<li><a href="downloading.html#source_download">Downloading source packages</a></li>
-	<li><a href="downloading.html#linux_binaries">Downloading binaries for Linux</a></li>
-	<li><a href="downloading.html#windows_binaries">Downloading binary packages for windows</a></li>
-	<li><a href="downloading.html#MacOS">Downloading binary packages for Mac OS</a></li>
-	<li><a href="downloading.html#FreeBSD_portage">FreeBSD portage</a></li>
 	<li><a href="from_sources.html">Compiling dar from source</a></li>
 	<li><a href="from_sources.html#Tools_sites">Related Softwares</a></li>
       </ul>
@@ -60,17 +54,7 @@
       <h2><a name="command_line">Dar documentation</a></h2>
 
       <p>
-	<i>Dar</i>Since release 2.0.0, <i>dar</i> is a command-line adaptation
-	of the underlying <i>libdar</i> library. It uses libdar's API as well
-	as several other <a href="presentation.html#external_tools">external tools</a>
-      </p>
-      <p>
-	<i>Dar</i> source code provides both <b>dar</b> and <b>libdar</b>, while
-	many distro split each source code in two or more packages (dar command-line,
-	libdar library, libdar header, dar documentation...).
-      </p>
-      <p>
-	the following documentation focuses on the command-line usage:
+	The following documentation focuses on the <i>dar</i> command-line tools:
       </p>
       <ul>
 	<li><a href="Tutorial.html">Tutorial</a></li>
@@ -87,26 +71,39 @@
 	are welcome to <a href="#ask_for_support">ask for support</a>
       </p>
 
+      <p>
+	Several <a href="presentation.html#external_tools">external tools</a> are based on <i>libdar</i> or <i>dar</i>
+	and will provide some or all of the features presented in the documentation referred above.
+	Thanks to refer to their respective documentation.
+      </p>
+
+
       <h2><a name="libdar">Libdar documentation</a></h2>
 
       <p>
 	Libdar, the library that powers the <i>dar</i> command-line tool as well as
 	<a href="presentation.html#external_tools">several other softwares</a>
-	has its own documentation. All features available to <i>dar</i> are available
-	thanks to <i>libdar</i>'s API which is also documented with samples and tutorial.
+	has its own documentation. All features available from <i>dar</i> are available
+	thanks to <i>libdar</i>'s API which is fully documented, including samples and tutorial.
       </p>
       <p>
 	The API exists today for C++ and Python3 languages.
       </p>
 
       <ul>
-	<li>The <a href="api_tutorial.html">API tutorial</a></li>
+	<li>The <a href="api_tutorial.html">API tutorial</a> for C++ programming</li>
 	<li>Dar command-line source code for API usage illustration</li>
-	<li>The libdar's <a href="python/libdar_test.py">python binding tutorial</a> based on examples of use</li>
-	<li>The <a href="man/index.html">API reference documentation</a></li>
+	<li>The libdar's <a href="python/libdar_test.py">python binding tutorial</a>
+	  based on examples of use. It follows steps of the
+ 	  <i>API Tutorial</i> but using the equivalent
+	  Python classes.
+	</li>
+	<li>The <a href="man/index.html">API reference documentation</a>
+	  can be referred to by both C++ and Python developpers.
+	</li>
 	<li>
 	  The <a href="https://lists.sourceforge.net/lists/listinfo/dar-libdar_api">libdar-api</a> mailing-list
-	  if you want support on the API usage.
+	  if you want support on the API or Python binding usage.
 	</li>
       </ul>
 
@@ -125,49 +122,6 @@
 	welcome to drop your questions on the <a href="https://lists.sourceforge.net/lists/listinfo/dar-discussions">dar-discussion</a>
 	mailing-list.
       </p>
-
-      <h2><a name="interactions">Feedback and Interactions</a></h2>
-
-      <dt class=void><a name="ask_for_support">Community</a></dt><dd>
-	<i>Dar</i> has a community quite active on the
-	<a href="https://lists.sourceforge.net/lists/listinfo/dar-support">dar-support mailing-list</a>
-	though it is not a substitute for trying finding your answers from the documentation first.
-      </dd>
-
-      <dt class=void><a name="stay_tuned">The</a> <a href="http://lists.sourceforge.net/lists/listinfo/dar-news">dar-news mailing-list</a></dt><dd>
-	is a read-only mailing-list that has a very low email volume (in
-	average, less than one email a month). Its purpose is to  informed about major events
-	like new releases or security issues
-      </dd>
-
-      <dt class=void><a name="reporting_a_bug">Bug?</a></dt><dd>
-	You thing you have hit a bug? If you are unsure, ask on the
-	<a href="https://lists.sourceforge.net/lists/listinfo/dar-support">dar-support mailing-list</a>
-	else open a bur report at the
-	<a href="http://sourceforge.net/tracker/?group_id=65612&amp;atid=511612">Bug Tracker</a>
-	(if one has not already been openned for the same problem).
-      </dd>
-
-      <dt class=void><a name="Submiting_a_patch">Contributing?</a></dt><dd>
-	You want to contribute? You can either:
-	<ul>
-	  <li>
-	    submit a path at the
-	    <a href="http://sourceforge.net/tracker/?group_id=65612&amp;atid=511614">Patch Tracker</a>
-	  </li>
-	  <li>
-	    or propose a pull-request on <a href="https://github.com/Edrusb/Dar">github</a>
-	  </li>
-	</ul>
-	In any case, thanks to respect the <a href=https://github.com/Edrusb/Dr/blob/master/CONTRIBUTUING.md>basic rule</a>
-	like coding style if possible document your code as described.
-      </dd>
-
-      <dt class=void><a name="Asking_for_a_new_feature">New feature</a></dt><dd>
-	You can ask for new feature (describing the use case is a plus)
-	at the
-	<a href="http://sourceforge.net/tracker/?group_id=65612&amp;atid=511615">New Feature tracker</a>
-      </dd>
     </div>
   </body>
 </html>

@@ -78,6 +78,8 @@
 	<a href="#delta">Why dar does not automatically perform delta difference (aka rsync increment)?</a><br/>
 	<a href="#cyrillic">Why do dar reports truncated filenames under Windows, especially with cyrillic filenames?</a><br/>
 	<a href="#win32">I have a 32 bits windows system, which binary package can I to use?</a><br/>
+	<a href="#windows_slash">Path slash and back-slash consideration under Windows</a><br/>
+	<a href="#windows_root">Under Windows, which directory corresponds to /</a><br/>
 	<a href="#lzop_vs_dar">lzo compression is slower with dar than with lzop, why?</a><br/>
 	<a href="#libthreadar">what is libthreadar and why libdar relies on it?</a><br/>
 	<a href="#sftppubkey">I have sftp pubkey authentication working with ssh/sftp, how to have dar using too this public key authentication for sftp?</a><br/>
@@ -2730,8 +2732,55 @@ be done using:
       if you enconter any problem building dar binary for windows, this FAQ will be updated accordingly.
     </p>
 
-    <a name="lzop_vs_dar"><b>lzo compression is slower with dar than with lzop, why?</b></a><br/>
+    <a name="windows_slash"><b>Path slash and back-slash consideration under Windows</b></a><br/>
+    <p>
+      The paths given to dar's arguments and options
+      must respect the UNIX way (use slashes "/" not back
+      slashes "\" as it ought to be under Windows)
+      thus for example you have to have to use <code>/temp</code>
+      in place of <code>\temp</code>
+    </p>
+    <p>
+      Moreover, drive letters cannot be used the usual way, like
+      <code><e>c:\</e>windows\system32</code>. Instead you will have to
+      give the following path <code><e>/cygdrive/c/</e>windows/system32</code>.
+      As you see the <code>/cygdrive</code> directory is a
+      virtual directory that has all the drives as children directories:
+    </p>
+    <p>
+      Here is a more global example:
+    </p>
+    <code class=block>
+      &nbsp;c:\dar_win-1.2.1\dar -c /cygdrive/f/tmp/toto -s 2G -z1 -R "/cygdrive/c/My Documents"
+      &nbsp;
+      &nbsp;  ^             ^         ^   ^                     ^
+      &nbsp;  |             |         |   |                     |
+      &nbsp;  ---------------         ---------------------------
+      &nbsp; here use anti-slash        but here we use slash
+      &nbsp; as usually under           in arguments given to dar
+      &nbsp; windows to point
+      &nbsp; the command
+    </code>
 
+    <a name="windows_root"><b>Under Windows, which directory corresponds to /</b></a><br/>
+    <p>
+      When running <i>dar</i> from a windows command-line (thus not from cygwin environement), dar's root directory
+      is the parent directory of the one holding the <i>dar.exe</i> file. This does not mean that you cannot have dar
+      backing up anything outside this directory (you can thanks to the <code>/cygdrive/...</code> path alias seen above),
+      but when dar looks for <code>darrc</code> it looks using this parent directory as the "/" root one.
+    </p>
+    <p>
+      Since release 2.6.14, the published dar packages for Windows are configured and built
+      in such a way that <i>dar.exe</i> uses the provided <code>darrc</code> file located in the <code>etc</code>
+      sub-directory. So <code>darrc</code> is now usable, out of the box.
+      However if you rename the directory where <i>dar.exe</i> is located, which name is something like
+      <code>dar64-x.y.z-win64</code>, the <i>dar.exe</i> binary will still look for a <code>darrc</code> at
+      <code>/dar64-x.y.z-win64/etc/darrc</code>, taking as root directory the parent directory
+      of the directory where it resides. You can still then explicitely rely on it by mean of a -B option
+      pointing to the modified path where the <code>darrc</code> is located.
+    </p>
+
+    <a name="lzop_vs_dar"><b>lzo compression is slower with dar than with lzop, why?</b></a><br/>
     <p>
       when using the "lzo" compression algorithm, <i>dar/libdar</i> always uses the algorithm
       <i>lzo1x_999</i> with the compression level requested
