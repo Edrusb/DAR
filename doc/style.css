@@ -43,7 +43,6 @@ div.top
     padding-top: 10px;
     padding-bottom: 40px;
     padding-left: 10px;
-    margin-bottom: 15px;
 }
 
 div.top img
@@ -53,13 +52,40 @@ div.top img
     max-height:120px;
 }
 
-/* floating menu */
 
+/* menuitem */
+
+div.menuitem
+{
+    border-radius: 14px 1px 14px 1px;
+    background: lightBlue;
+    padding: 2%;
+    margin-bottom: 3%;
+}
+
+div.menuitem code
+{
+    background: inherit;
+}
+
+/* menuitem active */
+
+div.menufloatleft div.active
+{
+    border-radius: 14px 1px 14px 1px;
+    background: LightYellow;
+    padding: 2%;
+    margin-bottom: 3%;
+}
+
+/* non floating menu box */
 
 div.menu
 {
     clear: both;
 }
+
+/* floating menu box */
 
 div.menufloatleft
 {
@@ -67,32 +93,39 @@ div.menufloatleft
     text-align: center;
     margin-right: 5px;
     margin-bottom: 5px;
-    background: inherit;
+    background: rgb(221,221,221);
 
     float: left;
     max-width: 20%;
     width:100%;
     position: -webkit-sticky;
     position: sticky;
-    top: 10%;
-    border-style: solid;
+    top: 0;
+    height: 110%;
+    border-style: none;
     border-width: 2px;
     border-color: Grey;
-    box-shadow: 5px 5px grey;
 }
 
-div.menuitem
+div.menufloatleft a
 {
-    border-radius: 14px 1px 14px 1px;
-    background: lightBlue;
-    padding: 2%;
-    margin-bottom: 1%;
+    font-style: normal;
+    text-decoration: none;
+    font-size: 1.25em;
 }
 
-div.menuitem code
+div.menufloatleft div:hover
 {
-    background: inherit;
+    background: White;
+    padding: 4%;
+    margin: 1%;
+   text-shadow: 3px 3px 2px Grey;
 }
+
+
+/*
+main section
+*/
 
 div.main
 {
