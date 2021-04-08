@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-# to contact the author : http://dar.linux.free.fr/email.html
+# to contact the author, see the AUTHOR file
 #######################################################################
 
 dist_noinst_DATA = make_cygwin_dist batch_cygwin batch_linux batch_linux_ea README batch_solaris Args/Makefile Args/args.c prepare_install finish_install dar_check failer init
