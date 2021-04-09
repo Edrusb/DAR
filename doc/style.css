@@ -112,6 +112,8 @@ div.menufloatleft a
     font-style: normal;
     text-decoration: none;
     font-size: 1.25em;
+    font-weight: bold;
+    color: #000055;
 }
 
 div.menufloatleft div:hover
