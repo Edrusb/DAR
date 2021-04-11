@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: DAR 2.6.0\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2021-03-28 17:57+0200\n"
+"POT-Creation-Date: 2021-04-11 22:43+0200\n"
 "PO-Revision-Date: 2021-03-28 17:59+0200\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
@@ -7064,7 +7064,8 @@ msgstr "OK, on garde %S comme nom de base"
 #: src/dar_suite/line_tools.cpp:1534
 #, c-format
 msgid "Auto detecting min-digits to be %i"
-msgstr "Détection automatique de %i chiffre(s) minimum(s) pour les numéros de tranche"
+msgstr ""
+"Détection automatique de %i chiffre(s) minimum(s) pour les numéros de tranche"
 
 #: src/dar_suite/line_tools.cpp:1676
 msgid "Error while fetching hostname: "
