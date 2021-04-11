@@ -107,7 +107,7 @@ namespace libdar
         parallel_tronconneuse(const parallel_tronconneuse & ref) = delete;
 
             /// move constructor
-        parallel_tronconneuse(parallel_tronconneuse && ref) noexcept = default;
+        parallel_tronconneuse(parallel_tronconneuse && ref) = default;
 
             /// assignment operator
         parallel_tronconneuse & operator = (const parallel_tronconneuse & ref) = delete;

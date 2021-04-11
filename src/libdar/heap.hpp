@@ -50,7 +50,7 @@ namespace libdar
     public:
 	heap() {}; // start with an empty heap
 	heap(const heap & ref) = delete;
-	heap(heap && ref) noexcept = default;
+	heap(heap && ref) = default;
 	heap & operator = (const heap & ref) = delete;
 	heap & operator = (heap && ref) noexcept = default;
 
