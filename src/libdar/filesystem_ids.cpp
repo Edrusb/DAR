@@ -139,8 +139,8 @@ namespace libdar
 	    string errmsg = tools_strerror_r(errno);
 
 	    throw Erange("filesystem_ids", tools_printf(gettext("Cannot read filesystem information at %S: %S"),
-						       path,
-						       errmsg));
+							&path,
+							&errmsg));
 	}
 
 	return buf.st_dev;
