@@ -94,6 +94,7 @@ install-data-local:
 	egrep 'LIBDAR|DAR_' $(DESTDIR)$(pkgincludedir)/libdar_config.h | grep -v "#undef" >  $(DESTDIR)$(pkgincludedir)/config.h.tmp
 	mv  $(DESTDIR)$(pkgincludedir)/config.h.tmp  $(DESTDIR)$(pkgincludedir)/libdar_config.h
 	chmod 0644 $(DESTDIR)$(pkgincludedir)/*
+	chmod 0755 $(DESTDIR)$(pkgincludedir)
 	$(INSTALL) -d $(DESTDIR)$(pkgconfigdir)
 	$(INSTALL) -m 0644 libdar.pc $(DESTDIR)$(pkgconfigdir)/libdar$(LIBDAR_SUFFIX).pc
 
