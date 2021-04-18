@@ -42,7 +42,7 @@ div.top img
     float:left;
 }
 
-div.top h1
+div.top h1, div.top div.h1
 {
     flex-grow: 2;
 }
