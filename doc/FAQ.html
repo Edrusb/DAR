@@ -22,7 +22,7 @@
       </div>
     </div>
 
-    <div class=menu>
+    <div class=menutop>
       <div class=menuitem>
 	<a href="#A1">
 	  I restore/save all files but dar reported some files have been ignored,
@@ -90,108 +90,109 @@
       </div>
     </div>
 
-    <h2>Answers:</h2>
-    <a name="A1"><b>I restore/save all files but dar reported some files have been ignored, what are those ignored files?</b></a><br/>
-    <p>
-      When restoring/saving, all files are considered by default. But if you specify some files to restore or
-      save, all other files are "ignored", this is the case when using -P -X
-      -I, -g -[ or -] options
-    </p>
+    <div class=main>
+      <h2>Answers:</h2>
+      <a name="A1"><b>I restore/save all files but dar reported some files have been ignored, what are those ignored files?</b></a><br/>
+      <p>
+	When restoring/saving, all files are considered by default. But if you specify some files to restore or
+	save, all other files are "ignored", this is the case when using -P -X
+	-I, -g -[ or -] options
+      </p>
 
-    <a name="A2" id="A2"><b>Dar hangs when using it with pipes, why?</b></a><br/>
-    <p>
-      Dar can produce backups on its
-      standard output, if you give '-' as
-      basename. But it cannot read a backup from its standard input in
-      direct access mode. To
-      feed a backup to dar through pipes, you either need <code>dar_slave</code> and two pipes
-      or use the sequential mode (<code>--sequential-mode</code> option, which gives
-      slow restoration of a few files compared to the (default) direct access mode).
-      To use dar with dar_slave over pipes in direct access mode (which is
-      the&nbsp; more efficient way to proceed), see the <a href="usage_notes.html#dar_remote">detailed notes</a> or more
-      precisely <a href="usage_notes.html#netcat_ssh">dar and ssh note</a>.
-    </p>
+      <a name="A2" id="A2"><b>Dar hangs when using it with pipes, why?</b></a><br/>
+      <p>
+	Dar can produce backups on its
+	standard output, if you give '-' as
+	basename. But it cannot read a backup from its standard input in
+	direct access mode. To
+	feed a backup to dar through pipes, you either need <code>dar_slave</code> and two pipes
+	or use the sequential mode (<code>--sequential-mode</code> option, which gives
+	slow restoration of a few files compared to the (default) direct access mode).
+	To use dar with dar_slave over pipes in direct access mode (which is
+	the&nbsp; more efficient way to proceed), see the <a href="usage_notes.html#dar_remote">detailed notes</a> or more
+	precisely <a href="usage_notes.html#netcat_ssh">dar and ssh note</a>.
+      </p>
 
-    <a name="A3" id="A3"><b>Why, when I restore 1 file, dar report 3 files have been restored?</b></a><br/>
-    <p>
-      if you restore for example the file usr/bin/emacs dar will first
-      restore usr (if the directory already exists, it will get its date and
-      ownership restored, all existing files in that directory will however stay
-      preserved), then
-      /usr/bin will be restored, and last usr/bin/emacs will be restored.
-      Thus 3 inodes have been
-      restored or modified while only one file has been asked for restoration.
-    </p>
-    <a name="libattr"><b>While compiling dar I get the following message: <code>g++: /lib/libattr.a: No such file or directory</code>, what can I do?</b></a><br/>
-    <p>
-      The problem comes from an
-      incoherence in your distro (Redhat and Slackware seem(ed) concerned at
-      least): Dar (Libtool) finds
-      <code>/usr/lib/gcc-lib/i386-redhat-linux/3.3.3/../../../libattr.la</code>
-      file to link with. This file defines where is located libattr static and
-      dynamic libraries but in this file both static and dynamic libraries
-      are expected to be found under /lib. While the dynamic libattr is
-      there, the static version has been moved to /usr/lib. A
-      workaround is to make a symbolic link:
-    </p>
-    <code class=block>
-      ln -s /usr/lib/libattr.a /lib/libattr.a
-    </code>
-    <br/>
+      <a name="A3" id="A3"><b>Why, when I restore 1 file, dar report 3 files have been restored?</b></a><br/>
+      <p>
+	if you restore for example the file usr/bin/emacs dar will first
+	restore usr (if the directory already exists, it will get its date and
+	ownership restored, all existing files in that directory will however stay
+	preserved), then
+	/usr/bin will be restored, and last usr/bin/emacs will be restored.
+	Thus 3 inodes have been
+	restored or modified while only one file has been asked for restoration.
+      </p>
+      <a name="libattr"><b>While compiling dar I get the following message: <code>g++: /lib/libattr.a: No such file or directory</code>, what can I do?</b></a><br/>
+      <p>
+	The problem comes from an
+	incoherence in your distro (Redhat and Slackware seem(ed) concerned at
+	least): Dar (Libtool) finds
+	<code>/usr/lib/gcc-lib/i386-redhat-linux/3.3.3/../../../libattr.la</code>
+	file to link with. This file defines where is located libattr static and
+	dynamic libraries but in this file both static and dynamic libraries
+	are expected to be found under /lib. While the dynamic libattr is
+	there, the static version has been moved to /usr/lib. A
+	workaround is to make a symbolic link:
+      </p>
+      <code class=block>
+	ln -s /usr/lib/libattr.a /lib/libattr.a
+      </code>
+      <br/>
 
-    <a name="A4" id="A4"><b>I cannot find the binary package for my distro, where to look for?</b></a><br/>
-    <p>
-      For any
-      binary package, ask
-      your distro maintainer to include dar (if
-      not already done), and check on the web site of your preferred distro
-      for a dar package
-    </p>
+      <a name="A4" id="A4"><b>I cannot find the binary package for my distro, where to look for?</b></a><br/>
+      <p>
+	For any
+	binary package, ask
+	your distro maintainer to include dar (if
+	not already done), and check on the web site of your preferred distro
+	for a dar package
+      </p>
 
-    <a name="A6" id="A6"><b>Can I use different filters between a full backup and a
-      differential backup? Would not dar consider some file not included in
-	the filter to be deleted?</b></a><br/>
-    <p>
-      Yes, you
-      can. No, there is no
-      risk to have dar deleting the files that
-      were not selected for the differential backup. Here is the way dar
-      works:
-    </p>
+      <a name="A6" id="A6"><b>Can I use different filters between a full backup and a
+	  differential backup? Would not dar consider some file not included in
+	  the filter to be deleted?</b></a><br/>
+      <p>
+	Yes, you
+	can. No, there is no
+	risk to have dar deleting the files that
+	were not selected for the differential backup. Here is the way dar
+	works:
+      </p>
 
-    <p>During a
-      backup process, when a
-      file is ignored due to filter
-      exclusion, an "ignored" entry is added to the catalogue. At the
-      end of the backup, dar compares both catalogues, the one of reference
-      and the new one built during the backup process, and adds a "detruit" entry
-      (which means "destroyed" in French), when an entry of the reference is not
-      present in the new catalogue. Thus, if an "ignored" is present no
-      "detruit" will be added for that name. Then all "ignored" entries are
-      removed and the catalogue is written at the end of the backup or archive.
-    </p>
+      <p>During a
+	backup process, when a
+	file is ignored due to filter
+	exclusion, an "ignored" entry is added to the catalogue. At the
+	end of the backup, dar compares both catalogues, the one of reference
+	and the new one built during the backup process, and adds a "detruit" entry
+	(which means "destroyed" in French), when an entry of the reference is not
+	present in the new catalogue. Thus, if an "ignored" is present no
+	"detruit" will be added for that name. Then all "ignored" entries are
+	removed and the catalogue is written at the end of the backup or archive.
+      </p>
 
-    <a name="A7" id="A7"><b>Once in action, dar makes all the system slower and slower, then it stops with the message
-	"killed"! How to overcome this problem?</b></a><br/>
-    <p>
-      Dar needs
-      virtual memory to
-      work. Virtual memory is the RAM + SWAP
-      space. Dar memory requirement grows with the amount of file saved, not
-      with the amount of data saved. If you have a few huge files you will
-      have little chance to see any memory limitation problem. At the
-      opposite, saving a plethora of files (either big or small), will make
-      dar request an increasing amount of virtual memory. Dar needs this memory to build the
-      <i>catalogue</i> (the contents) of the backup it creates. Same thing, for
-      differential backup, except it also needs to load in memory the
-      <i>catalogue</i> of the backup of reference, which most of the time will make
-      dar using twice more memory when doing a differential backup than a
-      full backup.
-    <p/>
-    <p>
-      Anyway, the
-      solution is:
-    </p>
+      <a name="A7" id="A7"><b>Once in action, dar makes all the system slower and slower, then it stops with the message
+	  "killed"! How to overcome this problem?</b></a><br/>
+      <p>
+	Dar needs
+	virtual memory to
+	work. Virtual memory is the RAM + SWAP
+	space. Dar memory requirement grows with the amount of file saved, not
+	with the amount of data saved. If you have a few huge files you will
+	have little chance to see any memory limitation problem. At the
+	opposite, saving a plethora of files (either big or small), will make
+	dar request an increasing amount of virtual memory. Dar needs this memory to build the
+	<i>catalogue</i> (the contents) of the backup it creates. Same thing, for
+	differential backup, except it also needs to load in memory the
+	<i>catalogue</i> of the backup of reference, which most of the time will make
+	dar using twice more memory when doing a differential backup than a
+	full backup.
+      <p/>
+      <p>
+	Anyway, the
+	solution is:
+      </p>
       <ol>
         <li>Read the <a href="Limitations.html">limitatons file</a> to
 	  understand the problem and
@@ -216,61 +217,61 @@
 	  <a href="https://lists.sourceforge.net/lists/listinfo/dar-support">dar-support mailing-list</a>.
 	</li>
       </ol>
-    <p>
-      Last, there is always the workaround to make several smaller backups
-      of the files to save. For example, making a backup for all that is in
-      /usr/local, another one for all that is in /var and so on. These backup can be full
-      or differential. The drawback is not big as you can store these
-      backups side by side and use them at will. Moreover, you can feed a
-      unique dar_manager database with all these different backups
-      which will hide you the fact that there are several full and
-      several differential backups concerning different set of files.
-    </p>
-
-    <a name="A8" id="A8"><b>I have a backup I want to change the size of slices?</b></a><br/>
-    <p>
-      <code>dar_xform</code> is your friend!
-    </p>
-    <code class=block>
-      dar_xform -s &lt;size&gt; original_backup new_backup
-    </code>
-
-    <p><code>dar_xform</code>
-      will create a new backup file with the slices of the requested
-      size, (you can also make use of -S option for the first slice). Note
-      that you don't need to decrypt the backup, not dar will uncompress it,
-      this is thus a very fast processing. See <a href="man/index.html">dar_xform
-	man page</a> for more.
+      <p>
+	Last, there is always the workaround to make several smaller backups
+	of the files to save. For example, making a backup for all that is in
+	/usr/local, another one for all that is in /var and so on. These backup can be full
+	or differential. The drawback is not big as you can store these
+	backups side by side and use them at will. Moreover, you can feed a
+	unique dar_manager database with all these different backups
+	which will hide you the fact that there are several full and
+	several differential backups concerning different set of files.
       </p>
 
-    <a name="A9" id="A9"><b>I have a backup in one slice, how can I split it in several slices?</b></a><br/>
-    <p>
-      <code>dar_xform</code> is your friend!
-    </p>
-    <p>
-      see just above.
-    </p>
-
-    <a name="A10" id="A10"><b>I have a backup in several slice, how can I stick all them in a single file?</b></a><br/>
-    <p>
-      <code>dar_xform</code> is your friend!
+      <a name="A8" id="A8"><b>I have a backup I want to change the size of slices?</b></a><br/>
+      <p>
+	<code>dar_xform</code> is your friend!
       </p>
-    <code class=block>
-      dar_xform original_backup new_backup
-    </code>
-    <p>
-      dar_xform without <code>-s</code> option creates a single sliced backup.
-      See <a href="man/index.html">dar_xform man page</a> for more.
-    </p>
+      <code class=block>
+	dar_xform -s &lt;size&gt; original_backup new_backup
+      </code>
 
-    <a name="A11" id="A11"><b>I have a backup, how can I change its encryption scheme?</b></a><br/>
-    <p>
-      The merging feature let you do
-      that. The merging has two roles, putting
-      in one backup the contents of two different backups, and at the same time
-      filtering out some files you decided not to include into the resulting
-      backup. The merging feature can take two but also only one backup as
-      input. This is what we will use and without any filter to keep all saved files.
+      <p><code>dar_xform</code>
+	will create a new backup file with the slices of the requested
+	size, (you can also make use of -S option for the first slice). Note
+	that you don't need to decrypt the backup, not dar will uncompress it,
+	this is thus a very fast processing. See <a href="man/index.html">dar_xform
+	  man page</a> for more.
+      </p>
+
+      <a name="A9" id="A9"><b>I have a backup in one slice, how can I split it in several slices?</b></a><br/>
+      <p>
+	<code>dar_xform</code> is your friend!
+      </p>
+      <p>
+	see just above.
+      </p>
+
+      <a name="A10" id="A10"><b>I have a backup in several slice, how can I stick all them in a single file?</b></a><br/>
+      <p>
+	<code>dar_xform</code> is your friend!
+      </p>
+      <code class=block>
+	dar_xform original_backup new_backup
+      </code>
+      <p>
+	dar_xform without <code>-s</code> option creates a single sliced backup.
+	See <a href="man/index.html">dar_xform man page</a> for more.
+      </p>
+
+      <a name="A11" id="A11"><b>I have a backup, how can I change its encryption scheme?</b></a><br/>
+      <p>
+	The merging feature let you do
+	that. The merging has two roles, putting
+	in one backup the contents of two different backups, and at the same time
+	filtering out some files you decided not to include into the resulting
+	backup. The merging feature can take two but also only one backup as
+	input. This is what we will use and without any filter to keep all saved files.
       <p>
 	<ul>
           <li>a single input (our original backup)</li>
@@ -278,1566 +279,1566 @@
           <li>
 	    keeping files compressed (no decompression/re compression) to
 	    speed up the process (<code>-ak</code> option)
-        </li>
-      </ul>
+          </li>
+	</ul>
 	<code class=block>
 	  dar -+ new_backup -A original_backup -K "&lt;new_algo&gt;:new pass" -ak
 	</code>
-	<p>
-	  If you don't want to have password in
-	  clear on the command line (command that can be seen for example with <i>top</i>
-	  or <i>ps</i> by other users), simply provide
-	  <code>"&lt;algo&gt;:"</code> then dar will ask you on the fly for the password. If using
-	  blowfish you can then just provide <code>":"</code>
-	  for the keys. Note that before release 2.5.0, -J option was needed to provide
-	  the password of the source backup. Since then, without -J option, dar will ask interactively
-	  for the password of the backup to read. You can still use -J
-	  option to provide the password from a DCF file and this way avoid dar interactively asking for it.
+      <p>
+	If you don't want to have password in
+	clear on the command line (command that can be seen for example with <i>top</i>
+	or <i>ps</i> by other users), simply provide
+	<code>"&lt;algo&gt;:"</code> then dar will ask you on the fly for the password. If using
+	blowfish you can then just provide <code>":"</code>
+	for the keys. Note that before release 2.5.0, -J option was needed to provide
+	the password of the source backup. Since then, without -J option, dar will ask interactively
+	for the password of the backup to read. You can still use -J
+	option to provide the password from a DCF file and this way avoid dar interactively asking for it.
       </p>
-    <p>
-      Note that you can also change slicing of the backup at the same time
-      thanks to -s and -S options:
-    </p>
-    <code class=block>
-      dar -+ new_backup -A original_backup -K ":" -ak -s 1G
-    </code>
-    <br/>
-
-    <a name="A12" id="A12"><b>I have a backup, how can I change its compression algorithm?</b></a><br/>
-    <p>
-      Same thing as above: we will use the merging feature:
-    </p>
-
-    <p>
-      to use bzip2 compression:
-    </p>
-    <code class=block>
-      dar -+ new_backup -A original_backup -zbzip2
-    </code>
-
-    <p>
-      to use gzip compression
-    </p>
-    <code class=block>
-      dar -+ new_backup -A original_backup -zgzip
-    </code>
-
-    <p>
-      to use lzo compression, use <code>-zlzo</code>, for LZ4 use
-      <code>-zlz4</code>, for zstd use <code>-lzstd</code> and so on.
-    </p>
-    <p>
-      To use no compression at all, do no add any -z option or exclude all files from compression (<code>-Z "*"</code>):
-    </p>
-    <code class=block>
-      dar -+ new_backup -A original_backup
-    </code>
-    <br/>
-
-    <p>
-      Note that you can also change encryption scheme and slicing at the same
-      time you change compression:
-    </p>
-
-    <code class=block>
-      dar -+ new_backup -A original_backup -zbzip2 -K ":" -J ":" -s 1G
-    </code>
-    <br/>
-
-    <a name="A13"><b>Which options can I use with which options?</b></a><br/>
-
-    <p>
-      DAR provides seven commands:
-    </p>
-    <dl>
-      <dd><code>-c</code> to create a new backup</dd>
-      <dd><code>-x</code> to extract files from a given backup</dd>
-      <dd><code>-l</code> to list the contents of a given backup</dd>
-      <dd><code>-d</code> to compare the contents of a backup with filesystem</dd>
-      <dd><code>-t</code> to test the internal coherence of a given backup</dd>
-      <dd><code>-C</code> to isolate a backup (extract its contents to a usually small file) or make a snapshot of the current filesystem</dd>
-      <dd><code>-+</code> to merge two backups in one or create a sub
-	backup from one or two other ones</dd>
-      <dd><code>-y</code> to repair a backup</dd>
-    </dl>
-    <p>
-      For each command listed above, here follows the available options (those marked OK):
-    </p>
-    <div class=table>
-      <table class=center>
-	<tr>
-	  <th>short option</th>
-	  <th>long option</th>
-	  <th>-c</th>
-	  <th>-x</th>
-	  <th>-l</th>
-	  <th>-d</th>
-	  <th>-t</th>
-	  <th>-C</th>
-	  <th>-+</th>
-	  <th>-y</th>
-	</tr>
-
-	<tr>
-	  <td>-v</td>
-	  <td>--verbose</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	</tr>
-
-	<tr>
-	  <td>-vs</td>
-	  <td>--verbose=s</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	</tr>
-
-	<tr>
-	  <td>-b</td>
-	  <td>--beep</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	</tr>
-
-	<tr>
-	  <td>-n</td>
-	  <td>--no-overwrite</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	</tr>
-
-	<tr>
-	  <td>-w</td>
-	  <td>--no-warn</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	</tr>
-
-	<tr>
-	  <td>-wa</td>
-	  <td>--no-warn=all</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-A</td>
-	  <td>--ref</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	</tr>
-
-	<tr>
-	  <td>-R</td>
-	  <td>--fs-root</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-X</td>
-	  <td>--exclude</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-I</td>
-	  <td>--include</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-P</td>
-	  <td>--prune</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-g</td>
-	  <td>--go-into</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-]</td>
-	  <td>--exclude-from-file</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-[</td>
-	  <td>--include-from-file</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-u</td>
-	  <td>--exclude-ea</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-U</td>
-	  <td>--include-ea</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-i</td>
-	  <td>--input</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-o</td>
-	  <td>--output</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-O</td>
-	  <td>--comparison-field</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-H</td>
-	  <td>--hour</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-E</td>
-	  <td>--execute</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	</tr>
-
-	<tr>
-	  <td>-F</td>
-	  <td>--ref-execute</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	</tr>
-
-	<tr>
-	  <td>-K</td>
-	  <td>--key</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	</tr>
-
-	<tr>
-	  <td>-J</td>
-	  <td>--ref-key</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	</tr>
-
-	<tr>
-	  <td>-#</td>
-	  <td>--crypto-block</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	</tr>
-
-	<tr>
-	  <td>-*</td>
-	  <td>--ref-crypto-block</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	</tr>
-
-	<tr>
-	  <td>-B</td>
-	  <td>--batch</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	</tr>
-
-	<tr>
-	  <td>-N</td>
-	  <td>--noconf</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	</tr>
-
-	<tr>
-	  <td>-e</td>
-	  <td>--empty</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	</tr>
-
-	<tr>
-	  <td>-aSI</td>
-	  <td>--alter=SI</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	</tr>
-
-	<tr>
-	  <td>-abinary</td>
-	  <td>--alter=binary</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	</tr>
-
-	<tr>
-	  <td>-Q</td>
-	  <td></td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	</tr>
-
-	<tr>
-	  <td>-aa</td>
-	  <td>--alter=atime</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-ac</td>
-	  <td>--alter=ctime</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-am</td>
-	  <td>--alter=mask</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-an</td>
-	  <td>--alter=no-case</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-acase</td>
-	  <td>--alter=case</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-ar</td>
-	  <td>--alter=regex</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-ag</td>
-	  <td>--alter=glob</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-z</td>
-	  <td>--compression</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-s</td>
-	  <td>--slice</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	</tr>
-
-	<tr>
-	  <td>-S</td>
-	  <td>--first-slice</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	</tr>
-
-	<tr>
-	  <td>-p</td>
-	  <td>--pause</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	</tr>
-
-	<tr>
-	  <td>-@</td>
-	  <td>--aux</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-$</td>
-	  <td>--aux-key</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-~</td>
-	  <td>--aux-execute</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-%</td>
-	  <td>--aux-crypto-block</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-D</td>
-	  <td>--empty-dir</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-Z</td>
-	  <td>--exclude-compression</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-Y</td>
-	  <td>--include-compression</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-m</td>
-	  <td>--mincompr</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-ak</td>
-	  <td>--alter=keep-compressed</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-af</td>
-	  <td>--alter=fixed-date</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td></td>
-	  <td>--nodump</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-M</td>
-	  <td>--no-mount-points</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-,</td>
-	  <td>--cache-directory-tagging</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-k</td>
-	  <td>--deleted</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-r</td>
-	  <td>--recent</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-f</td>
-	  <td>--flat</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-ae</td>
-	  <td>--alter=erase_ea</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-T</td>
-	  <td>--list-format</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-as</td>
-	  <td>--alter=saved</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-ad</td>
-	  <td>--alter=decremental</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-q</td>
-	  <td>--quiet</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	</tr>
-
-	<tr>
-	  <td>-/</td>
-	  <td>--overwriting-policy</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-&lt;</td>
-	  <td>--backup-hook-include</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-&gt;</td>
-	  <td>--backup-hook-exclude</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-=</td>
-	  <td>--backup-hook-execute</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-ai</td>
-	  <td>--alter=ignore-unknown-inode-type</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-at</td>
-	  <td>--alter=tape-marks</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-0</td>
-	  <td>--sequential-read</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-;</td>
-	  <td>--min-digits</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	</tr>
-
-	<tr>
-	  <td>-1</td>
-	  <td>--sparse-file-min-size</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-ah</td>
-	  <td>--alter=hole-recheck</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-^</td>
-	  <td>--slice-mode</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	</tr>
-
-	<tr>
-	  <td>-_</td>
-	  <td>--retry-on-change</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-asecu</td>
-	  <td>--alter=secu</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-.</td>
-	  <td>--user-comment</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-3</td>
-	  <td>--hash</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	</tr>
-
-	<tr>
-	  <td>-2</td>
-	  <td>--dirty-behavior</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-al</td>
-	  <td>--alter=lax</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	</tr>
-
-	<tr>
-	  <td>-alist-ea</td>
-	  <td>--alter=list-ea</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-4</td>
-	  <td>--fsa-scope</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-5</td>
-	  <td>--exclude-by-ra</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-7</td>
-	  <td>--sign</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	</tr>
-
-	<tr>
-	  <td>-'</td>
-	  <td>--modified-data-detection</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-{</td>
-	  <td>--include-delta-sig</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-}</td>
-	  <td>--exclude-delta-sig</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-8</td>
-	  <td>--delta</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-6</td>
-	  <td>--delta-sig-min-size</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-az</td>
-	  <td>--alter=zeroing-negative-dates</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-\</td>
-	  <td>--ignored-as-symlink</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-T</td>
-	  <td>--kdf-param</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>--aduc</td>
-	  <td>--alter=duc</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	</tr>
-
-	<tr>
-	  <td>-G</td>
-	  <td>--multi-thread</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	</tr>
-
-	<tr>
-	  <td>-j</td>
-	  <td>--network-retry-delay</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-afile-auth</td>
-	  <td>--alter=file-authentication</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-ab</td>
-	  <td>--alter=blind-to-signatures</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>OK</td>
-	  <td>--</td>
-	</tr>
-
-	<tr>
-	  <td>-aheader</td>
-	  <td>--alter=header</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>OK</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	  <td>--</td>
-	</tr>
-      </table>
-    </div>
-    <br/>
-
-    <a name="A14"><b><span>Why dar reports corruption of the backup I have transfered with FTP?</b></a><br/>
-    <p>
-      Dar backups
-      are binary files,
-      they must be transfered in
-      binary mode
-      when using FTP. This is done in the following way for the ftp
-      command-line client :
-    </p>
-    <code class=block>
-      ftp &lt;somewhere&gt;
-      &lt;login&gt;
-      &lt;password&gt;
-      <e>bin</e>
-      put &lt;file&gt;
-      get &lt;file&gt;
-      bye
-    </code>
-
-    <p>
-      If you transfer a backup (or
-      any other binary file) in ascii mode (the opposite of binary mode), the
-      8th bit of each byte will be lost and the backup will become
-      impossible to recover (due to the destruction of this information). Be
-      very careful to test your backup after transferring back to you host
-      to be sure you can delete the original file.
-    </p>
-
-
-    <a name="UIDGID"><b> Why DAR does save UID/GID
-	instead of plain usernames and usergroups?</b></a><br/>
-    <p>In each file property is
-      not present the name of the owner nor the name of the group owner, but
-      instead are present two numbers, the user ID and the group ID (UID
-      &amp; GID in short). The /etc/password file associates to these numbers
-      a names and some other properties (like the login shell, the
-      home directory, the password, see also /etc/shadow).
-      Thus, when you do a directory list (with the 'ls' command for example
-      or with any GUI program for another example), the listing application
-      used
-      does open each directory, there it finds a list of name and a inode
-      number associated, then the listing program fetchs the inode attributes
-      for each file and looks among other information for the UID and the
-      GID. To be able
-      to display the real user name and group name, the listing application
-      use a well-defined standard C library call that will do the lookup in
-      /etc/password, eventually NIS system if configured and any other
-      additional
-      system, [this way applications have not to bother with the many system
-      configuration possible, the same API interface is used whatever is the
-      system], then lookup returns the name if it exist and the listing
-      application displays for each
-      file found in a directory the attributes and the user name and group
-      name as returned by the system instead of the UID and GID.
-    </p>
-    <p>
-      As you can see, the user name and
-      group name are not part of any file attribute, but UID and GID *are*
-      instead. Dar is a backup tool mainly, it does preserve as much as
-      possible the file properties to be able to restore them as close as
-      possible
-      to their original state. Thus a file saved with UID=3 will be restored
-      with UID=3. The name corresponding the UID 3 may exist or not,&nbsp;
-      may exist and be the same or may exist and be different, the file will
-      be anyway restored in UID 3.
-    </p>
-
-    <p><u>Scenario with dar's way of restoring</u></p>
-
-    <p>
-      Thus, when doing backup and
-      restoration of a crashed system you can be confident, the restoration
-      will not interfere with the bootable system you have used to launch dar
-      to restore your disk. Assuming you have UID 1 labeled <i>'bin'</i> in your
-      real crashed system, but this UID 1 is labeled <i>'admin'</i> in the boot
-      system, while UID 2 is labeled <i>'bin'</i>
-      in this boot system, files owned
-      by <i>bin</i> in the system to
-      restore will be restored under UID 1, not UID 2
-      which is used by the temporary boot system. At that time after
-      restoration still running the from the boot system, if you do a 'ls'
-      you will see that the original files
-      owned by <i>'bin'</i> are now owned
-      by user <i>'admin'.</i>
-    </p>
-
-    <p>
-      This is really a mirage: in your restoration you will also restore the <i>/etc/password</i>
-      file and other system configuration files (like NIS configuration files if they have
-      been used), then at reboot time on the newly restored real system, the UID 1 will
-      be backed associated to user <i>'bin'</i>
-      as expected and files originally owned by user <i>bin</i> will now been listed as owned
-      by <i>bin</i> as expected.
-    </p>
-
-    <p><u>Scenario with plain name way of restoring</u></p>
-
-    <p>
-      If dar had done else, restoring
-      the files owned by <i>'bin'</i> to
-      the UID corresponding to <i>'bin',</i>
-      these files would have been given UID 2 (the one used by the temporary
-      bootable system used to launch dar). But once the real restored system
-      would have been launched, this UID 2 would have become some other user and
-      not <i>'bin'</i> which is mapped to
-      UID 1 in the restored <i>/etc/password.</i>
-    </p>
-
-    <p>
-      Now, if you want to change some
-      UID/GID when moving a set of files from
-      one live system to another system, there is no problem if you are <i>not</i>
-      restoring dar under the <i>'root'</i>
-      account. Other account than <i>'root'</i> are
-      usually not allowed to modify UID/GID, thus restored files by dar will
-      have group and user ownership of the dar process, which is the one that
-      has launched dar.
-    </p>
-
-    <p>
-      But if you really need to move a
-      directory tree containing a set of files with different ownership and
-      you want to preserve these different ownership from one live system to
-      another, while the corresponding UID/GID do not match between the two
-      system, dar can still help you:
-    </p>
-
-    <ul>
-      <li>Save your directory tree on the source live system</li>
-      <li>
-	From the root account in the destination live system do the
-	following:
-      </li>
-      <li>restore the backup content in a empty directory</li>
-      <li>
-	change the UID of files according to the one used by the
-	destination filesystem with the command:
-	    <code class=block>
-	      find /path/to/restored/backup -uid &lt;old UID&gt; -print -exec chown &lt;new name&gt; {} \;
-	      find /path/to/restored/backup -gid &lt;old GID&gt; -print -exec chgrp &lt;new name&gt; {} \;
-	    </code>
-	    The first command will let you
-	    remap an UID to another for all files
-	    under the /path/to/restored/backup directory<br/>
-	    The second command will let you remap a GID to another for all files
-	    under the /path/to/restored/backup directory
-      </li>
-    </ul>
+      <p>
+	Note that you can also change slicing of the backup at the same time
+	thanks to -s and -S options:
+      </p>
+      <code class=block>
+	dar -+ new_backup -A original_backup -K ":" -ak -s 1G
+      </code>
+      <br/>
+
+      <a name="A12" id="A12"><b>I have a backup, how can I change its compression algorithm?</b></a><br/>
+      <p>
+	Same thing as above: we will use the merging feature:
+      </p>
+
+      <p>
+	to use bzip2 compression:
+      </p>
+      <code class=block>
+	dar -+ new_backup -A original_backup -zbzip2
+      </code>
+
+      <p>
+	to use gzip compression
+      </p>
+      <code class=block>
+	dar -+ new_backup -A original_backup -zgzip
+      </code>
+
+      <p>
+	to use lzo compression, use <code>-zlzo</code>, for LZ4 use
+	<code>-zlz4</code>, for zstd use <code>-lzstd</code> and so on.
+      </p>
+      <p>
+	To use no compression at all, do no add any -z option or exclude all files from compression (<code>-Z "*"</code>):
+      </p>
+      <code class=block>
+	dar -+ new_backup -A original_backup
+      </code>
+      <br/>
+
+      <p>
+	Note that you can also change encryption scheme and slicing at the same
+	time you change compression:
+      </p>
+
+      <code class=block>
+	dar -+ new_backup -A original_backup -zbzip2 -K ":" -J ":" -s 1G
+      </code>
+      <br/>
+
+      <a name="A13"><b>Which options can I use with which options?</b></a><br/>
+
+      <p>
+	DAR provides seven commands:
+      </p>
+      <dl>
+	<dd><code>-c</code> to create a new backup</dd>
+	<dd><code>-x</code> to extract files from a given backup</dd>
+	<dd><code>-l</code> to list the contents of a given backup</dd>
+	<dd><code>-d</code> to compare the contents of a backup with filesystem</dd>
+	<dd><code>-t</code> to test the internal coherence of a given backup</dd>
+	<dd><code>-C</code> to isolate a backup (extract its contents to a usually small file) or make a snapshot of the current filesystem</dd>
+	<dd><code>-+</code> to merge two backups in one or create a sub
+	  backup from one or two other ones</dd>
+	<dd><code>-y</code> to repair a backup</dd>
+      </dl>
+      <p>
+	For each command listed above, here follows the available options (those marked OK):
+      </p>
+      <div class=table>
+	<table class=center>
+	  <tr>
+	    <th>short option</th>
+	    <th>long option</th>
+	    <th>-c</th>
+	    <th>-x</th>
+	    <th>-l</th>
+	    <th>-d</th>
+	    <th>-t</th>
+	    <th>-C</th>
+	    <th>-+</th>
+	    <th>-y</th>
+	  </tr>
+
+	  <tr>
+	    <td>-v</td>
+	    <td>--verbose</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	  </tr>
+
+	  <tr>
+	    <td>-vs</td>
+	    <td>--verbose=s</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	  </tr>
+
+	  <tr>
+	    <td>-b</td>
+	    <td>--beep</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	  </tr>
+
+	  <tr>
+	    <td>-n</td>
+	    <td>--no-overwrite</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	  </tr>
+
+	  <tr>
+	    <td>-w</td>
+	    <td>--no-warn</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	  </tr>
+
+	  <tr>
+	    <td>-wa</td>
+	    <td>--no-warn=all</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-A</td>
+	    <td>--ref</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	  </tr>
+
+	  <tr>
+	    <td>-R</td>
+	    <td>--fs-root</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-X</td>
+	    <td>--exclude</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-I</td>
+	    <td>--include</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-P</td>
+	    <td>--prune</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-g</td>
+	    <td>--go-into</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-]</td>
+	    <td>--exclude-from-file</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-[</td>
+	    <td>--include-from-file</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-u</td>
+	    <td>--exclude-ea</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-U</td>
+	    <td>--include-ea</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-i</td>
+	    <td>--input</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-o</td>
+	    <td>--output</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-O</td>
+	    <td>--comparison-field</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-H</td>
+	    <td>--hour</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-E</td>
+	    <td>--execute</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	  </tr>
+
+	  <tr>
+	    <td>-F</td>
+	    <td>--ref-execute</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	  </tr>
+
+	  <tr>
+	    <td>-K</td>
+	    <td>--key</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	  </tr>
+
+	  <tr>
+	    <td>-J</td>
+	    <td>--ref-key</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	  </tr>
+
+	  <tr>
+	    <td>-#</td>
+	    <td>--crypto-block</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	  </tr>
+
+	  <tr>
+	    <td>-*</td>
+	    <td>--ref-crypto-block</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	  </tr>
+
+	  <tr>
+	    <td>-B</td>
+	    <td>--batch</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	  </tr>
+
+	  <tr>
+	    <td>-N</td>
+	    <td>--noconf</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	  </tr>
+
+	  <tr>
+	    <td>-e</td>
+	    <td>--empty</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	  </tr>
+
+	  <tr>
+	    <td>-aSI</td>
+	    <td>--alter=SI</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	  </tr>
+
+	  <tr>
+	    <td>-abinary</td>
+	    <td>--alter=binary</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	  </tr>
+
+	  <tr>
+	    <td>-Q</td>
+	    <td></td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	  </tr>
+
+	  <tr>
+	    <td>-aa</td>
+	    <td>--alter=atime</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-ac</td>
+	    <td>--alter=ctime</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-am</td>
+	    <td>--alter=mask</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-an</td>
+	    <td>--alter=no-case</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-acase</td>
+	    <td>--alter=case</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-ar</td>
+	    <td>--alter=regex</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-ag</td>
+	    <td>--alter=glob</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-z</td>
+	    <td>--compression</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-s</td>
+	    <td>--slice</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	  </tr>
+
+	  <tr>
+	    <td>-S</td>
+	    <td>--first-slice</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	  </tr>
+
+	  <tr>
+	    <td>-p</td>
+	    <td>--pause</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	  </tr>
+
+	  <tr>
+	    <td>-@</td>
+	    <td>--aux</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-$</td>
+	    <td>--aux-key</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-~</td>
+	    <td>--aux-execute</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-%</td>
+	    <td>--aux-crypto-block</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-D</td>
+	    <td>--empty-dir</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-Z</td>
+	    <td>--exclude-compression</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-Y</td>
+	    <td>--include-compression</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-m</td>
+	    <td>--mincompr</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-ak</td>
+	    <td>--alter=keep-compressed</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-af</td>
+	    <td>--alter=fixed-date</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td></td>
+	    <td>--nodump</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-M</td>
+	    <td>--no-mount-points</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-,</td>
+	    <td>--cache-directory-tagging</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-k</td>
+	    <td>--deleted</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-r</td>
+	    <td>--recent</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-f</td>
+	    <td>--flat</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-ae</td>
+	    <td>--alter=erase_ea</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-T</td>
+	    <td>--list-format</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-as</td>
+	    <td>--alter=saved</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-ad</td>
+	    <td>--alter=decremental</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-q</td>
+	    <td>--quiet</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	  </tr>
+
+	  <tr>
+	    <td>-/</td>
+	    <td>--overwriting-policy</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-&lt;</td>
+	    <td>--backup-hook-include</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-&gt;</td>
+	    <td>--backup-hook-exclude</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-=</td>
+	    <td>--backup-hook-execute</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-ai</td>
+	    <td>--alter=ignore-unknown-inode-type</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-at</td>
+	    <td>--alter=tape-marks</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-0</td>
+	    <td>--sequential-read</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-;</td>
+	    <td>--min-digits</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	  </tr>
+
+	  <tr>
+	    <td>-1</td>
+	    <td>--sparse-file-min-size</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-ah</td>
+	    <td>--alter=hole-recheck</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-^</td>
+	    <td>--slice-mode</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	  </tr>
+
+	  <tr>
+	    <td>-_</td>
+	    <td>--retry-on-change</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-asecu</td>
+	    <td>--alter=secu</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-.</td>
+	    <td>--user-comment</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-3</td>
+	    <td>--hash</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	  </tr>
+
+	  <tr>
+	    <td>-2</td>
+	    <td>--dirty-behavior</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-al</td>
+	    <td>--alter=lax</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	  </tr>
+
+	  <tr>
+	    <td>-alist-ea</td>
+	    <td>--alter=list-ea</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-4</td>
+	    <td>--fsa-scope</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-5</td>
+	    <td>--exclude-by-ra</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-7</td>
+	    <td>--sign</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	  </tr>
+
+	  <tr>
+	    <td>-'</td>
+	    <td>--modified-data-detection</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-{</td>
+	    <td>--include-delta-sig</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-}</td>
+	    <td>--exclude-delta-sig</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-8</td>
+	    <td>--delta</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-6</td>
+	    <td>--delta-sig-min-size</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-az</td>
+	    <td>--alter=zeroing-negative-dates</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-\</td>
+	    <td>--ignored-as-symlink</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-T</td>
+	    <td>--kdf-param</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>--aduc</td>
+	    <td>--alter=duc</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	  </tr>
+
+	  <tr>
+	    <td>-G</td>
+	    <td>--multi-thread</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	  </tr>
+
+	  <tr>
+	    <td>-j</td>
+	    <td>--network-retry-delay</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-afile-auth</td>
+	    <td>--alter=file-authentication</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-ab</td>
+	    <td>--alter=blind-to-signatures</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>OK</td>
+	    <td>--</td>
+	  </tr>
+
+	  <tr>
+	    <td>-aheader</td>
+	    <td>--alter=header</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>OK</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	    <td>--</td>
+	  </tr>
+	</table>
+      </div>
+      <br/>
+
+      <a name="A14"><b>Why dar reports corruption of the backup I have transfered with FTP?</b></a><br/>
+      <p>
+	Dar backups
+	are binary files,
+	they must be transfered in
+	binary mode
+	when using FTP. This is done in the following way for the ftp
+	command-line client :
+      </p>
+      <code class=block>
+	ftp &lt;somewhere&gt;
+	&lt;login&gt;
+	&lt;password&gt;
+	<e>bin</e>
+	put &lt;file&gt;
+	get &lt;file&gt;
+	bye
+      </code>
+
+      <p>
+	If you transfer a backup (or
+	any other binary file) in ascii mode (the opposite of binary mode), the
+	8th bit of each byte will be lost and the backup will become
+	impossible to recover (due to the destruction of this information). Be
+	very careful to test your backup after transferring back to you host
+	to be sure you can delete the original file.
+      </p>
+
+
+      <a name="UIDGID"><b> Why DAR does save UID/GID
+	  instead of plain usernames and usergroups?</b></a><br/>
+      <p>In each file property is
+	not present the name of the owner nor the name of the group owner, but
+	instead are present two numbers, the user ID and the group ID (UID
+	&amp; GID in short). The /etc/password file associates to these numbers
+	a names and some other properties (like the login shell, the
+	home directory, the password, see also /etc/shadow).
+	Thus, when you do a directory list (with the 'ls' command for example
+	or with any GUI program for another example), the listing application
+	used
+	does open each directory, there it finds a list of name and a inode
+	number associated, then the listing program fetchs the inode attributes
+	for each file and looks among other information for the UID and the
+	GID. To be able
+	to display the real user name and group name, the listing application
+	use a well-defined standard C library call that will do the lookup in
+	/etc/password, eventually NIS system if configured and any other
+	additional
+	system, [this way applications have not to bother with the many system
+	configuration possible, the same API interface is used whatever is the
+	system], then lookup returns the name if it exist and the listing
+	application displays for each
+	file found in a directory the attributes and the user name and group
+	name as returned by the system instead of the UID and GID.
+      </p>
+      <p>
+	As you can see, the user name and
+	group name are not part of any file attribute, but UID and GID *are*
+	instead. Dar is a backup tool mainly, it does preserve as much as
+	possible the file properties to be able to restore them as close as
+	possible
+	to their original state. Thus a file saved with UID=3 will be restored
+	with UID=3. The name corresponding the UID 3 may exist or not,&nbsp;
+	may exist and be the same or may exist and be different, the file will
+	be anyway restored in UID 3.
+      </p>
+
+      <p><u>Scenario with dar's way of restoring</u></p>
+
+      <p>
+	Thus, when doing backup and
+	restoration of a crashed system you can be confident, the restoration
+	will not interfere with the bootable system you have used to launch dar
+	to restore your disk. Assuming you have UID 1 labeled <i>'bin'</i> in your
+	real crashed system, but this UID 1 is labeled <i>'admin'</i> in the boot
+	system, while UID 2 is labeled <i>'bin'</i>
+	in this boot system, files owned
+	by <i>bin</i> in the system to
+	restore will be restored under UID 1, not UID 2
+	which is used by the temporary boot system. At that time after
+	restoration still running the from the boot system, if you do a 'ls'
+	you will see that the original files
+	owned by <i>'bin'</i> are now owned
+	by user <i>'admin'.</i>
+      </p>
+
+      <p>
+	This is really a mirage: in your restoration you will also restore the <i>/etc/password</i>
+	file and other system configuration files (like NIS configuration files if they have
+	been used), then at reboot time on the newly restored real system, the UID 1 will
+	be backed associated to user <i>'bin'</i>
+	as expected and files originally owned by user <i>bin</i> will now been listed as owned
+	by <i>bin</i> as expected.
+      </p>
+
+      <p><u>Scenario with plain name way of restoring</u></p>
+
+      <p>
+	If dar had done else, restoring
+	the files owned by <i>'bin'</i> to
+	the UID corresponding to <i>'bin',</i>
+	these files would have been given UID 2 (the one used by the temporary
+	bootable system used to launch dar). But once the real restored system
+	would have been launched, this UID 2 would have become some other user and
+	not <i>'bin'</i> which is mapped to
+	UID 1 in the restored <i>/etc/password.</i>
+      </p>
+
+      <p>
+	Now, if you want to change some
+	UID/GID when moving a set of files from
+	one live system to another system, there is no problem if you are <i>not</i>
+	restoring dar under the <i>'root'</i>
+	account. Other account than <i>'root'</i> are
+	usually not allowed to modify UID/GID, thus restored files by dar will
+	have group and user ownership of the dar process, which is the one that
+	has launched dar.
+      </p>
+
+      <p>
+	But if you really need to move a
+	directory tree containing a set of files with different ownership and
+	you want to preserve these different ownership from one live system to
+	another, while the corresponding UID/GID do not match between the two
+	system, dar can still help you:
+      </p>
+
+      <ul>
+	<li>Save your directory tree on the source live system</li>
+	<li>
+	  From the root account in the destination live system do the
+	  following:
+	</li>
+	<li>restore the backup content in a empty directory</li>
+	<li>
+	  change the UID of files according to the one used by the
+	  destination filesystem with the command:
+	  <code class=block>
+	    find /path/to/restored/backup -uid &lt;old UID&gt; -print -exec chown &lt;new name&gt; {} \;
+	    find /path/to/restored/backup -gid &lt;old GID&gt; -print -exec chgrp &lt;new name&gt; {} \;
+	  </code>
+	  The first command will let you
+	  remap an UID to another for all files
+	  under the /path/to/restored/backup directory<br/>
+	  The second command will let you remap a GID to another for all files
+	  under the /path/to/restored/backup directory
+	</li>
+      </ul>
 
 
       <u>Example on how to globally modify ownership of a directory tree user by user</u><br/>
 
-    <p>
-      For example, you have on the <i>source</i> system three users: Pierre
-      (UID 100), Paul (UID 101), Jacques (UID 102)
-      but on the <i>destination</i> system,
-      these same users are mapped to
-      different UID: Pierre has UID 101, Paul has UID 102 and Jacques has UID 100.
-    </p>
-    <p>
-      We temporary need an unused UID on the destination system, we will
-      assume UID 680 is not used. Then after the backup restoration in the
-      directory /tmp/A we will do the following:
-    </p>
-    <code class=block>
-      find /tmp/A -uid 100 -print -exec chown 680 {} \;
-      find /tmp/A -uid 101 -print -exec chown pierre {} \;
-      find /tmp/A -uid 102 -print -exec chown paul {} \;
-      find /tmp/A -uid 680 -print -exec chown jacques&nbsp; {} \;
-    </code>
+      <p>
+	For example, you have on the <i>source</i> system three users: Pierre
+	(UID 100), Paul (UID 101), Jacques (UID 102)
+	but on the <i>destination</i> system,
+	these same users are mapped to
+	different UID: Pierre has UID 101, Paul has UID 102 and Jacques has UID 100.
+      </p>
+      <p>
+	We temporary need an unused UID on the destination system, we will
+	assume UID 680 is not used. Then after the backup restoration in the
+	directory /tmp/A we will do the following:
+      </p>
+      <code class=block>
+	find /tmp/A -uid 100 -print -exec chown 680 {} \;
+	find /tmp/A -uid 101 -print -exec chown pierre {} \;
+	find /tmp/A -uid 102 -print -exec chown paul {} \;
+	find /tmp/A -uid 680 -print -exec chown jacques&nbsp; {} \;
+      </code>
       <p>
 	which is:
       </p>
@@ -1861,475 +1862,476 @@
 	</li>
       </ul>
 
-    <p>
-      You can then move the modified
-      files to appropriated destination or
-      make a new dar backup to be restored in appropriated place if you want
-      to use some of dar's feature like for example only restore files that
-      are more recent than those present on filesystem.
-    </p>
-    <a name="Dar_Manager_encrypted"><b>Dar_Manager does not accept encrypted backups, how to workaround this?</b></a><br/>
-    <p>
-      Yes, that's true, dar_manager
-      does not accept encrypted backups. The
-      first reason is that while dar_manager database cannot be encrypted
-      this is not very fair to add to them encrypted backups. The second
-      reason is because the dar_manager database should hold the key for each
-      encrypted backup making this backup the weakest point in your data
-      security: Breaking the database encryption would then provide
-      access to any encryption key, and with original backup access it would
-      bring access to data of any of the backup added to the database.
-    <p>
-      To workaround this, you can proceed as follows:
-    </p>
-    <ul>
-      <li>
-	isolate your encrypted backup into an unencrypted 'isolated
-	catalogue': Do not use the -K option while isolating.
-	Without -J option dar will prompt for the password of the encrypted
-	archive. For automated process, you are encouraged to use
-	a DCF file with restricted permissions and
-	containing the '-J &lt;key&gt;' option to be passed for dar. The instruct
-	dar to read that file thanks to -B option.
-      </li>
-      <li>
-	add these extracted catalogue to the dar_manager database
-	of your choice,
-      </li>
-      <li>
-	change the name and path of the added catalogue to point to
-	your real encrypted backups (-b and -p options of dar_manager).</li>
-    </ul>
-
-    <p>
-      Note that as the database is not
-      encrypted this will expose the backup
-      file listing (not the file's contents) of your encrypted backups to
-      anyone able to read the database, thus it is recommended to set
-      restrictive permission to this database file.
-    </p>
-    <p>
-      When will come the time to use dar_manager to restore some file, you
-      will have to make dar_manager pass the key to dar for it be able to
-      restore the needed files from the backup. This can be done in several
-      ways: dar_manager's command-line, dar_manager database or dar.dcf file.
-    </p>
-
-    <ol>
-      <li>
-	dar_manager's command-line: simply pass the -e "-K
-	&lt;key&gt;" to dar_manager . Note that this will expose the key twice:
-on dar_manager's command-line and on dar's command-line.
-      </li>
-      <li>
-	dar_manager database: the database can store some constant
-	command to be passed to dar. This is done using the -o option, or the
-	-i option. The -o option exposes the arguments you want to be passed to
-	dar because they are on dar_manager command-line. While the -i option,
-	let you do the same thing but in an interactive manner, this is a
-	better choice.
-      </li>
-      <li>
-	A better way is to use a DCF file with restrictive
-	permission. This one will receive the '-K &lt;key&gt;' option for dar
-	to be able to read the encrypted backups. And dar_manager will ask dar
-	to read this file thanks to the '-B &lt;filename&gt;' option you will
-	have given either on dar_manager's command-line (-e -B &lt;filename&gt;
-	...) or from the stored option in the database (-o -B &lt;filename&gt;).
-      </li>
-      <li>
-	The best way is let dar_manager pass the -K option to dar,
-	but without password : simply passing the -e "-K :" option to
-	dar_manager. When dar will get the -K option with the ":" argument, it
-	will dynamically ask for the password and store it in a secured memory.
-      </li>
-    </ol>
-
-    <a name="staticOSX"><b>How to overcome the lack of static linking on MacOS X?</b></a><br/>
-
-    <p>
-      The answer comes from Dave
-      Vasilevsky in an email to the dar-support
-      mailing-list. I let him explain how to do:
-    </p>
-
-    <div style="font-style:italic; margin-left:25px;">
       <p>
-	Pure-static
-	executables aren't used on OS X.
-	However, Mac OS X does have other ways to build portable binaries.
-	HOWTO build portable binaries on OS X?
+	You can then move the modified
+	files to appropriated destination or
+	make a new dar backup to be restored in appropriated place if you want
+	to use some of dar's feature like for example only restore files that
+	are more recent than those present on filesystem.
       </p>
+      <a name="Dar_Manager_encrypted"><b>Dar_Manager does not accept encrypted backups, how to workaround this?</b></a><br/>
       <p>
-	First, you have to make sure
-	that dar only uses operating-system
-	libraries that exist on the oldest version of OS X that you care about.
-	You do this by specifying one of Apple's SDKs, for example:
-      </p>
-      <code class=block>
-	export CPPFLAGS="-isysroot /Developer/SDKs/MacOSX10.2.8.sdk"
-	export LDFLAGS="-Wl,-syslibroot,/Developer/SDKs/MacOSX10.2.8.sdk"
-      </code>
+	Yes, that's true, dar_manager
+	does not accept encrypted backups. The
+	first reason is that while dar_manager database cannot be encrypted
+	this is not very fair to add to them encrypted backups. The second
+	reason is because the dar_manager database should hold the key for each
+	encrypted backup making this backup the weakest point in your data
+	security: Breaking the database encryption would then provide
+	access to any encryption key, and with original backup access it would
+	bring access to data of any of the backup added to the database.
       <p>
-	Second, you have to make sure
-	that any non-system libraries that dar
-	links to are linked in statically. To do this edit
-	dar/src/dar_suite/Makefile, changing LDADD to
-	'../libdar/.libs/libdar.a'. If any other non-system
-	libs are used (such as gettext), change the
-	makefiles so they are also linked in
-	statically. Apple should really give us a way to force the linker to do this
-	automatically!
-      </p>
-      <p>
-	Some caveats:
+	To workaround this, you can proceed as follows:
       </p>
       <ul>
-	<li>If you build for 10.3 or
-	  lower, you will not get EA support, and
-	  therefore you will not be able to save special Mac information like
-	  resource forks.
+	<li>
+	  isolate your encrypted backup into an unencrypted 'isolated
+	  catalogue': Do not use the -K option while isolating.
+	  Without -J option dar will prompt for the password of the encrypted
+	  archive. For automated process, you are encouraged to use
+	  a DCF file with restricted permissions and
+	  containing the '-J &lt;key&gt;' option to be passed for dar. The instruct
+	  dar to read that file thanks to -B option.
 	</li>
 	<li>
-	  To work on both ppc and x86
-	  Macs, you need to build a universal
-	  binary. For instructions, use Google -)
+	  add these extracted catalogue to the dar_manager database
+	  of your choice,
 	</li>
 	<li>
-	  To make a 10.2-compatible
-	  binary, you must build with GCC 3.3.
+	  change the name and path of the added catalogue to point to
+	  your real encrypted backups (-b and -p options of dar_manager).</li>
+      </ul>
+
+      <p>
+	Note that as the database is not
+	encrypted this will expose the backup
+	file listing (not the file's contents) of your encrypted backups to
+	anyone able to read the database, thus it is recommended to set
+	restrictive permission to this database file.
+      </p>
+      <p>
+	When will come the time to use dar_manager to restore some file, you
+	will have to make dar_manager pass the key to dar for it be able to
+	restore the needed files from the backup. This can be done in several
+	ways: dar_manager's command-line, dar_manager database or dar.dcf file.
+      </p>
+
+      <ol>
+	<li>
+	  dar_manager's command-line: simply pass the -e "-K
+	  &lt;key&gt;" to dar_manager . Note that this will expose the key twice:
+	  on dar_manager's command-line and on dar's command-line.
 	</li>
 	<li>
-	  These instructions won't work
-	  for the 10.1 SDK, that one is harder to
-	  use.
+	  dar_manager database: the database can store some constant
+	  command to be passed to dar. This is done using the -o option, or the
+	  -i option. The -o option exposes the arguments you want to be passed to
+	  dar because they are on dar_manager command-line. While the -i option,
+	  let you do the same thing but in an interactive manner, this is a
+	  better choice.
 	</li>
-    </div>
+	<li>
+	  A better way is to use a DCF file with restrictive
+	  permission. This one will receive the '-K &lt;key&gt;' option for dar
+	  to be able to read the encrypted backups. And dar_manager will ask dar
+	  to read this file thanks to the '-B &lt;filename&gt;' option you will
+	  have given either on dar_manager's command-line (-e -B &lt;filename&gt;
+	  ...) or from the stored option in the database (-o -B &lt;filename&gt;).
+	</li>
+	<li>
+	  The best way is let dar_manager pass the -K option to dar,
+	  but without password : simply passing the -e "-K :" option to
+	  dar_manager. When dar will get the -K option with the ":" argument, it
+	  will dynamically ask for the password and store it in a secured memory.
+	</li>
+      </ol>
 
-    <a name="single_slice"><b>Why cannot I test, extract file, list the contents of a given slice from a backup?</b></a><br/>
+      <a name="staticOSX"><b>How to overcome the lack of static linking on MacOS X?</b></a><br/>
 
-    <p>
-      Well this is due to dar's design. However you can list a whole backup and see
-      in which slice(s) a file is located:
-    </p>
+      <p>
+	The answer comes from Dave
+	Vasilevsky in an email to the dar-support
+	mailing-list. I let him explain how to do:
+      </p>
 
-    <code class=block>
-      <b># dar -l test <e>-Tslice</e> -g etc/passwd</b>
-      <e>Slice(s)</e>|[Data ][D][ EA  ][FSA][Compr][S]|Permission| Filemane
-      --------+--------------------------------+----------+-----------------------------
-      <e>1</e>        [Saved][-]       [-L-][  69%][ ] drwxr-xr-x etc
-      <e>2</e>        [Saved][ ]       [-L-][  63%][ ] -rw-r--r-- etc/passwd
-      -----
-      All displayed files have their data in slice range [1-2]
-      -----
-      <b>#</b>
-    </code>
-    <br/>
+      <div style="font-style:italic; margin-left:25px;">
+	<p>
+	  Pure-static
+	  executables aren't used on OS X.
+	  However, Mac OS X does have other ways to build portable binaries.
+	  HOWTO build portable binaries on OS X?
+	</p>
+	<p>
+	  First, you have to make sure
+	  that dar only uses operating-system
+	  libraries that exist on the oldest version of OS X that you care about.
+	  You do this by specifying one of Apple's SDKs, for example:
+	</p>
+	<code class=block>
+	  export CPPFLAGS="-isysroot /Developer/SDKs/MacOSX10.2.8.sdk"
+	  export LDFLAGS="-Wl,-syslibroot,/Developer/SDKs/MacOSX10.2.8.sdk"
+	</code>
+	<p>
+	  Second, you have to make sure
+	  that any non-system libraries that dar
+	  links to are linked in statically. To do this edit
+	  dar/src/dar_suite/Makefile, changing LDADD to
+	  '../libdar/.libs/libdar.a'. If any other non-system
+	  libs are used (such as gettext), change the
+	  makefiles so they are also linked in
+	  statically. Apple should really give us a way to force the linker to do this
+	  automatically!
+	</p>
+	<p>
+	  Some caveats:
+	</p>
+	<ul>
+	  <li>If you build for 10.3 or
+	    lower, you will not get EA support, and
+	    therefore you will not be able to save special Mac information like
+	    resource forks.
+	  </li>
+	  <li>
+	    To work on both ppc and x86
+	    Macs, you need to build a universal
+	    binary. For instructions, use Google -)
+	  </li>
+	  <li>
+	    To make a 10.2-compatible
+	    binary, you must build with GCC 3.3.
+	  </li>
+	  <li>
+	    These instructions won't work
+	    for the 10.1 SDK, that one is harder to
+	    use.
+	  </li>
+	</ul>
+      </div>
 
-    <a name="merge_two_isolated"><b>Why cannot I merge two isolated catalogues?</b></a><br/>
-    <p>
-      Since version 2.4.0, isolated catalogues can also be used to rescue an
-      corrupted internal catalogue of the backup it has been isolated from.
-      For that feature be possible, a mecanism let dar know if an given
-      isolated catalogue and a given backup correspond to the same contents.
-      Merging two isolated catalogues would break this feature as the
-      resulting backup would not match any real backup an could only be
-      used as reference for a differential backup.
-    </p>
+      <a name="single_slice"><b>Why cannot I test, extract file, list the contents of a given slice from a backup?</b></a><br/>
 
-    <a name="parallel"><b>How to use the full power of my multi-processor computer?</b></a><br/>
-    <p>
-      Since release 2.7.0 it is possible to have dar efficiently using many threads at two independent levels:
-    </p>
-    <dl>
-      <dt class=void>encryption</dt><dd>
-	You can specify the number of thread to use to cipher/decipher a backup. Note however
-	that during tests done for 2.7.0 validation, it was observed that having more
-	than two threads for encryption does not gives better results than using only two threads
-	when compression is used, because most of the time compression is more CPU intensive
-	than encryption (well all depends on the chosen algorithms, that's right).
-      </dd>
-      <dt class=void>compression</dt><dd>
-	Before release 2.7.0 compression was done per file in streaming mode. In this
-	mode to compress data you need to know the result of the compression of the data that
-	is located before it, this brings good compression ratio but is impossible to
-	parallelize. To be able to compress in parallel one need to split data in block,
-	and compress blocks independently. There you can use a lot of threads up to the time
-	when this is the disk I/O that is the slowest process. Adding more compression
-	thread will not change the result. The drawback of compressing per thread is less
-	the compression ratio that is slightly less good than in stream compression mode, than
-	the memory requirement to hold a data block of clear data per thread and the compressed
-	resulting data, times the number of threads. To avoid having any thread waiting for
-	disk I/O, you even have to store a bit more memory block than the number of threads,
-	this is managed by libdar.
-      </dd>
-    </dl>
-    <p>
-      To activate multi-threading with dar, use the <code>-G</code> option, read the dar man page
-      for all details about the way to define the number of encryption thread and the number of
-      compression thread, as well as the compression block size to use.
-    </p>
+      <p>
+	Well this is due to dar's design. However you can list a whole backup and see
+	in which slice(s) a file is located:
+      </p>
 
-    <a name="threadsafe"><b>Is libdar thread-safe, which way do you mean it is?</b></a><br/>
+      <code class=block>
+	<b># dar -l test <e>-Tslice</e> -g etc/passwd</b>
+	<e>Slice(s)</e>|[Data ][D][ EA  ][FSA][Compr][S]|Permission| Filemane
+	--------+--------------------------------+----------+-----------------------------
+	<e>1</e>        [Saved][-]       [-L-][  69%][ ] drwxr-xr-x etc
+	<e>2</e>        [Saved][ ]       [-L-][  63%][ ] -rw-r--r-- etc/passwd
+	-----
+	All displayed files have their data in slice range [1-2]
+	-----
+	<b>#</b>
+      </code>
+      <br/>
 
-    <p>
-      libdar is the part of dar's
-      source code that has been rewritten to be used by external programs
-      (like kdar). It has been modified to be used in a multi-threaded
-      environment, thus, <b>*yes*, libdar is thread-safe</b>.
-      However, thread-safe does not mean that you do not have to take some
-      precautions in your programs while using libdar (or any other library).
-    </p>
-    <p>
-      Care must thus be taken for two different threads
-      <b>not acting on the same variables/objects at the same time</b>.
-      This is however possible with the use of posix mutex, which would
-      define a portion of code (known as a critical section) that cannot be
-      entered by more than one thread at a time.
-    </p>
-    <p>
-      A few objects provided by libdar API supports the concurrent access
-      from several threads, read the API documentation for more.
-    </p>
+      <a name="merge_two_isolated"><b>Why cannot I merge two isolated catalogues?</b></a><br/>
+      <p>
+	Since version 2.4.0, isolated catalogues can also be used to rescue an
+	corrupted internal catalogue of the backup it has been isolated from.
+	For that feature be possible, a mecanism let dar know if an given
+	isolated catalogue and a given backup correspond to the same contents.
+	Merging two isolated catalogues would break this feature as the
+	resulting backup would not match any real backup an could only be
+	used as reference for a differential backup.
+      </p>
 
-    <a name="How_to_solve_configure:_error:_Cannot"><b>How to solve
-      <code>configure: error: Cannot find size_t type</code>?</b></a><br/>
-    <p>
-      This error shows when you lack support for C++ compilation. Check the
-      gcc compiler has been compiled with C++ support activated, or if you
-      are using gcc binary from a distro, double check you have installed the
-      C++ support for gcc.
-    </p>
-
-    <a name="slow_2_4_0"><b>Why dar became much slower since release 2.4.0?</b></a><br/>
-
-    <p>
-      This is the drawback of new features!
-    </p>
-    <ul>
-      <li>
-	Espetially	to be able to read dar backup through pipes in
-	sequential mode, dar inserts so-called "escape sequence" to know
-	for example when a new file starts. This way dar can skip to the next
-	mark upon backup corruption or if the given file has not to be
-	restored. However, if such a sequence of byte is found into a file's
-	data, it must be modified not to collide with real escape sequences.
-	This leads dar to inspect all data added to a backup for
-	such sequence of byte, instead of just copying the data to the backup
-	(eventually compressing and cyphering it).
-      </li>
-      <li>
-	The other feature that brings an important overhead is the
-	sparse file detection mechanism. To be able to detect a hole in a file
-	and store it into the backup, dar needs here too, to inspect each
-	file's data.
-      </li>
-    </ul>
-    <p>
-      You can disable both of these features, using respectively the options <code><b>-at</b></code>
-      option, which suppress "tape marks" (just another name for escape
-      sequences), but does not allow the generated backup to be used in
-      sequential read mode, and <b><code>-1 0</b></code>
-      option, which completely disables the sparse file detection. The
-      execution time becomes back the same as the one of dar 2.3.x releases.
-    </p>
-
-    <a name="slow_2_5_0"><b>Why dar became yet slower since release 2.5.0?</b></a><br/>
-
-    <p>
-      This is again the drawback of new features!
-    </p>
-    <ul>
-      <li>
-	The first feature that drain time is <b>Filesystem Specific Attributes (FSA)</b>,
-	as it requires new system calls for each new files to save. This has
-	little impact when saving a lot of big files but become visible when
-	saving a lot a tiny files or directories.
-      </li>
-      <li>
-	The second feature is the use of <b>fadvise()</b>
-	system call that preserves
-	cache usage. In other words dar tells the system it does not need
-	anymore a file when it has been read (backup) or written (restoration)
-	this has the advantage to reduce cache presure from dar to the benefit
-	of other running process needs. The idea here is to preserves as much
-	as possible a live operating system from being affected by a running
-	backup relying on dar. The consequence is that if running dar a second
-	time on the same set of file, with dar 2.4.x and below the data to save
-	was most of the time in the cache which could lead to very fast
-	execution, while with dar 2.5.x the data to save may have been flushed
-	out of the cache by more important data for another application. This
-	second time dar is run, the data has to be read again from disk which
-	does not bring the same very fast execution as reading from cache.
-      </li>
-    </ul>
-    <p>
-      You can disable both of these features. The first can be disabled <b>at compilation time</b>
-      giving <code><b>--disable-fadvise</b></code> to the <code>./configure</code> script.
-      The second option can be disabled at any time by adding the
-      <code><b>--fsa-scope=none</b></code> option to <code>dar</code>.
-      The execution time becomes back then the same as the one of dar 2.4.x releases.
-    </p>
-
-
-    <a name="search_for_questions"><b>How to search for questions (and their answers) about known problems similar to mines?</b></a><br/>
-
-    <p>
-      Have a look a the <a href="https://sourceforge.net/p/dar/mailman/search/?mail_list=dar-support">dar-support mailing-list archive</a>
-      and if you cannot find any answer to your problem feel free to send an email to this mailing-list describing your problem/need.
-    </p>
-
-    <a name="open_failed_excluded"><b>Why dar tells me that he failed to open a directory, while I have excluded this directory?</b></a><br/>
-
-    <p>
-      Reading the contents of a
-      directory is done using the usual system call
-      (opendir/readdir/closedir). The first call (opendir) let dar design
-      which directory to inspect, the dar call readdir to get the next entry
-      in the opened directory. Once nothing has to be read, closedir is
-      called. The problem here is that dar cannot start reading a directory
-      do some treatment and start reading another directory. In brief, the
-      opendir/readdir/closedir system call are not re-entrant.
-    </p>
-    <p>
-      This is in particular critical for dar as it does a depth lookup in the
-      directory tree. In other words, from the root if we have two
-      directories A and B, dar reads A's contents, the contents of its
-      subdirectories, then once finished, it read the next entry of the root
-      directory (which is B), then read the contents of B and then of each of
-      its subdirectories, then once finished for B, it must go back to the
-      root again, and read the next entry. In the meanwhile dar had to open
-      many directories to get their contents.
-    </p>
-    <p>
-      For this reason dar caches the directory contents (when it first meet a
-      directory, it read its whole content and stores it in the RAM). This is
-      only after, that dar decide whether to include or not a given
-      directory. But at this point then, its contents has already been read
-      thus you may get the message that dar failed to read a given directory
-      contents, while you explicitly specify not to include that particular
-      directory in the backup.
-    </p>
-
-    <a name="security"><b>Dar reports a
-	<code>SECURITY WARNING! SUSPICIOUS FILE</code> what does that mean!?</b>
-    </a><br/>
-
-    <p>
-      When dar reports the following message:
-    </p>
-    <code class=block>
-      SECURITY WARNING! SUSPICIOUS FILE &lt;filepath&gt;: ctime changed since backup of reference was done, while no inode or data changed
-    </code>
-
-    <p>
-      You should be concerned by finding an explanation to the root cause
-      that triggered dar to ring this alarm. As you probably know, a unix
-      file has three (sometimes four) dates:
-    </p>
-
-    <ol>
-      <li><b>atime</b> is changed
-	anytime you read the file's contents or write to it (this is the last <b>a</b>ccess time)
-      </li>
-      <li><b>mtime</b> is changed
-	anytime you write to the file's data (this is the last <b>m</b>odification time)
-      </li>
-      <li><b>ctime</b> is changed
-	anythime ou modify the file's attributes (the is the last <b>c</b>hange time)
-      </li>
-      <li><b>btime</b> is never changed once a file has been created (this is the <b>b</b>irth time or creation time),
-	not all filesystem do provide it.
-    </ol>
-
-    <p>
-      In other words:
-    </p>
-    <ul>
-      <li>if you only read the data of file, only its <b>atime</b> will be updated<sup>1</sup></li>
-      <li>if you write some data to a file, its <b>ctime</b> and <b>mtime</b> will change, atime will stay unchanged</li>
-      <li>if you change ownership, permission, extended attributes, etc. only <b>ctime</b> will change</li>
-      <li>if you write to a file and modify its atime or mtime to let think the file has not been read or modified, <b>ctime</b> will change in any case.</li>
-    </ul>
-    <p>
-      Yes, the point is that in most (if not all) unix systems, over the
-      kernel itself, user program can also manually set the atime
-      and mtime manually to any arbitrary  value
-      (see the "touch" command for example), but to my knowledge, no system
-      provides a mean to manually set the ctime of a file. This value cannot
-      thus be faked.
-    </p>
-    <p>
-      However, some rootkits and other nasty programs that tend to hide
-      themselves from the system administrator use this trick and modify the
-      mtime to become more difficult to detect. Thus, the ctime keeps track
-      of the date and time of their infamy. However, ctime may also change
-      while neither mtime nor atime do, in several almost rare but normal
-      situations. Thus, if you are faced to this message, you should first verify the
-      following points before thinking your system has been infected by a
-      rootkit:
-    </p>
-    <ul>
-      <li>
-	have you added or removed a hardlink pointing to that file
-	and this file's data has not been modified since last backup?
-      </li>
-      <li>
-	have you changed this file's extended attributs (including Linux ACL and
-	MacOS file forks) while file's data has not been modified since last
-	backup?
-      </li>
-      <li>
-	have you recently restored your data and are now performing
-	a differential backup taking as reference the backup used to restore
-	that same data? Or in other words, does that particular file has just
-	been restored from a backup (was removed by accident for example)?
-      </li>
-      <li>
-	have you just moved from a dar version older than release
-	2.4.0 to dar version 2.4.0 or more recent?
-      </li>
-      <li>
-	have you upgraded the package this file is part of since
-	last backup?
-      </li>
-    </ul>
-    <p>
-      How to know atime/mtime/ctime of a file?
-    </p>
-    <ul>
-      <li>mtime is provided by the command: <code>ls -l</code></li>
-      <li>atime is provided by the command : <code>ls -l --time=atime</code></li>
-      <li>ctime is provided by the command : <code>ls -l --time=ctime</code></li>
-      <li>the <code>stat</code> command provides all dates of a given file: <code>stat &lt;filename&gt;</code></li>
-    </ul>
-    <dl>
-      <dt class=void>Note:</dt>
-      <dd>
-	With dar
-	version older than 2.4.0 (by default, unless -aa option is use) once a
-	file has been read for backup, dar set back the atime to the value it
-	had before dar read it. This trick was used to accomodate some programs
-	like leafnode (NNTP caching program) that base their cache purging
-	scheme on the atime of files. When you do a backup using dar 2.3.11 for
-	example, file that had their mtime modified are saved as expected and
-	their atime is set back to their original values (value they had just
-	before dar read them), which has the slide effect to modify the ctime.
-	If then you upgrade to dar 2.4.0 or more recent and do a differential
-	backup, if that same file has not been modified since, dar will see
-	that the ctime has changed while no other metadata did (user,
-	ownership, group, mtime), thus this alarm message will show for all
-	saved files in the last 2.3.11 backup made. The next differential
-	backup made using dar 2.4.0 (or more recent), the problem will not show
-	anymore.
-      </dd>
+      <a name="parallel"><b>How to use the full power of my multi-processor computer?</b></a><br/>
+      <p>
+	Since release 2.7.0 it is possible to have dar efficiently using many threads at two independent levels:
+      </p>
+      <dl>
+	<dt class=void>encryption</dt><dd>
+	  You can specify the number of thread to use to cipher/decipher a backup. Note however
+	  that during tests done for 2.7.0 validation, it was observed that having more
+	  than two threads for encryption does not gives better results than using only two threads
+	  when compression is used, because most of the time compression is more CPU intensive
+	  than encryption (well all depends on the chosen algorithms, that's right).
+	</dd>
+	<dt class=void>compression</dt><dd>
+	  Before release 2.7.0 compression was done per file in streaming mode. In this
+	  mode to compress data you need to know the result of the compression of the data that
+	  is located before it, this brings good compression ratio but is impossible to
+	  parallelize. To be able to compress in parallel one need to split data in block,
+	  and compress blocks independently. There you can use a lot of threads up to the time
+	  when this is the disk I/O that is the slowest process. Adding more compression
+	  thread will not change the result. The drawback of compressing per thread is less
+	  the compression ratio that is slightly less good than in stream compression mode, than
+	  the memory requirement to hold a data block of clear data per thread and the compressed
+	  resulting data, times the number of threads. To avoid having any thread waiting for
+	  disk I/O, you even have to store a bit more memory block than the number of threads,
+	  this is managed by libdar.
+	</dd>
       </dl>
-    <p>
-      Well, if you cannot find an valid explanation from the one presented
-      above, you'd better consider that your system has been infected by a
-      rootkit or a virus and use all the necessary tools (see below for
-      examples) to find some evidence of it.
-    </p>
+      <p>
+	To activate multi-threading with dar, use the <code>-G</code> option, read the dar man page
+	for all details about the way to define the number of encryption thread and the number of
+	compression thread, as well as the compression block size to use.
+      </p>
+
+      <a name="threadsafe"><b>Is libdar thread-safe, which way do you mean it is?</b></a><br/>
+
+      <p>
+	libdar is the part of dar's
+	source code that has been rewritten to be used by external programs
+	(like kdar). It has been modified to be used in a multi-threaded
+	environment, thus, <b>*yes*, libdar is thread-safe</b>.
+	However, thread-safe does not mean that you do not have to take some
+	precautions in your programs while using libdar (or any other library).
+      </p>
+      <p>
+	Care must thus be taken for two different threads
+	<b>not acting on the same variables/objects at the same time</b>.
+	This is however possible with the use of posix mutex, which would
+	define a portion of code (known as a critical section) that cannot be
+	entered by more than one thread at a time.
+      </p>
+      <p>
+	A few objects provided by libdar API supports the concurrent access
+	from several threads, read the API documentation for more.
+      </p>
+
+      <a name="How_to_solve_configure:_error:_Cannot"><b>How to solve
+	  <code>configure: error: Cannot find size_t type</code>?</b></a><br/>
+      <p>
+	This error shows when you lack support for C++ compilation. Check the
+	gcc compiler has been compiled with C++ support activated, or if you
+	are using gcc binary from a distro, double check you have installed the
+	C++ support for gcc.
+      </p>
+
+      <a name="slow_2_4_0"><b>Why dar became much slower since release 2.4.0?</b></a><br/>
+
+      <p>
+	This is the drawback of new features!
+      </p>
+      <ul>
+	<li>
+	  Espetially	to be able to read dar backup through pipes in
+	  sequential mode, dar inserts so-called "escape sequence" to know
+	  for example when a new file starts. This way dar can skip to the next
+	  mark upon backup corruption or if the given file has not to be
+	  restored. However, if such a sequence of byte is found into a file's
+	  data, it must be modified not to collide with real escape sequences.
+	  This leads dar to inspect all data added to a backup for
+	  such sequence of byte, instead of just copying the data to the backup
+	  (eventually compressing and cyphering it).
+	</li>
+	<li>
+	  The other feature that brings an important overhead is the
+	  sparse file detection mechanism. To be able to detect a hole in a file
+	  and store it into the backup, dar needs here too, to inspect each
+	  file's data.
+	</li>
+      </ul>
+      <p>
+	You can disable both of these features, using respectively the options <code><b>-at</b></code>
+	option, which suppress "tape marks" (just another name for escape
+	sequences), but does not allow the generated backup to be used in
+	sequential read mode, and <b><code>-1 0</b></code>
+	option, which completely disables the sparse file detection. The
+	execution time becomes back the same as the one of dar 2.3.x releases.
+      </p>
+
+      <a name="slow_2_5_0"><b>Why dar became yet slower since release 2.5.0?</b></a><br/>
+
+      <p>
+	This is again the drawback of new features!
+      </p>
+      <ul>
+	<li>
+	  The first feature that drain time is <b>Filesystem Specific Attributes (FSA)</b>,
+	  as it requires new system calls for each new files to save. This has
+	  little impact when saving a lot of big files but become visible when
+	  saving a lot a tiny files or directories.
+	</li>
+	<li>
+	  The second feature is the use of <b>fadvise()</b>
+	  system call that preserves
+	  cache usage. In other words dar tells the system it does not need
+	  anymore a file when it has been read (backup) or written (restoration)
+	  this has the advantage to reduce cache presure from dar to the benefit
+	  of other running process needs. The idea here is to preserves as much
+	  as possible a live operating system from being affected by a running
+	  backup relying on dar. The consequence is that if running dar a second
+	  time on the same set of file, with dar 2.4.x and below the data to save
+	  was most of the time in the cache which could lead to very fast
+	  execution, while with dar 2.5.x the data to save may have been flushed
+	  out of the cache by more important data for another application. This
+	  second time dar is run, the data has to be read again from disk which
+	  does not bring the same very fast execution as reading from cache.
+	</li>
+      </ul>
+      <p>
+	You can disable both of these features. The first can be disabled <b>at compilation time</b>
+	giving <code><b>--disable-fadvise</b></code> to the <code>./configure</code> script.
+	The second option can be disabled at any time by adding the
+	<code><b>--fsa-scope=none</b></code> option to <code>dar</code>.
+	The execution time becomes back then the same as the one of dar 2.4.x releases.
+      </p>
+
+
+      <a name="search_for_questions"><b>How to search for questions (and their answers) about known problems similar to mines?</b></a><br/>
+
+      <p>
+	Have a look a the <a href="https://sourceforge.net/p/dar/mailman/search/?mail_list=dar-support">dar-support mailing-list archive</a>
+	and if you cannot find any answer to your problem feel free to send an email to this mailing-list describing your problem/need.
+      </p>
+
+      <a name="open_failed_excluded"><b>Why dar tells me that he failed to open a directory, while I have excluded this directory?</b></a><br/>
+
+      <p>
+	Reading the contents of a
+	directory is done using the usual system call
+	(opendir/readdir/closedir). The first call (opendir) let dar design
+	which directory to inspect, the dar call readdir to get the next entry
+	in the opened directory. Once nothing has to be read, closedir is
+	called. The problem here is that dar cannot start reading a directory
+	do some treatment and start reading another directory. In brief, the
+	opendir/readdir/closedir system call are not re-entrant.
+      </p>
+      <p>
+	This is in particular critical for dar as it does a depth lookup in the
+	directory tree. In other words, from the root if we have two
+	directories A and B, dar reads A's contents, the contents of its
+	subdirectories, then once finished, it read the next entry of the root
+	directory (which is B), then read the contents of B and then of each of
+	its subdirectories, then once finished for B, it must go back to the
+	root again, and read the next entry. In the meanwhile dar had to open
+	many directories to get their contents.
+      </p>
+      <p>
+	For this reason dar caches the directory contents (when it first meet a
+	directory, it read its whole content and stores it in the RAM). This is
+	only after, that dar decide whether to include or not a given
+	directory. But at this point then, its contents has already been read
+	thus you may get the message that dar failed to read a given directory
+	contents, while you explicitly specify not to include that particular
+	directory in the backup.
+      </p>
+
+      <a name="security"><b>Dar reports a
+	  <code>SECURITY WARNING! SUSPICIOUS FILE</code> what does that mean!?</b>
+      </a><br/>
+
+      <p>
+	When dar reports the following message:
+      </p>
+      <code class=block>
+	SECURITY WARNING! SUSPICIOUS FILE &lt;filepath&gt;: ctime changed since backup of reference was done, while no inode or data changed
+      </code>
+
+      <p>
+	You should be concerned by finding an explanation to the root cause
+	that triggered dar to ring this alarm. As you probably know, a unix
+	file has three (sometimes four) dates:
+      </p>
+
+      <ol>
+	<li><b>atime</b> is changed
+	  anytime you read the file's contents or write to it (this is the last <b>a</b>ccess time)
+	</li>
+	<li><b>mtime</b> is changed
+	  anytime you write to the file's data (this is the last <b>m</b>odification time)
+	</li>
+	<li><b>ctime</b> is changed
+	  anythime ou modify the file's attributes (the is the last <b>c</b>hange time)
+	</li>
+	<li><b>btime</b> is never changed once a file has been created (this is the <b>b</b>irth time or creation time),
+	  not all filesystem do provide it.
+      </ol>
+
+      <p>
+	In other words:
+      </p>
+      <ul>
+	<li>if you only read the data of file, only its <b>atime</b> will be updated<sup>1</sup></li>
+	<li>if you write some data to a file, its <b>ctime</b> and <b>mtime</b> will change, atime will stay unchanged</li>
+	<li>if you change ownership, permission, extended attributes, etc. only <b>ctime</b> will change</li>
+	<li>if you write to a file and modify its atime or mtime to let think the file has not been read or modified, <b>ctime</b> will change in any case.</li>
+      </ul>
+      <p>
+	Yes, the point is that in most (if not all) unix systems, over the
+	kernel itself, user program can also manually set the atime
+	and mtime manually to any arbitrary  value
+	(see the "touch" command for example), but to my knowledge, no system
+	provides a mean to manually set the ctime of a file. This value cannot
+	thus be faked.
+      </p>
+      <p>
+	However, some rootkits and other nasty programs that tend to hide
+	themselves from the system administrator use this trick and modify the
+	mtime to become more difficult to detect. Thus, the ctime keeps track
+	of the date and time of their infamy. However, ctime may also change
+	while neither mtime nor atime do, in several almost rare but normal
+	situations. Thus, if you are faced to this message, you should first verify the
+	following points before thinking your system has been infected by a
+	rootkit:
+      </p>
+      <ul>
+	<li>
+	  have you added or removed a hardlink pointing to that file
+	  and this file's data has not been modified since last backup?
+	</li>
+	<li>
+	  have you changed this file's extended attributs (including Linux ACL and
+	  MacOS file forks) while file's data has not been modified since last
+	  backup?
+	</li>
+	<li>
+	  have you recently restored your data and are now performing
+	  a differential backup taking as reference the backup used to restore
+	  that same data? Or in other words, does that particular file has just
+	  been restored from a backup (was removed by accident for example)?
+	</li>
+	<li>
+	  have you just moved from a dar version older than release
+	  2.4.0 to dar version 2.4.0 or more recent?
+	</li>
+	<li>
+	  have you upgraded the package this file is part of since
+	  last backup?
+	</li>
+      </ul>
+      <p>
+	How to know atime/mtime/ctime of a file?
+      </p>
+      <ul>
+	<li>mtime is provided by the command: <code>ls -l</code></li>
+	<li>atime is provided by the command : <code>ls -l --time=atime</code></li>
+	<li>ctime is provided by the command : <code>ls -l --time=ctime</code></li>
+	<li>the <code>stat</code> command provides all dates of a given file: <code>stat &lt;filename&gt;</code></li>
+      </ul>
+      <dl>
+	<dt class=void>Note:</dt>
+	<dd>
+	  With dar
+	  version older than 2.4.0 (by default, unless -aa option is use) once a
+	  file has been read for backup, dar set back the atime to the value it
+	  had before dar read it. This trick was used to accomodate some programs
+	  like leafnode (NNTP caching program) that base their cache purging
+	  scheme on the atime of files. When you do a backup using dar 2.3.11 for
+	  example, file that had their mtime modified are saved as expected and
+	  their atime is set back to their original values (value they had just
+	  before dar read them), which has the slide effect to modify the ctime.
+	  If then you upgrade to dar 2.4.0 or more recent and do a differential
+	  backup, if that same file has not been modified since, dar will see
+	  that the ctime has changed while no other metadata did (user,
+	  ownership, group, mtime), thus this alarm message will show for all
+	  saved files in the last 2.3.11 backup made. The next differential
+	  backup made using dar 2.4.0 (or more recent), the problem will not show
+	  anymore.
+	</dd>
+      </dl>
+      <p>
+	Well, if you cannot find an valid explanation from the one presented
+	above, you'd better consider that your system has been infected by a
+	rootkit or a virus and use all the necessary tools (see below for
+	examples) to find some evidence of it.
+      </p>
       <ul>
 	<li><a href="http://rkhunter.sourceforge.net/">Rootkit Hunter</a></li>
 	<li><a href="http://www.unhide-forensics.info/">Unhide</a></li>
@@ -2343,8 +2345,8 @@ on dar_manager's command-line and on dar's command-line.
 	switch to the command-line.
       </p>
       <p>
-	  <b><sup>1</sup></b> atime may also not be updated at all if filesystem
-	  is mounted with relatime or noatime option.
+	<b><sup>1</sup></b> atime may also not be updated at all if filesystem
+	is mounted with relatime or noatime option.
       </p>
 
       <a name="copy"><b>Can dar help copy a large directory tree?</b></a><br/>
@@ -2382,931 +2384,931 @@ on dar_manager's command-line and on dar's command-line.
 	dar -c - -R &lt;srcdir&gt; --retry-on-change 3 -N | dar -x - --sequential-read -N -R &lt;dstdir&gt;
       </code>
 
-    <p>
-      <code>&lt;srcdir&gt;</code> contents will be copied to <code>&lt;dstdir&gt;</code>
-      both must exist before running this command, and <code>&lt;dstdir&gt;</code>
-      should be an empty dir.
-    </p>
-    <p>
-      Here is an example: we will copy the content of /home/my to /home2/my.
-      first we create the destination directory, then we run <code>dar</code>
-    </p>
+      <p>
+	<code>&lt;srcdir&gt;</code> contents will be copied to <code>&lt;dstdir&gt;</code>
+	both must exist before running this command, and <code>&lt;dstdir&gt;</code>
+	should be an empty dir.
+      </p>
+      <p>
+	Here is an example: we will copy the content of /home/my to /home2/my.
+	first we create the destination directory, then we run <code>dar</code>
+      </p>
 
-    <code class=block>
-      mkdir /home2/my
-      dar -c - -R /home/my --retry-on-change 3 | dar -x - --sequential-read -R /home2/my
-    </code>
-
-    <p>
-      The <code>--retry-on-change</code> let dar
-      retry the copy of a file up to three times if that file has changed at
-      the time dar was reading it. You can increase this number at will. If a
-      file fails to be copied correctly after more than the allowed retry, a
-      warning is issued about that file and it is flagged as dirty in the
-      data flow, the second dar command will then ask you whether you want it
-      to be restored (here copied) on not.
-    </p>
-    <p>
-      "piping" ('|' shell syntax) the first dar's output to the second dar's
-      input makes the operation not requiering any temporary storage, only
-      virtual memory is used to perform this copy. Compression is thus not
-      requested as it would only slow down the whole process.
-    </p>
-    <p>
-      <b>last point,</b> you
-      should compare the copied data to the original one, before removing it,
-      as no backup file has been dropped down to filesystem. This can simply
-be done using:
       <code class=block>
-	diff -r &lt;srcdir&gt; &lt;dstdir&gt;
+	mkdir /home2/my
+	dar -c - -R /home/my --retry-on-change 3 | dar -x - --sequential-read -R /home2/my
       </code>
-    <p>
-      But, no, diff will not check extended Attributes, File Forks or Posix
-      ACL, hard linked inodes, etc. If you want a more controlable way of
-      copying a large directory, simply use dar with a real backup file,
-      compare the backup toward the original filesystem, restore the backup
-      contents to its new place, and compare the restored filesystem toward
-      the original backup.
-    </p>
-    <p>
-      Any better idea? Feel free to contact dar's author for an update of
-      this documentation!
-    </p>
 
-    <a name="compression"><b>Does dar compress per file or the whole backup?</b></a><br/>
-    <p>
-      Dar uses compression (gzip, lzo, bzip2, xz/lzma, zstd, lz4, ...) with different level of
-      compression (1 for quick but
-      low compression up to 9 for best
-      compression but slower execution) on <u>a file by file basis</u>.
-      I other words, the compression engine is reset for each new file added
-      into the backup. When a corruption occurs in a
-      file like a compressed <i>tar</i>
-      backup, it is not possible to decompress the data passed
-      that corruption, with tar you loose all files stored after such data
-      corruption.
-    </p>
-    <p>
-      Having compression per file has instead the <u>advantage</u>
-      to only impact one file inside the backup and all files that are
-      stored before or after such data corruption can still be restored from
-      that corrupted backup. Compressing per file opens the possibility to
-      not compress all files in the
-      backup, in particular already compressed files (like *.jpeg, *.mpeg, some *.avi
-      files and of course the *.gz, *.bz2 or *.lzo files). Avoiding
-      compressing already compressed files save CPU cycles (in other words
-      it speeds up backup process time). And while compressing an already
-      compressed file takes time for nothing, it also leads to require more storage space
-      than if that same file was not compressed a second tim
-    </p>
-    <p>
-      The <u>drawback</u> is that the
-      overall compression ratio is slightly less good.
-    </p>
-    <p>
-      How to activate compression with dar? Use the
-      <code><b>--compression</b></code>
-      option (or -z in short), telling the algorithm to use and the
-      compression level (--compression=bzip2:9 or -zgip:7 for example), you
-      may not mention the compression ratio (which default to 9) and even not
-      mention the compression algorithm which default to gzip. Thus -z or
-      -zlzo are correct.
-    </p>
-    <p>
-      To select file to compress or not compress, several options are
-      available: <code><b>--exclude-compression</b></code>
-      (or -Z in short --- the uppercase Z here) <code><b>--include-compression</b></code>
-      (or -Y in short). Both take as argument a mask that based on their
-      names define files that have to be compressed or not to be compressed. For
-      example <code>-Z "*.avi" -Z "*.mp?" -Z "*.mpeg"</code> will avoid compressing MPEG,
-      MP3, MP2 and AVI files. Note that dar provides in its <code>/etc/darrc</code>
-      default configuration file, a long list of -Z options to avoid compressing
-      most common compressed files, that you can activate by simply adding
-      <code><b>compress-exclusion</b></code> on dar command-line.
-    </p>
-    <p>
-      In addition to excluding/including files from compression based on
-      their name, you can also exclude small files (for which compression
-      ratio is usually poor) using the <code><b>--mincompr</b></code>
-      option which takes a size as argument: <code>--mincompr 1k</code> will avoid compressing
-      files which size is less than or equal to 1024 bytes. You should find
-      all details about these options in <a href="man/dar.html">dar man page</a>.
-      Check also the <code>-am</code> and <code>-ar</code> options to
-      understand how <code>--exclude-compression</code>and
-      <code>--include-compression</code> interact with
-      each other, or how to use <i>regular expression</i>s in place of
-      <i>glob expressions</i> in masks.
-    </p>
+      <p>
+	The <code>--retry-on-change</code> let dar
+	retry the copy of a file up to three times if that file has changed at
+	the time dar was reading it. You can increase this number at will. If a
+	file fails to be copied correctly after more than the allowed retry, a
+	warning is issued about that file and it is flagged as dirty in the
+	data flow, the second dar command will then ask you whether you want it
+	to be restored (here copied) on not.
+      </p>
+      <p>
+	"piping" ('|' shell syntax) the first dar's output to the second dar's
+	input makes the operation not requiering any temporary storage, only
+	virtual memory is used to perform this copy. Compression is thus not
+	requested as it would only slow down the whole process.
+      </p>
+      <p>
+	<b>last point,</b> you
+	should compare the copied data to the original one, before removing it,
+	as no backup file has been dropped down to filesystem. This can simply
+	be done using:
+	<code class=block>
+	  diff -r &lt;srcdir&gt; &lt;dstdir&gt;
+	</code>
+      <p>
+	But, no, diff will not check extended Attributes, File Forks or Posix
+	ACL, hard linked inodes, etc. If you want a more controlable way of
+	copying a large directory, simply use dar with a real backup file,
+	compare the backup toward the original filesystem, restore the backup
+	contents to its new place, and compare the restored filesystem toward
+	the original backup.
+      </p>
+      <p>
+	Any better idea? Feel free to contact dar's author for an update of
+	this documentation!
+      </p>
 
-    <a name="sizes"><b>What slice size can I use with dar?</b></a><br/>
+      <a name="compression"><b>Does dar compress per file or the whole backup?</b></a><br/>
+      <p>
+	Dar uses compression (gzip, lzo, bzip2, xz/lzma, zstd, lz4, ...) with different level of
+	compression (1 for quick but
+	low compression up to 9 for best
+	compression but slower execution) on <u>a file by file basis</u>.
+	I other words, the compression engine is reset for each new file added
+	into the backup. When a corruption occurs in a
+	file like a compressed <i>tar</i>
+	backup, it is not possible to decompress the data passed
+	that corruption, with tar you loose all files stored after such data
+	corruption.
+      </p>
+      <p>
+	Having compression per file has instead the <u>advantage</u>
+	to only impact one file inside the backup and all files that are
+	stored before or after such data corruption can still be restored from
+	that corrupted backup. Compressing per file opens the possibility to
+	not compress all files in the
+	backup, in particular already compressed files (like *.jpeg, *.mpeg, some *.avi
+	files and of course the *.gz, *.bz2 or *.lzo files). Avoiding
+	compressing already compressed files save CPU cycles (in other words
+	it speeds up backup process time). And while compressing an already
+	compressed file takes time for nothing, it also leads to require more storage space
+	than if that same file was not compressed a second tim
+      </p>
+      <p>
+	The <u>drawback</u> is that the
+	overall compression ratio is slightly less good.
+      </p>
+      <p>
+	How to activate compression with dar? Use the
+	<code><b>--compression</b></code>
+	option (or -z in short), telling the algorithm to use and the
+	compression level (--compression=bzip2:9 or -zgip:7 for example), you
+	may not mention the compression ratio (which default to 9) and even not
+	mention the compression algorithm which default to gzip. Thus -z or
+	-zlzo are correct.
+      </p>
+      <p>
+	To select file to compress or not compress, several options are
+	available: <code><b>--exclude-compression</b></code>
+	(or -Z in short --- the uppercase Z here) <code><b>--include-compression</b></code>
+	(or -Y in short). Both take as argument a mask that based on their
+	names define files that have to be compressed or not to be compressed. For
+	example <code>-Z "*.avi" -Z "*.mp?" -Z "*.mpeg"</code> will avoid compressing MPEG,
+	MP3, MP2 and AVI files. Note that dar provides in its <code>/etc/darrc</code>
+	default configuration file, a long list of -Z options to avoid compressing
+	most common compressed files, that you can activate by simply adding
+	<code><b>compress-exclusion</b></code> on dar command-line.
+      </p>
+      <p>
+	In addition to excluding/including files from compression based on
+	their name, you can also exclude small files (for which compression
+	ratio is usually poor) using the <code><b>--mincompr</b></code>
+	option which takes a size as argument: <code>--mincompr 1k</code> will avoid compressing
+	files which size is less than or equal to 1024 bytes. You should find
+	all details about these options in <a href="man/dar.html">dar man page</a>.
+	Check also the <code>-am</code> and <code>-ar</code> options to
+	understand how <code>--exclude-compression</code>and
+	<code>--include-compression</code> interact with
+	each other, or how to use <i>regular expression</i>s in place of
+	<i>glob expressions</i> in masks.
+      </p>
 
-    <p>
-      The <b>minimum slice size is around 20 bytes</b>,
-      but you will only be able to store 3 to 4 bytes of information per
-      slice, due to the slice header that need around 15 bytes in each slice (this vary
-      depending on options used and may increase in future backup version
-      format). <b>But there is no maximum slice size!</b>
-      In other words you can give to <code>-s</code> and <code>-S</code> options
-      an as long as required positive integer, thanks to its internal own
-      integer type named "<i>infinint</i>"
-      dar is able to handle arbitrarily large
-      integers (file offset, file size, etc.).
-    </p>
-    <P>
-      You can make use of suffixes like 'k' for kilo, M for mega, G for giga
-      etc... (<a href="usage_notes.html#bytes_bits_kilo">all suffixes are
-	listed here</a>) to simplify your work. See also
-      the <code>-aSI </code>and <code>-abinary</code> options to swap meaning
-      between ko (= 1000 octets) kio (= 1024 octets).
-    </p>
-    <p>
-      Last point dar/libdar can be compiled using the --enable-mode=64 option
-      given to ./configure while building dar (this is the default since release 2.6.0).
-      This replaces the "infinint" type by 64 bits integers, for better performances and reduced memory usage.
-      However this has some drawback on backup size and dates. See the <a href="Limitations.html">limitations</a> for more details.<br/>
-      Since release 2.6.0 the default being the 64 bits mode, to have dar/libdar using <i>infinint</i>
-      one need to use the following option <code>./configure --enable-mode=infinint</code>.
-    </p>
+      <a name="sizes"><b>What slice size can I use with dar?</b></a><br/>
 
-    <a name="fuse"><b>Is there a dar <a href="http://fuse.sourceforge.net/">fuse</a> filesystem?</b></a><br/>
+      <p>
+	The <b>minimum slice size is around 20 bytes</b>,
+	but you will only be able to store 3 to 4 bytes of information per
+	slice, due to the slice header that need around 15 bytes in each slice (this vary
+	depending on options used and may increase in future backup version
+	format). <b>But there is no maximum slice size!</b>
+	In other words you can give to <code>-s</code> and <code>-S</code> options
+	an as long as required positive integer, thanks to its internal own
+	integer type named "<i>infinint</i>"
+	dar is able to handle arbitrarily large
+	integers (file offset, file size, etc.).
+      </p>
+      <P>
+	You can make use of suffixes like 'k' for kilo, M for mega, G for giga
+	etc... (<a href="usage_notes.html#bytes_bits_kilo">all suffixes are
+	  listed here</a>) to simplify your work. See also
+	the <code>-aSI </code>and <code>-abinary</code> options to swap meaning
+	between ko (= 1000 octets) kio (= 1024 octets).
+      </p>
+      <p>
+	Last point dar/libdar can be compiled using the --enable-mode=64 option
+	given to ./configure while building dar (this is the default since release 2.6.0).
+	This replaces the "infinint" type by 64 bits integers, for better performances and reduced memory usage.
+	However this has some drawback on backup size and dates. See the <a href="Limitations.html">limitations</a> for more details.<br/>
+	Since release 2.6.0 the default being the 64 bits mode, to have dar/libdar using <i>infinint</i>
+	one need to use the following option <code>./configure --enable-mode=infinint</code>.
+      </p>
 
-    <p>
-      You can find several applications
-      relying on dar or directly on libdar
-      to manage dar backup, these are referred here as <a href="presentation.html#external_tools">external software</a>
-      because they are not maintained nor have been created by the author of
-      dar and libdar. <a href="http://www.boomerangsworld.de/cms/avfs/extfs?lang=en">AVFS</a>
-      is such external software that provides a virtual file system layer for
-      transparently accessing the content
-      of backups and remote directories just like local files.
-    </p>
+      <a name="fuse"><b>Is there a dar <a href="http://fuse.sourceforge.net/">fuse</a> filesystem?</b></a><br/>
 
-    <a name="tar"><b>how dar compares to tar or rsync</b></a><br/>
+      <p>
+	You can find several applications
+	relying on dar or directly on libdar
+	to manage dar backup, these are referred here as <a href="presentation.html#external_tools">external software</a>
+	because they are not maintained nor have been created by the author of
+	dar and libdar. <a href="http://www.boomerangsworld.de/cms/avfs/extfs?lang=en">AVFS</a>
+	is such external software that provides a virtual file system layer for
+	transparently accessing the content
+	of backups and remote directories just like local files.
+      </p>
 
-    <p>
-      All depends on the use case you want to address. A <a href="benchmark.html">benchmark</a> has
-      been setup to match the performances, features and behaviors or <i>dar</i>, <i>rsync</i> and <i>tar</i> in
-      regard to a set of common use cases. Hopefully this will help you answer this question.
-    </p>
+      <a name="tar"><b>how dar compares to tar or rsync</b></a><br/>
 
-    <a name="diff"><b>Why when comparing a backup with filesystem, dar does not report new files found on filesystem?</b></a><br/>
+      <p>
+	All depends on the use case you want to address. A <a href="benchmark.html">benchmark</a> has
+	been setup to match the performances, features and behaviors or <i>dar</i>, <i>rsync</i> and <i>tar</i> in
+	regard to a set of common use cases. Hopefully this will help you answer this question.
+      </p>
 
-    <p>
-      Backup comparison (<code>-d</code> option) is
-      to be seen as a step further than
-      backup testing (<code>-t</code> option) where dar checks the backup internal
-      structure and usability. The step further here is not only to check
-      that each part of the backup is readable and has a correct associated
-      CRC but also that it matches what is present on filesystem. So yes, if
-      new files are present on filesystem, nothing has to be reported. If a
-      file changed, dar reports that the file does not match what's in the
-      backup, if a file is missing dar cannot compare it with filesystem
-      and reports an error too.
-    </p>
-    <p>
-      So you want to know what has changed on your filesystem?
-      No problem, <b>do a differential backup!</b>
-      OK, you don't want to have a new backup or do not have the space for
-      that, just output the backup to /dev/null and request on-fly isolation
-      as follows:
-    </p>
-    <code class=block>
-      dar -c - -A &lt;ref backup&gt; -@ &lt;isolated&gt; ... other options ... &gt; /dev/null</span><br/>
-    </code>
+      <a name="diff"><b>Why when comparing a backup with filesystem, dar does not report new files found on filesystem?</b></a><br/>
 
-    <p>
-      <dl>
-	<dt class=void><code>&lt;ref backup&gt;</code></dt>
-	<dd>is the backup of reference or an isolated
-	  catalogue
-	</dd>
-	<dt class=void><code>&lt;isolated&gt;</code></dt>
-	<dd>
-	  is the name of the isolated
-	  catalogue to produce.
-	</dd>
-      </dl>
-    <p>
-      Once the operation has completed, you can list
-      the isolated catalogue using the following command:
-    </p>
-    <code class=block>
-      dar -l &lt;isolated&gt; -as
-    </code>
-    <p>
-      It will give you the exact difference between your current filesystem
-      and the filesystem at the time the <code>&lt;ref backup&gt;</code> was done:
-      modified files and new files are reported with <code>[inref]</code> for either data EA or both,
-      while deleted files are reported by <code>[--- REMOVED ENTRY ----]</code>
-      information, followed by the estimated removal date and the type of the
-      removed file (<code>[-]</code> for plain file, <code>[d]</code> for directory, and so on. More
-      details in dar man page for listing command).
-    </p>
+      <p>
+	Backup comparison (<code>-d</code> option) is
+	to be seen as a step further than
+	backup testing (<code>-t</code> option) where dar checks the backup internal
+	structure and usability. The step further here is not only to check
+	that each part of the backup is readable and has a correct associated
+	CRC but also that it matches what is present on filesystem. So yes, if
+	new files are present on filesystem, nothing has to be reported. If a
+	file changed, dar reports that the file does not match what's in the
+	backup, if a file is missing dar cannot compare it with filesystem
+	and reports an error too.
+      </p>
+      <p>
+	So you want to know what has changed on your filesystem?
+	No problem, <b>do a differential backup!</b>
+	OK, you don't want to have a new backup or do not have the space for
+	that, just output the backup to /dev/null and request on-fly isolation
+	as follows:
+      </p>
+      <code class=block>
+	dar -c - -A &lt;ref backup&gt; -@ &lt;isolated&gt; ... other options ... &gt; /dev/null<br/>
+      </code>
+
+      <p>
+	<dl>
+	  <dt class=void><code>&lt;ref backup&gt;</code></dt>
+	  <dd>is the backup of reference or an isolated
+	    catalogue
+	  </dd>
+	  <dt class=void><code>&lt;isolated&gt;</code></dt>
+	  <dd>
+	    is the name of the isolated
+	    catalogue to produce.
+	  </dd>
+	</dl>
+      <p>
+	Once the operation has completed, you can list
+	the isolated catalogue using the following command:
+      </p>
+      <code class=block>
+	dar -l &lt;isolated&gt; -as
+      </code>
+      <p>
+	It will give you the exact difference between your current filesystem
+	and the filesystem at the time the <code>&lt;ref backup&gt;</code> was done:
+	modified files and new files are reported with <code>[inref]</code> for either data EA or both,
+	while deleted files are reported by <code>[--- REMOVED ENTRY ----]</code>
+	information, followed by the estimated removal date and the type of the
+	removed file (<code>[-]</code> for plain file, <code>[d]</code> for directory, and so on. More
+	details in dar man page for listing command).
+      </p>
 
 
-    <a name="delta"><b>Why dar does not automatically perform delta difference (aka rsync increment)?</b></a><br/>
+      <a name="delta"><b>Why dar does not automatically perform delta difference (aka rsync increment)?</b></a><br/>
 
-    <p>
-      Because delta different is subject in theory to checksum collision (but it is very
-      unprobable though), which could lead a new version of a file being seen
-      the same as an older one while some changes took place in it. A second
-      reason is to take care of users preference, that do not want
-      having this feature activated by default. Well, now, activating delta
-      difference with dar is quite simple and flexible, see <a href="usage_notes.html#delta">note</a>.<br/>
-    </p>
+      <p>
+	Because delta different is subject in theory to checksum collision (but it is very
+	unprobable though), which could lead a new version of a file being seen
+	the same as an older one while some changes took place in it. A second
+	reason is to take care of users preference, that do not want
+	having this feature activated by default. Well, now, activating delta
+	difference with dar is quite simple and flexible, see <a href="usage_notes.html#delta">note</a>.<br/>
+      </p>
 
-    <a name="cyrillic"><b>Why do dar reports truncated filenames under Windows, especially with cyrillic filenames?</b></a><br/>
+      <a name="cyrillic"><b>Why do dar reports truncated filenames under Windows, especially with cyrillic filenames?</b></a><br/>
 
-    <p>
-      Dar/libdar has been first
-      developer for Linux. It has been later ported to many other operating
-      systems. For Unix-like system (FreeBSD, Solaris, ...), it can run as a
-      native program by just recompiled it for the target OS and processor.
-      For Windows system, it cannot because Unix and Windows systems do not
-      provide the same system calls at all. The easiest way to have dar
-      running under Windows was to rely on Cygwin, which translates the Unix
-      system calls to Windows system calls. However Cygwin brings some
-      limitations. One of them is that it cannot provide filenames longer
-      than 256 bytes, while today's Windows can have much longer filenames.
-    </p>
-    <p>
-      What the point with cyrillic filenames? Cyrillic characters unlike most
-      latin ones are not stored as a single byte, they usually use several
-      bytes per character, thus this maximum file size is reached much
-      quicker than with latin filenames, but the problem also exists with
-      them.
-    </p>
-    <p>
-      The consequence is that when dar reads a directory that contains a
-      large filename, the Cygwin layer is not able to provide it entierly:
-      the filename is truncated. When dar wants to read information about
-      that filename most of the time such truncated filename does not exists
-      and dar reports the message from the system that this file does not
-      exists (which might sound strange from user point of view). Since
-      release 2.5.4 dar reports instead that filename has been truncated and
-      that it will be ignored.
-    </p>
+      <p>
+	Dar/libdar has been first
+	developer for Linux. It has been later ported to many other operating
+	systems. For Unix-like system (FreeBSD, Solaris, ...), it can run as a
+	native program by just recompiled it for the target OS and processor.
+	For Windows system, it cannot because Unix and Windows systems do not
+	provide the same system calls at all. The easiest way to have dar
+	running under Windows was to rely on Cygwin, which translates the Unix
+	system calls to Windows system calls. However Cygwin brings some
+	limitations. One of them is that it cannot provide filenames longer
+	than 256 bytes, while today's Windows can have much longer filenames.
+      </p>
+      <p>
+	What the point with cyrillic filenames? Cyrillic characters unlike most
+	latin ones are not stored as a single byte, they usually use several
+	bytes per character, thus this maximum file size is reached much
+	quicker than with latin filenames, but the problem also exists with
+	them.
+      </p>
+      <p>
+	The consequence is that when dar reads a directory that contains a
+	large filename, the Cygwin layer is not able to provide it entierly:
+	the filename is truncated. When dar wants to read information about
+	that filename most of the time such truncated filename does not exists
+	and dar reports the message from the system that this file does not
+	exists (which might sound strange from user point of view). Since
+	release 2.5.4 dar reports instead that filename has been truncated and
+	that it will be ignored.
+      </p>
 
-    <a name="win32"><b>I have a 32 bits windows system, which binary package can I to use?</b></a><br/>
+      <a name="win32"><b>I have a 32 bits windows system, which binary package can I to use?</b></a><br/>
 
-    <p>
-      Up to release 2.4.15 (including)
-      the dar/libdar binaries for windows were built on a 32 bits windows
-      (XP) system. After that release, binaries for windows have been built
-      using a 64 bits windows system (7, now 8 and probably 10 soon).
-      Unfortunately, the filename of the binary packages for windows do not
-      reflect that change and have still been labeled "i386" while included
-      binaries do no more supporting i386 CPU family (which are 32 bits CPU).
-      This is an oversight that has been unseen until Adrian Buciuman's
-      remark in dar-support mailing-list September 23d, 2016. In consequence
-      after that date binary packages for windows will receive an additional
-      field corresponding to the windows flavor they have been built against.
-    </p>
-    <p>
-      Some may still need 32 bits windows binaries of dar, unfortunately I
-      have no more access to such system, but if you have such windows ISO
-      image and valid license to give me, I could install it into a virtual
-      machine and provide binary packages for 32 bits too.
-    </p>
-    <p>
-      Until then, you can build yourself the binary for windows. Here follows the recipe:
-    </p>
-    <p>
-      install <a href="https://www.cygwin.com/">Cygwin</a> on windows including at least the following packages:
-    </p>
-    <ul>
-      <li>clang C/C++ compiler</li>
-      <li>cygwin devel</li>
-      <li>doxygen</li>
-      <li>gettext-devel</li>
-      <li>liblzo2-devel</li>
-      <li>libzzip-devel</li>
-      <li>libgpgme-devel</li>
-      <li>librsync-devel (starting future release 2.6.0)</li>
-      <li>make</li>
-      <li>tcsh</li>
-      <li>zip<br/>
-      </li>
-      <li>upx</li>
-    </ul>
-    <p>
-      Then get the dar source code and extract its content (either using windows native tools or using tar under cygwin)
-      For clarity let's assuming you have extracted dar source package for version x.y.z
-      into <code>C:\Temp</code> directory, thus you now have the directory <code>C:\Temp\dar-x.y.z</code>
-    </p>
-    <p>
-      Run a cygwin terminal and "cd" into that directory:
-    </p>
-    <code class=block>
-      cd /cygdrive/c/Temp/dar-x.y.z
-    </code>
-    <p>
-      In the previous command, note that from within a cygwin shell, the path
-      use slashes not windows backslashes ; note also the 'c' is lowercase
-      while windows shows upper case letter for drives...
-    </p>
-    <p>
-      But don't worry, we are almost finished, run the following script:
-    </p>
-    <code class=block>
-      misc/batch_cygwin x.y.z
-    </code>
-    <p>
-      starting release 2.5.7 the syntax will change / has changed
-    </p>
-    <code class=block>
-      misc/batch_cygwin x.y.z win32
-    </code>
-    <p>
-      the new "win32" or "win64" field will be used to label the zip package
-      containing the dar/libdar binary for windows, that's up to you to
-      choose the value corresponding to your OS 32/64 bits flavor.
-    </p>
-    <p>
-      At the end of the process you will get a dar zip file for windows in
-      <code>C:\Temp\dar-x.y.z</code> directory.
-    </p>
-    <p>
-      Feel free to ask for support on
-      <a href="https://lists.sourceforge.net/lists/listinfo/dar-support">dar-support mailing-list</a>
-      if you enconter any problem building dar binary for windows, this FAQ will be updated accordingly.
-    </p>
+      <p>
+	Up to release 2.4.15 (including)
+	the dar/libdar binaries for windows were built on a 32 bits windows
+	(XP) system. After that release, binaries for windows have been built
+	using a 64 bits windows system (7, now 8 and probably 10 soon).
+	Unfortunately, the filename of the binary packages for windows do not
+	reflect that change and have still been labeled "i386" while included
+	binaries do no more supporting i386 CPU family (which are 32 bits CPU).
+	This is an oversight that has been unseen until Adrian Buciuman's
+	remark in dar-support mailing-list September 23d, 2016. In consequence
+	after that date binary packages for windows will receive an additional
+	field corresponding to the windows flavor they have been built against.
+      </p>
+      <p>
+	Some may still need 32 bits windows binaries of dar, unfortunately I
+	have no more access to such system, but if you have such windows ISO
+	image and valid license to give me, I could install it into a virtual
+	machine and provide binary packages for 32 bits too.
+      </p>
+      <p>
+	Until then, you can build yourself the binary for windows. Here follows the recipe:
+      </p>
+      <p>
+	install <a href="https://www.cygwin.com/">Cygwin</a> on windows including at least the following packages:
+      </p>
+      <ul>
+	<li>clang C/C++ compiler</li>
+	<li>cygwin devel</li>
+	<li>doxygen</li>
+	<li>gettext-devel</li>
+	<li>liblzo2-devel</li>
+	<li>libzzip-devel</li>
+	<li>libgpgme-devel</li>
+	<li>librsync-devel (starting future release 2.6.0)</li>
+	<li>make</li>
+	<li>tcsh</li>
+	<li>zip<br/>
+	</li>
+	<li>upx</li>
+      </ul>
+      <p>
+	Then get the dar source code and extract its content (either using windows native tools or using tar under cygwin)
+	For clarity let's assuming you have extracted dar source package for version x.y.z
+	into <code>C:\Temp</code> directory, thus you now have the directory <code>C:\Temp\dar-x.y.z</code>
+      </p>
+      <p>
+	Run a cygwin terminal and "cd" into that directory:
+      </p>
+      <code class=block>
+	cd /cygdrive/c/Temp/dar-x.y.z
+      </code>
+      <p>
+	In the previous command, note that from within a cygwin shell, the path
+	use slashes not windows backslashes ; note also the 'c' is lowercase
+	while windows shows upper case letter for drives...
+      </p>
+      <p>
+	But don't worry, we are almost finished, run the following script:
+      </p>
+      <code class=block>
+	misc/batch_cygwin x.y.z
+      </code>
+      <p>
+	starting release 2.5.7 the syntax will change / has changed
+      </p>
+      <code class=block>
+	misc/batch_cygwin x.y.z win32
+      </code>
+      <p>
+	the new "win32" or "win64" field will be used to label the zip package
+	containing the dar/libdar binary for windows, that's up to you to
+	choose the value corresponding to your OS 32/64 bits flavor.
+      </p>
+      <p>
+	At the end of the process you will get a dar zip file for windows in
+	<code>C:\Temp\dar-x.y.z</code> directory.
+      </p>
+      <p>
+	Feel free to ask for support on
+	<a href="https://lists.sourceforge.net/lists/listinfo/dar-support">dar-support mailing-list</a>
+	if you enconter any problem building dar binary for windows, this FAQ will be updated accordingly.
+      </p>
 
-    <a name="windows_slash"><b>Path slash and back-slash consideration under Windows</b></a><br/>
-    <p>
-      The paths given to dar's arguments and options
-      must respect the UNIX way (use slashes "/" not back
-      slashes "\" as it ought to be under Windows)
-      thus for example you have to have to use <code>/temp</code>
-      in place of <code>\temp</code>
-    </p>
-    <p>
-      Moreover, drive letters cannot be used the usual way, like
-      <code><e>c:\</e>windows\system32</code>. Instead you will have to
-      give the following path <code><e>/cygdrive/c/</e>windows/system32</code>.
-      As you see the <code>/cygdrive</code> directory is a
-      virtual directory that has all the drives as children directories:
-    </p>
-    <p>
-      Here is a more global example:
-    </p>
-    <code class=block>
-      &nbsp;c:\dar_win-1.2.1\dar -c /cygdrive/f/tmp/toto -s 2G -z1 -R "/cygdrive/c/My Documents"
-      &nbsp;
-      &nbsp;  ^             ^         ^   ^                     ^
-      &nbsp;  |             |         |   |                     |
-      &nbsp;  ---------------         ---------------------------
-      &nbsp; here use anti-slash        but here we use slash
-      &nbsp; as usually under           in arguments given to dar
-      &nbsp; windows to point
-      &nbsp; the command
-    </code>
+      <a name="windows_slash"><b>Path slash and back-slash consideration under Windows</b></a><br/>
+      <p>
+	The paths given to dar's arguments and options
+	must respect the UNIX way (use slashes "/" not back
+	slashes "\" as it ought to be under Windows)
+	thus for example you have to have to use <code>/temp</code>
+	in place of <code>\temp</code>
+      </p>
+      <p>
+	Moreover, drive letters cannot be used the usual way, like
+	<code><e>c:\</e>windows\system32</code>. Instead you will have to
+	give the following path <code><e>/cygdrive/c/</e>windows/system32</code>.
+	As you see the <code>/cygdrive</code> directory is a
+	virtual directory that has all the drives as children directories:
+      </p>
+      <p>
+	Here is a more global example:
+      </p>
+      <code class=block>
+	&nbsp;c:\dar_win-1.2.1\dar -c /cygdrive/f/tmp/toto -s 2G -z1 -R "/cygdrive/c/My Documents"
+	&nbsp;
+	&nbsp;  ^             ^         ^   ^                     ^
+	&nbsp;  |             |         |   |                     |
+	&nbsp;  ---------------         ---------------------------
+	&nbsp; here use anti-slash        but here we use slash
+	&nbsp; as usually under           in arguments given to dar
+	&nbsp; windows to point
+	&nbsp; the command
+      </code>
 
-    <a name="windows_root"><b>Under Windows, which directory corresponds to /</b></a><br/>
-    <p>
-      When running <i>dar</i> from a windows command-line (thus not from cygwin environement), dar's root directory
-      is the parent directory of the one holding the <i>dar.exe</i> file. This does not mean that you cannot have dar
-      backing up anything outside this directory (you can thanks to the <code>/cygdrive/...</code> path alias seen above),
-      but when dar looks for <code>darrc</code> it looks using this parent directory as the "/" root one.
-    </p>
-    <p>
-      Since release 2.6.14, the published dar packages for Windows are configured and built
-      in such a way that <i>dar.exe</i> uses the provided <code>darrc</code> file located in the <code>etc</code>
-      sub-directory. So <code>darrc</code> is now usable, out of the box.
-      However if you rename the directory where <i>dar.exe</i> is located, which name is something like
-      <code>dar64-x.y.z-win64</code>, the <i>dar.exe</i> binary will still look for a <code>darrc</code> at
-      <code>/dar64-x.y.z-win64/etc/darrc</code>, taking as root directory the parent directory
-      of the directory where it resides. You can still then explicitely rely on it by mean of a -B option
-      pointing to the modified path where the <code>darrc</code> is located.
-    </p>
+      <a name="windows_root"><b>Under Windows, which directory corresponds to /</b></a><br/>
+      <p>
+	When running <i>dar</i> from a windows command-line (thus not from cygwin environement), dar's root directory
+	is the parent directory of the one holding the <i>dar.exe</i> file. This does not mean that you cannot have dar
+	backing up anything outside this directory (you can thanks to the <code>/cygdrive/...</code> path alias seen above),
+	but when dar looks for <code>darrc</code> it looks using this parent directory as the "/" root one.
+      </p>
+      <p>
+	Since release 2.6.14, the published dar packages for Windows are configured and built
+	in such a way that <i>dar.exe</i> uses the provided <code>darrc</code> file located in the <code>etc</code>
+	sub-directory. So <code>darrc</code> is now usable, out of the box.
+	However if you rename the directory where <i>dar.exe</i> is located, which name is something like
+	<code>dar64-x.y.z-win64</code>, the <i>dar.exe</i> binary will still look for a <code>darrc</code> at
+	<code>/dar64-x.y.z-win64/etc/darrc</code>, taking as root directory the parent directory
+	of the directory where it resides. You can still then explicitely rely on it by mean of a -B option
+	pointing to the modified path where the <code>darrc</code> is located.
+      </p>
 
-    <a name="lzop_vs_dar"><b>lzo compression is slower with dar than with lzop, why?</b></a><br/>
-    <p>
-      when using the "lzo" compression algorithm, <i>dar/libdar</i> always uses the algorithm
-      <i>lzo1x_999</i> with the compression level requested
-      (from 1 to 9) as argument. Dar thus provides 9 different
-      compression/speed levels with lzo.
-    </p>
-    <p>
-      In the other hand, as of today (2017) <i>lzop</i>, the command line tool,
-      uses the very degradated lzo algorithm known as <i>lzo1x_1_15</i>
-      for level 1 and  the intermediate <i>lzo1x_1</i> algorithm
-      for levels from 2 to 6, which makes levels 2 to 6
-      totally equivalent from the <i>lzop</i> program point of view.
-      Last, compression levels 7 to 9 for <i>lzop</i> uses the same <i>lzo1x_999</i>
-      algorithm as what dar/libdar uses, which is the only algorithm of the lzo family
-      that makes use of a compression levels. In total lzop only provides 5 different
-      compression levels/algorithms only.
-    </p>
-    <p>
-      So now, you know why dar is slower than lzop when using lzo compression at level 1 to 6.
-      To get to equivalent feature as <i>lzop</i> provides for level 1 and 2-6,  dar/libdar
-      provides two additional lzo-based compression algorithms: <code><b>lzop-1</b></code>
-      and <code><b>lzop-3</b></code>. As
-      you guess, <code>lzop-1</code> uses the <i>lzo1x_1_15</i> algorithm as lzop does for
-      its compression level 1, and <code>lzop-3</code> uses the <i>lzo1x_1</i> algorithm as lzop does
-      for its compression levels 2 to 6. For both lzop-1 and lzop-3 algorithms,
-      the compression level is not used, you can keep the default or change its value this
-      will not change dar behavior.
-    </p>
+      <a name="lzop_vs_dar"><b>lzo compression is slower with dar than with lzop, why?</b></a><br/>
+      <p>
+	when using the "lzo" compression algorithm, <i>dar/libdar</i> always uses the algorithm
+	<i>lzo1x_999</i> with the compression level requested
+	(from 1 to 9) as argument. Dar thus provides 9 different
+	compression/speed levels with lzo.
+      </p>
+      <p>
+	In the other hand, as of today (2017) <i>lzop</i>, the command line tool,
+	uses the very degradated lzo algorithm known as <i>lzo1x_1_15</i>
+	for level 1 and  the intermediate <i>lzo1x_1</i> algorithm
+	for levels from 2 to 6, which makes levels 2 to 6
+	totally equivalent from the <i>lzop</i> program point of view.
+	Last, compression levels 7 to 9 for <i>lzop</i> uses the same <i>lzo1x_999</i>
+	algorithm as what dar/libdar uses, which is the only algorithm of the lzo family
+	that makes use of a compression levels. In total lzop only provides 5 different
+	compression levels/algorithms only.
+      </p>
+      <p>
+	So now, you know why dar is slower than lzop when using lzo compression at level 1 to 6.
+	To get to equivalent feature as <i>lzop</i> provides for level 1 and 2-6,  dar/libdar
+	provides two additional lzo-based compression algorithms: <code><b>lzop-1</b></code>
+	and <code><b>lzop-3</b></code>. As
+	you guess, <code>lzop-1</code> uses the <i>lzo1x_1_15</i> algorithm as lzop does for
+	its compression level 1, and <code>lzop-3</code> uses the <i>lzo1x_1</i> algorithm as lzop does
+	for its compression levels 2 to 6. For both lzop-1 and lzop-3 algorithms,
+	the compression level is not used, you can keep the default or change its value this
+	will not change dar behavior.
+      </p>
 
-    <div class=table>
-      <table class=center>
-	<tr>
-          <th>compression level<br/>for lzop</th>
-          <th>algorithm for dar</th>
-          <th>compression level<br/>for dar</th>
-          <th>lzo algorith used</th>
-	</tr>
-	<tr>
-          <td>1</td>
-          <td>lzop-1<br/>
-          </td>
-          <td>-<br/>
-          </td>
-          <td>lzo1x_1_15<br/>
-          </td>
-	</tr>
-	<tr>
-          <td>2<br/>
-          </td>
-          <td>lzop-3<br/>
-          </td>
-          <td>-<br/>
-          </td>
-          <td>lzo1x_1<br/>
-          </td>
-	</tr>
-	<tr>
-          <td>3<br/>
-          </td>
-          <td>lzop-3</td>
-          <td>-<br/>
-          </td>
-          <td>lzo1x_1</td>
-	</tr>
-	<tr>
-          <td>4<br/>
-          </td>
-          <td>lzop-3</td>
-          <td>-<br/>
-          </td>
-          <td>lzo1x_1</td>
-	</tr>
-	<tr>
-          <td>5<br/>
-          </td>
-          <td>lzop-3</td>
-          <td>-<br/>
-          </td>
-          <td>lzo1x_1</td>
-	</tr>
-	<tr>
-          <td>6<br/>
-          </td>
-          <td>lzop-3</td>
-          <td>-<br/>
-          </td>
-          <td>lzo1x_1</td>
-	</tr>
-	<tr>
-          <td>-<br/>
-          </td>
-          <td>lzo<br/>
-          </td>
-          <td>1<br/>
-          </td>
-          <td>lzo1x_999</td>
-	</tr>
-	<tr>
-          <td>-<br/>
-          </td>
-          <td>lzo<br/>
-          </td>
-          <td>2<br/>
-          </td>
-          <td>lzo1x_999</td>
-	</tr>
-	<tr>
-          <td>-<br/>
-          </td>
-          <td>lzo<br/>
-          </td>
-          <td>3<br/>
-          </td>
-          <td>lzo1x_999</td>
-	</tr>
-	<tr>
-          <td>-<br/>
-          </td>
-          <td>lzo<br/>
-          </td>
-          <td>4<br/>
-          </td>
-          <td>lzo1x_999</td>
-	</tr>
-	<tr>
-          <td>-<br/>
-          </td>
-          <td>lzo<br/>
-          </td>
-          <td>5<br/>
-          </td>
-          <td>lzo1x_999</td>
-	</tr>
-	<tr>
-          <td>-<br/>
-          </td>
-          <td>lzo<br/>
-          </td>
-          <td>6<br/>
-          </td>
-          <td>lzo1x_999</td>
-	</tr>
-	<tr>
-          <td>7<br/>
-          </td>
-          <td>lzo<br/>
-          </td>
-          <td>7<br/>
-          </td>
-          <td>lzo1x_999</td>
-	</tr>
-	<tr>
-          <td>8<br/>
-          </td>
-          <td>lzo<br/>
-          </td>
-          <td>8<br/>
-          </td>
-          <td>lzo1x_999</td>
-	</tr>
-	<tr>
-          <td>9<br/>
-          </td>
-          <td>lzo<br/>
-          </td>
-          <td>9<br/>
-          </td>
-          <td>lzo1x_999</td>
-	</tr>
-      </table>
-    </div>
-    <br/>
+      <div class=table>
+	<table class=center>
+	  <tr>
+            <th>compression level<br/>for lzop</th>
+            <th>algorithm for dar</th>
+            <th>compression level<br/>for dar</th>
+            <th>lzo algorith used</th>
+	  </tr>
+	  <tr>
+            <td>1</td>
+            <td>lzop-1<br/>
+            </td>
+            <td>-<br/>
+            </td>
+            <td>lzo1x_1_15<br/>
+            </td>
+	  </tr>
+	  <tr>
+            <td>2<br/>
+            </td>
+            <td>lzop-3<br/>
+            </td>
+            <td>-<br/>
+            </td>
+            <td>lzo1x_1<br/>
+            </td>
+	  </tr>
+	  <tr>
+            <td>3<br/>
+            </td>
+            <td>lzop-3</td>
+            <td>-<br/>
+            </td>
+            <td>lzo1x_1</td>
+	  </tr>
+	  <tr>
+            <td>4<br/>
+            </td>
+            <td>lzop-3</td>
+            <td>-<br/>
+            </td>
+            <td>lzo1x_1</td>
+	  </tr>
+	  <tr>
+            <td>5<br/>
+            </td>
+            <td>lzop-3</td>
+            <td>-<br/>
+            </td>
+            <td>lzo1x_1</td>
+	  </tr>
+	  <tr>
+            <td>6<br/>
+            </td>
+            <td>lzop-3</td>
+            <td>-<br/>
+            </td>
+            <td>lzo1x_1</td>
+	  </tr>
+	  <tr>
+            <td>-<br/>
+            </td>
+            <td>lzo<br/>
+            </td>
+            <td>1<br/>
+            </td>
+            <td>lzo1x_999</td>
+	  </tr>
+	  <tr>
+            <td>-<br/>
+            </td>
+            <td>lzo<br/>
+            </td>
+            <td>2<br/>
+            </td>
+            <td>lzo1x_999</td>
+	  </tr>
+	  <tr>
+            <td>-<br/>
+            </td>
+            <td>lzo<br/>
+            </td>
+            <td>3<br/>
+            </td>
+            <td>lzo1x_999</td>
+	  </tr>
+	  <tr>
+            <td>-<br/>
+            </td>
+            <td>lzo<br/>
+            </td>
+            <td>4<br/>
+            </td>
+            <td>lzo1x_999</td>
+	  </tr>
+	  <tr>
+            <td>-<br/>
+            </td>
+            <td>lzo<br/>
+            </td>
+            <td>5<br/>
+            </td>
+            <td>lzo1x_999</td>
+	  </tr>
+	  <tr>
+            <td>-<br/>
+            </td>
+            <td>lzo<br/>
+            </td>
+            <td>6<br/>
+            </td>
+            <td>lzo1x_999</td>
+	  </tr>
+	  <tr>
+            <td>7<br/>
+            </td>
+            <td>lzo<br/>
+            </td>
+            <td>7<br/>
+            </td>
+            <td>lzo1x_999</td>
+	  </tr>
+	  <tr>
+            <td>8<br/>
+            </td>
+            <td>lzo<br/>
+            </td>
+            <td>8<br/>
+            </td>
+            <td>lzo1x_999</td>
+	  </tr>
+	  <tr>
+            <td>9<br/>
+            </td>
+            <td>lzo<br/>
+            </td>
+            <td>9<br/>
+            </td>
+            <td>lzo1x_999</td>
+	  </tr>
+	</table>
+      </div>
+      <br/>
 
-    <a name="libthreadar"><b>What is libthreadar and why libdar relies on it?</b></a><br/>
+      <a name="libthreadar"><b>What is libthreadar and why libdar relies on it?</b></a><br/>
 
-    <p>
-      libthreadar is a wrapping library of the Posix C threads. It was originally part of
-      <a href="https://sourceforge.net/projects/webdar/">webdar</a>
-      a libdar based web server project, but as this code became necessary
-      also inside libdar, all this thread relative classes have been put into
-      a separated library called libthreadar, that today both webdar and
-      libdar rely upon.
-    </p>
-    <p>
-      dar/libdar rely on libthreadar to manage several threads inside libdar,
-      which is necessary to efficiently implement the remote repository
-      feature based on libcurl (available starting release 2.6.0).
-    </p>
-    <p>
-      <u>Why not using boost library or the thread suppport brought by C++11?</u>
-    </p>
-    Because first no complier implemented C++11 at the time webdar was
-    started and second boost thread was not found to be adapted to the need
-    for the following reasons:
-    </p>
-    <ul>
-      <li>
-	I wanted a more object oriented approach than passing a
-	function to be ran into a separated thread as provided by boost/C++11
-	interface, where from the pure virtual class libthreadar::thread that
-	let you create inherited class from.
-      </li>
-      <li>
-	I wanted to avoid functions/methods with multiple
-	parameters, as it has shown in the past with libdar to be a source of
-	problem when it comes to backward compatibily while adding new
-	features. Instead the inherited class can provide as many different
-	methods to setup individual parameters before the thread is run()
-      </li>
-      <li>
-	As a consequence, another need was to be able to set an
-	object before the thread is effectively run, the C++ object existence
-	need not to match the thread existence, in other words the object shall
-	be created first and the thread run() afterward. Of course the
-	destruction of a thread object would kill the thread it is wrapping.
-	The other advantage doing that way was the possibility to re-run() a
-	thread from the same object once a first thread had completed
-	eventually modifying some parameters through the method provided by the
-	inherited class from libthreadar::thread
-      </li>
-      <li>
-	Last but not least, I wanted to have an exception thrown
-	from within a thread and not caught up to the global thread function
-	(thus leading the thread to end), to be kept over the thread existance
-	and relaunched into the thread calling the join() method for that
-	object. Thus avoiding having a coherent treatment of errors using C++
-	exception when thread were used.
-      </li>
-    </ul>
-    <p>
-      libthreadar does all this and is a completely independant piece of
-      software from both webdar and dar/libdar. So you can use it freely
-      (LGPLv3 licensing) if you want. As all project I've been
-      published, it is documented as much as possible, feedback is always
-      welcome of something is not clear, wrong or missing.
-    </p>
-    <p>
-      libthreadar source code can be found
-      <a href="https://sourceforge.net/projects/libthreadar/">here</a>,
-      documentation is available in source package as well as online
-      <a href="http://libthreadar.sourceforge.net/">here</a>
-    </p>
+      <p>
+	libthreadar is a wrapping library of the Posix C threads. It was originally part of
+	<a href="https://sourceforge.net/projects/webdar/">webdar</a>
+	a libdar based web server project, but as this code became necessary
+	also inside libdar, all this thread relative classes have been put into
+	a separated library called libthreadar, that today both webdar and
+	libdar rely upon.
+      </p>
+      <p>
+	dar/libdar rely on libthreadar to manage several threads inside libdar,
+	which is necessary to efficiently implement the remote repository
+	feature based on libcurl (available starting release 2.6.0).
+      </p>
+      <p>
+	<u>Why not using boost library or the thread suppport brought by C++11?</u>
+      </p>
+      Because first no complier implemented C++11 at the time webdar was
+      started and second boost thread was not found to be adapted to the need
+      for the following reasons:
+      </p>
+      <ul>
+	<li>
+	  I wanted a more object oriented approach than passing a
+	  function to be ran into a separated thread as provided by boost/C++11
+	  interface, where from the pure virtual class libthreadar::thread that
+	  let you create inherited class from.
+	</li>
+	<li>
+	  I wanted to avoid functions/methods with multiple
+	  parameters, as it has shown in the past with libdar to be a source of
+	  problem when it comes to backward compatibily while adding new
+	  features. Instead the inherited class can provide as many different
+	  methods to setup individual parameters before the thread is run()
+	</li>
+	<li>
+	  As a consequence, another need was to be able to set an
+	  object before the thread is effectively run, the C++ object existence
+	  need not to match the thread existence, in other words the object shall
+	  be created first and the thread run() afterward. Of course the
+	  destruction of a thread object would kill the thread it is wrapping.
+	  The other advantage doing that way was the possibility to re-run() a
+	  thread from the same object once a first thread had completed
+	  eventually modifying some parameters through the method provided by the
+	  inherited class from libthreadar::thread
+	</li>
+	<li>
+	  Last but not least, I wanted to have an exception thrown
+	  from within a thread and not caught up to the global thread function
+	  (thus leading the thread to end), to be kept over the thread existance
+	  and relaunched into the thread calling the join() method for that
+	  object. Thus avoiding having a coherent treatment of errors using C++
+	  exception when thread were used.
+	</li>
+      </ul>
+      <p>
+	libthreadar does all this and is a completely independant piece of
+	software from both webdar and dar/libdar. So you can use it freely
+	(LGPLv3 licensing) if you want. As all project I've been
+	published, it is documented as much as possible, feedback is always
+	welcome of something is not clear, wrong or missing.
+      </p>
+      <p>
+	libthreadar source code can be found
+	<a href="https://sourceforge.net/projects/libthreadar/">here</a>,
+	documentation is available in source package as well as online
+	<a href="http://libthreadar.sourceforge.net/">here</a>
+      </p>
 
-    <a name="sftppubkey"><b>I have sftp pubkey authentication working with ssh/sftp, how to have dar using too this public key authentication for sftp?</b></a><br/>
+      <a name="sftppubkey"><b>I have sftp pubkey authentication working with ssh/sftp, how to have dar using too this public key authentication for sftp?</b></a><br/>
 
-    <p>
-      The answer is as simply as adding the following option while calling dar: <code><b>-afile-auth</b></code>
-    </p>
-    <p>
-      Why not doing pubkey by default and falling back to password authentication?
-    </p>
-    <p>
-      First this is by choice, because -afile-auth also uses ~/.netrc even
-      when using sftp. Second it could be possible to first try public key
-      authentication and falling back to password authentication, but it
-      would require libdar to first connect, eventually failing if pubkey was
-      not provisionned or wrong then connecting again asking user for
-      password on command line. I seems more efficient doing else: file authentication
-      when user ask to to so, password authentication else.
-      The counterpart is not huge for user (you can add -afile-auth in your
-      ~/.darrc and forget about it).
-    </p>
+      <p>
+	The answer is as simply as adding the following option while calling dar: <code><b>-afile-auth</b></code>
+      </p>
+      <p>
+	Why not doing pubkey by default and falling back to password authentication?
+      </p>
+      <p>
+	First this is by choice, because -afile-auth also uses ~/.netrc even
+	when using sftp. Second it could be possible to first try public key
+	authentication and falling back to password authentication, but it
+	would require libdar to first connect, eventually failing if pubkey was
+	not provisionned or wrong then connecting again asking user for
+	password on command line. I seems more efficient doing else: file authentication
+	when user ask to to so, password authentication else.
+	The counterpart is not huge for user (you can add -afile-auth in your
+	~/.darrc and forget about it).
+      </p>
 
-    <a name="libssh2"><b>I Cannot get dar to connect to remote server using SFTP, it fails with <code>SSL peer certificate or SSH remote key was not OK</code></b></a><br/>
+      <a name="libssh2"><b>I Cannot get dar to connect to remote server using SFTP, it fails with <code>SSL peer certificate or SSH remote key was not OK</code></b></a><br/>
 
-    <p>
-      This may be due to several well known reasons:
-  </p>
-    <ul>
-      <li>dar/libdar cannot find the known_hosts file</li>
-      <li>if using key authentifcation instead of password, dar/libdar cannot find the private key file</li>
-      <li>if using key authentifcation instead of password, dar/libdar cannot find the public key file</li>
-      <li>You have an outdate version of libssh2 or libcurl library and lack support for <i>ecdsa</i> host keys</li>
-    </ul>
-    <p>
-      <u>How to workaround?</u>
-    <p>
-    <p>
-      For the <b>three first cases</b>, you can make use of environment variable to change the default behavior:
-    </p>
-    <code class=block>
-      DAR_SFTP_KNOWNHOSTS_FILE
-      DAR_SFTP_PUBLIC_KEYFILE
-      DAR_SFTP_PRIVATE_KEYFILE
-    </code>
-    <p>
-      They respectively default to:
-    </p>
+      <p>
+	This may be due to several well known reasons:
+      </p>
+      <ul>
+	<li>dar/libdar cannot find the known_hosts file</li>
+	<li>if using key authentifcation instead of password, dar/libdar cannot find the private key file</li>
+	<li>if using key authentifcation instead of password, dar/libdar cannot find the public key file</li>
+	<li>You have an outdate version of libssh2 or libcurl library and lack support for <i>ecdsa</i> host keys</li>
+      </ul>
+      <p>
+	<u>How to workaround?</u>
+      <p>
+      <p>
+	For the <b>three first cases</b>, you can make use of environment variable to change the default behavior:
+      </p>
+      <code class=block>
+	DAR_SFTP_KNOWNHOSTS_FILE
+	DAR_SFTP_PUBLIC_KEYFILE
+	DAR_SFTP_PRIVATE_KEYFILE
+      </code>
+      <p>
+	They respectively default to:
+      </p>
       <code class=block>
 	$HOME/.ssh/known_hosts
 	$HOME/.ssh/id_rsa.pub
 	$HOME/.ssh/id_rsa
       </code>
-    <p>
-      Changing them accordingly to your need is done before running dar from the shell, for example
-      if you use sh or bash:
-    </p>
+      <p>
+	Changing them accordingly to your need is done before running dar from the shell, for example
+	if you use sh or bash:
+      </p>
 
-    <code class=block>
-      export DAR_SFTP_KNOWNHOSTS_FILE=~/.ssh/known_hosts_alternative
-      # then use dar as expected
-      dar -c sftp://....
-      dar -t sftp://...
-    </code>
-
-    <p>
-      if you use csh or tcsh:
-    </p>
-
-    <code class=block>
-      setenv DAR_SFTP_KNOWNHOSTS_FILE ~/.ssh/known_hosts_alternative
-      # then use dar as expected
-      dar -c sftp://...
-      dar -t sftp://...
+      <code class=block>
+	export DAR_SFTP_KNOWNHOSTS_FILE=~/.ssh/known_hosts_alternative
+	# then use dar as expected
+	dar -c sftp://....
+	dar -t sftp://...
       </code>
 
-    <p>
-      For the fourth and <b>last case</b>, the thing is more tricky:
-    </p>
-    <p>
-      First, if you don't already know what the known_hosts file is used for:
-    </p>
-    <dl>
-      <dd>
-	<i>
-	  It is used by ssh/sftp to
-	  validate that the host you connect to is not a pirate host trying to
-	  put itself between you and the real sftp/ssh server you intend to
-	  connect to. Usually the first time you connect to an sftp/ssh server
-	  you need to validate the fingerprint of the key received from the server
-	  (checking by another mean like phone call to the server's admin, https
-	  web browsing to the server page, and so on). When you validate the host
-	  key the first time, this adds a new line in known_hosts file in order
-	  for ssh/sftp client to automatically check the next time you connect
-	  that the host is still the correct one.
-	</i>
-      </dd>
-    </dl>
-    <p>
-      The known_hosts file is usually located in your home directory at
-      <code>~/.ssh/known_hosts</code> and looks like this:
-    </p>
+      <p>
+	if you use csh or tcsh:
+      </p>
 
-    <code class=block>
-      asteroide.lan <b>ecdsa-sha2-nistp256</b> AAAAE2V...
-      esxi,192.168.5.20 <b>ssh-rsa </b>AAAAB3N...
-      192.168.6.253 <b>ssh-rsa</b> AAAAB3N...
-    </code>
+      <code class=block>
+	setenv DAR_SFTP_KNOWNHOSTS_FILE ~/.ssh/known_hosts_alternative
+	# then use dar as expected
+	dar -c sftp://...
+	dar -t sftp://...
+      </code>
 
-    <p>
-      Each line concerns a different sftp/ssh server and contains three fields
+      <p>
+	For the fourth and <b>last case</b>, the thing is more tricky:
+      </p>
+      <p>
+	First, if you don't already know what the known_hosts file is used for:
+      </p>
       <dl>
-	<dt class=void><code>&lt;hostame or IP&gt;</code></dt><dd>
-	  this is the server we have already connected to
-	</dd>
-	<dt class=void><code>&lt;host-key type&gt;</code></dt><dd>
-	  this is the type of key
-	</dd>
-	<dt class=void><code>&lt;key&gt;</code></dt><dd>
-	  this is the public key the server has sent the first time we connected
+	<dd>
+	  <i>
+	    It is used by ssh/sftp to
+	    validate that the host you connect to is not a pirate host trying to
+	    put itself between you and the real sftp/ssh server you intend to
+	    connect to. Usually the first time you connect to an sftp/ssh server
+	    you need to validate the fingerprint of the key received from the server
+	    (checking by another mean like phone call to the server's admin, https
+	    web browsing to the server page, and so on). When you validate the host
+	    key the first time, this adds a new line in known_hosts file in order
+	    for ssh/sftp client to automatically check the next time you connect
+	    that the host is still the correct one.
+	  </i>
 	</dd>
       </dl>
-    <p>
-      We will focus on the second field.
-    </p>
-    <p>
-      dar/libdar relies on <i>libcurl</i> for networking protocol interaction, which
-      in turn relies on <i>libssh2</i>. Before <i>libssh2</i> 1.9.0 only <i>rsa</i>
-      host key were supported leading to this message as soon as the <i>known_hosts</i>
-      file contained a non-rsa host key (even another host listed in the <i>known_hosts</i>
-      file than the one we tend to connect).
-      As of December 2020, if 1.9.0 has now support for addition host key types (<i>ecdsa</i> and
-      <i>ed25519</i>) libcurl does not yet leverage this support and the problem persists.
-      I'm confident that things will be updated soon for this problem to be solved in a few months.
-    </p>
-    <p>
-      In the meantime, several options are available to workaround that limitation:
-    </p>
-    <ol>
-      <li>
-	disable known_hosts checking, by setting the environment
-	variable <code>DAR_SFTP_KNOWNHOSTS_FILE</code> to an empty string. Libdar will then
-	not ask libcurl/libssh2 to check for known hosts validity,
-	<b>but this is not a recommend option!</b>
-	because it opens the door to man-in-the-middle attacks.
-      </li>
-      <li>
-	copy the known_host file to <code>~/.ssh/known_host_for_libssh2</code>
-	and remove from this copy all the lines corresponding to host keys that are
-	not supported by libssh2, then set the <code>DAR_SFTP_KNOWNHOSTS_FILE</code>
-	variable to that new file. This workaround is OK only if the non
-	supported host key are not the one you intend to have dar communcating
-	with...
-      </li>
-      <li>
-	replace the the host key of the ssh/sftp server by an
-	ssh-rsa one, OK, this will most probably imply you to have root
-	permission on the remote ssh/sftp server... which is not possible when
-	using public cloud service over Internet.
-      </li>
-    </ol>
+      <p>
+	The known_hosts file is usually located in your home directory at
+	<code>~/.ssh/known_hosts</code> and looks like this:
+      </p>
 
-    <a name="too_large"><b><code>Cannot open catalogue: Cannot handle such a too large integer.</code> What to do?</b></a><br/>
+      <code class=block>
+	asteroide.lan <b>ecdsa-sha2-nistp256</b> AAAAE2V...
+	esxi,192.168.5.20 <b>ssh-rsa </b>AAAAB3N...
+	192.168.6.253 <b>ssh-rsa</b> AAAAB3N...
+      </code>
 
-    <p>
-      Unless using dar/libdar built in 32 bits mode, you should not meet this
-      error message from dar unless exceeding the 64 bits
-      <a href="Limitations.html#Integers">integer limits</a>.
-      To know which intergers type dar relies on (infinint, 32 bits or 64
-      bits) run dar -V and check the line <code>Integer size used</code>:
-    </p>
+      <p>
+	Each line concerns a different sftp/ssh server and contains three fields
+	<dl>
+	  <dt class=void><code>&lt;hostame or IP&gt;</code></dt><dd>
+	    this is the server we have already connected to
+	  </dd>
+	  <dt class=void><code>&lt;host-key type&gt;</code></dt><dd>
+	    this is the type of key
+	  </dd>
+	  <dt class=void><code>&lt;key&gt;</code></dt><dd>
+	    this is the public key the server has sent the first time we connected
+	  </dd>
+	</dl>
+      <p>
+	We will focus on the second field.
+      </p>
+      <p>
+	dar/libdar relies on <i>libcurl</i> for networking protocol interaction, which
+	in turn relies on <i>libssh2</i>. Before <i>libssh2</i> 1.9.0 only <i>rsa</i>
+	host key were supported leading to this message as soon as the <i>known_hosts</i>
+	file contained a non-rsa host key (even another host listed in the <i>known_hosts</i>
+	file than the one we tend to connect).
+	As of December 2020, if 1.9.0 has now support for addition host key types (<i>ecdsa</i> and
+	<i>ed25519</i>) libcurl does not yet leverage this support and the problem persists.
+	I'm confident that things will be updated soon for this problem to be solved in a few months.
+      </p>
+      <p>
+	In the meantime, several options are available to workaround that limitation:
+      </p>
+      <ol>
+	<li>
+	  disable known_hosts checking, by setting the environment
+	  variable <code>DAR_SFTP_KNOWNHOSTS_FILE</code> to an empty string. Libdar will then
+	  not ask libcurl/libssh2 to check for known hosts validity,
+	  <b>but this is not a recommend option!</b>
+	  because it opens the door to man-in-the-middle attacks.
+	</li>
+	<li>
+	  copy the known_host file to <code>~/.ssh/known_host_for_libssh2</code>
+	  and remove from this copy all the lines corresponding to host keys that are
+	  not supported by libssh2, then set the <code>DAR_SFTP_KNOWNHOSTS_FILE</code>
+	  variable to that new file. This workaround is OK only if the non
+	  supported host key are not the one you intend to have dar communcating
+	  with...
+	</li>
+	<li>
+	  replace the the host key of the ssh/sftp server by an
+	  ssh-rsa one, OK, this will most probably imply you to have root
+	  permission on the remote ssh/sftp server... which is not possible when
+	  using public cloud service over Internet.
+	</li>
+      </ol>
 
-    <code class=block>
-      <b># src/dar_suite/dar -V</b>
+      <a name="too_large"><b><code>Cannot open catalogue: Cannot handle such a too large integer.</code> What to do?</b></a><br/>
 
-      dar version 2.7.0_dev, Copyright (C) 2002-2020 Denis Corbin
-      Long options support         : YES
+      <p>
+	Unless using dar/libdar built in 32 bits mode, you should not meet this
+	error message from dar unless exceeding the 64 bits
+	<a href="Limitations.html#Integers">integer limits</a>.
+	To know which intergers type dar relies on (infinint, 32 bits or 64
+	bits) run dar -V and check the line <code>Integer size used</code>:
+      </p>
 
-      Using libdar 6.3.0 built with compilation time options:
-      gzip compression (libz)      : YES
-      bzip2 compression (libbzip2) : YES
-      lzo compression (liblzo2)    : YES
-      xz compression (liblzma)     : YES
-      zstd compression (libzstd)   : YES
-      lz4 compression (liblz4)     : YES
-      Strong encryption (libgcrypt): YES
-      Public key ciphers (gpgme)   : YES
-      Extended Attributes support  : YES
-      Large files support (> 2GB)  : YES
-      ext2fs NODUMP flag support   : YES
-      <e>Integer size used            : 64 bits</e>
-      Thread safe support          : YES
-      Furtive read mode support    : YES
-      Linux ext2/3/4 FSA support   : YES
-      Mac OS X HFS+ FSA support    : NO
-      Linux statx() support        : YES
-      Detected system/CPU endian   : little
-      Posix fadvise support        : YES
-      Large dir. speed optimi.     : YES
-      Timestamp read accuracy      : 1 nanosecond
-      Timestamp write accuracy     : 1 nanosecond
-      Restores dates of symlinks   : YES
-      Multiple threads (libthreads): YES (1.3.1)
-      Delta compression (librsync) : YES
-      Remote repository (libcurl)  : YES
-      argon2 hashing (libargon2)   : YES
+      <code class=block>
+	<b># src/dar_suite/dar -V</b>
 
-      compiled the Jan  7 2021 with GNUC version 8.3.0
-      dar is part of the Disk Backup suite (Release 2.7.0_dev)
-      dar comes with ABSOLUTELY NO WARRANTY; for details
-      type `dar -W'. This is free software, and you are welcome
-      to redistribute it under certain conditions; type `dar -L | more'
-      for details.
-    </code>
-    <p>
-      If you read "infinint" and see the above error message from dar, thanks to
-      <a href="index.html#reporting_a_bug">report a bug</a> this should never occur.
-      Else the problem appear when
-      using dar before release 2.5.13 either at backup creation time when
-      dar met a file with a negative date, or at backup reading time,
-      reading a backup generated by dar 2.4.x or older and containing a
-      file with a very distant date in the future thing dar 2.4.x and below
-      recorded when the system returned a negative date for a file to save.
-    </p>
-    <p>
-      What is a negative date? Date of files are recorded un "unix" time,
-      that's to say the number of second elapsed since the beginning of year
-      1970. A negative date is means a date before 1970, which should
-      normally not be met today because the few computer that existed at that
-      time had not such way of storing dates nor the same files and
-      filesystems.
-    </p>
-    <p>
-      However for some reasons such negative dates can be set returned by
-      several operating systems (Linux based ones among others) and dar today
-      has not the ability to record such dates (but if you need dar storing
-      negative dates for a good reason please fill a
-      <a href="index.html#Asking_for_a_new_feature">feature request</a> with the
-      reason you need this feature).
-    </p>
-    <p>
-      Since release 2.5.13 when dar the system reports a negative date for a
-      file to save, dar asks the user to consider the date was zero, this
-      requires user interaction and may not fit all needs. For that reason,
-      the -az option has been added to automatically assume negative dates
-      read from filesystem to be equal to zero (January 1st 1970, 00:00 GMT)
-      without user interaction.
-    </p>
+	dar version 2.7.0_dev, Copyright (C) 2002-2020 Denis Corbin
+	Long options support         : YES
 
-    <a name="full-from-diff"><b>I have a diff/incremental backup and I want to convert it to a full backup, how to do that?</b></a><br/>
+	Using libdar 6.3.0 built with compilation time options:
+	gzip compression (libz)      : YES
+	bzip2 compression (libbzip2) : YES
+	lzo compression (liblzo2)    : YES
+	xz compression (liblzma)     : YES
+	zstd compression (libzstd)   : YES
+	lz4 compression (liblz4)     : YES
+	Strong encryption (libgcrypt): YES
+	Public key ciphers (gpgme)   : YES
+	Extended Attributes support  : YES
+	Large files support (> 2GB)  : YES
+	ext2fs NODUMP flag support   : YES
+	<e>Integer size used            : 64 bits</e>
+	Thread safe support          : YES
+	Furtive read mode support    : YES
+	Linux ext2/3/4 FSA support   : YES
+	Mac OS X HFS+ FSA support    : NO
+	Linux statx() support        : YES
+	Detected system/CPU endian   : little
+	Posix fadvise support        : YES
+	Large dir. speed optimi.     : YES
+	Timestamp read accuracy      : 1 nanosecond
+	Timestamp write accuracy     : 1 nanosecond
+	Restores dates of symlinks   : YES
+	Multiple threads (libthreads): YES (1.3.1)
+	Delta compression (librsync) : YES
+	Remote repository (libcurl)  : YES
+	argon2 hashing (libargon2)   : YES
 
-    <p>
-      it is possible to convert a differential backup if you also have the full
-      backup is has been based on, in other words: the backup of reference.
-      This is pretty simple to do:
-    </p>
+	compiled the Jan  7 2021 with GNUC version 8.3.0
+	dar is part of the Disk Backup suite (Release 2.7.0_dev)
+	dar comes with ABSOLUTELY NO WARRANTY; for details
+	type `dar -W'. This is free software, and you are welcome
+	to redistribute it under certain conditions; type `dar -L | more'
+	for details.
+      </code>
+      <p>
+	If you read "infinint" and see the above error message from dar, thanks to
+	<a href="index.html#reporting_a_bug">report a bug</a> this should never occur.
+	Else the problem appear when
+	using dar before release 2.5.13 either at backup creation time when
+	dar met a file with a negative date, or at backup reading time,
+	reading a backup generated by dar 2.4.x or older and containing a
+	file with a very distant date in the future thing dar 2.4.x and below
+	recorded when the system returned a negative date for a file to save.
+      </p>
+      <p>
+	What is a negative date? Date of files are recorded un "unix" time,
+	that's to say the number of second elapsed since the beginning of year
+	1970. A negative date is means a date before 1970, which should
+	normally not be met today because the few computer that existed at that
+	time had not such way of storing dates nor the same files and
+	filesystems.
+      </p>
+      <p>
+	However for some reasons such negative dates can be set returned by
+	several operating systems (Linux based ones among others) and dar today
+	has not the ability to record such dates (but if you need dar storing
+	negative dates for a good reason please fill a
+	<a href="index.html#Asking_for_a_new_feature">feature request</a> with the
+	reason you need this feature).
+      </p>
+      <p>
+	Since release 2.5.13 when dar the system reports a negative date for a
+	file to save, dar asks the user to consider the date was zero, this
+	requires user interaction and may not fit all needs. For that reason,
+	the -az option has been added to automatically assume negative dates
+	read from filesystem to be equal to zero (January 1st 1970, 00:00 GMT)
+	without user interaction.
+      </p>
 
-    <code class=block>
-      dar -+ new_full_backup -A backup_of_reference -@ differential_backup full-from-diff [other options]
-    </code>
+      <a name="full-from-diff"><b>I have a diff/incremental backup and I want to convert it to a full backup, how to do that?</b></a><br/>
 
-    <dl>
-      <dt class=void><b>new_full_backup</b></dt><dd>
-	is a backup that will be created according the provided other options
-	(compression, encryption, slicing, hashing and so on as specified on arguments).
-      </dd>
-      <dt class=void><b>backup_of_reference</b></dt><dd>
-	is the full backup that was used as reference for the differential backup
-      </dd>
-      <dt class=void><b>differential_backup</b></dt><dd>
-	is the differential backup you want to convert into a full backup
-      </dd>
-    </dl>
+      <p>
+	it is possible to convert a differential backup if you also have the full
+	backup is has been based on, in other words: the backup of reference.
+	This is pretty simple to do:
+      </p>
 
-    <p>
-      the important point is the last argument <code>"full-from-diff"</code> which is defined in
-      /etc/darrc and makes the merging operation used here (-+ option) working as expected for
-      the resulting backup be the same as if a full backup had been done instead of a differential
-      backup at the time "differential_backup" was created.
-    </p>
-    <p>
-      For incremental backups, (backup which reference is not a full backup) you can also use
-      this method but you first need to create the full backup from the incremental/differential
-      backup that has been used as reference for this incremental backup. Thus the process should
-      follow the same order used to create backups.
-    </p>
+      <code class=block>
+	dar -+ new_full_backup -A backup_of_reference -@ differential_backup full-from-diff [other options]
+      </code>
 
+      <dl>
+	<dt class=void><b>new_full_backup</b></dt><dd>
+	  is a backup that will be created according the provided other options
+	  (compression, encryption, slicing, hashing and so on as specified on arguments).
+	</dd>
+	<dt class=void><b>backup_of_reference</b></dt><dd>
+	  is the full backup that was used as reference for the differential backup
+	</dd>
+	<dt class=void><b>differential_backup</b></dt><dd>
+	  is the differential backup you want to convert into a full backup
+	</dd>
+      </dl>
+
+      <p>
+	the important point is the last argument <code>"full-from-diff"</code> which is defined in
+	/etc/darrc and makes the merging operation used here (-+ option) working as expected for
+	the resulting backup be the same as if a full backup had been done instead of a differential
+	backup at the time "differential_backup" was created.
+      </p>
+      <p>
+	For incremental backups, (backup which reference is not a full backup) you can also use
+	this method but you first need to create the full backup from the incremental/differential
+	backup that has been used as reference for this incremental backup. Thus the process should
+	follow the same order used to create backups.
+      </p>
+    </div>
   </body>
 </html>
