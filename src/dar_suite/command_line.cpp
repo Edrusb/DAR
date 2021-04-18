@@ -413,7 +413,11 @@ bool get_args(shared_ptr<user_interaction> & dialog,
             if(p.aux_root == nullptr)
                 throw SRC_BUG;
             else
+	    {
                 line_tools_check_basename(*dialog, *p.aux_root, *p.aux_filename, EXTENSION, false);
+		if(p.aux_num_digits == 0)
+		    line_tools_check_min_digits(*dialog, *p.aux_root, *p.aux_filename, EXTENSION, p.aux_num_digits);
+	    }
         }
 
         if(p.fs_root == nullptr)
@@ -442,7 +446,11 @@ bool get_args(shared_ptr<user_interaction> & dialog,
             if(p.ref_root == nullptr)
                 throw SRC_BUG;
             else
+	    {
                 line_tools_check_basename(*dialog, *p.ref_root, *p.ref_filename, EXTENSION, false);
+		if(p.ref_num_digits == 0)
+		    line_tools_check_min_digits(*dialog, *p.ref_root, *p.ref_filename, EXTENSION, p.ref_num_digits);
+	    }
         }
 
         if(p.algo != compression::none && p.op != create && p.op != isolate && p.op != merging)
