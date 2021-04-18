@@ -42,6 +42,15 @@ div.top img
     float:left;
 }
 
+@media only screen and (max-width: 800px)
+{
+    div.top img
+    {
+	width: 150px;
+    }
+}
+
+
 div.top h1, div.top div.h1
 {
     flex-grow: 2;
@@ -136,6 +145,28 @@ div.maintop
 {
     padding-bottom: 5%;
     min-width: 100%;
+}
+
+@media only screen and (max-width: 600px)
+{
+    div.top
+    {
+	border-radius: 14px 1px 1px 1px;
+    }
+    div.page
+    {
+	flex-direction: column;
+	align-items: stretch;
+    }
+    div.menuleft
+    {
+	margin-right: 0;
+    }
+    div.mainleft
+    {
+	width: 100%;
+	max-width: 100%;
+    }
 }
 
 /*
