@@ -42,2440 +42,2442 @@
       </div>
     </div>
 
-    <h2>Introduction</h2>
+    <div class=maintop>
+      <h2>Introduction</h2>
 
-    <p>
-      You will find here a collection of example of use cases
-      for several features of dar suite command-line tools.
-    </p>
+      <p>
+	You will find here a collection of example of use cases
+	for several features of dar suite command-line tools.
+      </p>
 
 
-    <h2><a name="dar_remote">Dar and remote backup</a></h2>
-    <p>
-      This topic has for objective to show the different methods available
-      to perform a remote backup (a backup of a system using a remote storage).
-      It does not describe the remote storage itself, nor the way to access it, but the
-      common ways to do so. For a precise description/recipies on how to use
-      dar with ssh, netcat, ftp or sftp, see the topics following this one.
-    </p>
-    <p>
-      Between these two hosts, we could also use NFS and we could
-      use dar as usually, eventually adding an IPSEC VPN if the
-      underlying network would not be secur (backup over Internet, ...), there is
-      nothing very complicated and this is a valid solution.
-    </p>
-    <p>
-      We could also split the backup in very small slices (using dar's -s and
-      eventually -S option) slices that would be moved to/from the storage before the
-      backup process to continue creating/reading the next one. We could even
-      make use of one or more of the dar's -E -F and -~ options to automate
-      the process and get a pretty viable backup process.
-    </p>
-    <p>
-      But what if for any reasons these previous methods were not acceptable for
-      our use context?
-    </p>
-    <p>
-      As a last resort, we can leverage the fact that dar can use its standard input
-      and output to work, and pipe these to any arbitrary command giving us the
-      greatest freedom available.
-      In the following we will find list two different ways to do so:
-    </p>
-    <ol>
-      <li>single pipe</li>
-      <li>dual pipes</li>
-    </ol>
+      <h2><a name="dar_remote">Dar and remote backup</a></h2>
+      <p>
+	This topic has for objective to show the different methods available
+	to perform a remote backup (a backup of a system using a remote storage).
+	It does not describe the remote storage itself, nor the way to access it, but the
+	common ways to do so. For a precise description/recipies on how to use
+	dar with ssh, netcat, ftp or sftp, see the topics following this one.
+      </p>
+      <p>
+	Between these two hosts, we could also use NFS and we could
+	use dar as usually, eventually adding an IPSEC VPN if the
+	underlying network would not be secur (backup over Internet, ...), there is
+	nothing very complicated and this is a valid solution.
+      </p>
+      <p>
+	We could also split the backup in very small slices (using dar's -s and
+	eventually -S option) slices that would be moved to/from the storage before the
+	backup process to continue creating/reading the next one. We could even
+	make use of one or more of the dar's -E -F and -~ options to automate
+	the process and get a pretty viable backup process.
+      </p>
+      <p>
+	But what if for any reasons these previous methods were not acceptable for
+	our use context?
+      </p>
+      <p>
+	As a last resort, we can leverage the fact that dar can use its standard input
+	and output to work, and pipe these to any arbitrary command giving us the
+	greatest freedom available.
+	In the following we will find list two different ways to do so:
+      </p>
+      <ol>
+	<li>single pipe</li>
+	<li>dual pipes</li>
+      </ol>
 
-    <h3>Single pipe</h3>
-    <h4>Full Backup</h4>
-    <p>
-      dar can output its archive to its standard output instead of a given
-      file. To activate it, use "-" as basename. Here is an example:
-    </p>
+      <h3>Single pipe</h3>
+      <h4>Full Backup</h4>
+      <p>
+	dar can output its archive to its standard output instead of a given
+	file. To activate it, use "-" as basename. Here is an example:
+      </p>
 
-    <code class=block>
-      dar -c - -R / -z | some_program
-    </code>
-    <p>
-      or
-    </p>
-    <code class=block>
-      dar -c - -R / -z &gt; named_pipe_or_file
-    </code>
-    <p>
-      Note, that file
-      splitting is not available as it has not much meaning when writing to a
-      pipe. At the other end of the pipe (on the remote
-      host), the data can be redirected to a file, with proper filename
-      (something that matches "*.1.dar").
-    </p>
-    <code class=block>
-      some_other_program &gt; backup_name.1.dar
-    </code>
-    <p>
-      It is also possible to redirect the output to <code>dar_xform</code>
-      which can in turn, on the
-      remote host, split the data flow into several slices, pausing between them
-      if necessary, exactly as dar is able to do:
-    </p>
-    <code class=block>
-      some_other_program | dar_xform -s 100M - backup_name
-    </code>
-    <p>
-      this will create <code>backup_name.1.dar</code>,
-      <code>backup_name.2.dar</code> and so on. The resulting archive is totally
-      compatible with those directly generated by dar.
-    </p>
-    <p>
-      <code>some_program</code> and <code>some_other_program</code> can be
-      anything you want.
-    </p>
-    <h4>Restoration</h4>
-    <p>
-      For restoration, the process implies dar to read an archive from a pipe,
-      which is possible adding the <code>--sequential-read</code> option. This
-      has however a drawback compared to the normal way dar behaves as it cannot
-      anymore seek to where is locarted one's file data but has to sequentially
-      read the whole backup (same way <i>tar</i> behaves), the only consequence
-      is a longer processing time espetially when restoring only a few files.
-    </p>
-    <p>
-      On the storage host, we would use:
-    </p>
-    <code class=block>
-      dar_xform backup_name - | some_other_program
+      <code class=block>
+	dar -c - -R / -z | some_program
+      </code>
+      <p>
+	or
+      </p>
+      <code class=block>
+	dar -c - -R / -z &gt; named_pipe_or_file
+      </code>
+      <p>
+	Note, that file
+	splitting is not available as it has not much meaning when writing to a
+	pipe. At the other end of the pipe (on the remote
+	host), the data can be redirected to a file, with proper filename
+	(something that matches "*.1.dar").
+      </p>
+      <code class=block>
+	some_other_program &gt; backup_name.1.dar
+      </code>
+      <p>
+	It is also possible to redirect the output to <code>dar_xform</code>
+	which can in turn, on the
+	remote host, split the data flow into several slices, pausing between them
+	if necessary, exactly as dar is able to do:
+      </p>
+      <code class=block>
+	some_other_program | dar_xform -s 100M - backup_name
+      </code>
+      <p>
+	this will create <code>backup_name.1.dar</code>,
+	<code>backup_name.2.dar</code> and so on. The resulting archive is totally
+	compatible with those directly generated by dar.
+      </p>
+      <p>
+	<code>some_program</code> and <code>some_other_program</code> can be
+	anything you want.
+      </p>
+      <h4>Restoration</h4>
+      <p>
+	For restoration, the process implies dar to read an archive from a pipe,
+	which is possible adding the <code>--sequential-read</code> option. This
+	has however a drawback compared to the normal way dar behaves as it cannot
+	anymore seek to where is locarted one's file data but has to sequentially
+	read the whole backup (same way <i>tar</i> behaves), the only consequence
+	is a longer processing time espetially when restoring only a few files.
+      </p>
+      <p>
+	On the storage host, we would use:
+      </p>
+      <code class=block>
+	dar_xform backup_name - | some_other_program
 
-      # or if archive is composed of a single slice
-      some_other_program &lt; backup_name.1.dar
-    </code>
-    <p>
-      While on the host to restore we would use:
-    </p>
-    <code class=block>
-      some_program | dar -x - --sequential-read <i>...other options...</i>
-    </code>
+	# or if archive is composed of a single slice
+	some_other_program &lt; backup_name.1.dar
+      </code>
+      <p>
+	While on the host to restore we would use:
+      </p>
+      <code class=block>
+	some_program | dar -x - --sequential-read <i>...other options...</i>
+      </code>
 
-    <h4>Differential/incremental Backup</h4>
-    <p>
-      Here with a single pipe, the only possible way is to rely on the operation of
-      <i>catalogue</i> isolation. This operation can be performed on the storage host
-      and the resulting isolated <i>catalogue</i> can the be transferted through a pipe
-      back to the host to backup. But there is a better way: on-fly isolation.
-    </p>
-    <code class=block>
-      dar -c - -R / -z <b>-@ isolated_full_catalogue</b> | some_program
-    </code>
-    <p>
-      This will produce a small file named <code>isolated_full_catalogue.1.dar</code>
-      on the local host (the host to backup), something we can then use to
-      create a differential/incremental backup:
-    </p>
-    <code class=block>
-      dar -c - -R / -z -@ isolated_diff_catalgue <b>-A isolated_full_catalogue</b> | some_program
-    </code>
-    <p>
-      We can then remove the <code>isolated_full_catalogue.1.dar</code> and
-      keep the new <code>isolated_diff_catalogue</code> to proceed further for
-      incremental backups. For differential backup, we would keep
-      <code>isolated_full_catalogue.1.dar</code> and would use the -@ option
-      to create an on-fly isolated catalogue only when creating the full backup.
-    </p>
-    <p>
-      The restoration process here is not different from what we saw above
-      for the full backup. We will restore the full backup, then the differential
-      and incremental, following their order of creation.
-    </p>
+      <h4>Differential/incremental Backup</h4>
+      <p>
+	Here with a single pipe, the only possible way is to rely on the operation of
+	<i>catalogue</i> isolation. This operation can be performed on the storage host
+	and the resulting isolated <i>catalogue</i> can the be transferted through a pipe
+	back to the host to backup. But there is a better way: on-fly isolation.
+      </p>
+      <code class=block>
+	dar -c - -R / -z <b>-@ isolated_full_catalogue</b> | some_program
+      </code>
+      <p>
+	This will produce a small file named <code>isolated_full_catalogue.1.dar</code>
+	on the local host (the host to backup), something we can then use to
+	create a differential/incremental backup:
+      </p>
+      <code class=block>
+	dar -c - -R / -z -@ isolated_diff_catalgue <b>-A isolated_full_catalogue</b> | some_program
+      </code>
+      <p>
+	We can then remove the <code>isolated_full_catalogue.1.dar</code> and
+	keep the new <code>isolated_diff_catalogue</code> to proceed further for
+	incremental backups. For differential backup, we would keep
+	<code>isolated_full_catalogue.1.dar</code> and would use the -@ option
+	to create an on-fly isolated catalogue only when creating the full backup.
+      </p>
+      <p>
+	The restoration process here is not different from what we saw above
+	for the full backup. We will restore the full backup, then the differential
+	and incremental, following their order of creation.
+      </p>
 
-    <h3>Dual pipes</h3>
-    <p>
-      To overcome the limited performance met when reading an archive using
-      a single pipe, we can use a pair of pipes instead and rely on
-      <code>dar_slave</code> on the remote storage host.
-    </p>
-    <p>
-      If we specify "-" as the backup basename for a reading operation
-      (-l, -t, -d, -x, or to -A when used with -C or -c),
-      dar and dar_slave will use their standard input
-      and output to communicate. The input of the first is expect to
-      receive the output of the second and vice versa.
-    </p>
-    <p>
-      We could test this with a pair of named pipes <code>todar</code>
-      and <code>toslave</code> and use shell redirection on dar and dar_slave
-      to make the glue. But this will not work due to the shell behavior:
-      dar and dar_slave would get blocked upon opening of the first named pipe,
-      waiting for the peer to open it also, even before they have started
-      (dead lock at shell level).
-    </p>
-    <p>
-      To overcome this issue met with named pipes, there is <b>-i and -o options</b>
-      that help: they receive a filename as argument, which may be a named pipe.
-      The argument provided to -i is used instead of stdin and the one&nbsp;
-      provided to -o is used instead of stdout. Note that -i and -o options are only
-      available if "-" is used as basename. Let's take an example:
-    </p>
-    <p>
-      Let's assume we want to restore an archive from the remote backup server. Thus
-      there we have to run dar_slave this way:
-    </p>
-    <code class=block>
-      mkfifo /tmp/todar /tmp/toslave
-      dar_slave <e>-o /tmp/todar -i /tmp/toslave</e> backup_name
-      some_program_remote < /tmp/todar
-			    some_other_program_remote > /tmp/toslave
-    </code>
-    <p>
-      we assume <code>some_program_remote</code> to read the data <code>/tmp/todar</code>
-      and making it available to the host we want to restore for dar to be able
-      to read it, while <code>some_other_program_remote</code> receive the output from dar
-      and write it to <code>/tmp/toslave</code>.
-    </p>
-    <p>
-      On the local host you have to run dar this way:
-    </p>
-    <code class=block>
-      mkfifo /tmp/todar /tmp/toslave
-      dar -x - <e>-i /tmp/todar -o /tmp/toslave</e> -v ...
-      some_program_local &gt; /tmp/todar
-      some_other_program_local &lt; /tmp/toslave
-    </code>
-    <p>
-      having here <code>some_program_local</code> communicating with
-      <code>some_program_remote</code> and writes the data received from dar_slave
-      to the <code>/tmp/todar</code> named pipe. While in the other direction
-      dar's output is read by <code>some_other_program_local</code> from
-      <code>/tmp/toslave</code> then sent it (by a way that is out of the scope
-      of this document) to <code>some_other_program_remote</code> that in turn
-      makes it available to dar_slave as seen above.
-    </p>
-    <p>
-      This applies also to differential backups when it comes to read the archive of
-      reference by mean of -A option. In the previous single pipe context, we used
-      an isolated catalogue. We can still do the same here, but can also leverage this
-      feature espetially when it comes to binary delta that imply reading the delta
-      signature in addition to the metadata, something not possible with
-      <code>--sequential-read</code> mode: We then come to this following architecture:
-    </p>
-    <code class=block>
-      &nbsp;    LOCAL HOST                                   REMOTE HOST
-      &nbsp;+-----------------+                     +-----------------------------+
-      &nbsp;|   filesystem    |                     |     backup of reference     |
-      &nbsp;|       |         |                     |            |                |
-      &nbsp;|       |         |                     |            |                |
-      &nbsp;|       V         |                     |            V                |
-      &nbsp;|    +-----+      | backup of reference |      +-----------+          |
-      &nbsp;|    | DAR |--&lt;-]=========================[-&lt;--| DAR_SLAVE |          |
-      &nbsp;|    |     |--&gt;-]=========================[-&gt;--|           |          |
-      &nbsp;|    +-----+      | orders to dar_slave |      +-----------+          |
-      &nbsp;|       |         |                     |      +-----------+          |
-      &nbsp;|       +---&gt;---]=========================[-&gt;--| DAR_XFORM |--&gt; backup|
-      &nbsp;|                 |        saved data   |      +-----------+ to slices|
-      &nbsp;+-----------------+                     +-----------------------------+
-    </code>
-    <p>
-      with <b>dar</b> on localhost using the following syntax, reading from a pair
-      of fifo the reference archive (-A option) and producing the differential backup
-      to its standard output:
-    </p>
-    <code class=block>
-      mkfifo <e>/tmp/toslave</e> <e>/tmp/todar</e>
-      some_program_local &gt; /tmp/todar
-      some_other_program_local &lt; /tmp/toslave
-      dar <e class=blue>-c -</e> <e>-A - -i /tmp/todar -o /tmp/toslave</e> <i>[...other options...]</i> | <e class=blue>some_third_program_local</e>
-    </code>
-    <p>
-      While <b>dar_slave</b> is run this way on the remote host:
-    </p>
-    <code class=block>
-      mkfifo <e>/tmp/toslave</e> <e>/tmp/todar</e>
-      some_program_remote &lt; /tmp/todar
-      some_other_program_remote & gt; /tmp/toslave
-      dar_slave <e>-i /tmp/toslave</e> <e>-o /tmp/todar</e> ref_backup
-    </code>
-    <p>
-      last <b>dar_xform</b> receives the differential backup and here
-      splits it into 1 giga slices adding a sha1 hash to each:
-    </p>
-    <code class=block>
-      some_third_program_remote | dar_xform -s 1G -3 sha1 <e>-</e> diff_backup
-    </code>
+      <h3>Dual pipes</h3>
+      <p>
+	To overcome the limited performance met when reading an archive using
+	a single pipe, we can use a pair of pipes instead and rely on
+	<code>dar_slave</code> on the remote storage host.
+      </p>
+      <p>
+	If we specify "-" as the backup basename for a reading operation
+	(-l, -t, -d, -x, or to -A when used with -C or -c),
+	dar and dar_slave will use their standard input
+	and output to communicate. The input of the first is expect to
+	receive the output of the second and vice versa.
+      </p>
+      <p>
+	We could test this with a pair of named pipes <code>todar</code>
+	and <code>toslave</code> and use shell redirection on dar and dar_slave
+	to make the glue. But this will not work due to the shell behavior:
+	dar and dar_slave would get blocked upon opening of the first named pipe,
+	waiting for the peer to open it also, even before they have started
+	(dead lock at shell level).
+      </p>
+      <p>
+	To overcome this issue met with named pipes, there is <b>-i and -o options</b>
+	that help: they receive a filename as argument, which may be a named pipe.
+	The argument provided to -i is used instead of stdin and the one&nbsp;
+	provided to -o is used instead of stdout. Note that -i and -o options are only
+	available if "-" is used as basename. Let's take an example:
+      </p>
+      <p>
+	Let's assume we want to restore an archive from the remote backup server. Thus
+	there we have to run dar_slave this way:
+      </p>
+      <code class=block>
+	mkfifo /tmp/todar /tmp/toslave
+	dar_slave <e>-o /tmp/todar -i /tmp/toslave</e> backup_name
+	some_program_remote < /tmp/todar
+			      some_other_program_remote > /tmp/toslave
+      </code>
+      <p>
+	we assume <code>some_program_remote</code> to read the data <code>/tmp/todar</code>
+	and making it available to the host we want to restore for dar to be able
+	to read it, while <code>some_other_program_remote</code> receive the output from dar
+	and write it to <code>/tmp/toslave</code>.
+      </p>
+      <p>
+	On the local host you have to run dar this way:
+      </p>
+      <code class=block>
+	mkfifo /tmp/todar /tmp/toslave
+	dar -x - <e>-i /tmp/todar -o /tmp/toslave</e> -v ...
+	some_program_local &gt; /tmp/todar
+	some_other_program_local &lt; /tmp/toslave
+      </code>
+      <p>
+	having here <code>some_program_local</code> communicating with
+	<code>some_program_remote</code> and writes the data received from dar_slave
+	to the <code>/tmp/todar</code> named pipe. While in the other direction
+	dar's output is read by <code>some_other_program_local</code> from
+	<code>/tmp/toslave</code> then sent it (by a way that is out of the scope
+	of this document) to <code>some_other_program_remote</code> that in turn
+	makes it available to dar_slave as seen above.
+      </p>
+      <p>
+	This applies also to differential backups when it comes to read the archive of
+	reference by mean of -A option. In the previous single pipe context, we used
+	an isolated catalogue. We can still do the same here, but can also leverage this
+	feature espetially when it comes to binary delta that imply reading the delta
+	signature in addition to the metadata, something not possible with
+	<code>--sequential-read</code> mode: We then come to this following architecture:
+      </p>
+      <code class=block>
+	&nbsp;    LOCAL HOST                                   REMOTE HOST
+	&nbsp;+-----------------+                     +-----------------------------+
+	&nbsp;|   filesystem    |                     |     backup of reference     |
+	&nbsp;|       |         |                     |            |                |
+	&nbsp;|       |         |                     |            |                |
+	&nbsp;|       V         |                     |            V                |
+	&nbsp;|    +-----+      | backup of reference |      +-----------+          |
+	&nbsp;|    | DAR |--&lt;-]=========================[-&lt;--| DAR_SLAVE |          |
+	&nbsp;|    |     |--&gt;-]=========================[-&gt;--|           |          |
+	&nbsp;|    +-----+      | orders to dar_slave |      +-----------+          |
+	&nbsp;|       |         |                     |      +-----------+          |
+	&nbsp;|       +---&gt;---]=========================[-&gt;--| DAR_XFORM |--&gt; backup|
+	&nbsp;|                 |        saved data   |      +-----------+ to slices|
+	&nbsp;+-----------------+                     +-----------------------------+
+      </code>
+      <p>
+	with <b>dar</b> on localhost using the following syntax, reading from a pair
+	of fifo the reference archive (-A option) and producing the differential backup
+	to its standard output:
+      </p>
+      <code class=block>
+	mkfifo <e>/tmp/toslave</e> <e>/tmp/todar</e>
+	some_program_local &gt; /tmp/todar
+	some_other_program_local &lt; /tmp/toslave
+	dar <e class=blue>-c -</e> <e>-A - -i /tmp/todar -o /tmp/toslave</e> <i>[...other options...]</i> | <e class=blue>some_third_program_local</e>
+      </code>
+      <p>
+	While <b>dar_slave</b> is run this way on the remote host:
+      </p>
+      <code class=block>
+	mkfifo <e>/tmp/toslave</e> <e>/tmp/todar</e>
+	some_program_remote &lt; /tmp/todar
+	some_other_program_remote & gt; /tmp/toslave
+	dar_slave <e>-i /tmp/toslave</e> <e>-o /tmp/todar</e> ref_backup
+      </code>
+      <p>
+	last <b>dar_xform</b> receives the differential backup and here
+	splits it into 1 giga slices adding a sha1 hash to each:
+      </p>
+      <code class=block>
+	some_third_program_remote | dar_xform -s 1G -3 sha1 <e>-</e> diff_backup
+      </code>
 
-    <h2><a name="netcat">dar and netcat</a></h2>
-    <p>
-      the <i>netcat</i> (<b>nc</b>) program is a simple but insecure (no authentication,
-      no data ciphering) approach to make link between dar and dar_slave or dar and dar_xform
-      as presented in the previous topic.
-    </p>
-    <p>
-      The context in which will take place the following examples is the one of a
-      "local" host named "flower" has to be backup or restored form/to a
-      remote host called "honey" (OK, the name of the machines are silly...)
-    </p>
+      <h2><a name="netcat">dar and netcat</a></h2>
+      <p>
+	the <i>netcat</i> (<b>nc</b>) program is a simple but insecure (no authentication,
+	no data ciphering) approach to make link between dar and dar_slave or dar and dar_xform
+	as presented in the previous topic.
+      </p>
+      <p>
+	The context in which will take place the following examples is the one of a
+	"local" host named "flower" has to be backup or restored form/to a
+	remote host called "honey" (OK, the name of the machines are silly...)
+      </p>
 
-    <h3>Creating a full backup</h3>
+      <h3>Creating a full backup</h3>
 
-    <p>
-      on honey:
-    </p>
-    <code class=block>
-      nc -l -p 5000 &gt; backup.1.dar
-    </code>
-    <p>
-      then on flower:
-    </p>
-    <code class=block>
-      dar -c - -R / -z | nc -w 3 honey 5000
-    </code>
-    <p>
-      but this will produce only one slice, instead you could use the
-      following to have several slices on honey:
-    </p>
-    <code class=block>
-      nc -l -p 5000 | dar_xform -s 10M -S 5M -p - backup
-    </code>
-    <p>
-      by the way note that <i>dar_xform</i>
-      can also launch a user script between slices exactly the same way
-      as dar does, thanks to the -E and -F options.
-    </p>
+      <p>
+	on honey:
+      </p>
+      <code class=block>
+	nc -l -p 5000 &gt; backup.1.dar
+      </code>
+      <p>
+	then on flower:
+      </p>
+      <code class=block>
+	dar -c - -R / -z | nc -w 3 honey 5000
+      </code>
+      <p>
+	but this will produce only one slice, instead you could use the
+	following to have several slices on honey:
+      </p>
+      <code class=block>
+	nc -l -p 5000 | dar_xform -s 10M -S 5M -p - backup
+      </code>
+      <p>
+	by the way note that <i>dar_xform</i>
+	can also launch a user script between slices exactly the same way
+	as dar does, thanks to the -E and -F options.
+      </p>
 
-    <h3>Testing the archive</h3>
+      <h3>Testing the archive</h3>
 
-    <p>
-      Testing the archive can be done
-      on honey, but diffing (comparison) implies reading the filesystem,
-      of flower this it must be run there. Both operation as well as archive
-      listing an other read operations can leverage what follows:
-    </p>
-    <p>
-      on honey:
-    </p>
-    <code class=block>
-      nc -l -p 5000 | dar_slave backup | nc -l -p 5001
-    </code>
-    <p>
-      then on flower:
-    </p>
-    <code class=block>
-      nc -w 3 honey 5001 | dar -t - | nc -w 3 honey 5000
-    </code>
-    <p>
-      Note that here too  <i>dar_slave</i> can
-      run a script between slices, if for example you need to load slices
-      from a tape robot, this can be done automatically, or if you just want to
-      mount/unmount a removable media eject or load it and ask the user to
-      change it or whatever else is your need.
-    </p>
+      <p>
+	Testing the archive can be done
+	on honey, but diffing (comparison) implies reading the filesystem,
+	of flower this it must be run there. Both operation as well as archive
+	listing an other read operations can leverage what follows:
+      </p>
+      <p>
+	on honey:
+      </p>
+      <code class=block>
+	nc -l -p 5000 | dar_slave backup | nc -l -p 5001
+      </code>
+      <p>
+	then on flower:
+      </p>
+      <code class=block>
+	nc -w 3 honey 5001 | dar -t - | nc -w 3 honey 5000
+      </code>
+      <p>
+	Note that here too  <i>dar_slave</i> can
+	run a script between slices, if for example you need to load slices
+	from a tape robot, this can be done automatically, or if you just want to
+	mount/unmount a removable media eject or load it and ask the user to
+	change it or whatever else is your need.
+      </p>
 
-    <h3>Comparing with original filesystem</h3>
-    <p>
-      this is very similar to the previous example:
-    </p>
-    <p>
-      on honey:
-    </p>
-    <code class=block>
-      nc -l -p 5000 | dar_slave backup | nc -l -p 5001
-    </code>
-    <p>
-      while on flower:
-    </p>
-    <code class=block>
-      nc -w 3 honey 5001 | dar -d - -R / | nc -w 3 honey 5000
-    </code>
+      <h3>Comparing with original filesystem</h3>
+      <p>
+	this is very similar to the previous example:
+      </p>
+      <p>
+	on honey:
+      </p>
+      <code class=block>
+	nc -l -p 5000 | dar_slave backup | nc -l -p 5001
+      </code>
+      <p>
+	while on flower:
+      </p>
+      <code class=block>
+	nc -w 3 honey 5001 | dar -d - -R / | nc -w 3 honey 5000
+      </code>
 
-    <h3>Making a differential backup</h3>
-    <p>
-      Here the problem
-      is that dar needs two pipes to send orders and read data coming from
-      dar_slave, and a third pipe to write out the new archive. This cannot
-      be realized only with stdin and stdout as previously. Thus we will need
-      a named pipe (created by the mkfifo command).
-    </p>
-    <p>
-      On honey in two different terminals:
-    </p>
-    <code class=block>
-      <e class=blue>nc -l -p 5000</e> | dar_slave backup | <e class=red>nc -l -p 5001</e>
-      <e>nc -l -p 5002</e> | dar_xform -s 10M -p - diff_backup
-    </code>
-    <p>
-      Then on flower:
-    </p>
-    <code class=block>
-      mkfifo toslave
-      <e class=blue>nc -w 3 honey 5000 &lt; toslave &amp;</e>
-      <e class=red>nc -w 3 honey 5001</e> | dar -A - <e class=blue>-o toslave</e> <e>-c -</e> -R / -z | <e>nc -w 3 honey 5002</e>
-    </code>
-    <p>
-      with netcat the
-      data goes in clear over the network. You could use ssh instead if you
-      want to have encryption over the network. The principle are the same
-      let's see this now:
-    </p>
+      <h3>Making a differential backup</h3>
+      <p>
+	Here the problem
+	is that dar needs two pipes to send orders and read data coming from
+	dar_slave, and a third pipe to write out the new archive. This cannot
+	be realized only with stdin and stdout as previously. Thus we will need
+	a named pipe (created by the mkfifo command).
+      </p>
+      <p>
+	On honey in two different terminals:
+      </p>
+      <code class=block>
+	<e class=blue>nc -l -p 5000</e> | dar_slave backup | <e class=red>nc -l -p 5001</e>
+	<e>nc -l -p 5002</e> | dar_xform -s 10M -p - diff_backup
+      </code>
+      <p>
+	Then on flower:
+      </p>
+      <code class=block>
+	mkfifo toslave
+	<e class=blue>nc -w 3 honey 5000 &lt; toslave &amp;</e>
+	<e class=red>nc -w 3 honey 5001</e> | dar -A - <e class=blue>-o toslave</e> <e>-c -</e> -R / -z | <e>nc -w 3 honey 5002</e>
+      </code>
+      <p>
+	with netcat the
+	data goes in clear over the network. You could use ssh instead if you
+	want to have encryption over the network. The principle are the same
+	let's see this now:
+      </p>
 
-    <h2><a name="ssh">Dar and ssh</a></h2>
+      <h2><a name="ssh">Dar and ssh</a></h2>
 
-    <h3>Creating full backup</h3>
-    <p>
-      we assume you have a sshd daemon on flower. We can
-      then run the following on honey:
-    </p>
-    <code class=block>
-      ssh flower dar -c - -R / -z &gt; backup.1.dar
-    </code>
-    <p>
-      Or still on honey:
-    </p>
-    <code class=block>
-      ssh flower dar -c - -R / -z | dar_xform -s 10M -S 5M -p - backup
-    </code>
+      <h3>Creating full backup</h3>
+      <p>
+	we assume you have a sshd daemon on flower. We can
+	then run the following on honey:
+      </p>
+      <code class=block>
+	ssh flower dar -c - -R / -z &gt; backup.1.dar
+      </code>
+      <p>
+	Or still on honey:
+      </p>
+      <code class=block>
+	ssh flower dar -c - -R / -z | dar_xform -s 10M -S 5M -p - backup
+      </code>
 
-    <h3>Testing the archive</h3>
-    <p>
-      On honey:
-    </p>
-    <code class=block>
-      dar -t backup
-    </code>
+      <h3>Testing the archive</h3>
+      <p>
+	On honey:
+      </p>
+      <code class=block>
+	dar -t backup
+      </code>
 
-    <h3>Comparing with original filesystem</h3>
-    <p>
-      On flower:
-    </p>
-    <code class=block>
-      mkfifo todar toslave
-      ssh honey dar_slave backup &gt; todar &lt; toslave &amp;
-      dar -d - -R / -i todar -o toslave
-    </code>
-    <p>
-      <b>Important:</b> Depending on the
-      shell you use, it may be necessary to invert the order in which "&gt; todar" and
-      "&lt; toslave" are given on command line. The problem is that the shell
-      hangs trying to open the pipes. Thanks to "/PeO" for his feedback.
-    </p>
-    <p>
-      Or on honey:
-    </p>
-    <code class=block>
-      mkfifo todar toslave
-      ssh flower dar -d - -R / &gt; toslave &lt; todar &amp;
-      dar_slave -i toslave -o todar backup
-    </code>
+      <h3>Comparing with original filesystem</h3>
+      <p>
+	On flower:
+      </p>
+      <code class=block>
+	mkfifo todar toslave
+	ssh honey dar_slave backup &gt; todar &lt; toslave &amp;
+	dar -d - -R / -i todar -o toslave
+      </code>
+      <p>
+	<b>Important:</b> Depending on the
+	shell you use, it may be necessary to invert the order in which "&gt; todar" and
+	"&lt; toslave" are given on command line. The problem is that the shell
+	hangs trying to open the pipes. Thanks to "/PeO" for his feedback.
+      </p>
+      <p>
+	Or on honey:
+      </p>
+      <code class=block>
+	mkfifo todar toslave
+	ssh flower dar -d - -R / &gt; toslave &lt; todar &amp;
+	dar_slave -i toslave -o todar backup
+      </code>
 
-    <h3>Making a differential backup</h3>
-    <p>
-      On flower:
-    </p>
-    <code class=block>
-      mkfifo todar toslave
-      ssh honey dar_slave backup &gt; todar &lt; toslave &amp;
-    </code>
-    <p>
-      and on honey:
-    </p>
-    <code class=block>
-      ssh flower dar -c - -A - -i todar -o toslave &gt; diff_linux.1.dar
-    </code>
-    <p>
-      Or
-    </p>
-    <code class=block>
-      ssh flower dar -c - -A - -i todar -o toslave | dar_xform -s 10M -S 5M -p - diff_linux
-    </code>
+      <h3>Making a differential backup</h3>
+      <p>
+	On flower:
+      </p>
+      <code class=block>
+	mkfifo todar toslave
+	ssh honey dar_slave backup &gt; todar &lt; toslave &amp;
+      </code>
+      <p>
+	and on honey:
+      </p>
+      <code class=block>
+	ssh flower dar -c - -A - -i todar -o toslave &gt; diff_linux.1.dar
+      </code>
+      <p>
+	Or
+      </p>
+      <code class=block>
+	ssh flower dar -c - -A - -i todar -o toslave | dar_xform -s 10M -S 5M -p - diff_linux
+      </code>
 
-    <h3>Integrated ssh support</h3>
-    <p>
-      Since release 2.6.0, you can use an URL-like archive basename. Assuming
-      you have slices test.1.dar, test.2.dar ... available in the directory
-      Archive of an FTP of SFTP (ssh) server you could read, extract, list, test, ... that
-      archive using the following syntax:
-    </p>
-    <code class=block>
-      dar -t ftp://login@ftp.server.some.where/Archive/example1 ...<i>other options</i>
-      dar -t sftp//login:pass@sftp.server.some/where/Archive/example2 ...<i>other options</i>
-      dar -t sftp//sftp.server.some/where/Archive/example2 -afile-auth ...<i>other options</i>
-    </code>
-    <p>
-      Same thing with -l, -x, -A and -@ options. Note that you still need to
-      provide the <u>archive base name</u> not a slice name as usually done with dar.
-      This option is also compatible with slicing and slice hashing, which will be
-      generated on remote server beside the slices:
-    </p>
-    <code class=block>
-      &nbsp;dar -c sftp://login:password@secured.server.some.where/Archive/day2/incremental \
-      &nbsp;    -A ftp://login@ftp.server.some.where/Archive/CAT_test --hash sha512         \
-      &nbsp;    -@ sftp://login2:password2@secured.server.some.where/Archive/day2/CAT_incremental \
-      &nbsp;    &lt;other options&gt;
-    </code>
-    <p>
-      By default if no password is given, dar asks the user interactively. If
-      no login is used, dar assumes the login to be "anonymous". When you add
-      the <code>-afile-auth</code> option, in absence of password on command-line, dar
-      checks for a password in the file ~/.netrc for both FTP and SFTP
-      protocols to avoid exposing password on command-line while still have
-      non interactive backup. See <b>man netrc</b> for this common file's syntax.
-      Using <code>-afile-auth</code> also activate public key authentication if
-      all is set for that (~/.ssh/id_rsa ...)
-    </p>
+      <h3>Integrated ssh support</h3>
+      <p>
+	Since release 2.6.0, you can use an URL-like archive basename. Assuming
+	you have slices test.1.dar, test.2.dar ... available in the directory
+	Archive of an FTP of SFTP (ssh) server you could read, extract, list, test, ... that
+	archive using the following syntax:
+      </p>
+      <code class=block>
+	dar -t ftp://login@ftp.server.some.where/Archive/example1 ...<i>other options</i>
+	dar -t sftp//login:pass@sftp.server.some/where/Archive/example2 ...<i>other options</i>
+	dar -t sftp//sftp.server.some/where/Archive/example2 -afile-auth ...<i>other options</i>
+      </code>
+      <p>
+	Same thing with -l, -x, -A and -@ options. Note that you still need to
+	provide the <u>archive base name</u> not a slice name as usually done with dar.
+	This option is also compatible with slicing and slice hashing, which will be
+	generated on remote server beside the slices:
+      </p>
+      <code class=block>
+	&nbsp;dar -c sftp://login:password@secured.server.some.where/Archive/day2/incremental \
+	&nbsp;    -A ftp://login@ftp.server.some.where/Archive/CAT_test --hash sha512         \
+	&nbsp;    -@ sftp://login2:password2@secured.server.some.where/Archive/day2/CAT_incremental \
+	&nbsp;    &lt;other options&gt;
+      </code>
+      <p>
+	By default if no password is given, dar asks the user interactively. If
+	no login is used, dar assumes the login to be "anonymous". When you add
+	the <code>-afile-auth</code> option, in absence of password on command-line, dar
+	checks for a password in the file ~/.netrc for both FTP and SFTP
+	protocols to avoid exposing password on command-line while still have
+	non interactive backup. See <b>man netrc</b> for this common file's syntax.
+	Using <code>-afile-auth</code> also activate public key authentication if
+	all is set for that (~/.ssh/id_rsa ...)
+      </p>
 
-    <h2><a name="remote">Comparing the different way to perform remote backup</a></h2>
+      <h2><a name="remote">Comparing the different way to perform remote backup</a></h2>
 
-    <p>
-      Since release 2.6.0 dar can directly use ftp or sftp to operate remotely.
-      This new feature has sometime some advantage over the
-      <a href="#ssh">methods descibed above with ssh</a> sometimes it has not,
-      the objective here is to clarify the pro and cons of each method.
-    </p>
+      <p>
+	Since release 2.6.0 dar can directly use ftp or sftp to operate remotely.
+	This new feature has sometime some advantage over the
+	<a href="#ssh">methods descibed above with ssh</a> sometimes it has not,
+	the objective here is to clarify the pro and cons of each method.
+      </p>
 
-    <div class=table>
-      <table>
-	<tr>
-          <th>Operation</th>
-          <th>dar + dar_slave/dar_xform through ssh</th>
-          <th>dar alone</th>
-	  <th>embedded sftp/ftp in dar</th>
-	</tr>
-	<tr>
-	  <th>
-	    Underlying mode of operation
-	  </th>
-	  <td>
-	    direct access mode
-	  </td>
-	  <td>
-	    sequential read mode
-	  </td>
-	  <td>
-	    direct access mode
-	  </td>
-	</tr>
-	<tr>
-	  <th>Backup</th>
-	  <td>
-            <ul>
-              <li>
-		best solution if you want to keep a local copy of the
-		backup or if you want to push the resulting archive to several
-		destinations
-	      </li>
-              <li>if sftp not available, only ssh is</li>
-              <li>
-		on-fly hash file is written locally (where is
-		dar_xform ran) and is thus computed by dar_xform
-		which cannot see network transmission errors
-              </li>
-            </ul>
-          </td>
-          <td>
-            <ul>
-              <li>
-		efficient but does not support slicing,
-		for the rest this is an as good solution as with dar_xform
-              </li>
-            </ul>
-          </td>
-	  <td>
-            <ul>
-              <li>best solution if you do not have space on local disks to store the resulting backup</li>
-              <li>requires on-fly isolation to local disk if you want to feed a local dar_manager database with the new archive</li>
-              <li>if ssh not available, only sftp is</li>
-              <li>
-		on-fly hash file is written to the remote directory beside the slice but calculated
-		locally, which can be used to detect network transmission error
-              </li>
-            </ul>
-          </td>
-	</tr>
-	<tr>
-          <th>
-	    Testing<br/>
-	    Diffing<br/>
-	    Listing
-          </th>
-          <td>
-            <ul>
-              <li>workaround if you hit the sftp <a href="Limitations.html">known_hosts limitation</a></li>
-              <li>sftp not available only ssh</li>
-              <li>
-		relies on dar &lt;-&gt; dar_slave exchanges which
-		protocol is not designed for high latency exchanges and may give slow
-		network performances in that situation
-              </li>
-            </ul>
-          </td>
-          <td>
-            <ul>
-              <li>very slow as it requires reading the whole archive</li>
-            </ul>
-          </td>
-	  <td>
-            <ul>
-              <li>maybe a simpler command line to execute</li>
-              <li>best solution if filtering a few files from a large archive dar will fetch over the network only the necessary data.</li>
-              <li>ssh not available only sftp</li>
-            </ul>
-          </td>
-	</tr>
-	<tr>
-          <th>Restoration</th>
-          <td>
-            <ul>
-	      <li>
-		workaround if you hit the sftp
-		<a href="Limitations.html">known_hosts limitation</a>
-	      </li>
-	      <li>sftp not available only ssh</li>
-            </ul>
-          </td>
-          <td>
-            <ul>
-              <li>very slow as it requires reading the whole archive</li>
-            </ul>
-          </td>
-	  <td>
-            <ul>
-              <li>efficient and simple</li>
-              <li>ssh not available only sftp</li>
-            </ul>
-          </td>
-	</tr>
-	<tr>
-          <th>
-	    Merging<br/>
-            <i>(should be done locally rather than over network if possible!!!)</i>
-	  </th>
-          <td>
-            <ul>
-              <li>complicated with the many pipes to setup</li>
-            </ul>
-          </td>
-          <td>
-            <ul>
-              <li>not supported!</li>
-            </ul>
-          </td>
-	  <td>
-            <ul>
-              <li>
-		not adapted if you need to feed the merging result to
-		a local dar_manager database (on-fly isolation not
-		available with merging with dar)
-              </li>
-            </ul>
-          </td>
-	</tr>
-	<tr>
-          <th>Isolation</th>
-          <td>
-            <ul>
-	      <li>
-		workaround if you hit the sftp
-		<a href="Limitations.html">known_hosts limitation</a>
-	      </li>
-	      <li>sftp not available only ssh</li>
-            </ul>
-          </td>
-          <td>
-            <ul>
-              <li>very slow as it requires reading the whole archive</li>
-            </ul>
-          </td>
-	  <td>
-            <ul>
-	      <li>
-		efficient and simple, transfers
-		the less possible data over the network
-	      </li>
-	      <li>ssh not available only sftp</li>
-            </ul>
-          </td>
-	</tr>
-	<tr>
-          <th>
-	    Repairing<br/>
-            <i>(should be done locally rather than over network if possible!!!)</i>
-	  </th>
-          <td>
-            <ul>
-              <li>not supported!</li>
-            </ul>
-          </td>
-          <td>
-            <ul>
-              <li>
-		propably the best way to repaire remotely
-		for efficiency, as this operation uses
-		sequential reading
-              </li>
-            </ul>
-          </td>
-	  <td>
-            <ul>
-              <li>ssh not available only sftp</li>
-            </ul>
-          </td>
-	</tr>
-      </table>
-    </div>
+      <div class=table>
+	<table>
+	  <tr>
+            <th>Operation</th>
+            <th>dar + dar_slave/dar_xform through ssh</th>
+            <th>dar alone</th>
+	    <th>embedded sftp/ftp in dar</th>
+	  </tr>
+	  <tr>
+	    <th>
+	      Underlying mode of operation
+	    </th>
+	    <td>
+	      direct access mode
+	    </td>
+	    <td>
+	      sequential read mode
+	    </td>
+	    <td>
+	      direct access mode
+	    </td>
+	  </tr>
+	  <tr>
+	    <th>Backup</th>
+	    <td>
+              <ul>
+		<li>
+		  best solution if you want to keep a local copy of the
+		  backup or if you want to push the resulting archive to several
+		  destinations
+		</li>
+		<li>if sftp not available, only ssh is</li>
+		<li>
+		  on-fly hash file is written locally (where is
+		  dar_xform ran) and is thus computed by dar_xform
+		  which cannot see network transmission errors
+		</li>
+              </ul>
+            </td>
+            <td>
+              <ul>
+		<li>
+		  efficient but does not support slicing,
+		  for the rest this is an as good solution as with dar_xform
+		</li>
+              </ul>
+            </td>
+	    <td>
+              <ul>
+		<li>best solution if you do not have space on local disks to store the resulting backup</li>
+		<li>requires on-fly isolation to local disk if you want to feed a local dar_manager database with the new archive</li>
+		<li>if ssh not available, only sftp is</li>
+		<li>
+		  on-fly hash file is written to the remote directory beside the slice but calculated
+		  locally, which can be used to detect network transmission error
+		</li>
+              </ul>
+            </td>
+	  </tr>
+	  <tr>
+            <th>
+	      Testing<br/>
+	      Diffing<br/>
+	      Listing
+            </th>
+            <td>
+              <ul>
+		<li>workaround if you hit the sftp <a href="Limitations.html">known_hosts limitation</a></li>
+		<li>sftp not available only ssh</li>
+		<li>
+		  relies on dar &lt;-&gt; dar_slave exchanges which
+		  protocol is not designed for high latency exchanges and may give slow
+		  network performances in that situation
+		</li>
+              </ul>
+            </td>
+            <td>
+              <ul>
+		<li>very slow as it requires reading the whole archive</li>
+              </ul>
+            </td>
+	    <td>
+              <ul>
+		<li>maybe a simpler command line to execute</li>
+		<li>best solution if filtering a few files from a large archive dar will fetch over the network only the necessary data.</li>
+		<li>ssh not available only sftp</li>
+              </ul>
+            </td>
+	  </tr>
+	  <tr>
+            <th>Restoration</th>
+            <td>
+              <ul>
+		<li>
+		  workaround if you hit the sftp
+		  <a href="Limitations.html">known_hosts limitation</a>
+		</li>
+		<li>sftp not available only ssh</li>
+              </ul>
+            </td>
+            <td>
+              <ul>
+		<li>very slow as it requires reading the whole archive</li>
+              </ul>
+            </td>
+	    <td>
+              <ul>
+		<li>efficient and simple</li>
+		<li>ssh not available only sftp</li>
+              </ul>
+            </td>
+	  </tr>
+	  <tr>
+            <th>
+	      Merging<br/>
+              <i>(should be done locally rather than over network if possible!!!)</i>
+	    </th>
+            <td>
+              <ul>
+		<li>complicated with the many pipes to setup</li>
+              </ul>
+            </td>
+            <td>
+              <ul>
+		<li>not supported!</li>
+              </ul>
+            </td>
+	    <td>
+              <ul>
+		<li>
+		  not adapted if you need to feed the merging result to
+		  a local dar_manager database (on-fly isolation not
+		  available with merging with dar)
+		</li>
+              </ul>
+            </td>
+	  </tr>
+	  <tr>
+            <th>Isolation</th>
+            <td>
+              <ul>
+		<li>
+		  workaround if you hit the sftp
+		  <a href="Limitations.html">known_hosts limitation</a>
+		</li>
+		<li>sftp not available only ssh</li>
+              </ul>
+            </td>
+            <td>
+              <ul>
+		<li>very slow as it requires reading the whole archive</li>
+              </ul>
+            </td>
+	    <td>
+              <ul>
+		<li>
+		  efficient and simple, transfers
+		  the less possible data over the network
+		</li>
+		<li>ssh not available only sftp</li>
+              </ul>
+            </td>
+	  </tr>
+	  <tr>
+            <th>
+	      Repairing<br/>
+              <i>(should be done locally rather than over network if possible!!!)</i>
+	    </th>
+            <td>
+              <ul>
+		<li>not supported!</li>
+              </ul>
+            </td>
+            <td>
+              <ul>
+		<li>
+		  propably the best way to repaire remotely
+		  for efficiency, as this operation uses
+		  sequential reading
+		</li>
+              </ul>
+            </td>
+	    <td>
+              <ul>
+		<li>ssh not available only sftp</li>
+              </ul>
+            </td>
+	  </tr>
+	</table>
+      </div>
 
-    <h2><a name="bytes_bits_kilo">Bytes, bits, kilo, mega etc.</a></h2>
-    <p>
-      Sorry by advance for the following school-like introduction to size prefix available
-      with dar, but it seems that the metric system is (still) not taught in all countries
-      leading some to ugly/erroneous writings... so let me remind what
-      I've been told at school...
-    </p>
-    <p>
-      You probably know a bit the metric system, where a dimension is expressed by a base unit
-      (the <i>meter</i> for distance, the <i>liter</i> for volume, the <i>Joule</i> for energy,
-      the <i>Volt</i> for electrical potential, the <i>bar</i> for pressure, the <i>Watt</i> for
-      power, the <i>second</i> for time, etc.), and all declined using prefixes:
-    </p>
-    <code class=block>
-      prefix (symbol) = ratio
-      ================
-      deci (d) = 0.1
-      centi (c) = 0.01
-      milli (m) = 0.001
-      micro (&mu;) = 0.000,001
-      nano (n) = 0.000,000,001
-      pico (p) = 0.000,000,000,001
-      femto (f) = 0.000,000,000,000,001
-      atto (a) = 0.000,000,000,000,000,001
-      zepto (z) = 0.000,000,000,000,000,000,001
-      yocto (y) = 0.000,000,000,000,000,000,000,001
-      deca (da) = 10
-      hecto (h) = 100
-      kilo (k) = 1,000 (yes, this is a lower case letter, not an
-      upper case! Uppercase letter 'K' is the Kelvin: temperature unit)
-      mega (M) = 1,000,000
-      giga (G) = 1,000,000,000
-      tera (T) = 1,000,000,000,000
-      peta (P) = 1,000,000,000,000,000
-      exa (E) = 1,000,000,000,000,000,000
-      zetta (Z) = 1,000,000,000,000,000,000,000
-      yotta (Y) = 1,000,000,000,000,000,000,000,000
-    </code>
-    <p>
-      Not all prefix have been introduced at the same time, the oldest
-      (c, d, m, da, h, k) exist since 1795, this explain the fact
-      they are all lowercase and are not all power of 1000. The other
-      are much more recent (1960, 1975, 1991 according to
-      <a href="https://en.wikipedia.org/wiki/Yotta-">Wikipedia</a>)
-    </p>
-    <p>
-      some other rules I had been told at school are:
-    </p>
-    <ul>
-      <li>the unit follows the number</li>
-      <li>a space has to be used between the number of the unit</li>
-    </ul>
-    <p>
-      Thus instead of writing "4K hour" the correct writing is "4 kh" for
-      <i>four kilohour</i>.
-    </p>
-    <p>
-      This way two milliseconds (noted "2 ms") are 0.002 second,
-      and 5 kilometers (noted "5 km") are 5,000 meters. All
-      was fine and nice up to the recent time when computer science appeared:
-      In that discipline, the need to measure the size of information storage
-      raised. The smallest size, is the <i>bit</i>
-      (contraction of <i><b>bi</b>nary digi<b>t</b></i>), binary because
-      it has two possible states: "0" and "1". Grouping bits by 8 computer
-      scientists called it a <i>byte</i>
-      or also an <i>octet</i>.
-    </p>
-    <p>
-      A byte having 256 different states (2 power 8) and when the ASCII (American
-      Standard Code for Information Interchange) code arrived to assign a letter
-      or more generally characters to the different values of a byte, ('A' is
-      assigned to 65, space to 32, etc) and as as most text is composed of a
-      set of character, they started to count information size in byte unit.
-      Time after time, following technology evolution, memory size approached
-      1000 bytes.
-    </p>
-    <p>
-      But as memory is accessed through a bus which is a fixed number
-      of cables (or integrated circuits), on which only two possible
-      voltages are authorized (to mean 0 or 1), the total amount of byte that a
-      bus can address is always a power of 2 here too. With a two cable bus,
-      you can have 4 values (00, 01, 10 and 11, where a digit is the state
-      of a cable) so you can address 4 bytes.
-    </p>
-    <p>
-      Giving a value to each cable defines an <u>address</u> to read or write
-      in the memory. So when memory size approached 1000 bytes they could address
-      1024 bytes (2 power 10) and it was decided that a "kilobyte" would be that:
-      1024 bytes. Some time after, and by extension, a megabyte has been
-      defined to be 1024 kilobytes, a gigabyte to be 1024 megabytes, etc. at
-      the exception of the 1.44 MB floppy where here the capacity is 1440
-      kilobytes thus here "mega" means 1000 kilo...
-    </p>
-    <p>
-      In parallel, in the telecommunications domain, going from analogical
-      to digital signal made the bit to be used also. In place of the analogical signal, took
-      place a flow of bits, representing the samples of the original signal.
-      For telecommunications the problem was more a problem of size of flow:
-      how much bit could be transmitted by second. At some ancient time
-      appeared the 1200 bit by second, then 64000, also designed as 64
-      kbit/s. Thus here, kilo stays in the usual meaning of 1000 time the
-      base unit. You can also find Ethernet 10 Mbit/s which is 10,000,000 and
-      still today the latest 400 Gbit/s ethernet is 400,000,000,000 bits/s.
-      Same thing with Token-Ring that had rates at 4, 16 or 100
-      Mbit/s (4,000,000 16,000,000 or 100,000,000 bits/s). But, even for
-      telecommunications, kilo is not always 1000 times the base unit: the E1
-      bandwidth at 2Mbit/s for example, is in fact 32*64kbit/s thus 2048
-      kbit/s ... not 2000 kbit/s
-    </p>
-    <p>
-      <b>Anyway, back to dar and present time</b>, you have to possibility to
-      give the size in byte or using a single letter as suffix
-      (k, M, T, P, E, Z, Y, the base unit being implicitely
-      the byte) thus the possibility to
-      provide a size in kilo, mega, tera, peta, exa, zetta or yotta byte,
-      with the computer science definition of these terms (power of 1024) by
-      default.
-    </p>
-    <p>
-      These suffixes are for simplicity and to not have to compute how much
-      make powers of 1024. For example, if you want to fill a CD-R you will
-      have to use the "-s 650M" option which is equivalent to "-s
-      6815744400", choose the one you prefer, the result is the same :-).
-    </p>
-    <p>
-      Now, if you want 2 Megabytes slices in the sense of the metric system,
-      simply use "-s 2000000" but since version 2.2.0, you can alter the meaning
-      of all the suffixes used by dar, using the following
-      <code>--alter=SI-units</code> option.
-      (which can be shorten to <code>-aSI</code> or <code>-asi</code>):
-    </p>
-    <code class=block>
-      -aSI -s 2k
-    </code>
-    <p>
-      Yes, and to make things more confuse, marketing/sales arrived and made sellers count
-      gigabits a third way: I remember some time ago, I bought a hard disk which
-      was described as "2.1 GB", (OK, that's now long ago!), but in
-      fact it had only 2097152 bytes available. This is far from 2202009
-      bytes (= 2.1 GiB for computer science meaning), and a bit more than
-      2,000,000 bytes (metric system). OK, if it had these 2202009 bytes
-      (computer science meaning of 2.1 GB), this hard disk would have been
-      sold under the label "2.5 GB"!? ... just kidding :-)
-    </p>
-    <p>
-      Note that to distinguish kilo, mega, tera and so on, new
-      abbreviations are officially defined, but are not used within dar:
-    </p>
-    <code class=block>
-      ki = 1024
-      Mi = 1024*1024
-      Gi = and so on...
-      Ti
-      Pi
-      Ei
-      Zi
-      Yi
-    </code>
-    <p>
-      For example, we have 1 kiB for 1 kilobytes (= 1024 bytes), and 1 kibit
-      for 1 kilobits (= 1024 bits) and 1 kB (= 1000 Bytes) and 1 kbit (= 1000
-      bits)...
-    </div>
+      <h2><a name="bytes_bits_kilo">Bytes, bits, kilo, mega etc.</a></h2>
+      <p>
+	Sorry by advance for the following school-like introduction to size prefix available
+	with dar, but it seems that the metric system is (still) not taught in all countries
+	leading some to ugly/erroneous writings... so let me remind what
+	I've been told at school...
+      </p>
+      <p>
+	You probably know a bit the metric system, where a dimension is expressed by a base unit
+	(the <i>meter</i> for distance, the <i>liter</i> for volume, the <i>Joule</i> for energy,
+	the <i>Volt</i> for electrical potential, the <i>bar</i> for pressure, the <i>Watt</i> for
+	power, the <i>second</i> for time, etc.), and all declined using prefixes:
+      </p>
+      <code class=block>
+	prefix (symbol) = ratio
+	================
+	deci (d) = 0.1
+	centi (c) = 0.01
+	milli (m) = 0.001
+	micro (&mu;) = 0.000,001
+	nano (n) = 0.000,000,001
+	pico (p) = 0.000,000,000,001
+	femto (f) = 0.000,000,000,000,001
+	atto (a) = 0.000,000,000,000,000,001
+	zepto (z) = 0.000,000,000,000,000,000,001
+	yocto (y) = 0.000,000,000,000,000,000,000,001
+	deca (da) = 10
+	hecto (h) = 100
+	kilo (k) = 1,000 (yes, this is a lower case letter, not an
+	upper case! Uppercase letter 'K' is the Kelvin: temperature unit)
+	mega (M) = 1,000,000
+	giga (G) = 1,000,000,000
+	tera (T) = 1,000,000,000,000
+	peta (P) = 1,000,000,000,000,000
+	exa (E) = 1,000,000,000,000,000,000
+	zetta (Z) = 1,000,000,000,000,000,000,000
+	yotta (Y) = 1,000,000,000,000,000,000,000,000
+      </code>
+      <p>
+	Not all prefix have been introduced at the same time, the oldest
+	(c, d, m, da, h, k) exist since 1795, this explain the fact
+	they are all lowercase and are not all power of 1000. The other
+	are much more recent (1960, 1975, 1991 according to
+	<a href="https://en.wikipedia.org/wiki/Yotta-">Wikipedia</a>)
+      </p>
+      <p>
+	some other rules I had been told at school are:
+      </p>
+      <ul>
+	<li>the unit follows the number</li>
+	<li>a space has to be used between the number of the unit</li>
+      </ul>
+      <p>
+	Thus instead of writing "4K hour" the correct writing is "4 kh" for
+	<i>four kilohour</i>.
+      </p>
+      <p>
+	This way two milliseconds (noted "2 ms") are 0.002 second,
+	and 5 kilometers (noted "5 km") are 5,000 meters. All
+	was fine and nice up to the recent time when computer science appeared:
+	In that discipline, the need to measure the size of information storage
+	raised. The smallest size, is the <i>bit</i>
+	(contraction of <i><b>bi</b>nary digi<b>t</b></i>), binary because
+	it has two possible states: "0" and "1". Grouping bits by 8 computer
+	scientists called it a <i>byte</i>
+	or also an <i>octet</i>.
+      </p>
+      <p>
+	A byte having 256 different states (2 power 8) and when the ASCII (American
+	Standard Code for Information Interchange) code arrived to assign a letter
+	or more generally characters to the different values of a byte, ('A' is
+	assigned to 65, space to 32, etc) and as as most text is composed of a
+	set of character, they started to count information size in byte unit.
+	Time after time, following technology evolution, memory size approached
+	1000 bytes.
+      </p>
+      <p>
+	But as memory is accessed through a bus which is a fixed number
+	of cables (or integrated circuits), on which only two possible
+	voltages are authorized (to mean 0 or 1), the total amount of byte that a
+	bus can address is always a power of 2 here too. With a two cable bus,
+	you can have 4 values (00, 01, 10 and 11, where a digit is the state
+	of a cable) so you can address 4 bytes.
+      </p>
+      <p>
+	Giving a value to each cable defines an <u>address</u> to read or write
+	in the memory. So when memory size approached 1000 bytes they could address
+	1024 bytes (2 power 10) and it was decided that a "kilobyte" would be that:
+	1024 bytes. Some time after, and by extension, a megabyte has been
+	defined to be 1024 kilobytes, a gigabyte to be 1024 megabytes, etc. at
+	the exception of the 1.44 MB floppy where here the capacity is 1440
+	kilobytes thus here "mega" means 1000 kilo...
+      </p>
+      <p>
+	In parallel, in the telecommunications domain, going from analogical
+	to digital signal made the bit to be used also. In place of the analogical signal, took
+	place a flow of bits, representing the samples of the original signal.
+	For telecommunications the problem was more a problem of size of flow:
+	how much bit could be transmitted by second. At some ancient time
+	appeared the 1200 bit by second, then 64000, also designed as 64
+	kbit/s. Thus here, kilo stays in the usual meaning of 1000 time the
+	base unit. You can also find Ethernet 10 Mbit/s which is 10,000,000 and
+	still today the latest 400 Gbit/s ethernet is 400,000,000,000 bits/s.
+	Same thing with Token-Ring that had rates at 4, 16 or 100
+	Mbit/s (4,000,000 16,000,000 or 100,000,000 bits/s). But, even for
+	telecommunications, kilo is not always 1000 times the base unit: the E1
+	bandwidth at 2Mbit/s for example, is in fact 32*64kbit/s thus 2048
+	kbit/s ... not 2000 kbit/s
+      </p>
+      <p>
+	<b>Anyway, back to dar and present time</b>, you have to possibility to
+	give the size in byte or using a single letter as suffix
+	(k, M, T, P, E, Z, Y, the base unit being implicitely
+	the byte) thus the possibility to
+	provide a size in kilo, mega, tera, peta, exa, zetta or yotta byte,
+	with the computer science definition of these terms (power of 1024) by
+	default.
+      </p>
+      <p>
+	These suffixes are for simplicity and to not have to compute how much
+	make powers of 1024. For example, if you want to fill a CD-R you will
+	have to use the "-s 650M" option which is equivalent to "-s
+	6815744400", choose the one you prefer, the result is the same :-).
+      </p>
+      <p>
+	Now, if you want 2 Megabytes slices in the sense of the metric system,
+	simply use "-s 2000000" but since version 2.2.0, you can alter the meaning
+	of all the suffixes used by dar, using the following
+	<code>--alter=SI-units</code> option.
+	(which can be shorten to <code>-aSI</code> or <code>-asi</code>):
+      </p>
+      <code class=block>
+	-aSI -s 2k
+      </code>
+      <p>
+	Yes, and to make things more confuse, marketing/sales arrived and made sellers count
+	gigabits a third way: I remember some time ago, I bought a hard disk which
+	was described as "2.1 GB", (OK, that's now long ago!), but in
+	fact it had only 2097152 bytes available. This is far from 2202009
+	bytes (= 2.1 GiB for computer science meaning), and a bit more than
+	2,000,000 bytes (metric system). OK, if it had these 2202009 bytes
+	(computer science meaning of 2.1 GB), this hard disk would have been
+	sold under the label "2.5 GB"!? ... just kidding :-)
+      </p>
+      <p>
+	Note that to distinguish kilo, mega, tera and so on, new
+	abbreviations are officially defined, but are not used within dar:
+      </p>
+      <code class=block>
+	ki = 1024
+	Mi = 1024*1024
+	Gi = and so on...
+	Ti
+	Pi
+	Ei
+	Zi
+	Yi
+      </code>
+      <p>
+	For example, we have 1 kiB for 1 kilobytes (= 1024 bytes), and 1 kibit
+	for 1 kilobits (= 1024 bits) and 1 kB (= 1000 Bytes) and 1 kbit (= 1000
+	bits)...
+      </p>
 
-    <h2><a name="background">Running DAR in background</a></h2>
+      <h2><a name="background">Running DAR in background</a></h2>
 
-    <p>
-      DAR can be run in background this way:
-    </p>
-    <code class=block>
-      dar [command-line arguments] &lt; /dev/null &amp;
-    </code>
+      <p>
+	DAR can be run in background this way:
+      </p>
+      <code class=block>
+	dar [command-line arguments] &lt; /dev/null &amp;
+      </code>
 
-    <h2><a name="extensions_used">Files' extension used</a></h2>
+      <h2><a name="extensions_used">Files' extension used</a></h2>
 
-    <p>
-      dar suite programs may use several type of files:
-    </p>
-    <ul>
-      <li>slices (dar, dar_xform, dar_slave, dar_manager)</li>
-      <li>configuration files (dar, dar_xform, dar_slave)</li>
-      <li>databases (dar_manager)</li>
-      <li>
-	<a href="usage_notes.html#DUC">user commands for slices</a>
-	(dar, dar_xform, dar_slave, using -E, -F or -~ options)
-      </li>
-      <li>
-	<a href="usage_notes.html#DBP">user commands for files</a>
-	(dar only, during the backup process using -= option)
-      </li>
-      <li>filter lists (dar's -[ and -] options)</li>
-    </ul>
-    <p>
-      If for slice the extension and
-      even the filename format cannot be
-      customized, (basename.slicenumber.dar)
-      there is not mandatory rule for
-      the other type of files.
-    </p>
-    <p>
-      In the case you have no idea on how to name these,
-      here is the extensions I use:
-    </p>
-    <p>
+      <p>
+	dar suite programs may use several type of files:
+      </p>
+      <ul>
+	<li>slices (dar, dar_xform, dar_slave, dar_manager)</li>
+	<li>configuration files (dar, dar_xform, dar_slave)</li>
+	<li>databases (dar_manager)</li>
+	<li>
+	  <a href="usage_notes.html#DUC">user commands for slices</a>
+	  (dar, dar_xform, dar_slave, using -E, -F or -~ options)
+	</li>
+	<li>
+	  <a href="usage_notes.html#DBP">user commands for files</a>
+	  (dar only, during the backup process using -= option)
+	</li>
+	<li>filter lists (dar's -[ and -] options)</li>
+      </ul>
+      <p>
+	If for slice the extension and
+	even the filename format cannot be
+	customized, (basename.slicenumber.dar)
+	there is not mandatory rule for
+	the other type of files.
+      </p>
+      <p>
+	In the case you have no idea on how to name these,
+	here is the extensions I use:
+      </p>
+      <p>
+	<ul>
+	  <li>
+	    <b>"*.dcf"</b>: Dar Configuration file, aka DCF files (used with dar's -B option)
+	  </li>
+	  <li>
+	    <b>"*.dmd"</b>: Dar Manager Database, aka DMD files (used with
+	    dar_manager's -B and -C options)
+	  </li>
+	  <li>
+	    <b>"*.duc"</b>: Dar User Command, aka <a href="#DUC">DUC files</a>
+	    (used with dar's -E, -F, -~ options)
+	  </li>
+	  <li>
+	    <b>"*.dbp"</b>: Dar Backup Preparation,
+	    aka <a href="#DBP">DBP files</a>
+	    (used with dar's -= option)
+	  </li>
+	  <li>
+	    <b>"*.dfl"</b>: Dar Filter List, aka
+	    DFL files (used with dar's -[ or -] options)
+	  </li>
+	</ul>
+      <p>
+	but, you are totally free to use the filename you want! ;-)
+      </p>
+
+      <h2><a name="command_from_dar">Running command or scripts from DAR</a></h2>
+
+      <p>
+	You can run command from dar at two different places:
+      </p>
       <ul>
 	<li>
-	  <b>"*.dcf"</b>: Dar Configuration file, aka DCF files (used with dar's -B option)
+	  when dar has finished writing a slice only in backup, isolation or merging
+	  modes, or before dar needs a slice (DUC files), in reading mode (testing, diffing,
+	  extracting, ...) and when reading an archive of reference.
 	</li>
 	<li>
-	  <b>"*.dmd"</b>: Dar Manager Database, aka DMD files (used with
-	  dar_manager's -B and -C options)
-	</li>
-	<li>
-	  <b>"*.duc"</b>: Dar User Command, aka <a href="#DUC">DUC files</a>
-	  (used with dar's -E, -F, -~ options)
-	</li>
-	<li>
-	  <b>"*.dbp"</b>: Dar Backup Preparation,
-	  aka <a href="#DBP">DBP files</a>
-	  (used with dar's -= option)
-	</li>
-	<li>
-	  <b>"*.dfl"</b>: Dar Filter List, aka
-	  DFL files (used with dar's -[ or -] options)
+	  before and after saving a given file during the backup
+	  process (DBP files)
 	</li>
       </ul>
-    <p>
-      but, you are totally free to use the filename you want! ;-)
-    </p>
-
-    <h2><a name="command_from_dar">Running command or scripts from DAR</a></h2>
-
-    <p>
-      You can run command from dar at two different places:
-    </p>
-    <ul>
-      <li>
-	when dar has finished writing a slice only in backup, isolation or merging
-	modes, or before dar needs a slice (DUC files), in reading mode (testing, diffing,
-	extracting, ...) and when reading an archive of reference.
-      </li>
-      <li>
-	before and after saving a given file during the backup
-	process (DBP files)
-      </li>
-    </ul>
-
-    <h3><a name="DUC">Between slices</a></h3>
-
-    <p>
-      This concerns -E, -F and -~ options. They all receive a string as
-      argument. Thus, if the argument must be a command with its own
-      arguments, you have to put these between quotes for they appear as a
-      single string to the shell that interprets the dar command-line. For
-      example if you want to call <code>df .</code>
-      you have to use the following on DAR command-line:
-    </p>
-    <code class=block>
-      -E "df ."
-    </code>
-    <p>
-      or
-    </p>
-    <code class=block>
-      -E 'df .'
-    </code>
-    <p>
-      DAR provides several substitution strings in that context:
-    </p>
-    <ul>
-      <li>
-	<code>%%</code> is replaced by a single <code>%</code> Thus
-	if you need a <code>%</code> in you command line you MUST
-	replace it by <code>%%</code> in the argument string of
-	-E, -F or -~ options.
-      </li>
-      <li><code>%p</code> is replaced by the path to the slices</li>
-      <li><code>%b</code> is replaced by the basename of the slices</li>
-      <li><code>%n</code> is replaced by the number of the slice</li>
-      <li>
-	<code>%N</code> is replaced by the number of the slice with
-	padded zeros (it may differ from <code>%n</code> only when
-	--min-digits option is used)
-      </li>
-      <li><code>%c</code> is replaced by the context which is
-	either "operation", "init" or "last_slice" which values are
-	explained below
-      </li>
-    </ul>
-
-    <p>
-      The number of the slice (<code>%n</code> and <code>%N</code>)
-      is either the just written slice or the next slice to be read. For
-      example if you create an new archive (either using -c, -C or -+), in -E
-      option, the <code>%n</code> macro is the number of the last
-      slice completed. Else (using -t, -d, -A (with -c or -C), -l or -x),
-      this is the number of the slice that will be required very soon. While
-    </p>
-    <p>
-      <code>%c</code> (the context) is substituted by "init", "operation" or "last_slice"
-      in the following conditions:
-    </p>
-    <ul>
-      <li><b>init</b>: when the slice is asked before the catalogue is read</li>
-      <li><b>operation</b>: once the catalogue is read and/or data treatment has begun.</li>
-      <li><b>last_slice</b>: when the last slice has been written (archive creation only)</li>
-    </ul>
-    <p>
-      What the use of this feature? For example you want to burn the
-      brand-new slices on CD as soon as they are available.
-    </p>
-    <p>
-      let's build a little script for that:
-    </p>
-    <code class=block>
-      &nbsp;%cat burner
-      &nbsp;#!/bin/bash
-      &nbsp;
-      &nbsp;if [ "$1" == "" -o "$2" == "" ] ; then
-      &nbsp;    echo "usage: $0 &lt;filename&gt; &lt;number&gt;"
-      &nbsp;    exit 1
-      &nbsp;fi
-      &nbsp;
-      &nbsp;mkdir T
-      &nbsp;mv $1 T
-      &nbsp;mkisofs -o /tmp/image.iso -r -J -V "archive_$2" T
-      &nbsp;cdrecord dev=0,0 speed=8 -data /tmp/image.iso
-      &nbsp;rm /tmp/image.iso
-      &nbsp;# Now assuming an automount will mount the just newly burnt CD:
-      &nbsp;if diff /mnt/cdrom/$1 T/$1 ; then
-      &nbsp;    rm -rf T
-      &nbsp;else
-      &nbsp;    exit 2
-      &nbsp;endif
-      &nbsp;
-      &nbsp;%
-    </code>
-
-    <p>
-      This little script, receive the slice
-      filename, and its number as argument, what it does is to burn a CD with
-      it, and compare the resulting CD with the original slice. Upon failure,
-      the script return 2 (or 1 if syntax is not correct on the
-      command-line). Note that this script is only here for illustration,
-      there are many more interesting user scripts made by several dar users.
-      These are available in the <a href="doc/samples/index.html">examples</a>
-      part of the documentation.
-    </p>
-    <p>
-      One could then use it this way:
-    </p>
-    <code class=block>
-      -E "./burner %p/%b.%n.dar %n"
-    </code>
-    <p>
-      which can lead to the following DAR command-line:
-    </p>
-    <code class=block>
-      dar -c ~/tmp/example -z -R / usr/local -s 650M -E "./burner %p/%b.%n.dar %n" -p
-    </code>
-
-    <p>
-      First, note that as our script does
-      not change CD from the device, we need to pause between slices (-p
-      option). The pause take place after the execution of the command (-E
-      option). Thus we could add in the script a command to send a mail or
-      play a music to inform us that the slice is burned. The advantage, here
-      is that we don't have to come twice by slices, once the slice is
-      ready, and once the slice is burnt.
-    </p>
-    <p>
-      Another example:
-    </p>
-    <p>
-      you want to send a huge file by email. (OK that's better to use FTP, SFTP,...
-      but let's assume we have to workaround a server failure, or an absence of such
-      service). So let's suppose that you only have mail available to transfer your data:
-    </p>
-    <code class=block>
-      &nbsp;dar -c toto -s 2M my_huge_file \
-      &nbsp;    -E "uuencode %b.%n.dar %b.%n.dar | mail -s 'slice %n' your@email.address ; rm %b.%n.dar ; sleep 300"
-    </code>
-    <p>
-      Here we make an archive with slices of 2 Megabytes, because our mail
-      system does not allow larger emails. We save only one file:
-      "my_huge_file" (but we could even save the whole filesystem it would
-      also work). The command we execute each time a slice is ready is:
-    </p>
-    <ol>
-      <li>
-	uuencode the file and send the output my email to our address.
-      </li>
-      <li>remove the slice</li>
-      <li>
-	wait 5 minutes, to no overload too much the mail system,
-	This is also
-      </li>
-      <li>
-	useful, if you have a small mailbox, from which it takes
-	time to retrieve mail.
-      </li>
-    </ol>
-    <p>
-      Note that we did not used the <code>%p</code>
-      substitution string, as the slices are saved in the current directory.
-    </p>
-    <p>
-      Last example, is while extracting: in
-      the case the slices cannot all be present in the filesystem, you need a
-      script or a command to fetch the next to be requested slice. It could
-      be using ftp, lynx, ssh, etc. I let you do the script as an exercise.
-      :-). Note, if you plan to <u>share</u> your DUC files, thanks to use
-      the <a href="#DUC_convention">convention 	fo DUC files</a>.
-    </p>
-
-    <h3><a name="DBP">Before and after saving a file</a></h3>
-
-    <p>
-      This concerns the -=, -&lt; and -&gt; options. The -&lt; (include)
-      and -&gt; (exclude) options, let you define which file will need a
-      command to be run before and after their backup. While the -= option,
-      let you define which command to run for those files.
-    </p>
-    <p>
-      Let's suppose you have a very large file changing often that is located
-      in <code>/home/my/big/file</code>, an a running software modifies
-      several files under <code>/home/*/data</code> that need to have a
-      coherent status and are also changing very often.
-    </p>
-    <p>
-      Saving them without precaution,
-      will most probably make your big file flagged as "dirty" in dar's
-      archive, which means that the saved
-      status of the file may be a status that never existed for that file:
-      when dar saves a file it reads the first byte, then the second, etc. up
-      to the end of file. While dar is reading the middle of the file, an
-      application may change the very begin and then the very end of
-      that file, but only modified ending of that file will be saved, leading
-      the archive to contain a copy of the file in a state it never had.
-    </p>
-    <p>
-      For a set of different files that need coherent status this is even worse,
-      if dar saves one first file while another file is
-      modified at the same time, this will not lead having the currently
-      saved files flagged as "dirty", but may lead the software relying on this
-      set of files to fail when restoring its files because of the
-      incoherent states between them.
-    </p>
-    <p>
-      For that situation not to occur, we will use the following options:
-    </p>
-    <code class=block>
-      -R / "-&lt;" home/my/big/file "-&lt;" "home/*/data"
-    </code>
-    <p>
-      First, you must pay attention to quote around the -&lt; and -&gt; options
-      for the shell not to consider you ask for redirection to stdout or from stdin.
-    </p>
-    <p>
-      Back to the example, that says that for the files <code>/home/my/big/file</code>
-      and for any <code>"/home/*/data"</code> directory (or file),
-      a command will be run before and after saving that directory of file.
-      We need thus to define such command to run using the following option:
-    </p>
-    <code class=block>
-      -= "/root/scripts/before_after_backup.sh %f %p %c"
-    </code>
-    <p>
-      Well as you see, here too we may (and should) use substitutions macro:
-    </p>
-    <ul>
-      <li><code>%%</code> is replaced by a litteral <code>%</code></li>
-      <li>
-	<code>%p</code> is replaced by the full path (including filename)
-	of the file/directory to be saved
-      </li>
-      <li>
-	<code>%f</code> is replaced by the filename (without path)
-	of the file/directory to be saved
-      </li>
-      <li><code>%u</code> is the uid of the file's owner</li>
-      <li><code>%h</code> is the gid of the file's owner</li>
-      <li>
-	<code>%c</code> is replaced by the context, which
-	is either "start" or "end" depending on whether the file/directory is
-	about to be saved or has been completely saved.
-        </li>
-    </ul>
-    <p>
-      And our script here could look like this:
-    </p>
-    <code class=block>
-      &nbsp;%cat /root/scripts/before_after_backup.sh
-      &nbsp;#!/bin/sh
-      &nbsp;
-      &nbsp;if [ "$1" == "" ]; then
-      &nbsp;    echo "usage: $0 &lt;filename&gt; &lt;dir+filename&gt; &lt;context&gt;"
-      &nbsp;    exit 1
-      &nbsp;fi
-      &nbsp;
-      &nbsp;# for better readability:
-      &nbsp;filename="$1"
-      &nbsp;path_file="$2"
-      &nbsp;context="$3"
-      &nbsp;
-      &nbsp;if [ "$filename" = "data" ] ; then
-      &nbsp;    if ["$context" = "start" ] ; then
-      &nbsp;        # action to suspend the software using files located in "$2"
-      &nbsp;    else
-      &nbsp;        # action to resume the software using files located in "$2"
-      &nbsp;    fi
-      &nbsp;else
-      &nbsp;    if ["$path_file" = "/home/my/big/file" ] ; then
-      &nbsp;        if ["$context" = "start" ] ; then
-      &nbsp;            # suspend the application that writes to that file
-      &nbsp;        else
-      &nbsp;            # resume the application that writes to that file
-      &nbsp;        fi
-      &nbsp;    else
-      &nbsp;        # do nothing, or warn that no action is defined for that file
-      &nbsp;    fi
-      &nbsp;fi
-    </code>
-    <p>
-      So now, if we run dar with all these command, dar will execute
-      our script once before entering the <code>data</code>
-      directory located in a home directory of some user, and once all files
-      of that directory will have been saved. It will run our script also
-      before and after saving our <code>/home/my/big/file</code> file.
-    </p>
-    <p>
-      If you plan to share your DBP files, thanks to use the
-      <a href="#DBP_convention">DBP convention</a>.
-    </p>
-
-
-    <h2><a name="DUC_convention">Convention for DUC files</a></h2>
-
-    <p>
-      Since version 1.2.0 dar's user
-      can have dar calling a command or scripts (called DUC files)
-      between slices, thanks to the -E, -F and -~ options.
-      To be able to easily share your DUC commands or
-      scripts, I propose you the following convention:
-    </p>
-    <ul>
-      <li>
-	<p>
-	  use the <a href="usage_notes.html#XI">".duc" extension</a> to show
-	  anyone the script/command respect the following
-	</p>
-      </li>
-      <li>
-	<p>
-	  must be called from dar with the following arguments:
-	</p>
-	<code class=block>
-	  example.duc %p %b %n %e %c [other optional arguments]
-	</code>
-      </li>
-      <li>
-	<p>
-	  When called without argument, it must provide brief help on what it
-	  does and what are the expected arguments. This is the standard "usage:"
-	  convention.
-	</p>
-	<p>
-	  Then, any user, could share their DUC files
-	  and don't bother much about how to use them. Moreover it would be easy
-	  to chain them, if for example two persons created their own script,
-	  one <code>burn.duc</code> which burns a slice onDVD-R(W) and
-	  <code>par.duc</code> which makes a Parchive
-	  redundancy file from a slice, anybody could use both at a time giving
-	  the following argument to dar:
-	</p>
-	<code class=block>
-	  -E "par.duc %p %b %n %e %c 1" -E "burn.duc %p %b %n %e %c"
-	</code>
-	<p>
-	  of course a script has not to use all its arguments, in the case of
-	  <code>burn.duc</code> for example, the <code>%c</code> (context)
-	  is probably useless, and would not be
-	  used inside the script, while it is still possible to give it all the
-	  "normal" arguments of a DUC file, those not used simply being
-	  ignored.
-	</p>
-	<p>
-	  If you have interesting DUC scripts, you are welcome to contact
-	  dar maintainer (and not the maintainer of particular distro) by email,
-	  for it be add on the web site and in the following releases
-	  For now, check doc/samples directory for a few examples of DUC files.
-	</p>
-      </li>
-      <li>
-	<p>
-	  Note that all DUC scripts are expected to return a exit status of zero
-	  meaning that the operation has succeeded. If another exit status has
-	  been returned, dar asks the user for decision (or aborts if no user has
-	  been identified, for example, dar is not ran under a controlling
-	  terminal).
-	</p>
-      </li>
-    </ul>
-
-
-    <h2><a name="DBP_convention">Convention for DBP files</a></h2>
-
-    <p>
-      Same as above, the following
-      convention is proposed to ease the sharing of Dar Backup Preparation
-      files:
-    </p>
-    <ul>
-      <li>
-	<p>
-	  use the <a href="usage_notes.html#XI">".dbp" extension</a> to show
-	  anyone the script/command respect the following
-	</p>
-      </li>
-      <li>
-	<p>
-	  must be called from dar with the following arguments:
-	</p>
-	<code class=block>
-	  example.dbp %p %f %u %g %c [other optional arguments]
-	</code>
-      </li>
-      <li>
-	<p>
-	  when called without argument, it must provide brief help on what it
-	  does and what are the expected arguments. This is the standard "usage:"
-	  convention.
-	</p>
-      </li>
-      <li>
-	<p>
-	  Identically to DUC files, DBP files are expected to return a exist
-	  status of zero, else the backup process is suspended for the user to
-	  decide wether to retry, ignore the failure or abort the whole backup
-	  process.
-	</p>
-      </li>
-    </ul>
-
-    <h2><a name="user_targets">User targets in DCF</a></h2>
-
-    <p>
-      Since release 2.4.0, a DCF file (files given to -B option)
-      can contain user targets. A user target is an
-      extention of the conditional syntax. So we will first make a brief
-      review on conditional syntax:
-    </p>
-
-    <h3>Conditional syntax in DCF files</h3>
-    <p>
-      The conditional syntax gives the possiblility to have options in a DCF
-      file that are only active in a certain context:
-    </p>
-    <ul>
-      <li>archive extraction (<code>extract:</code>)</li>
-      <li>archive creation (<code>create:</code>)</li>
-      <li>archive listing (<code>list:</code>)</li>
-      <li>archive testing (<code>test:</code>)</li>
-      <li>archive comparison (<code>diff:</code>)</li>
-      <li>archive isolation (<code>isolate:</code>)</li>
-      <li>archive merging (<code>merge:</code>)</li>
-      <li>no action yet defined (<code>default:</code>)</li>
-      <li>all context (<code>all:</code>)</li>
-      <li>when a archive of reference is used (<code>reference:</code>)</li>
-      <li>when an auxilliary archive of reference is used (<code>auxiliary:</code>)</li>
-    </ul>
-    <p>
-      All option given after the keyword in parenthesis up to
-      the next user target or the end of the file, take effect only in the
-      corresponding context. An example should clarify this:
-    </p>
-    <code class=block>
-      %cat sample.dcf
-      # this is a comment
-
-      all:
-      --min-digits 3
-
-      extract:
-      -R /
-
-      reference:
-      -J aes:
-
-      auxilliary:
-      -~ aes:
-
-      create:
-      -K aes:
-      -ac
-      -Z "*.mp3"
-      -Z "*.avi"
-      -zlz4
-
-      isolate:
-      -K aes:
-      -zlzo
-
-      default:
-      -V
-    </code>
-    <p>
-      This way, the -Z options are only used when creating an archive, while
-      the --min-digits option is used in any case. Well, this ends the
-      review of the conditional syntax.
-    </p>
-
-    <h3>User targets</h3>
-    <p>
-      As stated previously, <i>user targets</i> feature extends the
-      <i>conditional syntax</i> we just reviewed above. This means new
-      and user defined "targets" can be added. The option that follow
-      them will be activated only if the keyword of the target is passed
-      on command-line or in a DCF file. Let's take an example:
-    </p>
-    <code class=block>
-      % cat my_dcf_file.dcf
-
-      <e>compress:</e>
-      -z lzo:5
-    </code>
-
-    <p>
-      In the default situation all that
-      follows the line <code>"compress:"</code> up to the next target
-      or as here up to the end of the file will be ignored
-      unless the <code>compress</code> keyword is passed on command-line:
-    </p>
-
-    <code class=block>
-      dar -c test -B sample.dcf <e>compress</e>
-    </code>
-    <p>
-      Which will do exactly the same as if you have typed:
-    </p>
-    <code class=block>
-      dar -c test -z lzo:5
-    </code>
-    <p>
-      Of course, you can use as many
-      user target as you wish in your files, the only constraint is that it
-      must not have the name of the reserved keyword of a conditional syntax,
-      but you can also mix conditional syntax and user targets. Here follows
-      a last example:
-    </p>
-    <code class=block>
-      % cat sample.dcf
-      # this is a comment
-
-      all:
-      --min-digits 3
-
-      extract:
-      -R /
-
-      reference:
-      -J aes:
-
-      auxilliary:
-      -~ aes:
-
-      create:
-      -K aes:
-      -ac
-      -Z "*.mp3"
-      -Z "*.avi"
-
-      default:
-      -V
-
-      # our first user target named "compress":
-      compress:
-      -z lzo:5
-
-      # a second user target named "verbose":
-      verbose:
-      -v
-      -vs
-
-      # a third user target named "ring":
-      ring:
-      -b
-
-      # a last user target named "hash":
-      hash:
-      --hash sha1
-
-    </code>
-    <p>
-      You can now use dar and activate a set of commands by simply adding
-      the name of the target on command-line:
-    </p>
-    <code class=block>
-      dar -c test -B sample.dcf <e>compress</e> <e>ring</e> <e>verbose</e> <e>hash</e>
-    </code>
-    <p>
-      which is equivalent to:
-    </p>
-    <code class=block>
-      dar -c test --min-digits 3 -K aes: -ac -Z "*.mp3" -Z "*.avi" -z lzo:5 -v -vs -b --hash sha1
-    </code>
-    <p>
-      Last for those that like
-      complicated things, you can recusively use DCF inside user targets,
-      which may contain conditional syntax and the same or some other user
-      targets of you own.
-    </p>
-
-    <h2><a name="Parchive">Using data protection with DAR &amp; Parchive</a></h2>
-
-    <p>
-      Parchive (<i>par</i> or <i>par2</i> in the following) is a
-      very nice program that makes possible to recover a file which has been
-      corrupted. It creates redundancy data stored in a separated file (or
-      set of files), which can be used to repair the original file. This
-      additional data may also be damaged, <i>par</i> will be able to repair the
-      original file as well as the redundancy files, up to a certain point,
-      of course. This point is defined by the percentage of redundancy you
-      defined for a given file. The <i>par</i> reference sites are:
-    </p>
-    <ul>
-      <li>
-	<a href="http://parchive.sourceforge.net/">http://parchive.sourceforge.net</a>
-	(original site no more maintained today)
-      </li>
-      <li>
-	<a href="https://github.com/Parchive/par2cmdline">https://github.com/Parchive/par2cmdline</a>
-	(fork from the official site maintained since decembre 2013)
-      </li>
-    </ul>
-    <p>
-      Since version 2.4.0, dar is provided with a default /etc/darrc file. This one
-      contains a set of user targets among which is <e><code>par2</code></e>.
-      This user target is what's over the surface of the par2 integration with dar.
-      It invokes the <code>dar_par.dcf</code> file provided with dar that automatically
-      creates parity file for each slice during backup. When testing an archive it
-      verifies parity data with the archive, and if necessary repaires slices.
-      So now you only need install par2 and use dar this way to activate Parchive
-      integration with dar:
-    </p>
-    <code class=block>
-      dar [options] <e>par2</e>
-    </code>
-    <p>
-      Simple no?
-    </p>
-
-    <h2><a name="filtering">Examples of file filtering</a></h2>
-
-    <p>
-      File filtering is what defines which files are saved, listed,
-      restored, compared, tested, considered for merging... In brief, in the
-      following we will speak of which file are elected for the
-      <i>"operation"</i>, either a backup, a restoration, an
-      archive contents listing, an archive comparison, etc.
-    </p>
-    <p>
-      On dar command-line, file filtering is done using the following
-      options -X, -I, -P, -R,  -[, -],  -g, --filter-by-ea or --nodump.
-      You have of course all these option using the libdar API.
-    </p>
-    <p>
-      OK, Let's start with some concretes examples:
-    </p>
-    <code class=block>
-      dar -c toto
-    </code>
-    <p>
-      this will backup the current directory and all what is located into it
-      to build the toto archive, also located in the current directory.
-      Usually you should get a warning telling you that you are about to
-      backup the archive itself
-    </p>
-    <p>
-      Now let's see something more interesting:
-    </p>
-    <code class=block>
-      dar -c toto -R / -g home/ftp
-    </code>
-    <p>
-      the -R option tell dar to consider all file under the / root directory,
-      while the <code> -g "home/ftp"</code>
-      argument tells dar to restrict the operation only on the
-      <code>home/ftp</code> subdirectory of the given
-      root directory, which here is <code>/home/ftp</code>.
-    </p>
-    <p>
-      But this is a little bit different from the following:
-    </p>
-    <code class=block>
-      dar -c toto -R /home/ftp
-    </code>
-    <p>
-      here dar will save any file under /home/ftp without any restriction. So
-      what is the difference with the previous form? Both will save just the
-      same files, right, but the file <code>/home/ftp/welcome.msg</code>
-      for example, will be stored as <code>&lt;ROOT&gt;/home/ftp/welcome.msg</code>
-      in the first example while it will be saved as
-      <code>&lt;ROOT&gt;/welcome.msg</code> in the second example.
-      Here <code>&lt;ROOT&gt;</code> is a symbolic representation of the
-      <i>filesystem root</i>, which at restoration or comparison time it will be substitued
-      by the argument given to -R option (which defaults to "."). Let's
-      continue with other filtering mechanism:
-    </p>
-    <code class=block>
-      dar -c toto -R / -g home/ftp -P home/ftp/pub
-    </code>
-    <p>
-      Same as previously, but the <code>-P option</code> leads all files
-      under the <code>/home/ftp/pub</code>
-      not to be considered for the operation. If <code>-P option</code> is
-      used without <code>-g option</code> all files under the -R root directory
-      except the one pointed to by <code>-P options</code> (can be used several time)
-      are saved.
-    </p>
-    <code class=block>
-      dar -c toto -R / -P etc/password -g etc
-    </code>
-    <p>
-      here we save all the <code>/etc</code> except the <code>/etc/password</code> file. Arguments
-      given to -P can be plain files also. But when they are directory this
-      exclusion applies to the directory itself and its contents. Note that
-      using -X to exclude "password" does have the same effect:
-    </p>
-    <code class=block>
-      dar -c toto -R / -X "password" -g etc
-    </code>
-    <p>
-      will save all the <code>/etc</code> directory except any file with name equal to
-      "password". thus of course <code>/etc/password</code> will no be saved, but if it
-      exists, <code>/etc/rc.d/password</code> will not be saved neither if it is not a
-      directory. Yes, if a directory <code>/etc/rc.d/password</code> exist, it will not be
-      affected by the -X option. As well as -I option, -X option do not apply
-      to directories. The reason is to be able to filter some file by type (file extension for
-      example) without excluding a particular directory. For example you want to save
-      all mp3 files and only MP3 files:
-    </p>
-    <code class=block>
-      dar -c toto -R / --alter=no-case -I "*.mp3" home/ftp
-    </code>
-    <p>
-      will save any ending by mp3 or MP3 (<code>--alter=no-case</code> modify the
-      default behavior and make the mask following it case insensitive, use
-      <code>--alter=case</code> to revert to the default behavior for the following
-      masks). The backup is restricted to <code>/home/ftp</code> directories
-      and subdirectories. If instead -I (or -X) applied to directories, we
-      would only be able to recurse in subdirectories ending by ".mp3" or
-      ".MP3". If you had a directory named "/home/ftp/Music" for example,
-      full of mp3, you would not have been able to save it.
-    </p>
-    <p>
-      Note that the glob expressions (where comes the shell-like wild-card
-      '*' '?' and so on), can do much more complicated things like "*.[mM][pP]3".
-      You could thus replace the previous example by the following for
-      the same result:
-    </p>
-    <code class=block>
-      dar -c toto -R / -I "*.[mM][pP]3" home/ftp
-    </code>
-    <p>
-      And, instead of using <b>glob expression</b>, you can
-      use <b>regular expressions</b> (regex) using the <code>-aregex</code>
-      option. You can also use alternatively both of them using <code>-aglob</code>
-      to return back to glob expressions. Each option
-      <code>-aregex</code>/<code>-aglob</code> modifies the filter option that follow
-      them on command-line or -B included files. This affects
-      <code>-I/-X/-P options</code> for file filtering as well as <code>-u/-U options</code>
-      for <i>Extended Attributes</i> filtering as well as <code>-Z/-Y options</code> for
-      file selected for compression.
-    </p>
-    <p>
-      Now the inside algorithm, to understand how -X/-I on one side and -P/-g/-[/-] options
-      act relative to each others: a file is elected for operation if:
-    </p>
-    <ol>
-      <li>its name does not match any -X option or it is a directory</li>
-      <li>
-	<b>and</b> if some -I is given, file is either a directory or match at
-	least one of the -I option given.
-      </li>
-      <li><b>and</b> path and filename do not match any -P option</li>
-      <li><b>and</b> if some -g options are given, the path to the file matches at least one of the -g options.</li>
-    </ol>
-    <p>
-      The algorithm we detailed above is the default one, which is historical
-      and called the <b>unordered</b> method. But since version 2.2.x
-      there is also an more poweful <b>ordered</b> method (activated adding
-      <code>-am option</code>) which gives even more freedom to filters,
-      the <a href="doc/man/index.html">dar man mage</a> will give you all
-      the details, but in short it leads the a mask to take precendence
-      on the one found before it on the command-line:
-    </p>
-    <code class=block>
-      dar -c toto -R / <e>-am</e> -P home -g home/denis -P home/denis/.ssh
-    </code>
-    <p>
-      will save everything except what's in <code>/home</code> but
-      <code>/home/denis</code> will derogate and will be saved except
-      for what's in <code>/home/denis/.ssh</code>. -X and -I acts also
-      similarly between them when <code>-am</code> is used the latest
-      filter met takes precedence (but -P/-g do not interfer with -X/-I).
-    </p>
-    <p>
-      To summarize, in parallel of file filtering, you will find Extended Attributes
-      filtering thanks to the <code>-u and -U options</code>
-      (they work the same as -X and -I option but apply to EA),
-      you will also find the file compression
-      filtering (-Z and -Y options) that defines which file to compress or to
-      not compress, here too the way they work is the same as seen with -X
-      and -I options. The <code>-ano-case</code> and <code>-acase</code>
-      options do also apply to all, as well as the <code>-am option</code>.
-      Last all these filtering (file, EA, compression) can also use
-      regular expression in place of glob expression (thanks to the
-      <code>-ag</code> / <code>-ar</code> options).
-    </p>
-
-
-    <h2><a name="Decremental_Backup">Decremental Backup</a></h2>
-
-    <h3>Introduction</h3>
-    <p>
-      Well, you have already heard about "<b>Full</b>" backup, in which
-      all files are completely saved in such a way that let you use this
-      backup alone to completely restore your data. You have also
-      probably heard about "<b>differential</b>"
-      backup in which is only stored the
-      changes that occurred since an archive of reference was made. There is
-      also the "<b>incremental</b>" backup, which in substance, is
-      the same as "differential" ones. The difference resides in the nature
-      of the archive of reference: "Differential" backup use only a "full"
-      backup as reference, while "incremental" may use a "full" backup, a
-      "differential" backup or another "incremental" backup as reference
-      (Well, in dar's documentation the term "differential" is commonly
-      used in place of "incremental", since there is no conceptual
-      difference from the point of view of dar software).
-    </p>
-    <p>
-      let's now see a new type of backup: the "<b>decremental</b>" backup.
-      All started by a feature request from Yuraukar on dar-support
-      mailing-list:
-      <dl>
-	<dt class=void></dt><dd>
-	  <i>
-	    In the full/differential backup scheme, for a given file, you have as
-	    many versions as changes that were detected from backup to backup.
-	    That's fair in terms of storage space required, as you do not store twice the
-	    same file in the same state, which you would do if you were doing only
-	    full backups. But the drawback is that you do not know by advance in which
-	    backup to find the latest version of a given file. Another drawback
-	    comes when you want to restore your entire system to the latest state available from your
-	    backup set, you need to restore the most ancient backup
-	    (the latest full backup), then the others one by one in
-	    chronological order (the incremental/differential backups). This
-	    may take some time, yes. This is moreover inefficient, because, you
-	    will restore N old revisions of a file that have changed often before
-	    restoring the last and more recent version.
-	  </i>
-	</dd>
-      </dl>
-    </p>
-    <p>
-      Yuraukar idea was to have all latest versions of files in the latest
-      backup done. Thus the most recent archive would always stay a full
-      backup. But, to still be able to restore a file in an older state than
-      the most recent (in case of accidental suppression), we need a so
-      called decremental backup. This backup's archive of reference is
-      in the future (a more recent decremental backup or the latest
-      backup done, which is a full backup in this scheme).
-      This so called "decremental" backup stores all the file differences
-      from this archive of reference that let you get from the reference
-      state to an older state.
-    </p>
-    <p>
-      Assuming this is most probable to restore the latest version of a
-      filesystem than any older state available, decremental backup seem an
-      interesting alternative to incremental backups, as in that case you
-      only have to use one archive (the latest) and each file get restored
-      only once (old data do not get overwritten at each archive restoration
-      as it is the case with incremental restoration).
-    </p>
-    <p>
-      Let's take an example: We have 4 files in the system named f1, f2, f3
-      and f4. We make backups at four different times t1, t2, t3 and t4 in
-      chronological order. We will also perform some changes in filesystem
-      along this period: f1 has will be removed from the system between t3
-      and t4, while f4 will only appear between t3 and t4. f2 will be
-      modified between t2 and t3 while f3 will be changed between t3 and t4.
-    </p>
-    <p>
-      All this can be represented this way, where lines are the state at a
-      given date while each column represents a given file.
-    </p>
-    <code class=block>
-      &nbsp;time
-      &nbsp;   ^
-      &nbsp;   |                       * represents the version 1 of a file
-      &nbsp;t4 +         #    #    *   # represents the version 2 of a file
-      &nbsp;   |
-      &nbsp;t3 +    *    #    *
-      &nbsp;   |
-      &nbsp;t2 +    *    *    *
-      &nbsp;   |
-      &nbsp;t1 +    *    *    *
-      &nbsp;   |
-      &nbsp;   +----+----+----+----+---
-      &nbsp;        f1   f2   f3   f4
-    </code>
-    <p>
-      Now we will represent the contents of backups at these different
-      times, first using only full backup, then using incremental backups and
-      at last using decremental backups. We will use the symbol <code>'O'</code> in place
-      of data if a given file's data is not stored in the archive because it
-      has not changed since the archive of reference was made. We will also
-      use an <code>'x'</code> to represent the information that a given file has been
-      recorded in an archive as deleted since the archive of reference was made. This
-      information is used at restoration time to remove a file from
-      filesystem to be able to get the exact state of files seen at the date
-      the backup was made.
-    </p>
-
-    <h3>Full backups behavior</h3>
-
-    <code class=block>
-      &nbsp;   ^
-      &nbsp;   |
-      &nbsp;t4 +         #    #    *
-      &nbsp;   |
-      &nbsp;t3 +    *    #    *
-      &nbsp;   |
-      &nbsp;t2 +    *    *    *
-      &nbsp;   |
-      &nbsp;t1 +    *    *    *
-      &nbsp;   |
-      &nbsp;   +----+----+----+----+---
-      &nbsp;        f1   f2   f3   f4
-    </code>
-
-    <p>
-      Yes, this is easy, each backup contains all the files that
-      existed at the time the backup was made. To restore in the state the
-      system had at a given date, we only use one backup, which is the one
-      that best corresponds to the date we want. The drawback is that we
-      saved three time the file f1 an f3 version 1, and twice f2 version 2,
-      which correspond to a waste of storage space.
-    </p>
-
-    <h3>Full/Incremental backups behavior</h3>
-
-
-    <code class=block>
-      &nbsp;   ^
-      &nbsp;   |
-      &nbsp;t4 +    x    0    #    *     0 represents a file which only state is recorded
-      &nbsp;   |                         as such, no data is stored in the archive
-      &nbsp;t3 +    0    #    0          very little space is consummed by such entry
-      &nbsp;   |
-      &nbsp;t2 +    0    0    0          x represents an entry telling that the corresponding
-      &nbsp;   |                         file has to be removed
-      &nbsp;t1 +    *    *    *
-      &nbsp;   |
-      &nbsp;   +----+----+----+----+---
-      &nbsp;        f1   f2   f3   f4
-    </code>
-    <p>
-      Now we see that archive done at date 't2' does not contain any data as
-      no changed have been detected between t1 and t2. This backup is quite
-      small and needs only little storage. Archive at t3 date only stores
-      f2's new version, and at t4 the archive stores f4 new file and f3's new
-      version. We also see that f1 is marked as removed from filesystem since
-      date t3 as it no longer existing in filesystem but existed in the
-      archive of reference done at t3.
-    </p>
-    <p>
-      As you see, restoring to the latest state is more complicated compared
-      to only using full backups, it is neither simple to know in which
-      backup to took for a given file's data at date t3 for example, but yes,
-      we do not waste storage space anymore. The restoration process the user
-      has to follow is to restore in turn:
-    </p>
-    <ul>
-      <li>
-	archive done at t1, which will put old version of files and restore
-	f1 that have been removed at t4
-      </li>
-      <li>archive done at t2, that will do nothing at all</li>
-      <li>
-	archive done at t3, that will replace f2's old version by its new one
-      </li>
-      <li>
-	archive done at t4, that will remove f1, add f4 and replace f3's old
-	version to by its latest version.
-      </li>
-    </ul>
-    <p>
-      The latest version of files is scattered over the two last archives
-      here, but in common systems, much of the data does not change at all
-      and can only be found in the first backup (the full backup).
-    </p>
-
-    <h3>Decremental backup behavior</h3>
-
-    <p>
-      Here is represented the contents of backups using decremental approach.
-      The most recent (t4) backup is always a full backup. Older backups are
-      decremental backups based on the just more recent one (t3 is a
-      difference based on t4, t1 is a difference based on t2). At the opposit
-      of incremental backups, the reference of the archive is in the future
-      not in the past.
-    </p>
-    <code class=block>
-      &nbsp;   ^
-      &nbsp;   |
-      &nbsp;t4 +         #    #    *
-      &nbsp;   |
-      &nbsp;t3 +    *    0    *    x
-      &nbsp;   |
-      &nbsp;t2 +    0    *    0
-      &nbsp;   |
-      &nbsp;t1 +    0    0    0
-      &nbsp;   |
-      &nbsp;   +----+----+----+----+---
-      &nbsp;        f1   f2   f3   f4
-    </code>
-    <p>
-      Thus obtaining the latest version of the system is as easy as done
-      using only full backups. And you also see that the space required to
-      store these decremental backup is equivalent to what is needed to
-      store the incremental backups. However, still the problem exist to
-      locate the archive in which to find a given's file data at a given
-      date. But also, you may see that backup done at time t1 can safely
-      be removed as it became useless because it does not store any data, and
-      loosing archive done at t1 and t2 is not a big problem, you just loose
-      old state data.
-    </p>
-    <p>
-      Now if we want to restore the filesystem in the state it has at time
-      t3, we have to restore archive done at t4 then restore archive done at
-      t3. This last step will have the consequences to create f1, replace
-      f3 by its older version and delete f4 which did not exist at time t3
-      (file which is maked 'x' meaning that it has to be removed). if we want
-      to go further in the past, we will restore the decremental backup t2
-      which will only replace f2's new version by the older version 1. Last
-      restoring t1 will have no effect as no changed were made between t1 and
-      t2.
-    </p>
-    <p>
-      What about dar_manager? Well, in nature, there is no difference
-      between an incremental backup and a differential/incremental backup.
-      The only difference resided in the way (the order) they have to be
-      used. So, even if you can add decremental backups in a dar_manager
-      database, it is not designed to handle them correctly. It is thus
-      better to keep dar_manager only for incremental/differential/full
-      backups.
-    </p>
-
-    <h3>Decremental backup theory</h3>
-
-    <p>
-      But how to get buitd decremental backup as the reference is in the future
-      and does not exist yet?
-    </p>
-    <p>
-      Assuming you have a full backup describing your system at date
-      t1, can we have in one shot both the new full backup for time t2 and
-      also transform the full backup of time t1 into a decremental backup
-      relative to time t2? In theory, yes. But there is a risk in case of failure
-      (filesystem full, lack of electric power, bug, ...): you may loose both
-      backups, the one which was under construction as well as the one we
-      took as reference and which was under process of transformaton to
-      decremental backup.
-    </p>
-    <p>
-      Seen this, the <b>libdar implementation</b> is to let
-      the user <u>do a normal full backup at each step</u> [Doing just a
-      differential backup sounds better at first, but this would end in more
-      archive manipulation, as we would have to generate both decremental and
-      new full backup, and we would manipulate at least the same amount of
-      data]. Then <u>with the two full backups</u> the user would have to use
-      archive <b>merging</b> to <u>create the decremental backup</u>
-      <b>using <code>-ad option</code></b>. Last, once the resulting
-      (decremental) archive have been tested and that the user is sure this
-      decremental backup is viable, he can <u>remove the older full backup</u>
-      and store the new decremental backup beside older ones and
-      the new full backup. This at last only, will save you disk space
-      and let you easily recover you system using the latest (full) backup.
-    </p>
-    <p>
-      Can one use an extracted catalogue instead of the old full backup to
-      perform a decremental backup? No.
-      The full backup to transform must have the whole data in it to be able
-      to create a decremental back with data in it. Only the new full backup
-      can be replaced by its extracted catalogue.
-    </p>
-    <p>
-      This last part about decremental backup is extracted from a discussion
-      with Dan Masson on dar-support mailing-list:
-    </p>
-
-    <h3>Decremental backup practice</h3>
-    <p>
-      We start by a full backup:
-    </p>
-    <code class=block>
-      dar -c /mnt/backup/FULL-2015-04-10 -R / -z -g /mnt/backup -D
-    </code>
-    <p>
-      Then at each new cycle, we a new full backup
-    </p>
-    <code class=block>
-      dar -c /mnt/backup/FULL-2015-04-11 -R / -z -g /mnt/backup -D
-    </code>
-    <p>
-      Then to save space, we reduce into a decremental backup the previous full backup:
-    </p>
-    <code class=block>
-      dar <e>-+ /mnt/backup/DECR-2015-04-10</e> -A /mnt/backup/FULL-2015-04-10 -@ /mnt/backup/FULL-2015-04-11 <e>-ad</e> -ak
-    </code>
-    <p>
-      By precaution test that the decremental archive is viable
-    </p>
-    <code class=block>
-      dar -t /mnt/backup/DECR-2015-04-10
-    </code>
-    <p>
-      Then make space by removing the old full backup:
-    </p>
-    <code class=block>
-      rm /mnt/backup/FULL-2015-04-10.*.dar
-    </code>
-    <p>
-      And you can loop this way forever, removing at at time the very oldest
-      decremental backups if space is missing.
-    </p>
-    <p>
-      Assuming you run this cycle each day, you get the following at each
-      new step/day:
-    </p>
-    <code class=block>
-      &nbsp;The 2015-04-10 you have:
-      &nbsp;    FULL-2015-04-10
-      &nbsp;
-      &nbsp;The 2015-04-11 you have:
-      &nbsp;    FULL-2015-04-11
-      &nbsp;    DECR-2015-04-10
-      &nbsp;
-      &nbsp;The 2015-04-12 you have:
-      &nbsp;    FULL-2015-04-12
-      &nbsp;    DECR-2015-04-11
-      &nbsp;    DECR-2015-04-10
-      &nbsp;
-      &nbsp;The 2015-04-13 you have:
-      &nbsp;    FULL-2015-04-13
-      &nbsp;    DECR-2015-04-12
-      &nbsp;    DECR-2015-04-11
-      &nbsp;    DECR-2015-04-10
-    </code>
-    <p>
-      and so on.
-    </p>
-
-    <h3>Restoration using decremental backup</h3>
-
-
-    <p>
-      <b>Scenario 1:</b> today 2015-04-17 you have lost your system, you want to restore it as
-      it was at the time of the last backup. <b>Solution:</b>: use the last backup it is a
-      full one, it is the latest backup, nothing more!
-    </p>
-    <code class=block>
-      dar -x /mnt/backup/FULL-2015-04-16 -R /
-    </code>
-    <p>
-      <b>Scenario 2:</b> today 2015-04-17 you have lost your system due to a virus or your
-      system had been compromised and you know it started the 2015-04-12 so
-      you want to restore your system at the time of 2015-04-11. First,
-      restore the last full archive (FULL-2015-04-16) then in reverse order
-      all the decremental ones: DECR-2015-04-15 then DECR-2015-04-14, then
-      DECR-2015-04-13, then DECR-2015-04-12 then DECR-2015-04-11. The
-      decremental backup are small, their restoration is usually quick
-      (depending on how much files changed in the day). So here we get in the
-      exact same situation you would have reach restoring only
-      FULL-2015-04-11, but you did not not have to store all the full
-      backups, just the latest.
-    </p>
-    <code class=block>
-      dar -x /mnt/backup/FULL-2015-04-16 -R /
-      dar -x /mnt/backup/DECR-2015-04-15 -R / -w
-      dar -x /mnt/backup/DECR-2015-04-14 -R / -w
-      dar -x /mnt/backup/DECR-2015-04-13 -R / -w
-      dar -x /mnt/backup/DECR-2015-04-12 -R / -w
-      dar -x /mnt/backup/DECR-2015-04-11 -R / -w
-    </code>
-
-    <h2><a name="door">Door inodes (Solaris)</a></h2>
-
-    <p>
-      A door inode is a dynamic
-      object that is created on top of an empty file, it does exist only when
-      a process has a reference to it, it is thus not possible to restore it.
-      But the empty file it is mounted on can be restored instead. As such,
-      dar restores an door inode with an empty file having the same
-      parameters as the door inode.
-    </p>
-    <p>
-      If an door inode is hard linked several times in the file system dar
-      will restore a plain file having as much hard links to the
-      corresponding locations.
-    </p>
-    <p>
-      Dar is also able to handle Extended Attributes associated to a door
-      file, if any. Last, if you list an archive containing door inodes, you
-      will see the 'D' letter as their type (by opposition to 'd' for
-      directories), this is conform to what the 'ls' command displays for
-      such entries.
-    </p>
-
-    <h2><a name="delta">How to use binary delta with dar</a></h2>
-
-    <h3>Terminology</h3>
-    <p>
-      <b>delta compression</b>, <b>binary diff</b> or <b>rsync increment</b>
-      all point to the same feature: a way to avoid resaving a whole file
-      during a differential/incremental backup but only save the modified
-      part of it instead. This solution is of course
-      interesting for large files that change often but only for little parts
-      of them (Microsoft exchange mailboxes, for example). Dar implements
-      this feature relying on <b>librsync library</b>, feature which we will
-      call <b>binary delta</b> in the following.
-    </p>
-
-    <h3>Librsync specific concepts</h3>
-
-    <p>
-      Before looking at the way to use dar, several concepts from librsync
-      have to be understood:
-    </p>
-    <p>
-      In order to make a binary delta
-      of a file <code>foo</code> which at time t1 contained data F1 and at
-      time t2 containted data F2, <i>librsync</i> requires first that a
-      <b>delta signature</b> be made against F1.
-    </p>
-    <p>
-      Then using that <i>delta signature</i> and data F2, <i>librsync</i>
-      is able to build a <b>delta patch</b> P1 that, if applied to
-      F1 will provide content F2:
-    </p>
-    <code class=block>
-      &nbsp;backing up file "foo"
-      &nbsp;        |
-      &nbsp;        V
-      &nbsp;time t1  content = F1    ---------&gt; <b>delta signature</b> of F1
-      &nbsp;        |                              |
-      &nbsp;        |                              |
-      &nbsp;        |                              +-------------&gt;  )       building <b>delta patch</b> "P1"
-      &nbsp;        V                                               )----&gt;  containing the difference
-      &nbsp;time t2  content = F2    ----------------------------&gt;  )       from F1 to F2
-      &nbsp;        |
-      &nbsp;       ...
-    </code>
-    <p>
-      At restoration time dar has then first to restore F1,
-      from a full backup or from a previous
-      differential backup, then using librsync applying the patch "P1" to
-      modify F1 into F2.
-    </p>
-    <code class=block>
-      &nbsp;restoring file "foo"
-      &nbsp;        |
-      &nbsp;        V
-      &nbsp;time t3  content = F1    &lt;---  from a previous backup
-      &nbsp;        |
-      &nbsp;        +------&gt;---------------&gt;----------------+
-      &nbsp;        .                                       |
-      &nbsp;        .                                       V
-      &nbsp;        .                                       + &lt;----- applying patch "P1"
-      &nbsp;        .                                       |
-      &nbsp;        +-----&lt;---------------&lt;-------------&lt;---+
-      &nbsp;        |
-      &nbsp;        V
-      &nbsp;time t4  content = F2
-    </code>
-
-    <h3>Using binary delta with dar</h3>
-    <p>
-      First, delta signature is not
-      activated by default, you have to tell dar you want to
-      <b>generate delta signature</b> using the <b>--delta sig</b>
-      option at archive creation/isolation/merging time. Then as soon as a
-      file has a delta signature in the archive of reference, dar will
-      perform a delta binary and store a <b>delta patch</b> if such file
-      has changed since the archive of reference was done. But better an
-      example than a long explanation:
-    </p>
-
-    <h4>Making differential backup</h4>
-
-    <p>
-      First, doing a full backup, we add the <b>--delta sig</b>
-      option for the resulting archive to contain the necessary signatures to
-      be provided to librsync later on in order to setup delta patches. This
-      has the drawback of additional space requirement but the advantage of
-      space economy at incremental/differential backups:
-    </p>
-    <code class=block>
-      dar -c full -R / -z <e>--delta sig</e> <i>...other options...</i>
-    </code>
-    <p>
-      Then there is nothing more specific to delta signature, this is the same way
-      as you were used to do with previous releases of dar: you just need to
-      rely on a archive of reference containing delta signatures for dar
-      activating delta binary. Here below, diff1 archive will eventually
-      contain delta patches of modified files since full archive was created,
-      but will not contain any delta signature.
-    </p>
-    <code class=block>
-      dar -c diff1 -A full -R / -z <i>...other options...</i>
-    </code>
-    <p>
-      The next differential backups will be done the same, based on the full backup:
-    </p>
-    <code class=block>
-      dar -c diff<e>2</e> -A full -R / -z <i>...other options...</i>
-    </code>
-    <p>
-      Looking at archive content, you will see the "[Delta]" flag in place of
-      the "[Saved]" flag for files that have been saved as a delta patch:
-    </p>
-    <code class=block>
-      [Data ][D][ EA ][FSA][Compr][S]| Permission | User | Group | Size | Date | filename<br>
-      -------------------------------+------------+------+-------+------+------+--------------
-      <e>[Delta]</e>[ ] [-L-][ 99%][X] -rwxr-xr-x 1000 1000 919 kio Tue Mar 22 20:22:34 2016 bash
-    </code>
-
-    <h4>Making incremental backup</h4>
-
-    <p>
-      Doing incremental backups, the first one is always
-      a full backup and is done the same as above for
-      differential backup:
-    </p>
-    <code class=block>
-      dar -c full -R / -z <e>--delta sig</e> <i>...other options...</i>
-    </code>
-    <p>
-      But at the opposit of differential
-      backups, incremental backups are also used as reference for the next
-      backup. Thus if you want to continue performing binary delta, some
-      <i>delta signatures</i> must be present beside the <i>delta patch</i> in the resulting
-      archives:
-    </p>
-    <code class=block>
-      dar -c incr1 -A full -R / -z <e>--delta sig</e> <i>...other options...</i>
-    </code>
-    <p>
-      Here the <b>--delta sig</b> switch leads dar to copy from the full
-      backup into the new backup all the <i>delta signatures</i> of unchanged files
-      and to recompute new <i>delta signature</i> of files that have changed, in
-      addition to the <i>delta patch</i> calculation that are done with or
-      without this option.
-    </p>
-
-    <h4>Making isolated catalogue</h4>
-
-    <p>
-      Delta binary still allows differential or incremental backup
-      using a isolated catalogue in place of the original backup of reference.
-      The point to take care about if you want to perform binary delta
-      is the way to build this isolated catalogue: the delta signature present
-      in the backup of reference files must be copied to the isolated catalogue,
-      else the differential or incremental backup will be a normal one
-      (= without binary delta):
-    </p>
-    <code class=block>
-      dar <b>-C</b> CAT_full -A full -z <e>--delta sig</e> <i>...other options...</i>
-    </code>
-    <p>
-      Note that if the archive of reference does not hold any delta
-      signature, the previous command will lead dar to compute on-fly delta
-      signature of saved files while performing catalogue isolation. You can
-      thus chose not to include delta signature inside full backup while
-      still being able to let dar use binary delta. However as dar cannot
-      compute delta signature without data, files that have been recorded as
-      unchanged since the archive of reference was made cannot have their
-      delta signature computed at isolation time. Same point if a file is
-      stored as a delta patch without delta signature associated with it, dar
-      will not be able to add a delta signature at isolation time for that
-      file.
-    </p>
-    <p>
-      Yes, this is as simple as adding <b>--delta sig</b>
-      to what you were used to do before. The resulting isolated catalogue
-      will be much larger than without delta signatures but still much
-      smaller than the full backup itself. The incremental or differential
-      backup can then be done the same as before but using CAT_full in place
-      of full:
-    </p>
-    <code class=block>
-      dar -c diff1 -A <b>CAT_</b>full -R / -z <i>...other options...</i>
-    </code>
-    <p>
-      or
-    </p>
-    <code class=block>
-      dar -c incr1 -A <b>CAT_</b>full -R / -z <e>--delta sig</e> <i>...other options...</i>
-    </code>
-
-    <h4>Merging archives</h4>
-
-    <p>
-      You may need to merge two backups or make a subset of a single
-      backup or even a mix of these two operations, possibility which
-      is brought by the <code>--merge</code> option for a long
-      time now. Here too if you want to keep the <i>delta signatures</i>
-      that could be present in the source archives you will have to use
-      <b>--delta sig</b> option:
-    </p>
-    <code class=block>
-      dar <b>--merge</b> merged_backup -A archive1 -@archive2 -z <e>--delta sig</e> <i>...other options...</i>
-    </code>
-
-    <h4>Restoring with binary delta</h4>
-    <p>
-      No special option has to be provided at restoration time.
-      Dar will figure out by itself whether the data stored in backup
-      for a file is a <i>plain data</i> and can restore the whole
-      file or is a <i>delta patch</i> that has to be applied to the
-      existing file lying on filesystem. Before
-      patching the file dar will calculate and check its CRC. if the
-      CRC is the expected one, the file will be patched else a
-      warning will be issued and the file will not be modified at all.
-    </p>
-    <p>
-      The point with restoration is to *always* restore all previous backups
-      in order, from the full backup down to all incremental one (or the
-      full backup and just the latest differential one), for dar be able
-      to apply the stored patches. Else restoration can fail for some or
-      all files. <b>Dar_manager</b> can be of great help here as it will
-      know which archive to skip and which not to skip in order to restore
-      a particular set of files. But for a restoration a whole filesystem
-      it is advised to just use dar and restore backup in order.
-    </p>
-
-    <h4>Performing binary delta only for some files</h4>
-
-    <p>
-      You can exclude some files from delta difference operation by
-      avoiding creating a delta signature for them in the archive of
-      reference, using the option <b>--exclude-delta-sig</b>.
-      You can also include only some files for delta signatures using the
-      <b>--include-delta-sig</b> option. Of course as with other
-      masks-related options like -I, -X, -U, -u, -Z, -Y, ... it is
-      possible to combine them to have an even greater and more accurate
-      definition of files for which you want to have delta signature being built
-    </p>
-    <code class=block>
-      &nbsp;dar -c full -R / -z <b>--delta sig</b> \
-      &nbsp;    --include-delta-sig "*.opt" \
-      &nbsp;    --include-delta-sig "*.pst" \
-      &nbsp;    --exclude-delta-sig "home/joe/*"
-    </code>
-    <p>
-      Independently from this filtering
-      mechanism based on path+filename, <i>delta signature</i> is
-      never calculated for files smaller than 10 kio because it does not
-      worse performing delta difference for them. You can change that
-      behavior using the option <b>--delta-sig-min-size &lt;size in byte&gt;</b>
-    </p>
-    <code class=block>
-      dar -c full -R / -z --delta sig --delta-sig-min-size 20k
-    </code>
-
-    <h4>Archive listing</h4>
-
-    <p>
-      Archive listing received adhoc addition to show which file have delta signature
-      and which one have been saved as delta patch. The <code>[Data ]</code> column shows
-      <code>[Delta]</code> in place of <code>[Saved]</code>
-      when a <i>delta patch</i> is used, and a new column entitled <code>[D]</code> shows
-      <code>[D]</code> when a <i>delta signature</i> is present for that file and
-      <code>[ ]</code> else (or <code>[-]</code> if delta signature is not applicable to
-      that type of file).
-    </p>
-    <p>
-      See man page about --delta related options for even more details.
-    </p>
-
-    <h3>Differences between rsync and dar</h3>
-
-    <p>
-      <i>rsync</i> uses <i>binary delta</i> to reduce the volume of data
-      over the network to synchronize a directory between two different hosts.
-      The resulting data is stored uncompressed but thus ready for use
-    </p>
-
-    <p>
-      <i>dar</i> uses <i>binary delta</i> to reduce the volume of data to
-      store (and thus transfer over the network) when performing a differential
-      or incremental backup. At the opposite of <i>rsync</i> the data stays
-      compressed and it thus not ready for use (backup/archiving context), and
-      the binary delta can be used incrementally to record a long history of
-      modification, while <i>rsync</i> looses past modifications at each new
-      remote synchronization
-    </p>
-    <p>
-      In conclusion <i>rsync</i> and <i>dar</i> to not address the same
-      purposes. For more about that topic check the <a href="benchmark.html">benchmark</a>
-    </p>
-
-    <h2><a name="Multi_recipient_signed_archive_weakness">Multi recipient signed archive weakness</a></h2>
-    <p>
-      As described in the <a href="Notes.html#asym">usage notes</a> it is possible
-      to encrypt an archive and have it readable by several recipients using their
-      respective gnupg private key. <b>So far, so good</b>!
-    </p>
-    <p>
-      It is also possible to embed your gnupg signature within such archive
-      for your recipient to have a proof the archive comes from you. If there
-      is only a single recipient, <b>So far, still so good</b>!
-    </p>
-    <p>
-      But when an archive is encrypted using gpg to different recipient and
-      is also signed, there is a known weakness. If one of the recipient
-      is an expert he/she could reuse your signature for a slightly different
-      archive
-    </p>
-    <p>
-      Well, if this type of attack should be accessible by an expert guy with
-      some constraints, it can only take place between a set of friends or at
-      least people that know each other enough to have exchanged their public
-      key information between them.
-    </p>
-    <p>
-      In that context, if you do think the risk is more than theorical
-      and the consequences of such exploit would be important, it is advised
-      to sign the dar archive outside dar, you can still keep encryption
-      with multi-recipients withing dar.
-    </p>
-    <code class=block>
-      dar -c my_secret_group_stuff -z -K gnupg:recipents1@group.group,recipient2@group.group -R /home/secret --hash sha512
-
-      # check the archive has not been corrupted
-      sha512sum -c my_secret_group_stuff.1.dar.sha512
-
-      #sign the hash file (it will be faster than signing the backup
-      # in particular if this one is huge
-      gpg --sign -b my_secret_group_stuff.1.dar.sha512
-
-      #send all three files to your recipients:
-      my_secret_group_stuff.1.dar
-      my_secret_group_stuff.1.dar.sha512
-      my_secret_group_stuff.1.dar.sha512.sig
-    </code>
+
+      <h3><a name="DUC">Between slices</a></h3>
+
+      <p>
+	This concerns -E, -F and -~ options. They all receive a string as
+	argument. Thus, if the argument must be a command with its own
+	arguments, you have to put these between quotes for they appear as a
+	single string to the shell that interprets the dar command-line. For
+	example if you want to call <code>df .</code>
+	you have to use the following on DAR command-line:
+      </p>
+      <code class=block>
+	-E "df ."
+      </code>
+      <p>
+	or
+      </p>
+      <code class=block>
+	-E 'df .'
+      </code>
+      <p>
+	DAR provides several substitution strings in that context:
+      </p>
+      <ul>
+	<li>
+	  <code>%%</code> is replaced by a single <code>%</code> Thus
+	  if you need a <code>%</code> in you command line you MUST
+	  replace it by <code>%%</code> in the argument string of
+	  -E, -F or -~ options.
+	</li>
+	<li><code>%p</code> is replaced by the path to the slices</li>
+	<li><code>%b</code> is replaced by the basename of the slices</li>
+	<li><code>%n</code> is replaced by the number of the slice</li>
+	<li>
+	  <code>%N</code> is replaced by the number of the slice with
+	  padded zeros (it may differ from <code>%n</code> only when
+	  --min-digits option is used)
+	</li>
+	<li><code>%c</code> is replaced by the context which is
+	  either "operation", "init" or "last_slice" which values are
+	  explained below
+	</li>
+      </ul>
+
+      <p>
+	The number of the slice (<code>%n</code> and <code>%N</code>)
+	is either the just written slice or the next slice to be read. For
+	example if you create an new archive (either using -c, -C or -+), in -E
+	option, the <code>%n</code> macro is the number of the last
+	slice completed. Else (using -t, -d, -A (with -c or -C), -l or -x),
+	this is the number of the slice that will be required very soon. While
+      </p>
+      <p>
+	<code>%c</code> (the context) is substituted by "init", "operation" or "last_slice"
+	in the following conditions:
+      </p>
+      <ul>
+	<li><b>init</b>: when the slice is asked before the catalogue is read</li>
+	<li><b>operation</b>: once the catalogue is read and/or data treatment has begun.</li>
+	<li><b>last_slice</b>: when the last slice has been written (archive creation only)</li>
+      </ul>
+      <p>
+	What the use of this feature? For example you want to burn the
+	brand-new slices on CD as soon as they are available.
+      </p>
+      <p>
+	let's build a little script for that:
+      </p>
+      <code class=block>
+	&nbsp;%cat burner
+	&nbsp;#!/bin/bash
+	&nbsp;
+	&nbsp;if [ "$1" == "" -o "$2" == "" ] ; then
+	&nbsp;    echo "usage: $0 &lt;filename&gt; &lt;number&gt;"
+	&nbsp;    exit 1
+	&nbsp;fi
+	&nbsp;
+	&nbsp;mkdir T
+	&nbsp;mv $1 T
+	&nbsp;mkisofs -o /tmp/image.iso -r -J -V "archive_$2" T
+	&nbsp;cdrecord dev=0,0 speed=8 -data /tmp/image.iso
+	&nbsp;rm /tmp/image.iso
+	&nbsp;# Now assuming an automount will mount the just newly burnt CD:
+	&nbsp;if diff /mnt/cdrom/$1 T/$1 ; then
+	&nbsp;    rm -rf T
+	&nbsp;else
+	&nbsp;    exit 2
+	&nbsp;endif
+	&nbsp;
+	&nbsp;%
+      </code>
+
+      <p>
+	This little script, receive the slice
+	filename, and its number as argument, what it does is to burn a CD with
+	it, and compare the resulting CD with the original slice. Upon failure,
+	the script return 2 (or 1 if syntax is not correct on the
+	command-line). Note that this script is only here for illustration,
+	there are many more interesting user scripts made by several dar users.
+	These are available in the <a href="doc/samples/index.html">examples</a>
+	part of the documentation.
+      </p>
+      <p>
+	One could then use it this way:
+      </p>
+      <code class=block>
+	-E "./burner %p/%b.%n.dar %n"
+      </code>
+      <p>
+	which can lead to the following DAR command-line:
+      </p>
+      <code class=block>
+	dar -c ~/tmp/example -z -R / usr/local -s 650M -E "./burner %p/%b.%n.dar %n" -p
+      </code>
+
+      <p>
+	First, note that as our script does
+	not change CD from the device, we need to pause between slices (-p
+	option). The pause take place after the execution of the command (-E
+	option). Thus we could add in the script a command to send a mail or
+	play a music to inform us that the slice is burned. The advantage, here
+	is that we don't have to come twice by slices, once the slice is
+	ready, and once the slice is burnt.
+      </p>
+      <p>
+	Another example:
+      </p>
+      <p>
+	you want to send a huge file by email. (OK that's better to use FTP, SFTP,...
+	but let's assume we have to workaround a server failure, or an absence of such
+	service). So let's suppose that you only have mail available to transfer your data:
+      </p>
+      <code class=block>
+	&nbsp;dar -c toto -s 2M my_huge_file \
+	&nbsp;    -E "uuencode %b.%n.dar %b.%n.dar | mail -s 'slice %n' your@email.address ; rm %b.%n.dar ; sleep 300"
+      </code>
+      <p>
+	Here we make an archive with slices of 2 Megabytes, because our mail
+	system does not allow larger emails. We save only one file:
+	"my_huge_file" (but we could even save the whole filesystem it would
+	also work). The command we execute each time a slice is ready is:
+      </p>
+      <ol>
+	<li>
+	  uuencode the file and send the output my email to our address.
+	</li>
+	<li>remove the slice</li>
+	<li>
+	  wait 5 minutes, to no overload too much the mail system,
+	  This is also
+	</li>
+	<li>
+	  useful, if you have a small mailbox, from which it takes
+	  time to retrieve mail.
+	</li>
+      </ol>
+      <p>
+	Note that we did not used the <code>%p</code>
+	substitution string, as the slices are saved in the current directory.
+      </p>
+      <p>
+	Last example, is while extracting: in
+	the case the slices cannot all be present in the filesystem, you need a
+	script or a command to fetch the next to be requested slice. It could
+	be using ftp, lynx, ssh, etc. I let you do the script as an exercise.
+	:-). Note, if you plan to <u>share</u> your DUC files, thanks to use
+	the <a href="#DUC_convention">convention 	fo DUC files</a>.
+      </p>
+
+      <h3><a name="DBP">Before and after saving a file</a></h3>
+
+      <p>
+	This concerns the -=, -&lt; and -&gt; options. The -&lt; (include)
+	and -&gt; (exclude) options, let you define which file will need a
+	command to be run before and after their backup. While the -= option,
+	let you define which command to run for those files.
+      </p>
+      <p>
+	Let's suppose you have a very large file changing often that is located
+	in <code>/home/my/big/file</code>, an a running software modifies
+	several files under <code>/home/*/data</code> that need to have a
+	coherent status and are also changing very often.
+      </p>
+      <p>
+	Saving them without precaution,
+	will most probably make your big file flagged as "dirty" in dar's
+	archive, which means that the saved
+	status of the file may be a status that never existed for that file:
+	when dar saves a file it reads the first byte, then the second, etc. up
+	to the end of file. While dar is reading the middle of the file, an
+	application may change the very begin and then the very end of
+	that file, but only modified ending of that file will be saved, leading
+	the archive to contain a copy of the file in a state it never had.
+      </p>
+      <p>
+	For a set of different files that need coherent status this is even worse,
+	if dar saves one first file while another file is
+	modified at the same time, this will not lead having the currently
+	saved files flagged as "dirty", but may lead the software relying on this
+	set of files to fail when restoring its files because of the
+	incoherent states between them.
+      </p>
+      <p>
+	For that situation not to occur, we will use the following options:
+      </p>
+      <code class=block>
+	-R / "-&lt;" home/my/big/file "-&lt;" "home/*/data"
+      </code>
+      <p>
+	First, you must pay attention to quote around the -&lt; and -&gt; options
+	for the shell not to consider you ask for redirection to stdout or from stdin.
+      </p>
+      <p>
+	Back to the example, that says that for the files <code>/home/my/big/file</code>
+	and for any <code>"/home/*/data"</code> directory (or file),
+	a command will be run before and after saving that directory of file.
+	We need thus to define such command to run using the following option:
+      </p>
+      <code class=block>
+	-= "/root/scripts/before_after_backup.sh %f %p %c"
+      </code>
+      <p>
+	Well as you see, here too we may (and should) use substitutions macro:
+      </p>
+      <ul>
+	<li><code>%%</code> is replaced by a litteral <code>%</code></li>
+	<li>
+	  <code>%p</code> is replaced by the full path (including filename)
+	  of the file/directory to be saved
+	</li>
+	<li>
+	  <code>%f</code> is replaced by the filename (without path)
+	  of the file/directory to be saved
+	</li>
+	<li><code>%u</code> is the uid of the file's owner</li>
+	<li><code>%h</code> is the gid of the file's owner</li>
+	<li>
+	  <code>%c</code> is replaced by the context, which
+	  is either "start" or "end" depending on whether the file/directory is
+	  about to be saved or has been completely saved.
+	</li>
+      </ul>
+      <p>
+	And our script here could look like this:
+      </p>
+      <code class=block>
+	&nbsp;%cat /root/scripts/before_after_backup.sh
+	&nbsp;#!/bin/sh
+	&nbsp;
+	&nbsp;if [ "$1" == "" ]; then
+	&nbsp;    echo "usage: $0 &lt;filename&gt; &lt;dir+filename&gt; &lt;context&gt;"
+	&nbsp;    exit 1
+	&nbsp;fi
+	&nbsp;
+	&nbsp;# for better readability:
+	&nbsp;filename="$1"
+	&nbsp;path_file="$2"
+	&nbsp;context="$3"
+	&nbsp;
+	&nbsp;if [ "$filename" = "data" ] ; then
+	&nbsp;    if ["$context" = "start" ] ; then
+	&nbsp;        # action to suspend the software using files located in "$2"
+	&nbsp;    else
+	&nbsp;        # action to resume the software using files located in "$2"
+	&nbsp;    fi
+	&nbsp;else
+	&nbsp;    if ["$path_file" = "/home/my/big/file" ] ; then
+	&nbsp;        if ["$context" = "start" ] ; then
+	&nbsp;            # suspend the application that writes to that file
+	&nbsp;        else
+	&nbsp;            # resume the application that writes to that file
+	&nbsp;        fi
+	&nbsp;    else
+	&nbsp;        # do nothing, or warn that no action is defined for that file
+	&nbsp;    fi
+	&nbsp;fi
+      </code>
+      <p>
+	So now, if we run dar with all these command, dar will execute
+	our script once before entering the <code>data</code>
+	directory located in a home directory of some user, and once all files
+	of that directory will have been saved. It will run our script also
+	before and after saving our <code>/home/my/big/file</code> file.
+      </p>
+      <p>
+	If you plan to share your DBP files, thanks to use the
+	<a href="#DBP_convention">DBP convention</a>.
+      </p>
+
+
+      <h2><a name="DUC_convention">Convention for DUC files</a></h2>
+
+      <p>
+	Since version 1.2.0 dar's user
+	can have dar calling a command or scripts (called DUC files)
+	between slices, thanks to the -E, -F and -~ options.
+	To be able to easily share your DUC commands or
+	scripts, I propose you the following convention:
+      </p>
+      <ul>
+	<li>
+	  <p>
+	    use the <a href="usage_notes.html#XI">".duc" extension</a> to show
+	    anyone the script/command respect the following
+	  </p>
+	</li>
+	<li>
+	  <p>
+	    must be called from dar with the following arguments:
+	  </p>
+	  <code class=block>
+	    example.duc %p %b %n %e %c [other optional arguments]
+	  </code>
+	</li>
+	<li>
+	  <p>
+	    When called without argument, it must provide brief help on what it
+	    does and what are the expected arguments. This is the standard "usage:"
+	    convention.
+	  </p>
+	  <p>
+	    Then, any user, could share their DUC files
+	    and don't bother much about how to use them. Moreover it would be easy
+	    to chain them, if for example two persons created their own script,
+	    one <code>burn.duc</code> which burns a slice onDVD-R(W) and
+	    <code>par.duc</code> which makes a Parchive
+	    redundancy file from a slice, anybody could use both at a time giving
+	    the following argument to dar:
+	  </p>
+	  <code class=block>
+	    -E "par.duc %p %b %n %e %c 1" -E "burn.duc %p %b %n %e %c"
+	  </code>
+	  <p>
+	    of course a script has not to use all its arguments, in the case of
+	    <code>burn.duc</code> for example, the <code>%c</code> (context)
+	    is probably useless, and would not be
+	    used inside the script, while it is still possible to give it all the
+	    "normal" arguments of a DUC file, those not used simply being
+	    ignored.
+	  </p>
+	  <p>
+	    If you have interesting DUC scripts, you are welcome to contact
+	    dar maintainer (and not the maintainer of particular distro) by email,
+	    for it be add on the web site and in the following releases
+	    For now, check doc/samples directory for a few examples of DUC files.
+	  </p>
+	</li>
+	<li>
+	  <p>
+	    Note that all DUC scripts are expected to return a exit status of zero
+	    meaning that the operation has succeeded. If another exit status has
+	    been returned, dar asks the user for decision (or aborts if no user has
+	    been identified, for example, dar is not ran under a controlling
+	    terminal).
+	  </p>
+	</li>
+      </ul>
+
+
+      <h2><a name="DBP_convention">Convention for DBP files</a></h2>
+
+      <p>
+	Same as above, the following
+	convention is proposed to ease the sharing of Dar Backup Preparation
+	files:
+      </p>
+      <ul>
+	<li>
+	  <p>
+	    use the <a href="usage_notes.html#XI">".dbp" extension</a> to show
+	    anyone the script/command respect the following
+	  </p>
+	</li>
+	<li>
+	  <p>
+	    must be called from dar with the following arguments:
+	  </p>
+	  <code class=block>
+	    example.dbp %p %f %u %g %c [other optional arguments]
+	  </code>
+	</li>
+	<li>
+	  <p>
+	    when called without argument, it must provide brief help on what it
+	    does and what are the expected arguments. This is the standard "usage:"
+	    convention.
+	  </p>
+	</li>
+	<li>
+	  <p>
+	    Identically to DUC files, DBP files are expected to return a exist
+	    status of zero, else the backup process is suspended for the user to
+	    decide wether to retry, ignore the failure or abort the whole backup
+	    process.
+	  </p>
+	</li>
+      </ul>
+
+      <h2><a name="user_targets">User targets in DCF</a></h2>
+
+      <p>
+	Since release 2.4.0, a DCF file (files given to -B option)
+	can contain user targets. A user target is an
+	extention of the conditional syntax. So we will first make a brief
+	review on conditional syntax:
+      </p>
+
+      <h3>Conditional syntax in DCF files</h3>
+      <p>
+	The conditional syntax gives the possiblility to have options in a DCF
+	file that are only active in a certain context:
+      </p>
+      <ul>
+	<li>archive extraction (<code>extract:</code>)</li>
+	<li>archive creation (<code>create:</code>)</li>
+	<li>archive listing (<code>list:</code>)</li>
+	<li>archive testing (<code>test:</code>)</li>
+	<li>archive comparison (<code>diff:</code>)</li>
+	<li>archive isolation (<code>isolate:</code>)</li>
+	<li>archive merging (<code>merge:</code>)</li>
+	<li>no action yet defined (<code>default:</code>)</li>
+	<li>all context (<code>all:</code>)</li>
+	<li>when a archive of reference is used (<code>reference:</code>)</li>
+	<li>when an auxilliary archive of reference is used (<code>auxiliary:</code>)</li>
+      </ul>
+      <p>
+	All option given after the keyword in parenthesis up to
+	the next user target or the end of the file, take effect only in the
+	corresponding context. An example should clarify this:
+      </p>
+      <code class=block>
+	%cat sample.dcf
+	# this is a comment
+
+	all:
+	--min-digits 3
+
+	extract:
+	-R /
+
+	reference:
+	-J aes:
+
+	auxilliary:
+	-~ aes:
+
+	create:
+	-K aes:
+	-ac
+	-Z "*.mp3"
+	-Z "*.avi"
+	-zlz4
+
+	isolate:
+	-K aes:
+	-zlzo
+
+	default:
+	-V
+      </code>
+      <p>
+	This way, the -Z options are only used when creating an archive, while
+	the --min-digits option is used in any case. Well, this ends the
+	review of the conditional syntax.
+      </p>
+
+      <h3>User targets</h3>
+      <p>
+	As stated previously, <i>user targets</i> feature extends the
+	<i>conditional syntax</i> we just reviewed above. This means new
+	and user defined "targets" can be added. The option that follow
+	them will be activated only if the keyword of the target is passed
+	on command-line or in a DCF file. Let's take an example:
+      </p>
+      <code class=block>
+	% cat my_dcf_file.dcf
+
+	<e>compress:</e>
+	-z lzo:5
+      </code>
+
+      <p>
+	In the default situation all that
+	follows the line <code>"compress:"</code> up to the next target
+	or as here up to the end of the file will be ignored
+	unless the <code>compress</code> keyword is passed on command-line:
+      </p>
+
+      <code class=block>
+	dar -c test -B sample.dcf <e>compress</e>
+      </code>
+      <p>
+	Which will do exactly the same as if you have typed:
+      </p>
+      <code class=block>
+	dar -c test -z lzo:5
+      </code>
+      <p>
+	Of course, you can use as many
+	user target as you wish in your files, the only constraint is that it
+	must not have the name of the reserved keyword of a conditional syntax,
+	but you can also mix conditional syntax and user targets. Here follows
+	a last example:
+      </p>
+      <code class=block>
+	% cat sample.dcf
+	# this is a comment
+
+	all:
+	--min-digits 3
+
+	extract:
+	-R /
+
+	reference:
+	-J aes:
+
+	auxilliary:
+	-~ aes:
+
+	create:
+	-K aes:
+	-ac
+	-Z "*.mp3"
+	-Z "*.avi"
+
+	default:
+	-V
+
+	# our first user target named "compress":
+	compress:
+	-z lzo:5
+
+	# a second user target named "verbose":
+	verbose:
+	-v
+	-vs
+
+	# a third user target named "ring":
+	ring:
+	-b
+
+	# a last user target named "hash":
+	hash:
+	--hash sha1
+
+      </code>
+      <p>
+	You can now use dar and activate a set of commands by simply adding
+	the name of the target on command-line:
+      </p>
+      <code class=block>
+	dar -c test -B sample.dcf <e>compress</e> <e>ring</e> <e>verbose</e> <e>hash</e>
+      </code>
+      <p>
+	which is equivalent to:
+      </p>
+      <code class=block>
+	dar -c test --min-digits 3 -K aes: -ac -Z "*.mp3" -Z "*.avi" -z lzo:5 -v -vs -b --hash sha1
+      </code>
+      <p>
+	Last for those that like
+	complicated things, you can recusively use DCF inside user targets,
+	which may contain conditional syntax and the same or some other user
+	targets of you own.
+      </p>
+
+      <h2><a name="Parchive">Using data protection with DAR &amp; Parchive</a></h2>
+
+      <p>
+	Parchive (<i>par</i> or <i>par2</i> in the following) is a
+	very nice program that makes possible to recover a file which has been
+	corrupted. It creates redundancy data stored in a separated file (or
+	set of files), which can be used to repair the original file. This
+	additional data may also be damaged, <i>par</i> will be able to repair the
+	original file as well as the redundancy files, up to a certain point,
+	of course. This point is defined by the percentage of redundancy you
+	defined for a given file. The <i>par</i> reference sites are:
+      </p>
+      <ul>
+	<li>
+	  <a href="http://parchive.sourceforge.net/">http://parchive.sourceforge.net</a>
+	  (original site no more maintained today)
+	</li>
+	<li>
+	  <a href="https://github.com/Parchive/par2cmdline">https://github.com/Parchive/par2cmdline</a>
+	  (fork from the official site maintained since decembre 2013)
+	</li>
+      </ul>
+      <p>
+	Since version 2.4.0, dar is provided with a default /etc/darrc file. This one
+	contains a set of user targets among which is <e><code>par2</code></e>.
+	This user target is what's over the surface of the par2 integration with dar.
+	It invokes the <code>dar_par.dcf</code> file provided with dar that automatically
+	creates parity file for each slice during backup. When testing an archive it
+	verifies parity data with the archive, and if necessary repaires slices.
+	So now you only need install par2 and use dar this way to activate Parchive
+	integration with dar:
+      </p>
+      <code class=block>
+	dar [options] <e>par2</e>
+      </code>
+      <p>
+	Simple no?
+      </p>
+
+      <h2><a name="filtering">Examples of file filtering</a></h2>
+
+      <p>
+	File filtering is what defines which files are saved, listed,
+	restored, compared, tested, considered for merging... In brief, in the
+	following we will speak of which file are elected for the
+	<i>"operation"</i>, either a backup, a restoration, an
+	archive contents listing, an archive comparison, etc.
+      </p>
+      <p>
+	On dar command-line, file filtering is done using the following
+	options -X, -I, -P, -R,  -[, -],  -g, --filter-by-ea or --nodump.
+	You have of course all these option using the libdar API.
+      </p>
+      <p>
+	OK, Let's start with some concretes examples:
+      </p>
+      <code class=block>
+	dar -c toto
+      </code>
+      <p>
+	this will backup the current directory and all what is located into it
+	to build the toto archive, also located in the current directory.
+	Usually you should get a warning telling you that you are about to
+	backup the archive itself
+      </p>
+      <p>
+	Now let's see something more interesting:
+      </p>
+      <code class=block>
+	dar -c toto -R / -g home/ftp
+      </code>
+      <p>
+	the -R option tell dar to consider all file under the / root directory,
+	while the <code> -g "home/ftp"</code>
+	argument tells dar to restrict the operation only on the
+	<code>home/ftp</code> subdirectory of the given
+	root directory, which here is <code>/home/ftp</code>.
+      </p>
+      <p>
+	But this is a little bit different from the following:
+      </p>
+      <code class=block>
+	dar -c toto -R /home/ftp
+      </code>
+      <p>
+	here dar will save any file under /home/ftp without any restriction. So
+	what is the difference with the previous form? Both will save just the
+	same files, right, but the file <code>/home/ftp/welcome.msg</code>
+	for example, will be stored as <code>&lt;ROOT&gt;/home/ftp/welcome.msg</code>
+	in the first example while it will be saved as
+	<code>&lt;ROOT&gt;/welcome.msg</code> in the second example.
+	Here <code>&lt;ROOT&gt;</code> is a symbolic representation of the
+	<i>filesystem root</i>, which at restoration or comparison time it will be substitued
+	by the argument given to -R option (which defaults to "."). Let's
+	continue with other filtering mechanism:
+      </p>
+      <code class=block>
+	dar -c toto -R / -g home/ftp -P home/ftp/pub
+      </code>
+      <p>
+	Same as previously, but the <code>-P option</code> leads all files
+	under the <code>/home/ftp/pub</code>
+	not to be considered for the operation. If <code>-P option</code> is
+	used without <code>-g option</code> all files under the -R root directory
+	except the one pointed to by <code>-P options</code> (can be used several time)
+	are saved.
+      </p>
+      <code class=block>
+	dar -c toto -R / -P etc/password -g etc
+      </code>
+      <p>
+	here we save all the <code>/etc</code> except the <code>/etc/password</code> file. Arguments
+	given to -P can be plain files also. But when they are directory this
+	exclusion applies to the directory itself and its contents. Note that
+	using -X to exclude "password" does have the same effect:
+      </p>
+      <code class=block>
+	dar -c toto -R / -X "password" -g etc
+      </code>
+      <p>
+	will save all the <code>/etc</code> directory except any file with name equal to
+	"password". thus of course <code>/etc/password</code> will no be saved, but if it
+	exists, <code>/etc/rc.d/password</code> will not be saved neither if it is not a
+	directory. Yes, if a directory <code>/etc/rc.d/password</code> exist, it will not be
+	affected by the -X option. As well as -I option, -X option do not apply
+	to directories. The reason is to be able to filter some file by type (file extension for
+	example) without excluding a particular directory. For example you want to save
+	all mp3 files and only MP3 files:
+      </p>
+      <code class=block>
+	dar -c toto -R / --alter=no-case -I "*.mp3" home/ftp
+      </code>
+      <p>
+	will save any ending by mp3 or MP3 (<code>--alter=no-case</code> modify the
+	default behavior and make the mask following it case insensitive, use
+	<code>--alter=case</code> to revert to the default behavior for the following
+	masks). The backup is restricted to <code>/home/ftp</code> directories
+	and subdirectories. If instead -I (or -X) applied to directories, we
+	would only be able to recurse in subdirectories ending by ".mp3" or
+	".MP3". If you had a directory named "/home/ftp/Music" for example,
+	full of mp3, you would not have been able to save it.
+      </p>
+      <p>
+	Note that the glob expressions (where comes the shell-like wild-card
+	'*' '?' and so on), can do much more complicated things like "*.[mM][pP]3".
+	You could thus replace the previous example by the following for
+	the same result:
+      </p>
+      <code class=block>
+	dar -c toto -R / -I "*.[mM][pP]3" home/ftp
+      </code>
+      <p>
+	And, instead of using <b>glob expression</b>, you can
+	use <b>regular expressions</b> (regex) using the <code>-aregex</code>
+	option. You can also use alternatively both of them using <code>-aglob</code>
+	to return back to glob expressions. Each option
+	<code>-aregex</code>/<code>-aglob</code> modifies the filter option that follow
+	them on command-line or -B included files. This affects
+	<code>-I/-X/-P options</code> for file filtering as well as <code>-u/-U options</code>
+	for <i>Extended Attributes</i> filtering as well as <code>-Z/-Y options</code> for
+	file selected for compression.
+      </p>
+      <p>
+	Now the inside algorithm, to understand how -X/-I on one side and -P/-g/-[/-] options
+	act relative to each others: a file is elected for operation if:
+      </p>
+      <ol>
+	<li>its name does not match any -X option or it is a directory</li>
+	<li>
+	  <b>and</b> if some -I is given, file is either a directory or match at
+	  least one of the -I option given.
+	</li>
+	<li><b>and</b> path and filename do not match any -P option</li>
+	<li><b>and</b> if some -g options are given, the path to the file matches at least one of the -g options.</li>
+      </ol>
+      <p>
+	The algorithm we detailed above is the default one, which is historical
+	and called the <b>unordered</b> method. But since version 2.2.x
+	there is also an more poweful <b>ordered</b> method (activated adding
+	<code>-am option</code>) which gives even more freedom to filters,
+	the <a href="doc/man/index.html">dar man mage</a> will give you all
+	the details, but in short it leads the a mask to take precendence
+	on the one found before it on the command-line:
+      </p>
+      <code class=block>
+	dar -c toto -R / <e>-am</e> -P home -g home/denis -P home/denis/.ssh
+      </code>
+      <p>
+	will save everything except what's in <code>/home</code> but
+	<code>/home/denis</code> will derogate and will be saved except
+	for what's in <code>/home/denis/.ssh</code>. -X and -I acts also
+	similarly between them when <code>-am</code> is used the latest
+	filter met takes precedence (but -P/-g do not interfer with -X/-I).
+      </p>
+      <p>
+	To summarize, in parallel of file filtering, you will find Extended Attributes
+	filtering thanks to the <code>-u and -U options</code>
+	(they work the same as -X and -I option but apply to EA),
+	you will also find the file compression
+	filtering (-Z and -Y options) that defines which file to compress or to
+	not compress, here too the way they work is the same as seen with -X
+	and -I options. The <code>-ano-case</code> and <code>-acase</code>
+	options do also apply to all, as well as the <code>-am option</code>.
+	Last all these filtering (file, EA, compression) can also use
+	regular expression in place of glob expression (thanks to the
+	<code>-ag</code> / <code>-ar</code> options).
+      </p>
+
+
+      <h2><a name="Decremental_Backup">Decremental Backup</a></h2>
+
+      <h3>Introduction</h3>
+      <p>
+	Well, you have already heard about "<b>Full</b>" backup, in which
+	all files are completely saved in such a way that let you use this
+	backup alone to completely restore your data. You have also
+	probably heard about "<b>differential</b>"
+	backup in which is only stored the
+	changes that occurred since an archive of reference was made. There is
+	also the "<b>incremental</b>" backup, which in substance, is
+	the same as "differential" ones. The difference resides in the nature
+	of the archive of reference: "Differential" backup use only a "full"
+	backup as reference, while "incremental" may use a "full" backup, a
+	"differential" backup or another "incremental" backup as reference
+	(Well, in dar's documentation the term "differential" is commonly
+	used in place of "incremental", since there is no conceptual
+	difference from the point of view of dar software).
+      </p>
+      <p>
+	let's now see a new type of backup: the "<b>decremental</b>" backup.
+	All started by a feature request from Yuraukar on dar-support
+	mailing-list:
+	<dl>
+	  <dt class=void></dt><dd>
+	    <i>
+	      In the full/differential backup scheme, for a given file, you have as
+	      many versions as changes that were detected from backup to backup.
+	      That's fair in terms of storage space required, as you do not store twice the
+	      same file in the same state, which you would do if you were doing only
+	      full backups. But the drawback is that you do not know by advance in which
+	      backup to find the latest version of a given file. Another drawback
+	      comes when you want to restore your entire system to the latest state available from your
+	      backup set, you need to restore the most ancient backup
+	      (the latest full backup), then the others one by one in
+	      chronological order (the incremental/differential backups). This
+	      may take some time, yes. This is moreover inefficient, because, you
+	      will restore N old revisions of a file that have changed often before
+	      restoring the last and more recent version.
+	    </i>
+	  </dd>
+	</dl>
+      </p>
+      <p>
+	Yuraukar idea was to have all latest versions of files in the latest
+	backup done. Thus the most recent archive would always stay a full
+	backup. But, to still be able to restore a file in an older state than
+	the most recent (in case of accidental suppression), we need a so
+	called decremental backup. This backup's archive of reference is
+	in the future (a more recent decremental backup or the latest
+	backup done, which is a full backup in this scheme).
+	This so called "decremental" backup stores all the file differences
+	from this archive of reference that let you get from the reference
+	state to an older state.
+      </p>
+      <p>
+	Assuming this is most probable to restore the latest version of a
+	filesystem than any older state available, decremental backup seem an
+	interesting alternative to incremental backups, as in that case you
+	only have to use one archive (the latest) and each file get restored
+	only once (old data do not get overwritten at each archive restoration
+	as it is the case with incremental restoration).
+      </p>
+      <p>
+	Let's take an example: We have 4 files in the system named f1, f2, f3
+	and f4. We make backups at four different times t1, t2, t3 and t4 in
+	chronological order. We will also perform some changes in filesystem
+	along this period: f1 has will be removed from the system between t3
+	and t4, while f4 will only appear between t3 and t4. f2 will be
+	modified between t2 and t3 while f3 will be changed between t3 and t4.
+      </p>
+      <p>
+	All this can be represented this way, where lines are the state at a
+	given date while each column represents a given file.
+      </p>
+      <code class=block>
+	&nbsp;time
+	&nbsp;   ^
+	&nbsp;   |                       * represents the version 1 of a file
+	&nbsp;t4 +         #    #    *   # represents the version 2 of a file
+	&nbsp;   |
+	&nbsp;t3 +    *    #    *
+	&nbsp;   |
+	&nbsp;t2 +    *    *    *
+	&nbsp;   |
+	&nbsp;t1 +    *    *    *
+	&nbsp;   |
+	&nbsp;   +----+----+----+----+---
+	&nbsp;        f1   f2   f3   f4
+      </code>
+      <p>
+	Now we will represent the contents of backups at these different
+	times, first using only full backup, then using incremental backups and
+	at last using decremental backups. We will use the symbol <code>'O'</code> in place
+	of data if a given file's data is not stored in the archive because it
+	has not changed since the archive of reference was made. We will also
+	use an <code>'x'</code> to represent the information that a given file has been
+	recorded in an archive as deleted since the archive of reference was made. This
+	information is used at restoration time to remove a file from
+	filesystem to be able to get the exact state of files seen at the date
+	the backup was made.
+      </p>
+
+      <h3>Full backups behavior</h3>
+
+      <code class=block>
+	&nbsp;   ^
+	&nbsp;   |
+	&nbsp;t4 +         #    #    *
+	&nbsp;   |
+	&nbsp;t3 +    *    #    *
+	&nbsp;   |
+	&nbsp;t2 +    *    *    *
+	&nbsp;   |
+	&nbsp;t1 +    *    *    *
+	&nbsp;   |
+	&nbsp;   +----+----+----+----+---
+	&nbsp;        f1   f2   f3   f4
+      </code>
+
+      <p>
+	Yes, this is easy, each backup contains all the files that
+	existed at the time the backup was made. To restore in the state the
+	system had at a given date, we only use one backup, which is the one
+	that best corresponds to the date we want. The drawback is that we
+	saved three time the file f1 an f3 version 1, and twice f2 version 2,
+	which correspond to a waste of storage space.
+      </p>
+
+      <h3>Full/Incremental backups behavior</h3>
+
+
+      <code class=block>
+	&nbsp;   ^
+	&nbsp;   |
+	&nbsp;t4 +    x    0    #    *     0 represents a file which only state is recorded
+	&nbsp;   |                         as such, no data is stored in the archive
+	&nbsp;t3 +    0    #    0          very little space is consummed by such entry
+	&nbsp;   |
+	&nbsp;t2 +    0    0    0          x represents an entry telling that the corresponding
+	&nbsp;   |                         file has to be removed
+	&nbsp;t1 +    *    *    *
+	&nbsp;   |
+	&nbsp;   +----+----+----+----+---
+	&nbsp;        f1   f2   f3   f4
+      </code>
+      <p>
+	Now we see that archive done at date 't2' does not contain any data as
+	no changed have been detected between t1 and t2. This backup is quite
+	small and needs only little storage. Archive at t3 date only stores
+	f2's new version, and at t4 the archive stores f4 new file and f3's new
+	version. We also see that f1 is marked as removed from filesystem since
+	date t3 as it no longer existing in filesystem but existed in the
+	archive of reference done at t3.
+      </p>
+      <p>
+	As you see, restoring to the latest state is more complicated compared
+	to only using full backups, it is neither simple to know in which
+	backup to took for a given file's data at date t3 for example, but yes,
+	we do not waste storage space anymore. The restoration process the user
+	has to follow is to restore in turn:
+      </p>
+      <ul>
+	<li>
+	  archive done at t1, which will put old version of files and restore
+	  f1 that have been removed at t4
+	</li>
+	<li>archive done at t2, that will do nothing at all</li>
+	<li>
+	  archive done at t3, that will replace f2's old version by its new one
+	</li>
+	<li>
+	  archive done at t4, that will remove f1, add f4 and replace f3's old
+	  version to by its latest version.
+	</li>
+      </ul>
+      <p>
+	The latest version of files is scattered over the two last archives
+	here, but in common systems, much of the data does not change at all
+	and can only be found in the first backup (the full backup).
+      </p>
+
+      <h3>Decremental backup behavior</h3>
+
+      <p>
+	Here is represented the contents of backups using decremental approach.
+	The most recent (t4) backup is always a full backup. Older backups are
+	decremental backups based on the just more recent one (t3 is a
+	difference based on t4, t1 is a difference based on t2). At the opposit
+	of incremental backups, the reference of the archive is in the future
+	not in the past.
+      </p>
+      <code class=block>
+	&nbsp;   ^
+	&nbsp;   |
+	&nbsp;t4 +         #    #    *
+	&nbsp;   |
+	&nbsp;t3 +    *    0    *    x
+	&nbsp;   |
+	&nbsp;t2 +    0    *    0
+	&nbsp;   |
+	&nbsp;t1 +    0    0    0
+	&nbsp;   |
+	&nbsp;   +----+----+----+----+---
+	&nbsp;        f1   f2   f3   f4
+      </code>
+      <p>
+	Thus obtaining the latest version of the system is as easy as done
+	using only full backups. And you also see that the space required to
+	store these decremental backup is equivalent to what is needed to
+	store the incremental backups. However, still the problem exist to
+	locate the archive in which to find a given's file data at a given
+	date. But also, you may see that backup done at time t1 can safely
+	be removed as it became useless because it does not store any data, and
+	loosing archive done at t1 and t2 is not a big problem, you just loose
+	old state data.
+      </p>
+      <p>
+	Now if we want to restore the filesystem in the state it has at time
+	t3, we have to restore archive done at t4 then restore archive done at
+	t3. This last step will have the consequences to create f1, replace
+	f3 by its older version and delete f4 which did not exist at time t3
+	(file which is maked 'x' meaning that it has to be removed). if we want
+	to go further in the past, we will restore the decremental backup t2
+	which will only replace f2's new version by the older version 1. Last
+	restoring t1 will have no effect as no changed were made between t1 and
+	t2.
+      </p>
+      <p>
+	What about dar_manager? Well, in nature, there is no difference
+	between an incremental backup and a differential/incremental backup.
+	The only difference resided in the way (the order) they have to be
+	used. So, even if you can add decremental backups in a dar_manager
+	database, it is not designed to handle them correctly. It is thus
+	better to keep dar_manager only for incremental/differential/full
+	backups.
+      </p>
+
+      <h3>Decremental backup theory</h3>
+
+      <p>
+	But how to get buitd decremental backup as the reference is in the future
+	and does not exist yet?
+      </p>
+      <p>
+	Assuming you have a full backup describing your system at date
+	t1, can we have in one shot both the new full backup for time t2 and
+	also transform the full backup of time t1 into a decremental backup
+	relative to time t2? In theory, yes. But there is a risk in case of failure
+	(filesystem full, lack of electric power, bug, ...): you may loose both
+	backups, the one which was under construction as well as the one we
+	took as reference and which was under process of transformaton to
+	decremental backup.
+      </p>
+      <p>
+	Seen this, the <b>libdar implementation</b> is to let
+	the user <u>do a normal full backup at each step</u> [Doing just a
+	differential backup sounds better at first, but this would end in more
+	archive manipulation, as we would have to generate both decremental and
+	new full backup, and we would manipulate at least the same amount of
+	data]. Then <u>with the two full backups</u> the user would have to use
+	archive <b>merging</b> to <u>create the decremental backup</u>
+	<b>using <code>-ad option</code></b>. Last, once the resulting
+	(decremental) archive have been tested and that the user is sure this
+	decremental backup is viable, he can <u>remove the older full backup</u>
+	and store the new decremental backup beside older ones and
+	the new full backup. This at last only, will save you disk space
+	and let you easily recover you system using the latest (full) backup.
+      </p>
+      <p>
+	Can one use an extracted catalogue instead of the old full backup to
+	perform a decremental backup? No.
+	The full backup to transform must have the whole data in it to be able
+	to create a decremental back with data in it. Only the new full backup
+	can be replaced by its extracted catalogue.
+      </p>
+      <p>
+	This last part about decremental backup is extracted from a discussion
+	with Dan Masson on dar-support mailing-list:
+      </p>
+
+      <h3>Decremental backup practice</h3>
+      <p>
+	We start by a full backup:
+      </p>
+      <code class=block>
+	dar -c /mnt/backup/FULL-2015-04-10 -R / -z -g /mnt/backup -D
+      </code>
+      <p>
+	Then at each new cycle, we a new full backup
+      </p>
+      <code class=block>
+	dar -c /mnt/backup/FULL-2015-04-11 -R / -z -g /mnt/backup -D
+      </code>
+      <p>
+	Then to save space, we reduce into a decremental backup the previous full backup:
+      </p>
+      <code class=block>
+	dar <e>-+ /mnt/backup/DECR-2015-04-10</e> -A /mnt/backup/FULL-2015-04-10 -@ /mnt/backup/FULL-2015-04-11 <e>-ad</e> -ak
+      </code>
+      <p>
+	By precaution test that the decremental archive is viable
+      </p>
+      <code class=block>
+	dar -t /mnt/backup/DECR-2015-04-10
+      </code>
+      <p>
+	Then make space by removing the old full backup:
+      </p>
+      <code class=block>
+	rm /mnt/backup/FULL-2015-04-10.*.dar
+      </code>
+      <p>
+	And you can loop this way forever, removing at at time the very oldest
+	decremental backups if space is missing.
+      </p>
+      <p>
+	Assuming you run this cycle each day, you get the following at each
+	new step/day:
+      </p>
+      <code class=block>
+	&nbsp;The 2015-04-10 you have:
+	&nbsp;    FULL-2015-04-10
+	&nbsp;
+	&nbsp;The 2015-04-11 you have:
+	&nbsp;    FULL-2015-04-11
+	&nbsp;    DECR-2015-04-10
+	&nbsp;
+	&nbsp;The 2015-04-12 you have:
+	&nbsp;    FULL-2015-04-12
+	&nbsp;    DECR-2015-04-11
+	&nbsp;    DECR-2015-04-10
+	&nbsp;
+	&nbsp;The 2015-04-13 you have:
+	&nbsp;    FULL-2015-04-13
+	&nbsp;    DECR-2015-04-12
+	&nbsp;    DECR-2015-04-11
+	&nbsp;    DECR-2015-04-10
+      </code>
+      <p>
+	and so on.
+      </p>
+
+      <h3>Restoration using decremental backup</h3>
+
+
+      <p>
+	<b>Scenario 1:</b> today 2015-04-17 you have lost your system, you want to restore it as
+	it was at the time of the last backup. <b>Solution:</b>: use the last backup it is a
+	full one, it is the latest backup, nothing more!
+      </p>
+      <code class=block>
+	dar -x /mnt/backup/FULL-2015-04-16 -R /
+      </code>
+      <p>
+	<b>Scenario 2:</b> today 2015-04-17 you have lost your system due to a virus or your
+	system had been compromised and you know it started the 2015-04-12 so
+	you want to restore your system at the time of 2015-04-11. First,
+	restore the last full archive (FULL-2015-04-16) then in reverse order
+	all the decremental ones: DECR-2015-04-15 then DECR-2015-04-14, then
+	DECR-2015-04-13, then DECR-2015-04-12 then DECR-2015-04-11. The
+	decremental backup are small, their restoration is usually quick
+	(depending on how much files changed in the day). So here we get in the
+	exact same situation you would have reach restoring only
+	FULL-2015-04-11, but you did not not have to store all the full
+	backups, just the latest.
+      </p>
+      <code class=block>
+	dar -x /mnt/backup/FULL-2015-04-16 -R /
+	dar -x /mnt/backup/DECR-2015-04-15 -R / -w
+	dar -x /mnt/backup/DECR-2015-04-14 -R / -w
+	dar -x /mnt/backup/DECR-2015-04-13 -R / -w
+	dar -x /mnt/backup/DECR-2015-04-12 -R / -w
+	dar -x /mnt/backup/DECR-2015-04-11 -R / -w
+      </code>
+
+      <h2><a name="door">Door inodes (Solaris)</a></h2>
+
+      <p>
+	A door inode is a dynamic
+	object that is created on top of an empty file, it does exist only when
+	a process has a reference to it, it is thus not possible to restore it.
+	But the empty file it is mounted on can be restored instead. As such,
+	dar restores an door inode with an empty file having the same
+	parameters as the door inode.
+      </p>
+      <p>
+	If an door inode is hard linked several times in the file system dar
+	will restore a plain file having as much hard links to the
+	corresponding locations.
+      </p>
+      <p>
+	Dar is also able to handle Extended Attributes associated to a door
+	file, if any. Last, if you list an archive containing door inodes, you
+	will see the 'D' letter as their type (by opposition to 'd' for
+	directories), this is conform to what the 'ls' command displays for
+	such entries.
+      </p>
+
+      <h2><a name="delta">How to use binary delta with dar</a></h2>
+
+      <h3>Terminology</h3>
+      <p>
+	<b>delta compression</b>, <b>binary diff</b> or <b>rsync increment</b>
+	all point to the same feature: a way to avoid resaving a whole file
+	during a differential/incremental backup but only save the modified
+	part of it instead. This solution is of course
+	interesting for large files that change often but only for little parts
+	of them (Microsoft exchange mailboxes, for example). Dar implements
+	this feature relying on <b>librsync library</b>, feature which we will
+	call <b>binary delta</b> in the following.
+      </p>
+
+      <h3>Librsync specific concepts</h3>
+
+      <p>
+	Before looking at the way to use dar, several concepts from librsync
+	have to be understood:
+      </p>
+      <p>
+	In order to make a binary delta
+	of a file <code>foo</code> which at time t1 contained data F1 and at
+	time t2 containted data F2, <i>librsync</i> requires first that a
+	<b>delta signature</b> be made against F1.
+      </p>
+      <p>
+	Then using that <i>delta signature</i> and data F2, <i>librsync</i>
+	is able to build a <b>delta patch</b> P1 that, if applied to
+	F1 will provide content F2:
+      </p>
+      <code class=block>
+	&nbsp;backing up file "foo"
+	&nbsp;        |
+	&nbsp;        V
+	&nbsp;time t1  content = F1    ---------&gt; <b>delta signature</b> of F1
+	&nbsp;        |                              |
+	&nbsp;        |                              |
+	&nbsp;        |                              +-------------&gt;  )       building <b>delta patch</b> "P1"
+	&nbsp;        V                                               )----&gt;  containing the difference
+	&nbsp;time t2  content = F2    ----------------------------&gt;  )       from F1 to F2
+	&nbsp;        |
+	&nbsp;       ...
+      </code>
+      <p>
+	At restoration time dar has then first to restore F1,
+	from a full backup or from a previous
+	differential backup, then using librsync applying the patch "P1" to
+	modify F1 into F2.
+      </p>
+      <code class=block>
+	&nbsp;restoring file "foo"
+	&nbsp;        |
+	&nbsp;        V
+	&nbsp;time t3  content = F1    &lt;---  from a previous backup
+	&nbsp;        |
+	&nbsp;        +------&gt;---------------&gt;----------------+
+	&nbsp;        .                                       |
+	&nbsp;        .                                       V
+	&nbsp;        .                                       + &lt;----- applying patch "P1"
+	&nbsp;        .                                       |
+	&nbsp;        +-----&lt;---------------&lt;-------------&lt;---+
+	&nbsp;        |
+	&nbsp;        V
+	&nbsp;time t4  content = F2
+      </code>
+
+      <h3>Using binary delta with dar</h3>
+      <p>
+	First, delta signature is not
+	activated by default, you have to tell dar you want to
+	<b>generate delta signature</b> using the <b>--delta sig</b>
+	option at archive creation/isolation/merging time. Then as soon as a
+	file has a delta signature in the archive of reference, dar will
+	perform a delta binary and store a <b>delta patch</b> if such file
+	has changed since the archive of reference was done. But better an
+	example than a long explanation:
+      </p>
+
+      <h4>Making differential backup</h4>
+
+      <p>
+	First, doing a full backup, we add the <b>--delta sig</b>
+	option for the resulting archive to contain the necessary signatures to
+	be provided to librsync later on in order to setup delta patches. This
+	has the drawback of additional space requirement but the advantage of
+	space economy at incremental/differential backups:
+      </p>
+      <code class=block>
+	dar -c full -R / -z <e>--delta sig</e> <i>...other options...</i>
+      </code>
+      <p>
+	Then there is nothing more specific to delta signature, this is the same way
+	as you were used to do with previous releases of dar: you just need to
+	rely on a archive of reference containing delta signatures for dar
+	activating delta binary. Here below, diff1 archive will eventually
+	contain delta patches of modified files since full archive was created,
+	but will not contain any delta signature.
+      </p>
+      <code class=block>
+	dar -c diff1 -A full -R / -z <i>...other options...</i>
+      </code>
+      <p>
+	The next differential backups will be done the same, based on the full backup:
+      </p>
+      <code class=block>
+	dar -c diff<e>2</e> -A full -R / -z <i>...other options...</i>
+      </code>
+      <p>
+	Looking at archive content, you will see the "[Delta]" flag in place of
+	the "[Saved]" flag for files that have been saved as a delta patch:
+      </p>
+      <code class=block>
+	[Data ][D][ EA ][FSA][Compr][S]| Permission | User | Group | Size | Date | filename<br>
+	-------------------------------+------------+------+-------+------+------+--------------
+	<e>[Delta]</e>[ ] [-L-][ 99%][X] -rwxr-xr-x 1000 1000 919 kio Tue Mar 22 20:22:34 2016 bash
+      </code>
+
+      <h4>Making incremental backup</h4>
+
+      <p>
+	Doing incremental backups, the first one is always
+	a full backup and is done the same as above for
+	differential backup:
+      </p>
+      <code class=block>
+	dar -c full -R / -z <e>--delta sig</e> <i>...other options...</i>
+      </code>
+      <p>
+	But at the opposit of differential
+	backups, incremental backups are also used as reference for the next
+	backup. Thus if you want to continue performing binary delta, some
+	<i>delta signatures</i> must be present beside the <i>delta patch</i> in the resulting
+	archives:
+      </p>
+      <code class=block>
+	dar -c incr1 -A full -R / -z <e>--delta sig</e> <i>...other options...</i>
+      </code>
+      <p>
+	Here the <b>--delta sig</b> switch leads dar to copy from the full
+	backup into the new backup all the <i>delta signatures</i> of unchanged files
+	and to recompute new <i>delta signature</i> of files that have changed, in
+	addition to the <i>delta patch</i> calculation that are done with or
+	without this option.
+      </p>
+
+      <h4>Making isolated catalogue</h4>
+
+      <p>
+	Delta binary still allows differential or incremental backup
+	using a isolated catalogue in place of the original backup of reference.
+	The point to take care about if you want to perform binary delta
+	is the way to build this isolated catalogue: the delta signature present
+	in the backup of reference files must be copied to the isolated catalogue,
+	else the differential or incremental backup will be a normal one
+	(= without binary delta):
+      </p>
+      <code class=block>
+	dar <b>-C</b> CAT_full -A full -z <e>--delta sig</e> <i>...other options...</i>
+      </code>
+      <p>
+	Note that if the archive of reference does not hold any delta
+	signature, the previous command will lead dar to compute on-fly delta
+	signature of saved files while performing catalogue isolation. You can
+	thus chose not to include delta signature inside full backup while
+	still being able to let dar use binary delta. However as dar cannot
+	compute delta signature without data, files that have been recorded as
+	unchanged since the archive of reference was made cannot have their
+	delta signature computed at isolation time. Same point if a file is
+	stored as a delta patch without delta signature associated with it, dar
+	will not be able to add a delta signature at isolation time for that
+	file.
+      </p>
+      <p>
+	Yes, this is as simple as adding <b>--delta sig</b>
+	to what you were used to do before. The resulting isolated catalogue
+	will be much larger than without delta signatures but still much
+	smaller than the full backup itself. The incremental or differential
+	backup can then be done the same as before but using CAT_full in place
+	of full:
+      </p>
+      <code class=block>
+	dar -c diff1 -A <b>CAT_</b>full -R / -z <i>...other options...</i>
+      </code>
+      <p>
+	or
+      </p>
+      <code class=block>
+	dar -c incr1 -A <b>CAT_</b>full -R / -z <e>--delta sig</e> <i>...other options...</i>
+      </code>
+
+      <h4>Merging archives</h4>
+
+      <p>
+	You may need to merge two backups or make a subset of a single
+	backup or even a mix of these two operations, possibility which
+	is brought by the <code>--merge</code> option for a long
+	time now. Here too if you want to keep the <i>delta signatures</i>
+	that could be present in the source archives you will have to use
+	<b>--delta sig</b> option:
+      </p>
+      <code class=block>
+	dar <b>--merge</b> merged_backup -A archive1 -@archive2 -z <e>--delta sig</e> <i>...other options...</i>
+      </code>
+
+      <h4>Restoring with binary delta</h4>
+      <p>
+	No special option has to be provided at restoration time.
+	Dar will figure out by itself whether the data stored in backup
+	for a file is a <i>plain data</i> and can restore the whole
+	file or is a <i>delta patch</i> that has to be applied to the
+	existing file lying on filesystem. Before
+	patching the file dar will calculate and check its CRC. if the
+	CRC is the expected one, the file will be patched else a
+	warning will be issued and the file will not be modified at all.
+      </p>
+      <p>
+	The point with restoration is to *always* restore all previous backups
+	in order, from the full backup down to all incremental one (or the
+	full backup and just the latest differential one), for dar be able
+	to apply the stored patches. Else restoration can fail for some or
+	all files. <b>Dar_manager</b> can be of great help here as it will
+	know which archive to skip and which not to skip in order to restore
+	a particular set of files. But for a restoration a whole filesystem
+	it is advised to just use dar and restore backup in order.
+      </p>
+
+      <h4>Performing binary delta only for some files</h4>
+
+      <p>
+	You can exclude some files from delta difference operation by
+	avoiding creating a delta signature for them in the archive of
+	reference, using the option <b>--exclude-delta-sig</b>.
+	You can also include only some files for delta signatures using the
+	<b>--include-delta-sig</b> option. Of course as with other
+	masks-related options like -I, -X, -U, -u, -Z, -Y, ... it is
+	possible to combine them to have an even greater and more accurate
+	definition of files for which you want to have delta signature being built
+      </p>
+      <code class=block>
+	&nbsp;dar -c full -R / -z <b>--delta sig</b> \
+	&nbsp;    --include-delta-sig "*.opt" \
+	&nbsp;    --include-delta-sig "*.pst" \
+	&nbsp;    --exclude-delta-sig "home/joe/*"
+      </code>
+      <p>
+	Independently from this filtering
+	mechanism based on path+filename, <i>delta signature</i> is
+	never calculated for files smaller than 10 kio because it does not
+	worse performing delta difference for them. You can change that
+	behavior using the option <b>--delta-sig-min-size &lt;size in byte&gt;</b>
+      </p>
+      <code class=block>
+	dar -c full -R / -z --delta sig --delta-sig-min-size 20k
+      </code>
+
+      <h4>Archive listing</h4>
+
+      <p>
+	Archive listing received adhoc addition to show which file have delta signature
+	and which one have been saved as delta patch. The <code>[Data ]</code> column shows
+	<code>[Delta]</code> in place of <code>[Saved]</code>
+	when a <i>delta patch</i> is used, and a new column entitled <code>[D]</code> shows
+	<code>[D]</code> when a <i>delta signature</i> is present for that file and
+	<code>[ ]</code> else (or <code>[-]</code> if delta signature is not applicable to
+	that type of file).
+      </p>
+      <p>
+	See man page about --delta related options for even more details.
+      </p>
+
+      <h3>Differences between rsync and dar</h3>
+
+      <p>
+	<i>rsync</i> uses <i>binary delta</i> to reduce the volume of data
+	over the network to synchronize a directory between two different hosts.
+	The resulting data is stored uncompressed but thus ready for use
+      </p>
+
+      <p>
+	<i>dar</i> uses <i>binary delta</i> to reduce the volume of data to
+	store (and thus transfer over the network) when performing a differential
+	or incremental backup. At the opposite of <i>rsync</i> the data stays
+	compressed and it thus not ready for use (backup/archiving context), and
+	the binary delta can be used incrementally to record a long history of
+	modification, while <i>rsync</i> looses past modifications at each new
+	remote synchronization
+      </p>
+      <p>
+	In conclusion <i>rsync</i> and <i>dar</i> to not address the same
+	purposes. For more about that topic check the <a href="benchmark.html">benchmark</a>
+      </p>
+
+      <h2><a name="Multi_recipient_signed_archive_weakness">Multi recipient signed archive weakness</a></h2>
+      <p>
+	As described in the <a href="Notes.html#asym">usage notes</a> it is possible
+	to encrypt an archive and have it readable by several recipients using their
+	respective gnupg private key. <b>So far, so good</b>!
+      </p>
+      <p>
+	It is also possible to embed your gnupg signature within such archive
+	for your recipient to have a proof the archive comes from you. If there
+	is only a single recipient, <b>So far, still so good</b>!
+      </p>
+      <p>
+	But when an archive is encrypted using gpg to different recipient and
+	is also signed, there is a known weakness. If one of the recipient
+	is an expert he/she could reuse your signature for a slightly different
+	archive
+      </p>
+      <p>
+	Well, if this type of attack should be accessible by an expert guy with
+	some constraints, it can only take place between a set of friends or at
+	least people that know each other enough to have exchanged their public
+	key information between them.
+      </p>
+      <p>
+	In that context, if you do think the risk is more than theorical
+	and the consequences of such exploit would be important, it is advised
+	to sign the dar archive outside dar, you can still keep encryption
+	with multi-recipients withing dar.
+      </p>
+      <code class=block>
+	dar -c my_secret_group_stuff -z -K gnupg:recipents1@group.group,recipient2@group.group -R /home/secret --hash sha512
+
+	# check the archive has not been corrupted
+	sha512sum -c my_secret_group_stuff.1.dar.sha512
+
+	#sign the hash file (it will be faster than signing the backup
+	# in particular if this one is huge
+	gpg --sign -b my_secret_group_stuff.1.dar.sha512
+
+	#send all three files to your recipients:
+	my_secret_group_stuff.1.dar
+	my_secret_group_stuff.1.dar.sha512
+	my_secret_group_stuff.1.dar.sha512.sig
+      </code>
+    </div>
   </body>
 </html>

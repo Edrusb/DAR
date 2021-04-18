@@ -30,16 +30,21 @@ div.top
     border-radius: 14px 1px 14px 1px;
     background: rgb(221,221,221);
     color: rgb(0,0,170);
-    clear: both;
     text-align: center;
     padding: 10px;
     overflow: auto;
-    vertical-align: middle;
+    display: flex;
+    align-items: center;
 }
 
 div.top img
 {
     float:left;
+}
+
+div.top h1
+{
+    flex-grow: 2;
 }
 
 /* menuitem */
@@ -71,7 +76,6 @@ div.menuitemactive
     overflow: hidden;
 }
 
-
 /* non floating menu box */
 
 div.menutop
@@ -81,19 +85,21 @@ div.menutop
 
 /* floating menu box */
 
+div.page
+{
+    display: flex;
+}
+
+/* page contains menuleft and main */
+
 div.menuleft
 {
     padding: 1%;
     text-align: center;
     margin-right: 20px;
-    margin-bottom: 5px;
     background: rgb(221,221,221);
-    clear: both;
-    float: left;
-    min-width: 20%;
-    max-width: 30%;
-    height: 100%;
-    border-style: none;
+    flex-basis: 25%;
+    flex-grow: 1;
 }
 
 div.menuleft a
@@ -120,9 +126,16 @@ div.menuleft a:hover
 main section
 */
 
-div.main
+div.mainleft
 {
     padding-bottom: 5%;
+    max-width: 75%;
+}
+
+div.maintop
+{
+    padding-bottom: 5%;
+    min-width: 100%;
 }
 
 /*
@@ -131,7 +144,7 @@ bottom jump to top page
 
 div.jump
 {
-    padding: 1%;
+    padding: 5px;
     text-align: center;
     margin-right: 5px;
     margin-bottom: 5px;
@@ -141,7 +154,7 @@ div.jump
     clear: both;
     width: 88%;
     position: fixed;
-    top: 85%;
+    bottom: 0px;
     border-style: solid;
     border-width: 2px;
     border-color: Grey;
