@@ -450,7 +450,7 @@ def f6():
                                        libdar.mycurl_protocol.proto_ftp,
                                        "anonymous",
                                        secu_pass,
-                                       "ftp.dm3c.org",
+                                       "ftp.edrusb.org",
                                        "",
                                        False,
                                        "",
@@ -462,7 +462,7 @@ def f6():
     opt.set_info_details(True)
 
     arch2 = libdar.archive(ui,
-                           libdar.path("/dar.linux.free.fr/"),
+                           libdar.path("/dar.linux.free.fr/Python_tutorial"),
                            "exemple",
                            "dar",
                            opt)
@@ -478,3 +478,5 @@ def f6():
 
 # they are all three accessible from python and follow
 # very closely the C++ syntax and usage
+# thanks to refer to the API documentation or to the
+# C++ tutorial
