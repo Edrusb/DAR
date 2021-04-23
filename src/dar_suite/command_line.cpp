@@ -405,7 +405,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
 	{
 	    bool creation = (p.op == create || p.op == isolate || p.op == merging || p.op == repairing);
             line_tools_check_basename(*dialog, *p.sauv_root, p.filename, EXTENSION, creation);
-	    if(!creation && p.num_digits == 0)
+	    if(!creation && p.num_digits.is_zero())
 		line_tools_check_min_digits(*dialog, *p.sauv_root, p.filename, EXTENSION, p.num_digits);
 	}
         if((p.op == merging || p.op == create) && p.aux_filename != nullptr)
@@ -415,7 +415,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
             else
 	    {
                 line_tools_check_basename(*dialog, *p.aux_root, *p.aux_filename, EXTENSION, false);
-		if(p.aux_num_digits == 0)
+		if(p.aux_num_digits.is_zero())
 		    line_tools_check_min_digits(*dialog, *p.aux_root, *p.aux_filename, EXTENSION, p.aux_num_digits);
 	    }
         }
@@ -448,7 +448,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
             else
 	    {
                 line_tools_check_basename(*dialog, *p.ref_root, *p.ref_filename, EXTENSION, false);
-		if(p.ref_num_digits == 0)
+		if(p.ref_num_digits.is_zero())
 		    line_tools_check_min_digits(*dialog, *p.ref_root, *p.ref_filename, EXTENSION, p.ref_num_digits);
 	    }
         }
