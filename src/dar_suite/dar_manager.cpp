@@ -618,6 +618,11 @@ static bool command_line(shell_interaction & dialog,
 	case add:
 	    if(rest.size() > 1)
 		dialog.message(gettext("Ignoring extra arguments on command line"));
+	    if(date_set == date_not_set) // --min-digits not set
+	    {
+		line_tools_check_min_digits(dialog, chem, filename, EXTENSION, date);
+		date_set = date_set_by_9;
+	    }
 	    break;
 	case chbase:
 	case where:
