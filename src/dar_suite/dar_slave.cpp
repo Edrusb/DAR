@@ -114,6 +114,8 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
     if(command_line(*ptr, argc, argv, chemin, filename, input_pipe, output_pipe, execute, min_digits))
     {
 	line_tools_check_basename(*dialog, chemin, filename, EXTENSION, false);
+	if(min_digits.is_zero())
+	    line_tools_check_min_digits(*dialog, chemin, filename, EXTENSION, min_digits);
 	libdar::libdar_slave slave(dialog,
 				   chemin,
 				   filename,
