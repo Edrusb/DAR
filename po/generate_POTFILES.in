@@ -15,4 +15,4 @@ EOF
 
 find . -type f -name "*.?pp" -print >> $target
 
-sed -r -e 's%^(MSGID_BUGS_ADDRESS =).*%\1 http://sourceforge.net/tracker/?group_id=65612&atid=511612%' po/Makevars.template > po/Makevars
+sed -r -e 's%^(MSGID_BUGS_ADDRESS =).*%\1 http://sourceforge.net/tracker/?group_id=65612\&atid=511612%' po/Makevars.template > po/Makevars
