@@ -2,12 +2,19 @@ What will you find here?
 
 Source code for dar suite program.
 
+build directory
+  contains source code that if put in their expected place are modified
+  by the automake/autoconf tool, thing that would leading to mix generated
+  code withing source code. see misc/init to set these files in place
+  automatically.
+
 libdar directory
   contains all code of dar that have been moved since version
   2.0.0 to a separated library known as libdar.
 
 dar_suite directory
-  contains all the rest of the code of dar, which is command-line specific
+  contains the command-line specific code to build dar, dar_xform, dar_slave
+  dar_cp, dar_manager and dar_split on top of libdar
 
 examples directory
   contains few programs that illustrate the use of infinint, they are built
@@ -20,9 +27,13 @@ testing directory
   only by developers, they are built when using --enable-examples with the
   configure script.
 
-check
+check directory
   contains the global validation routine that are run when calling
-  "make check". Note that running 'make check' may take several days to
+  "make check". Note that running 'make check' may take several weeks to
   complete depending on the power of your computer, this is also due to
   the fact that these routine are very basic but robust, they are not
   especially optimized for speed.
+
+python directory
+  contains the python3 binding for libdar, it is built with the rest of
+  the source code if prerequisites are found by the ./configure script.

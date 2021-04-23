@@ -1,11 +1,12 @@
-What will you find in this directory?
-
 --------------------
 | IMPORTANT!
 |   as there is so many distro today (yep, the Slackware hegemony is over...)
-|   I do not produce anymore binary packages. Ask your preferred distro
-|   maintainer team to upgrade their packages or wait for they do so.
+|   Ask your preferred distro maintainer team to upgrade their packages or
+|   wait for they do so. And as there is not only Linux supported refer to
+|   your operating system provider to get dar/libdar binaries
 --------------------
+
+What will you find in this directory?
 
 many script that help(ed) build the releases:
 - batch_cygwin

@@ -6,10 +6,10 @@ what do they do ?
 	factoriel
 
 At the beginning it was a test program for infinint. It computes the factorial
-of the given integer. If compiled without --enable-mode=... option given to
-configure, it will always (should at least), return the decimal representation
+of the given integer. If compiled with --enable-mode=infinint option given to
+./configure, it should always, return the decimal representation
 of the asked decimal. The problem is more the time it will take to compute it.
-And using --enable-mode=... you may get a message reporting that an integer
+And not using --enable-mode option you may get a message reporting that an integer
 overflow has occurred.
 
 

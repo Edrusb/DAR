@@ -29,8 +29,8 @@ with in addition:
 
 This library is part of dar and licensed under the GNU General
 Public License (GPL in the following), like all the source code of the Dar
-suite programs. This imply that you can link libdar to your programs at
-the condition that your programs are also covered by the GPL, which says
+suite programs. This means you can link libdar to your programs at
+the condition your programs are also covered by the GPL, which says
 in particular that you must provide source code of your programs. See
 COPYING file for details.
 
@@ -38,7 +38,7 @@ COPYING file for details.
 DOCUMENTATION
 ==============
 Documentation is built during the compilation process, see doc/README
-A built is available online at: http://dar.linux.free.fr/doc
+A built version is also available online at: http://dar.linux.free.fr/doc
 
 
 INSTALLATION

@@ -4,13 +4,13 @@
 
 In GIT you will only find source code, and no generated files. The configure
 script for example is generated from configure.ac file with autoconf tool,
-so you will not find it here an need specific tools to build this kind of files
+so you will not find it here but need specific tools to build all kinds of files
 that are usually included in released packages.
 
 WARNING 1:
 You must be aware of the GIT tree structure, if not, you will probably have
 obtained the latest development version. Development version of dar is nothing
-more nothing less than development! It may work or may not and may be in a
+more, nothing less, than development! It may work or may not and may be in a
 transition state. Do NOT USE DEVELOPMENT VERSION TO BACKUP YOUR SYSTEM!!!
 
 WARNING 2:
@@ -31,11 +31,11 @@ version of that branch, you are welcome to open a bug report.
 COMPILATION IN BRIEF:
 
 For a small program, you usually get a single source file to compile. But, when
-the program gets bigger, there is usually several files to compile and link
+the program becomes bigger, there is usually several files to compile and link
 together to obtain an executable binary. As this operation is not that evident
 and needs some understanding of the program implementation, usually the
-developpers provide a Makefile that let the building much more easy (just type
-'make' and the things goes on).
+developpers provide a Makefile that lead to a much more easy building process
+(just type 'make' and the things goes on).
 
 Here dar is not a small program, it uses several Makefiles, and overall it must
 be able to work under Linux, Solaris, FreeBSD, MacOS X, Cygwin, and many other
@@ -90,9 +90,9 @@ configure.ac -+-[autoconf]--> configure
 Makefile.am ---[automake]---> Makefile.in
 
 
-Makefile.in -+-[configure]-+--> Makefile
-             |             |
-config.h.in -+             +--> config.h
+Makefile.in -+-[./configure]-+--> Makefile
+             |               |
+config.h.in -+               +--> config.h
 
 
 Source code -+-[make dist]-+--> dar-<version>.tar.gz (standalone source package)
@@ -100,9 +100,9 @@ Source code -+-[make dist]-+--> dar-<version>.tar.gz (standalone source package)
 CONFIGURATION
 ==============
 
-Makefile.in -+-[configure]-+--> Makefile
-             |             |
-config.h.in -+             +--> config.h
+Makefile.in -+-[./configure]-+--> Makefile
+             |               |
+config.h.in -+               +--> config.h
 
 
 COMPILATION/LINKING
