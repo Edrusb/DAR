@@ -375,6 +375,8 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
 	{
             line_tools_split_path_basename(argv[optind], src_dir, src);
 	    line_tools_check_basename(dialog, *src_dir, src, EXTENSION, false);
+	    if(src_min_digits.is_zero())
+		line_tools_check_min_digits(dialog, *src_dir, src, EXTENSION, src_min_digits);
 	}
         else
         {
