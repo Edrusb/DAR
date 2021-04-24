@@ -2,9 +2,6 @@ SUBDIRS = samples mini-howto man
 dist_noinst_DATA = COMMAND_LINE Doxyfile portable_cp Benchmark_tools/README Benchmark_tools/always_change Benchmark_tools/bitflip Benchmark_tools/build_test_tree.bash Benchmark_tools/hide_change Benchmark_tools/historization_feature restoration_dependencies.txt
 dist_pkgdata_DATA = README Features.html Limitations.html Notes.html Tutorial.html Good_Backup_Practice.html FAQ.html api_tutorial.html dar_doc.jpg dar_s_doc.jpg index.html dar-catalog.dtd authentification.html dar_key.txt old_dar_key.txt from_sources.html presentation.html usage_notes.html python/libdar_test.py style.css restoration-with-dar.html benchmark.html benchmark_logs.html index_dar.html index_internal.html index_libdar.html
 
-INSTALL_HTML_MAN = $(INSTALL) -d $(DESTDIR)$(pkgdatadir)/man ; $(INSTALL) -m 0644 man/*.html $(DESTDIR)$(pkgdatadir)/man
-UNINSTALL_HTML_MAN = rm -rf $(DESTDIR)$(pkgdatadir)/man
-
 if USE_DOXYGEN
 DOXYGEN = @DOXYGEN_PROG@
 
@@ -20,13 +17,11 @@ clean-local:
 
 install-data-hook:
 	'$(srcdir)/portable_cp' html $(DESTDIR)$(pkgdatadir)
-	$(INSTALL_HTML_MAN)
 	$(INSTALL) -d $(DESTDIR)$(pkgdatadir)/python
 	$(INSTALL) -m 0644 '$(srcdir)/python/libdar_test.py' $(DESTDIR)$(pkgdatadir)/python
 
 uninstall-hook:
 	rm -rf $(DESTDIR)$(pkgdatadir)/html
-	$(UNINSTALL_HTML_MAN)
 	rm -rf $(DESTDIR)$(pkgdatadir)/python
 	rmdir $(DESTDIR)$(pkgdatadir) || true
 
@@ -37,10 +32,8 @@ all-local:
 clean-local:
 
 install-data-hook:
-	$(INSTALL_HTML_MAN)
 
 uninstall-hook:
-	$(UNINSTALL_HTML_MAN)
 
 endif
 

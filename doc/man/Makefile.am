@@ -1,4 +1,4 @@
-dist_noinst_DATA=index.html
+dist_pkgdata_DATA = index.html
 
 if USE_GROFF
 
@@ -17,5 +17,13 @@ all-local: $(TARGET)
 
 clean-local:
 	rm -f $(TARGET) *.1 copyman dar.html dar_slave.html dar_xform.html dar_manager.html dar_cp.html dar_split.html
+
+install-data-hook:
+	$(INSTALL) -d $(DESTDIR)$(pkgdatadir)/man
+	$(INSTALL) -m 0644 '$(srcdir)'/*.html $(DESTDIR)$(pkgdatadir)/man
+	$(INSTALL) -m 0644 '$(srcdir)/index.html' $(DESTDIR)$(pkgdatadir)/man
+
+uninstall-hook:
+	rm -rf $(DESTDIR)$(pkgdatadir)/man
 
 endif
