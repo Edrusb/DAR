@@ -723,10 +723,10 @@ exclude inodes from backup that have been set with the EA given in argument. If 
 If the argument is of the
 .B
 I:<path to fs>
-form, the filesystem in which this path points to is considered for the backup operation, that's to say, other file filtering mechanism will be applied and some or all files of that filesystem will be saved for backup. While with the
+form, the filesystem to which this path points to is considered for the backup operation, that's to say, other file filtering mechanism will be applied and some or all files of that filesystem will be saved for backup. While with the
 .B
 X:<path to fs>
-form, no file in that filesystem will even be considered for backup. both X: and I: forms must be provided with an absolute path. -M option can be used several times on the command-line. If only I: forms are used, the filesystem based filtering mechanism behaves as a white list (only those listed paths are included). If only X: form is used, the filesystem based filtering mechanism behaves as a black list (everything is considered except those listed paths). Last, while a mix of I: and X: forms are used, filsystems that will be considered for backup will be those given with an I: form and not also given with an X: form. Note that this is filesystem based filtering, not path based: If for example a filesystem is mounted under /var directory and you specify I:/var/log all /var filesystem will be considered for backup. If you rather want to only save what is in /var/log use the -P/-g/-X/-I/-[/-] options that realise the file filtering by name and path+name. You cannot exclude the filesystem which contains the path given to -R option. The use of -M option with argument erases any previous configuration done with -M option without argument (see below), and vice versa. By default (no -M option specified), no filtering based on filesystem is performed, in other worlds all files are considered for file filtering mechanism and eventually backup.
+form, no file in that filesystem will even be considered for backup. both X: and I: forms must be provided with an absolute path. -M option can be used several times on the command-line. If only I: forms are used, the filesystem based filtering mechanism behaves as a white list (only those listed paths are included). If only X: form is used, the filesystem based filtering mechanism behaves as a black list (everything is considered except those listed paths). Last, while a mix of I: and X: forms are used, filsystems that will be considered for backup will be those given with an I: form and not also given with an X: form. Note that this is filesystem based filtering, not path based: If for example a filesystem is mounted under /var directory and you specify I:/var/log all /var filesystem will be considered for backup. If you rather want to only save what is in /var/log use the -P/-g/-X/-I/-[/-] options that realise the file filtering by name and path+name. You cannot exclude the filesystem which contains the path given to -R option. The use of -M option with argument erases any previous configuration done with -M option without argument (see below), and vice versa. By default (no -M option specified), no filtering based on filesystem is performed, in other worlds all files are considered for other file filtering mechanism (in particular -P/-g/-X/-I/-[/-] options) and eventually backed up.
 .IP
 .B
 example of use:
@@ -1031,7 +1031,7 @@ linear
 returns the filesize. here, you will most of the time use 1 for multiplier and increase divisor to at least 10 for it makes sense
 .TP
 log2
-returns the upper rounded power of 2 to the file size (base 2 logarithm).
+returns the upper rounded power of 2 closest to the file size (base 2 logarithm).
 .TP
 square2
 returns the approximated value of the square root of the file size. Note that for better performance and as accurary is not important here, this function is implemented as exp2(log2(filesize)/2) where exp2 and log2 are based ont the integer left and right bit shift operations.
