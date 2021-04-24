@@ -1,48 +1,55 @@
 from 2.6.x to 2.7.0
 - using the truncate system call whenever possible in place of skipping
-  back in the archive when file need to resave uncompressed, file saved
-  to be read from filesystem or when file has changed while it was read
-  for backup
-- improved slice name versus base name error, now substiting (rather than
+  back in the archive, when file need to re-save uncompressed,
+  or when file has changed while it was read for backup
+- improved slice name versus base name error, now substituting (rather than
   just asking the user) the first by the later when else it would lead
   to an execution error.
 - auto-detecting min-digits at reading time in complement of the feature
   listed just above
-- added the possibility to specify a gnupg key by mean of its keyid in
+- added the possibility to specify a gnupg key by mean of its key-id in
   addition to the email address it may be associated to, both for
   asymmetrical encryption and archive signing.
 - added -b option to dar_split to set the I/O block size
 - added -r option to dar_split to limit the transfer rate
 - added -c option to dar_split to limit the number of tape to read
 - new feature: zstd compression algorithm added
-- replaced old and experimental multi-threaded implementation, -G option
-  now needs an argument on command line. New methods added in libdar API
+- replaced old and experimental multi-threaded implementation by
+  production grade one. -G option may now receive an argument on
+  command line for fine tuning. libdar API has been updated
   accordingly.
 - added multi-threaded compression when using the new per block
   compression mode, the legacy streaming compression mode is still
   available (see both -G and -z option extended syntax).
 - added lz4 compression algorithm.
-- removed some deprecaded old options (--gzip,...)
+- removed some deprecated/duplicated old options (--gzip,...)
+- enhanced the delta signature calculation providing mean for the user
+  to adapt the signature block size in regard to the file's size to
+  delta-sig. "--delta sig" option received an extended syntax.
 - increased timestamp precision from microsecond to nanosecond when the
-  operating system supports it. It is still possible to use configure's
+  operating system supports it. It is still possible to use configure
   --enable-limit-time-accuracy=us at compilation time to use microsecond
   or even second accuracy even if the OS can support finer precision.
 - added argon2 hashing algorithm for key derivation function (kdf) which
   becomes the default if libargon2 is available, else it defaults to sha1
-  as for 2.6.x. When argon2 is used and kdf default iteration count is
+  as for 2.6.x. When argon2 is used, kdf default iteration count is
   reduced to 10,000 (and stays 200,000 with sha1). This can be tuned
   as usual with --kdf-param option.
 - adding support for statx() under Linux which let libdar save file's
-  birthtime. Unfortunately unlike under FSD systems (FreeBSD, MACoS X,
+  birthtime. Unfortunately unlike under BSD systems (FreeBSD, MACoS X,
   and so on), the utime/utimes/timensat call do not set birthtime, so
-  you can restore birthtime of Linux's file only under BSD systems
-  today.
+  you cannot restore birthtime on Linux's unlike under BSD systems
 - AES becomes the default when gnupg is used without additional
   algorithm.
 - new implementation of the libcurl API use for more efficient reuse of
   established sessions.
+- You can now exclude/include per filesystem rather than just sticking
+  to the current filesystem or ignoring filesystem boundary. -M option
+  can now receive arguments.
 - new feature: dar_manager can now change the compression algorithm of
-  an existing database
+  an existing database.
+- Added a benchmark of dar versus tar and rsync for different use cases.
+- documentation review, update, cleanup, restructured and beautification.
 
 from 2.6.13 to 2.6.14
 - script used to build dar windows binary has been fixed to have the
