@@ -2238,7 +2238,7 @@ namespace libdar
 	}
 	else
 	{
-	    ret = new (nothrow) block_compressor(move(make_compress_module_ptr(algo, compression_level)), // compression level is not used here
+	    ret = new (nothrow) block_compressor(make_compress_module_ptr(algo, compression_level), // compression level is not used here
 						 base,
 						 block_size);
 	}
