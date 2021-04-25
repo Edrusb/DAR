@@ -1142,9 +1142,6 @@ namespace libdar
 	if(my_sig_block_len != your_sig_block_len)
 	    return false;
 
-	infinint size_me = sig_me->size();
-	infinint size_you = sig_you->size();
-
 	if(sig_me->size() != sig_you->size())
 	    return false;
 	else

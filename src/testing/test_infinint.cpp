@@ -214,7 +214,6 @@ static void routine2()
 
 static void routine3()
 {
-    infinint a = 5;
     infinint b = 49; // = 7^2
     infinint c = 729; // = 9^3
 

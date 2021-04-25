@@ -623,7 +623,6 @@ namespace libdar
 
 	unsigned char *sect = nullptr;
 	infinint ref_cp = ref;
-	infinint mask = 0xFF;
 	infinint tmp;
 	gcry_error_t err;
 
