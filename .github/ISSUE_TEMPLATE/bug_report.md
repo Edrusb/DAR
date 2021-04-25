@@ -11,7 +11,7 @@ assignees: ''
 - Check that what you intend to do is not clearly excluded in the documentation:
 http://dar.linux.free.fr/doc/man/index.html
 - Ask for support on dar-support mailing-list at 
-https://lists.sourceforge.net/lists/admin/dar-support
+https://sourceforge.net/projects/dar/lists/dar-support
 
 **Describe the bug**
 A clear and concise description of what the bug is. 
