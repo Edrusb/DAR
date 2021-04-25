@@ -77,7 +77,7 @@ namespace libdar
 	fichier_local(fichier_local && ref) noexcept: fichier_global(std::move(ref)) { move_from(std::move(ref)); };
 
 	    /// assignment operator
-	fichier_local & operator = (const fichier_local & ref) { detruit(); fichier_local::operator = (ref); copy_from(ref); return *this; };
+	fichier_local & operator = (const fichier_local & ref) { detruit(); copy_from(ref); return *this; };
 
 	    /// move operator
 	fichier_local & operator = (fichier_local && ref) noexcept { fichier_global::operator = (std::move(ref)); move_from(std::move(ref)); return *this; };
