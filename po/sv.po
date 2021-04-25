@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: sv\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612&atid=511612\n"
-"POT-Creation-Date: 2021-04-24 12:33+0200\n"
+"POT-Creation-Date: 2021-04-25 22:47+0200\n"
 "PO-Revision-Date: 2012-04-15 11:28+0200\n"
 "Last-Translator: Peter Landgren <peter.talken@telia.com>\n"
 "Language-Team: Swedish <kde-i18n-doc@kde.org>\n"
@@ -2771,7 +2771,7 @@ msgstr "annan ägargrupp (gid): %i <--> %i"
 msgid "different permission: %S <--> %S"
 msgstr "andra behörigheter: %S <--> %S"
 
-#: src/libdar/cat_inode.cpp:417 src/libdar/cat_file.cpp:1213
+#: src/libdar/cat_inode.cpp:417 src/libdar/cat_file.cpp:1210
 #, c-format
 msgid "difference of last modification date: %S <--> %S"
 msgstr "skillnad mot senaste ändringsdatum: %S <--> %S"
@@ -2925,17 +2925,17 @@ msgstr ""
 msgid "Error while retrieving delta signature from the archive: "
 msgstr "Fel vid läsning av användarsvar från terminal: "
 
-#: src/libdar/cat_file.cpp:1206
+#: src/libdar/cat_file.cpp:1203
 #, c-format
 msgid "not same size: %i <--> %i"
 msgstr "inte samma storlek: %i <--> %i"
 
-#: src/libdar/cat_file.cpp:1274
+#: src/libdar/cat_file.cpp:1271
 #, c-format
 msgid "different file data, offset of first difference is: %i"
 msgstr ""
 
-#: src/libdar/cat_file.cpp:1282
+#: src/libdar/cat_file.cpp:1279
 msgid ""
 "Same data but CRC value could not be verified because we did not guessed "
 "properly its width (sequential read restriction)"
@@ -2943,24 +2943,24 @@ msgstr ""
 "Samma data men CRC-värdet kunde inte verifieras, ty vi gissade inte korrekt "
 "dess bredd (sekvensiell läsbegränsning)"
 
-#: src/libdar/cat_file.cpp:1284
+#: src/libdar/cat_file.cpp:1281
 msgid "Same data but stored CRC does not match the data!?!"
 msgstr "Samma data men lagrat CRC matchar inte data!?!"
 
-#: src/libdar/cat_file.cpp:1325
+#: src/libdar/cat_file.cpp:1322
 msgid "Delta signature do not match"
 msgstr ""
 
-#: src/libdar/cat_file.cpp:1367
+#: src/libdar/cat_file.cpp:1364
 #, fuzzy, c-format
 msgid "Delta signature do not have the same size: %i <--> %i"
 msgstr "inte samma storlek: %i <--> %i"
 
-#: src/libdar/cat_file.cpp:1369
+#: src/libdar/cat_file.cpp:1366
 msgid "Delta signature have the same size but do not match"
 msgstr ""
 
-#: src/libdar/cat_file.cpp:1412
+#: src/libdar/cat_file.cpp:1409
 #, fuzzy
 msgid "CRC difference concerning file's data"
 msgstr "olika fildata"
@@ -3129,34 +3129,34 @@ msgstr ""
 "Misslyckades med att hämta från libgcrypt den blockstorlek använd vid "
 "cyphering algoritmen: %s/%s"
 
-#: src/libdar/crypto_sym.cpp:648
+#: src/libdar/crypto_sym.cpp:647
 #, c-format
 msgid "Error while generating IV: %s/%s"
 msgstr "Fel vi skapande av IV: %s/%s"
 
-#: src/libdar/crypto_sym.cpp:688
+#: src/libdar/crypto_sym.cpp:687
 #, c-format
 msgid "Error! SHA1 not available in libgcrypt: %s/%s"
 msgstr "Fel SHA1 ej tillgängligt i 'libgcrypt': %s/%s"
 
-#: src/libdar/crypto_sym.cpp:694
+#: src/libdar/crypto_sym.cpp:693
 #, c-format
 msgid "Error while derivating key from password (HMAC open): %s/%s"
 msgstr "Fel vid härledning av nyckel från lösenord (HMAC öppnat): %s/%s"
 
-#: src/libdar/crypto_sym.cpp:700
+#: src/libdar/crypto_sym.cpp:699
 #, c-format
 msgid "Error while derivating key from password (HMAC set key): %s/%s"
 msgstr "Fel vid härledning av key från lösenord (HMAC set key): %s/%s"
 
-#: src/libdar/crypto_sym.cpp:830
+#: src/libdar/crypto_sym.cpp:829
 #, fuzzy, c-format
 msgid "Error while computing KDF with argon2 algorithm: %d"
 msgstr "Fel vid jämförelse mellan arkiv och filsystem: "
 
-#: src/libdar/crypto_sym.cpp:867 src/libdar/crypto_sym.cpp:873
-#: src/libdar/crypto_sym.cpp:882 src/libdar/crypto_sym.cpp:890
-#: src/libdar/crypto_sym.cpp:941
+#: src/libdar/crypto_sym.cpp:866 src/libdar/crypto_sym.cpp:872
+#: src/libdar/crypto_sym.cpp:881 src/libdar/crypto_sym.cpp:889
+#: src/libdar/crypto_sym.cpp:940
 msgid "Library used for blowfish encryption does not respect RFC 3962"
 msgstr "Bibliotek, som används för blowfish-kryptering respekterar ej RFC 3962"
 

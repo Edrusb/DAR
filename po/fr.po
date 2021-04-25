@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: DAR 2.6.0\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612&atid=511612\n"
-"POT-Creation-Date: 2021-04-24 12:33+0200\n"
+"POT-Creation-Date: 2021-04-25 22:47+0200\n"
 "PO-Revision-Date: 2021-03-28 17:59+0200\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
@@ -2859,7 +2859,7 @@ msgstr "groupes propriétaires différents (gid) : %i <--> %i"
 msgid "different permission: %S <--> %S"
 msgstr "droits d'accès différents: %S <--> %S"
 
-#: src/libdar/cat_inode.cpp:417 src/libdar/cat_file.cpp:1213
+#: src/libdar/cat_inode.cpp:417 src/libdar/cat_file.cpp:1210
 #, c-format
 msgid "difference of last modification date: %S <--> %S"
 msgstr "différence de date de dernière modification : %S <--> %S"
@@ -3017,19 +3017,19 @@ msgstr "Marque pour signature delta introuvable"
 msgid "Error while retrieving delta signature from the archive: "
 msgstr "Erreur lors de la récupération de signature delta depuis l'archive : "
 
-#: src/libdar/cat_file.cpp:1206
+#: src/libdar/cat_file.cpp:1203
 #, c-format
 msgid "not same size: %i <--> %i"
 msgstr "tailles différentes : %i <--> %i"
 
-#: src/libdar/cat_file.cpp:1274
+#: src/libdar/cat_file.cpp:1271
 #, c-format
 msgid "different file data, offset of first difference is: %i"
 msgstr ""
 "les donnes ne correspondent pas: position de la première différence au sein "
 "du fichier: %i"
 
-#: src/libdar/cat_file.cpp:1282
+#: src/libdar/cat_file.cpp:1279
 msgid ""
 "Same data but CRC value could not be verified because we did not guessed "
 "properly its width (sequential read restriction)"
@@ -3037,28 +3037,28 @@ msgstr ""
 "Données identiques mais CRC non vérifié, car sa largeur n'a pas été devinée "
 "correctement (restriction due à la lecture sequentielle)"
 
-#: src/libdar/cat_file.cpp:1284
+#: src/libdar/cat_file.cpp:1281
 msgid "Same data but stored CRC does not match the data!?!"
 msgstr ""
 "Même donnée, mais le CRC enregistré ne correspond pas à ces données !?!"
 
-#: src/libdar/cat_file.cpp:1325
+#: src/libdar/cat_file.cpp:1322
 msgid "Delta signature do not match"
 msgstr "Les signatures delta ne correspondent pas"
 
-#: src/libdar/cat_file.cpp:1367
+#: src/libdar/cat_file.cpp:1364
 #, c-format
 msgid "Delta signature do not have the same size: %i <--> %i"
 msgstr "tailles différentes des signatures delta : %i <--> %i"
 
 #
-#: src/libdar/cat_file.cpp:1369
+#: src/libdar/cat_file.cpp:1366
 msgid "Delta signature have the same size but do not match"
 msgstr ""
 "Les signatures delta ont bien la même taille mais leurs contenus ne "
 "correspondent pas"
 
-#: src/libdar/cat_file.cpp:1412
+#: src/libdar/cat_file.cpp:1409
 msgid "CRC difference concerning file's data"
 msgstr "Difference de CRC pour les données du fichier"
 
@@ -3248,38 +3248,38 @@ msgstr ""
 "Échec lors de la récupération de la taille de bloc utilisée par libgcrypt "
 "pour l'algorithme de chiffrement : %s/%s"
 
-#: src/libdar/crypto_sym.cpp:648
+#: src/libdar/crypto_sym.cpp:647
 #, c-format
 msgid "Error while generating IV: %s/%s"
 msgstr "Erreur lors de la génération du vecteur initial (IV) : %s/%s"
 
-#: src/libdar/crypto_sym.cpp:688
+#: src/libdar/crypto_sym.cpp:687
 #, c-format
 msgid "Error! SHA1 not available in libgcrypt: %s/%s"
 msgstr "Erreur ! SHA1 n'est pas disponible dans libgcrypt : %s/%s"
 
-#: src/libdar/crypto_sym.cpp:694
+#: src/libdar/crypto_sym.cpp:693
 #, c-format
 msgid "Error while derivating key from password (HMAC open): %s/%s"
 msgstr ""
 "Erreur lors de la création de la clef à partir du mot de passe (ouverture "
 "HMAC) : %s/%s"
 
-#: src/libdar/crypto_sym.cpp:700
+#: src/libdar/crypto_sym.cpp:699
 #, c-format
 msgid "Error while derivating key from password (HMAC set key): %s/%s"
 msgstr ""
 "Erreur lors du calcul de la clef à partir du mot de passe (HMAC set key) : "
 "%s/%s"
 
-#: src/libdar/crypto_sym.cpp:830
+#: src/libdar/crypto_sym.cpp:829
 #, c-format
 msgid "Error while computing KDF with argon2 algorithm: %d"
 msgstr "Erreur lors du la dérivation de clef avec l'algorithme argon2 : %d"
 
-#: src/libdar/crypto_sym.cpp:867 src/libdar/crypto_sym.cpp:873
-#: src/libdar/crypto_sym.cpp:882 src/libdar/crypto_sym.cpp:890
-#: src/libdar/crypto_sym.cpp:941
+#: src/libdar/crypto_sym.cpp:866 src/libdar/crypto_sym.cpp:872
+#: src/libdar/crypto_sym.cpp:881 src/libdar/crypto_sym.cpp:889
+#: src/libdar/crypto_sym.cpp:940
 msgid "Library used for blowfish encryption does not respect RFC 3962"
 msgstr ""
 "La bibliothèque de chiffrement pour l'algorithme blowfish ne respecte pas la "
