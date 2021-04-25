@@ -1,3 +1,8 @@
+from 2.7.0 to 2.7.1
+- fixed compilation script to require support for C++14 due to new features
+  introduces in 2.7.0 that rely on modern constructions. Updated
+  documentation accordingly about this new requirement.
+
 from 2.6.x to 2.7.0
 - using the truncate system call whenever possible in place of skipping
   back in the archive, when file need to re-save uncompressed,
