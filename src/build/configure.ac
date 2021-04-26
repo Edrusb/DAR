@@ -167,17 +167,25 @@ AC_HEADER_TIME
 AC_CHECK_FUNCS([lchown mkdir regcomp rmdir strerr-or strerror_r utime fdopendir readdir_r ctime_r getgrnam_r getpwnam_r localtime_r])
 
 AC_MSG_CHECKING([for c++14 support])
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],
-                                   [ thread_local static int test = 0; ])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
+				     #include <memory>
+				   ],
+                                   [ thread_local static int test = 0;
+				     std::unique_ptr<int> x = std::make_unique<int>(0);
+				   ])
                   ],
                   [ AC_MSG_RESULT(yes) ],
                   [
                      AC_MSG_RESULT([no])
-                     AC_MSG_CHECKING([for c++ support with -std=c++14 option set])
+                     AC_MSG_CHECKING([for c++14 support with -std=c++14 option set])
                      CXXSTDFLAGS="-std=c++14"
                      CXXFLAGS="$CXXFLAGS $CXXSTDFLAGS"
-                     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],
-                                                        [ thread_local static int test = 0; ])
+                     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
+							  #include <memory>
+							],
+                                                        [ thread_local static int test = 0;
+							  std::unique_ptr<int> x = std::make_unique<int>(0);
+							])
                                         ],
                                         [ AC_MSG_RESULT(yes) ],
                                         [
