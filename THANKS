@@ -3,6 +3,7 @@ version 2.7.1
 Thanks to Ryan Schmidt, first for maintaining dar in MacPorts and second
 for having reported several issues met when compiling dar under MacOS X
 and also issues met when using compiler not supporting C++14 by default.
+Thanks to Graham Cobb for feedback.
 
 version 2.7.0
 --------------
