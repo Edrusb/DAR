@@ -23,7 +23,9 @@
 
 extern "C"
 {
-
+#if HAVE_STDLIB_H
+#include <stdlib.h>
+#endif
 } // end extern "C"
 
 #include "compressor_zstd.hpp"
