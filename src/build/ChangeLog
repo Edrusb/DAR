@@ -3,6 +3,7 @@ from 2.7.0 to 2.7.1
   introduces in 2.7.0 that rely on modern constructions. Updated
   documentation accordingly about this new requirement.
 - fixed missing included header for compilation to suceed under MacOS X
+- fixed typo in man page
 
 from 2.6.x to 2.7.0
 - using the truncate system call whenever possible in place of skipping
