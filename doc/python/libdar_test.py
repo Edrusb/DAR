@@ -463,7 +463,7 @@ def f6():
 
     arch2 = libdar.archive(ui,
                            libdar.path("/dar.linux.free.fr/Python_tutorial"),
-                           "exemple",
+                           "example",
                            "dar",
                            opt)
 
