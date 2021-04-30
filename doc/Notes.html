@@ -627,13 +627,20 @@
           of each file, just the filename is recorded. The file order and the
 	  EOD can be used to find the relative path of each entry.
 	</p>
-	<p>
 
 	<p>
-	  To be complete, the previous sequence is preceeded by the data_name
-	  as describe above and followed by a CRC calculated on the whole
-	  catalogue dumped data
+	  To be complete, the previous sequence is preceeded by
+	  the data_name  as describe above and and the in_place path.
+	  This sequence is then followed by a CRC calculated on the whole
+	  catalogue dumped data:
 	</p>
+
+	<code class=block>
+	  +------------+----------+------------------------------------+-----+
+	  |  data_name | in_place |<--------catalogue content--------->| CRC |
+	  |            |          | toto|titi|tata|blup|EOD|boum|...   |     |
+	  +------------+----------+------------------------------------+-----+
+	</code>
 
 	  <h4>The terminator</h4>
 	<p>
