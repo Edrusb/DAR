@@ -1088,6 +1088,12 @@ namespace libdar
 	    if(only_contains_an_isolated_catalogue())
 		get_ui().printf(gettext("\nWARNING! This archive only contains the catalogue of another archive, it can only be used as reference for differential backup or as rescue in case of corruption of the original archive's content. You cannot restore any data from this archive alone\n"));
 
+	    string in_place = sum.get_in_place();
+	    if(!in_place.empty())
+		get_ui().printf(gettext("in-place path: %S"), & in_place);
+	    else
+		get_ui().message(gettext("no in-place path recorded"));
+
 	    sum.get_contents().listing(get_ui());
 	}
 	catch(...)
