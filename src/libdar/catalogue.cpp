@@ -83,7 +83,9 @@ namespace libdar
 
     catalogue::catalogue(const std::shared_ptr<user_interaction> & ui,
 			 const datetime & root_last_modif,
-			 const label & data_name): mem_ui(ui), out_compare("/")
+			 const label & data_name): mem_ui(ui),
+						   out_compare("/"),
+						   in_place(".") // is absolute path when set
     {
 	contenu = nullptr;
 
@@ -114,7 +116,9 @@ namespace libdar
 			 compression default_algo,
 			 bool lax,
 			 const label & lax_layer1_data_name,
-			 bool only_detruit): mem_ui(ui), out_compare("/")
+			 bool only_detruit): mem_ui(ui),
+					     out_compare("/"),
+					     in_place(".")
     {
 	string tmp;
 	saved_status st;
@@ -237,6 +241,7 @@ namespace libdar
 	    // now copying the catalogue's data
 
 	out_compare = ref.out_compare;
+	in_place = ref.in_place;
 	partial_copy_from(ref);
 
 	return *this;
