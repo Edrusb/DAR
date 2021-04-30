@@ -151,6 +151,26 @@ namespace libdar
 		else
 		    ref_data_name.clear(); // a cleared data_name is emulated for older archives
 
+		if(reading_ver >= archive_version(11,1))
+		{
+		    string tmp;
+
+		    try
+		    {
+			tools_read_string(*pdesc.stack, tmp);
+			in_place = path(tmp);
+		    }
+		    catch(Erange & e)
+		    {
+			throw Erange("catalogue::catalogue(generic_file &)", gettext("incoherent catalogue structure"));
+		    }
+
+		    if(in_place.is_relative() && tmp != ".")
+			throw Erange("catalogue::catalogue(generic_file &)", gettext("incoherent catalogue structure"));
+		}
+		else
+		    in_place = path(".");
+
 		if(lax)
 		{
 		    if(ref_data_name != lax_layer1_data_name && !lax_layer1_data_name.is_cleared())
@@ -1014,6 +1034,7 @@ namespace libdar
 	    try
 	    {
 		ref_data_name.dump(*pdesc.stack);
+		tools_write_string(*pdesc.stack, in_place.display());
 		contenu->dump(pdesc, false);
 	    }
 	    catch(...)
