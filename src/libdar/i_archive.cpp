@@ -836,7 +836,7 @@ namespace libdar
 	    op_create_in_sub(oper_repair,
 			     chem_dst,
 			     sauv_path_t,
-			     src.pimpl->cat,             // ref1
+			     src.pimpl->cat,      // ref1
 			     nullptr,             // ref2
 			     initial_pause,
 			     bool_mask(true),     // selection
@@ -2361,6 +2361,9 @@ namespace libdar
 
 		    // *********** now we can perform the data filtering operation (adding data to the archive) *************** //
 
+		path ref1_in_place(".");
+		path ref2_in_place(".");
+
 		try
 		{
 		    catalogue *void_cat = nullptr;
@@ -2369,6 +2372,10 @@ namespace libdar
 		    switch(op)
 		    {
 		    case oper_create:
+
+			    // setting in_place
+			cat->set_in_place(fs_root);
+
 			if(ref_cat1 == nullptr)
 			{
 				// using a empty catalogue as reference if no reference is given
@@ -2381,6 +2388,22 @@ namespace libdar
 			    if(void_cat == nullptr)
 				throw Ememory("archive::i_archive::op_create_in_sub");
 			    ref_cat_ptr = void_cat;
+			}
+			else
+			{
+			    if(ref_cat1->get_in_place(ref1_in_place))
+			    {
+				if(ref1_in_place != fs_root)
+				{
+				    string ref1 = ref1_in_place.display();
+				    string actual = fs_root.display();
+				    get_ui().printf(gettext("Warning making a differential/incremental backup with a different root directory: %S <-> %S"),
+						    &ref1,
+						    &actual);
+				}
+				    // else we cannot check (old archive format or merged archive
+			    }
+
 			}
 
 			try
@@ -2448,6 +2471,23 @@ namespace libdar
 			}
 			break;
 		    case oper_merge:
+
+			if(ref_cat2 == nullptr || ! ref_cat2->get_in_place(ref2_in_place))
+			    if(ref_cat1->get_in_place(ref1_in_place))
+				cat->set_in_place(ref1_in_place); // keeping the in-place of ref1
+			    else
+				cat->clear_in_place();
+			else // ref_cat2 exists and has an in_place path stored in ref2_in_place
+			    if(ref_cat1->get_in_place(ref1_in_place))
+				if(ref1_in_place == ref2_in_place)
+				    cat->set_in_place(ref1_in_place); // both the same in_place
+				else
+				    cat->clear_in_place(); // different in-place paths, merging without it
+			    else
+				cat->set_in_place(ref2_in_place); // only ref2 has in_place path
+
+			if(ref_cat1->get_in_place(ref1_in_place))
+
 			if(info_details)
 			    get_ui().message(gettext("Processing files for merging..."));
 
@@ -2480,6 +2520,16 @@ namespace libdar
 				     sig_block_len);
 			break;
 		    case oper_repair:
+			if(ref_cat2 != nullptr)
+			    throw SRC_BUG;
+			if(ref_cat1 == nullptr)
+			    throw SRC_BUG;
+
+			if(ref_cat1->get_in_place(ref1_in_place))
+			    cat->set_in_place(ref1_in_place);
+			else
+			    cat->clear_in_place();
+
 			if(info_details)
 			    get_ui().message(gettext("Processing files for fixing..."));
 
