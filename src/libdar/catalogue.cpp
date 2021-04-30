@@ -1309,6 +1309,17 @@ namespace libdar
 	}
     }
 
+    bool catalogue::get_in_place(path & arg) const
+    {
+	if(in_place.is_absolute())
+	{
+	    arg = in_place;
+	    return true;
+	}
+	else
+	    return false;
+    }
+
     void catalogue::change_location(const pile_descriptor & pdesc)
     {
 	smart_pointer<pile_descriptor> tmp(new (nothrow) pile_descriptor(pdesc));

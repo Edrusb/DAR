@@ -241,7 +241,7 @@ namespace libdar
 	    /// \param[out] arg value of the in_place path
 	    /// \return true if the catalogue has a valid in_place value
 	    /// else false is returned an the argument is undefined
-	bool get_in_place(path & arg) const { if(in_place.is_absolute()) arg = in_place; else return false; };
+	bool get_in_place(path & arg) const;
 
     protected:
 	entree_stats & access_stats() { return stats; };
