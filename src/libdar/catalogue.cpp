@@ -1320,6 +1320,18 @@ namespace libdar
 	    return false;
     }
 
+    void catalogue::set_in_place(const path & arg)
+    {
+	if(arg.is_relative())
+	    throw SRC_BUG;
+	in_place = arg;
+    }
+
+    void catalogue::clear_in_place()
+    {
+	in_place = path(".");
+    }
+
     void catalogue::change_location(const pile_descriptor & pdesc)
     {
 	smart_pointer<pile_descriptor> tmp(new (nothrow) pile_descriptor(pdesc));
