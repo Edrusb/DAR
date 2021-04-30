@@ -69,6 +69,7 @@ namespace libdar
 	std::string get_asym() const { return asym; };
 	bool get_signed() const { return is_signed; };
 	bool get_tape_marks() const { return tape_marks; };
+	std::string get_in_place() const { return in_place; };
 
 
 	    // SETTINGS
@@ -89,6 +90,7 @@ namespace libdar
 	void set_asym(const std::string & arg) { asym = arg; };
 	void set_signed(bool arg) { is_signed = arg; };
 	void set_tape_marks(bool arg) { tape_marks = arg; };
+	void set_in_place(const std::string & arg) { in_place = arg; };
 
 	void clear();
 
@@ -109,6 +111,7 @@ namespace libdar
 	std::string asym;             ///< asymetrical encryption
 	bool is_signed;               ///< whether the archive is signed
 	bool tape_marks;              ///< whether the archive has tape marks (for sequential reading)
+	std::string in_place;         ///< in_place path empty string if absent
 
     };
 
