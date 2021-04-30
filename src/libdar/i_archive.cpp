@@ -1109,6 +1109,8 @@ namespace libdar
 	infinint slice_number;
 	infinint archive_size;
 
+	path tmp(".");
+
 	    // sanity checks
 
 	if(!exploitable)
@@ -1171,6 +1173,14 @@ namespace libdar
 	    throw SRC_BUG;
 	ret.set_storage_size(get_cat().get_contenu()->get_storage_size());
 	ret.set_data_size(get_cat().get_contenu()->get_size());
+	if(get_cat().get_in_place(tmp))
+	{
+	    if(tmp.is_relative())
+		throw SRC_BUG;
+	    ret.set_in_place(tmp.display());
+	}
+	else
+	    ret.set_in_place(""); // empty string when in_place is not set
 
 	ret.set_contents(get_cat().get_stats());
 
