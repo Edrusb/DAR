@@ -236,6 +236,10 @@ namespace libdar
 	    /// remove delta signature from the catalogue object as if they had never been calculated
 	void drop_delta_signatures();
 
+
+	    /// returns whether an in-place path is stored in the catalogue
+	bool has_in_place() const { return in_place.is_absolute(); };
+
 	    /// get the in_place path when available
 
 	    /// \param[out] arg value of the in_place path
