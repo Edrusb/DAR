@@ -1192,7 +1192,7 @@ namespace libdar
 	       || x_overwrite == nullptr
 	       || x_entrepot == nullptr
 	       || x_delta_mask == nullptr)
-		throw Ememory("archive_options_extract::copy_from");
+		throw Ememory("archive_options_merge::copy_from");
 
 	    x_ref = ref.x_ref;
 	    x_allow_over = ref.x_allow_over;
