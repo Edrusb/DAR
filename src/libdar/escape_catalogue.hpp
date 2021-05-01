@@ -92,6 +92,8 @@ namespace libdar
 	virtual bool read_if_present(std::string *name, const cat_nomme * & ref) const override;
 	virtual void tail_catalogue_to_current_read() override;
 	virtual bool read_second_time_dir() const override { return status == ec_detruits; };
+	virtual void set_in_place(const path & arg) override;
+	virtual void clear_in_place() override;
 
     private:
 	enum state
