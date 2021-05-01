@@ -2330,7 +2330,7 @@ namespace libdar
 	{
 	    string err = tools_strerror_r(errno);
 
-	    throw Erange("tools_unlink", tools_printf(gettext("Error unlinking %S: %s"), &filename, &err));
+	    throw Erange("tools_unlink", tools_printf(gettext("Error unlinking %S: %S"), &filename, &err));
 	}
     }
 
