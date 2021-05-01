@@ -933,6 +933,7 @@ namespace libdar
         statistics st = false;  // false => no lock for this internal object
 	statistics *st_ptr = progressive_report == nullptr ? &st : progressive_report;
 	comparison_fields wtc = options.get_what_to_check();
+	path real_fs_root(".");
 
         try
         {
@@ -960,6 +961,15 @@ namespace libdar
 	    fs_root.explode_undisclosed();
 	    enable_natural_destruction();
 
+	    if(options.get_in_place())
+	    {
+		if(!get_cat().get_in_place(real_fs_root))
+		    throw Erange("op_extract", gettext("Cannot use in-place restoration as no in-place path is stored in the archive"));
+	    }
+	    else
+		real_fs_root = fs_root;
+
+
 		/// calculating and setting the " recursive_has_changed" fields of directories to their values
 	    if(options.get_empty_dir() == false)
 		get_cat().launch_recursive_has_changed_update();
@@ -972,7 +982,7 @@ namespace libdar
 			       options.get_selection(),
 			       options.get_subtree(),
 			       get_cat(),
-			       tools_relative2absolute_path(fs_root, tools_getcwd()),
+			       tools_relative2absolute_path(real_fs_root, tools_getcwd()),
 			       options.get_warn_over(),
 			       options.get_info_details(),
 			       options.get_display_treated(),
@@ -1358,6 +1368,7 @@ namespace libdar
         statistics st = false;  // false => no lock for this internal object
 	statistics *st_ptr = progressive_report == nullptr ? &st : progressive_report;
 	bool isolated_mode = false;
+	path real_fs_root(".");
 
         try
         {
@@ -1380,13 +1391,22 @@ namespace libdar
 
 	    fs_root.explode_undisclosed();
             enable_natural_destruction();
+
+	    if(options.get_in_place())
+	    {
+		if(!get_cat().get_in_place(real_fs_root))
+		    throw Erange("op_extract", gettext("Cannot use in-place restoration as no in-place path is stored in the archive"));
+	    }
+	    else
+		real_fs_root = fs_root;
+
             try
             {
                 filtre_difference(get_pointer(),
 				  options.get_selection(),
 				  options.get_subtree(),
 				  get_cat(),
-				  tools_relative2absolute_path(fs_root, tools_getcwd()),
+				  tools_relative2absolute_path(real_fs_root, tools_getcwd()),
 				  options.get_info_details(),
 				  options.get_display_treated(),
 				  options.get_display_treated_only_dir(),
