@@ -1,6 +1,9 @@
 from 2.6.14 to 2.6.15
 - fixed error message formatting error leading message to contain garbage
   in place of system error information.
+- fixing bug (internal error) met while trying restoring files and dirs
+  without sufficient write permission on the destination directory tree
+  to perform the operation.
 
 from 2.6.13 to 2.6.14
 - script used to build dar windows binary has been fixed to have the

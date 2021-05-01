@@ -221,16 +221,25 @@ namespace libdar
 	    current_dir->pop(tmp);
 	    if(!stack_dir.empty())
 	    {
-		if(!empty && stack_dir.back().get_restore_date())
+		try
 		{
-		    string chem = (current_dir->append(stack_dir.back().get_name())).display();
-		    filesystem_tools_make_date(stack_dir.back(), chem, what_to_check, get_fsa_scope());
-		    filesystem_tools_make_owner_perm(get_ui(), stack_dir.back(), chem, what_to_check, get_fsa_scope());
+		    if(!empty && stack_dir.back().get_restore_date())
+		    {
+			string chem = (current_dir->append(stack_dir.back().get_name())).display();
+			filesystem_tools_make_date(stack_dir.back(), chem, what_to_check, get_fsa_scope());
+			filesystem_tools_make_owner_perm(get_ui(), stack_dir.back(), chem, what_to_check, get_fsa_scope());
+		    }
 		}
+		catch(...)
+		{
+		    stack_dir.pop_back();
+		    throw;
+		}
+		stack_dir.pop_back();
 	    }
 	    else
 		throw SRC_BUG;
-	    stack_dir.pop_back();
+
 	    return;
 	}
 
