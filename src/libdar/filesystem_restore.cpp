@@ -1214,7 +1214,7 @@ namespace libdar
 	    stack_dir.pop_back();
 	}
 	if(stack_dir.size() > 0)
-    throw SRC_BUG;
+	    throw SRC_BUG;
     }
 
 
