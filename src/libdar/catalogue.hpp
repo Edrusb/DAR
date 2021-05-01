@@ -244,10 +244,10 @@ namespace libdar
 	bool get_in_place(path & arg) const;
 
 	    /// set the in_place path for recording in the archive
-	void set_in_place(const path & arg);
+	virtual void set_in_place(const path & arg);
 
 	    /// clear the in_place path
-	void clear_in_place();
+	virtual void clear_in_place();
 
 
     protected:
