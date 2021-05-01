@@ -1174,12 +1174,18 @@ The --ref option can be used with an isolated catalogue to rescue an archive tha
 .TP 20
 -au, --alter=unix-sockets
 Do not restore unix-sockets. By default saved unix sockets are recreated at restoration time.
+.TP 20
+-ap, --alter=place
+Since version 2.7.1 libdar stores the filesystem root path (given -R option) used when creating a backup, this is the known as the 'in-place' path. At restoration time by default, dar uses the provided -R option or if not specified uses the current directory as root directory for the restoration operation. Using -ap option lead dar to read the in-place path from the backup and restore the data using this path instead. This option is thus exclusive with -R option and may lead dar to report an error if the archive has not stored any in-place path (older archive format or backup resulting of the merging of two backups having different in-place path).
 .PP
 .B TESTING AND DIFFERENCE SPECIFIC OPTIONS (to use with -t or -d)
 .PP
 .TP 20
 -ado-not-compare-symlink-mtime, --alter=do-not-compare-symlink-mtime
 With this option set, when comparing a symlink, no message shows when symlink in archive and symlink on filesystem do only differ by their mtime. See also -O option.
+.TP 20
+-ap, --alter=place
+is also available as described just above for restoration options.
 .PP
 No other specific option, but all general options are available except for example -w which is useless, as testing and comparing only read data. -A option is available as described in GENERAL OPTIONS to backup of internal catalogue of the archive (assuming you have a previously isolated catalogue available).
 .PP
