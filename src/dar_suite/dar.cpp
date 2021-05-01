@@ -898,6 +898,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		extract_options.set_ignore_deleted(param.not_deleted);
 		extract_options.set_fsa_scope(param.scope);
 		extract_options.set_ignore_unix_sockets(param.unix_sockets);
+		extract_options.set_in_place(param.in_place);
 
                 st = arch->op_extract(*param.fs_root,
 				      extract_options,
@@ -983,6 +984,8 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		diff_options.set_hourshift(param.hourshift);
 		diff_options.set_compare_symlink_date(param.no_compare_symlink_date);
 		diff_options.set_fsa_scope(param.scope);
+		diff_options.set_in_place(param.in_place);
+
                 st = arch->op_diff(*param.fs_root,
 				   diff_options,
 				   nullptr);
