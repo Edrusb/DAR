@@ -1379,6 +1379,9 @@ namespace libdar
 	    /// whether to ignore unix sockets while restoring
 	void set_ignore_unix_sockets(bool val) { x_ignore_unix_sockets = val; };
 
+	    /// whether to ignore fs_root and use in-place path stored in the archive
+	void set_in_place(bool arg) { x_in_place = arg; };
+
 
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
@@ -1402,6 +1405,7 @@ namespace libdar
 	bool get_ignore_deleted() const { return x_ignore_deleted; };
 	const fsa_scope & get_fsa_scope() const { return x_scope; };
 	bool get_ignore_unix_sockets() const { return x_ignore_unix_sockets; };
+	bool get_in_place() const { return x_in_place; };
 
     private:
 	mask * x_selection;
@@ -1423,6 +1427,7 @@ namespace libdar
 	bool x_ignore_deleted;
 	fsa_scope x_scope;
 	bool x_ignore_unix_sockets;
+	bool x_in_place;
 
 	void destroy() noexcept;
 	void nullifyptr() noexcept;
@@ -1585,6 +1590,9 @@ namespace libdar
 	    /// defines the FSA (Filesystem Specific Attribute) to only consider (by default all FSA activated at compilation time are considered)
 	void set_fsa_scope(const fsa_scope & scope) { x_scope = scope; };
 
+	    /// whether to ignore fs_root and use in-place path stored in the archive
+	void set_in_place(bool arg) { x_in_place = arg; };
+
 
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
@@ -1602,6 +1610,7 @@ namespace libdar
 	const infinint & get_hourshift() const { return x_hourshift; };
 	bool get_compare_symlink_date() const { return x_compare_symlink_date; };
 	const fsa_scope & get_fsa_scope() const { return x_scope; };
+	bool get_in_place() const { return x_in_place; };
 
     private:
 	mask * x_selection;
@@ -1618,6 +1627,7 @@ namespace libdar
 	infinint x_hourshift;
 	bool x_compare_symlink_date;
 	fsa_scope x_scope;
+	bool x_in_place;
 
 	void destroy() noexcept;
 	void nullifyptr() noexcept;

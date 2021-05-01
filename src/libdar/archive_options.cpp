@@ -1332,6 +1332,7 @@ namespace libdar
 	    x_ignore_deleted = false;
 	    x_scope = all_fsa_families();
 	    x_ignore_unix_sockets = false;
+	    x_in_place = false;
 	}
 	catch(...)
 	{
@@ -1464,6 +1465,7 @@ namespace libdar
 	    x_ignore_deleted = ref.x_ignore_deleted;
 	    x_scope = ref.x_scope;
 	    x_ignore_unix_sockets = ref.x_ignore_unix_sockets;
+	    x_in_place = ref.x_in_place;
 	}
 	catch(...)
 	{
@@ -1494,6 +1496,7 @@ namespace libdar
 	x_ignore_deleted = move(ref.x_ignore_deleted);
 	x_scope = move(ref.x_scope);
 	x_ignore_unix_sockets = move(ref.x_ignore_unix_sockets);
+	x_in_place = move(ref.x_in_place);
     }
 
 	/////////////////////////////////////////////////////////
@@ -1723,6 +1726,7 @@ namespace libdar
 	    x_hourshift = 0;
 	    x_compare_symlink_date = true;
 	    x_scope = all_fsa_families();
+	    x_in_place = false;
 	}
         catch(...)
         {
@@ -1859,6 +1863,7 @@ namespace libdar
 	    x_hourshift = ref.x_hourshift;
 	    x_compare_symlink_date = ref.x_compare_symlink_date;
 	    x_scope = ref.x_scope;
+	    x_in_place = ref.x_in_place;
 	}
 	catch(...)
 	{
@@ -1884,6 +1889,7 @@ namespace libdar
 	x_hourshift = move(ref.x_hourshift);
 	x_compare_symlink_date = move(ref.x_compare_symlink_date);
 	x_scope = move(ref.x_scope);
+	x_in_place = move(ref.x_in_place);
     }
 
 
