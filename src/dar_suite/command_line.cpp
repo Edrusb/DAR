@@ -333,6 +333,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
     p.kdf_hash = hash_algo::none;
     p.delta_sig_len.reset();
     p.unix_sockets = false;
+    p.in_place = false;
 
     if(!dialog)
 	throw SRC_BUG;
@@ -420,6 +421,14 @@ bool get_args(shared_ptr<user_interaction> & dialog,
 		    line_tools_check_min_digits(*dialog, *p.aux_root, *p.aux_filename, EXTENSION, p.aux_num_digits);
 	    }
         }
+
+	if(p.in_place)
+	{
+	    if(p.op != extract && p.op != diff)
+		throw Erange("get_args", gettext("-ap/--alter=place option is only available for restoration and comparison"));
+	    if(p.fs_root != nullptr)
+		throw Erange("get_args", gettext("-ap/--alter=place option is incompatible with -R/--fs-root option"));
+	}
 
         if(p.fs_root == nullptr)
         {
@@ -1641,6 +1650,8 @@ static bool get_args_recursive(recursive_param & rec,
 		    p.zeroing_neg_dates = true;
 		else if(strcasecmp("u", optarg) == 0 || strcasecmp("unix-sockets", optarg) == 0)
 		    p.unix_sockets = true;
+		else if(strcasecmp("p", optarg) == 0 || strcasecmp("place", optarg) == 0)
+		    p.in_place = true;
 		else
                     throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext("Unknown argument given to -a : %s"), optarg));
                 break;
