@@ -120,10 +120,6 @@ extern "C"
 #include "generic_rsync.hpp"
 #include "null_file.hpp"
 
-#ifndef UNIX_PATH_MAX
-#define UNIX_PATH_MAX 104
-#endif
-
 using namespace std;
 
 namespace libdar

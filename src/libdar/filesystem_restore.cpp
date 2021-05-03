@@ -123,10 +123,6 @@ extern "C"
 #include "compile_time_features.hpp"
 #include "op_tools.hpp"
 
-#ifndef UNIX_PATH_MAX
-#define UNIX_PATH_MAX 104
-#endif
-
 using namespace std;
 
 namespace libdar
