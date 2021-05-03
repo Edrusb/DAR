@@ -1131,6 +1131,9 @@ Overwriting policy can be used for archive restoration to define when and how fi
 .TP 20
 -A, --ref [[<URL>]<path>]/<basename>
 The --ref option can be used with an isolated catalogue to rescue an archive that has a corruption in the catalogue part, see GENERAL OPTIONS above for more details.
+.TP 20
+-au, --alter=unix-sockets
+Do not restore unix-sockets. By default saved unix sockets are recreated at restoration time.
 .PP
 .B TESTING AND DIFFERENCE SPECIFIC OPTIONS (to use with -t or -d)
 .PP
