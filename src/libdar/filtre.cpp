@@ -187,7 +187,8 @@ namespace libdar
 			archive_options_extract::t_dirty dirty,
 			bool only_deleted,
 			bool not_deleted,
-			const fsa_scope & scope)
+			const fsa_scope & scope,
+			bool ignore_unix_sockets)
     {
 	defile juillet = fs_racine; // 'juillet' is in reference to 14th of July ;-) when takes place the "defile'" on the Champs-Elysees.
 	const cat_eod tmp_eod;
@@ -219,7 +220,8 @@ namespace libdar
 				  empty,
 				  &overwrite,
 				  only_deleted,
-				  scope);
+				  scope,
+				  ignore_unix_sockets);
 		// if only_deleted, we set the filesystem to only overwrite mode (no creatation if not existing)
 		// we also filter to only restore directories and detruit objects.
 
