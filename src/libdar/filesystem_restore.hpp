@@ -69,7 +69,8 @@ namespace libdar
 			   bool empty,
 			   const crit_action *x_overwrite,
 			   bool x_only_overwrite,
-			   const fsa_scope & scope);
+			   const fsa_scope & scope,
+			   bool ignore_unix_sockets = false);
 
 	    /// copy constructor is forbidden
         filesystem_restore(const filesystem_restore & ref) = delete;
@@ -148,6 +149,7 @@ namespace libdar
 	bool ignore_over_restricts;
 	const crit_action *overwrite;
 	bool only_overwrite;
+	bool no_unix_sockets;
 
         void detruire();
 	void restore_stack_dir_ownership();

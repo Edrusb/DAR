@@ -137,7 +137,8 @@ namespace libdar
 					   bool x_empty,
 					   const crit_action *x_overwrite,
 					   bool x_only_overwrite,
-					   const fsa_scope & scope):
+					   const fsa_scope & scope,
+					   bool ignore_unix_sockets):
 	filesystem_hard_link_write(dialog),
 	filesystem_hard_link_read(dialog, compile_time::furtive_read(), scope)
     {
@@ -170,6 +171,7 @@ namespace libdar
 	warn_remove_no_match = x_warn_remove_no_match;
 	empty = x_empty;
 	only_overwrite = x_only_overwrite;
+	no_unix_sockets = ignore_unix_sockets;
 	reset_write();
 	zeroing_negative_dates_without_asking(); // when reading existing inode to evaluate overwriting action
     }
@@ -250,6 +252,9 @@ namespace libdar
 	    bool has_fsa_saved = x_ino != nullptr && x_ino->fsa_get_saved_status() == fsa_saved_status::full;
 	    path spot = current_dir->append(x_nom->get_name());
 	    string spot_display = spot.display();
+
+	    if(no_unix_sockets && dynamic_cast<const cat_prise *>(x) != nullptr)
+		return;
 
 	    cat_nomme *exists = nullptr;
 
