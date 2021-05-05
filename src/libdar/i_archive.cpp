@@ -989,7 +989,8 @@ namespace libdar
 			       options.get_dirty_behavior(),
 			       options.get_only_deleted(),
 			       options.get_ignore_deleted(),
-			       options.get_fsa_scope());
+			       options.get_fsa_scope(),
+			       options.get_ignore_unix_sockets());
 	    }
 	    catch(Euser_abort & e)
 	    {

@@ -63,7 +63,8 @@ namespace libdar
  			       archive_options_extract::t_dirty dirty, ///< whether to restore dirty files
 			       bool only_deleted,         ///< whether to only consider deleted files
 			       bool not_deleted,          ///< wether to consider deleted files
-			       const fsa_scope & scope    ///< scope of FSA to take into account
+			       const fsa_scope & scope,   ///< scope of FSA to take into account
+			       bool ignore_unix_sockets   ///< do not try to restore unix sockets
 	);
 
     extern void filtre_sauvegarde(const std::shared_ptr<user_interaction> & dialog,

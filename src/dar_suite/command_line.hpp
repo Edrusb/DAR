@@ -169,6 +169,7 @@ struct line_param
     infinint iteration_count;     ///< iteration count used when creating/isolating/merging an encrypted archive (key derivation)
     hash_algo kdf_hash;           ///< hash algo used for key derivation function
     delta_sig_block_size delta_sig_len; ///< block len to used for delta signature computation
+    bool unix_sockets;            ///< whether to restore unix-sockets
 
 	// constructor for line_param
     line_param()

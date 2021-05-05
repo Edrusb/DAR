@@ -897,6 +897,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		extract_options.set_only_deleted(param.only_deleted);
 		extract_options.set_ignore_deleted(param.not_deleted);
 		extract_options.set_fsa_scope(param.scope);
+		extract_options.set_ignore_unix_sockets(param.unix_sockets);
 
                 st = arch->op_extract(*param.fs_root,
 				      extract_options,

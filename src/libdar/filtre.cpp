@@ -187,7 +187,8 @@ namespace libdar
 			archive_options_extract::t_dirty dirty,
 			bool only_deleted,
 			bool not_deleted,
-			const fsa_scope & scope)
+			const fsa_scope & scope,
+			bool ignore_unix_sockets)
     {
 	defile juillet = fs_racine; // 'juillet' is in reference to 14th of July ;-) when takes place the "defile'" on the Champs-Elysees.
 	const cat_eod tmp_eod;
@@ -237,6 +238,7 @@ namespace libdar
 		const cat_inode *e_ino = dynamic_cast<const cat_inode *>(e);
 		const cat_file *e_file = dynamic_cast<const cat_file *>(e);
 		const cat_detruit *e_det = dynamic_cast<const cat_detruit *>(e);
+		const cat_prise *e_pri = dynamic_cast<const cat_prise *>(e);
 
 		if(e_mir != nullptr)
 		{
@@ -268,8 +270,15 @@ namespace libdar
 			bool empty_dir_covered = e_dir == nullptr || empty_dir || e_dir->get_recursive_has_changed(); // checking whether this is not a directory without any file to restore in it
 			bool flat_covered = e_dir == nullptr || !flat; // we do not restore directories in flat mode
 			bool only_deleted_covered = !only_deleted || e_dir != nullptr || e_det != nullptr; // we do not restore other thing than directories and cat_detruits when in "only_deleted" mode
+			bool socket_covered = ! ignore_unix_sockets || e_pri == nullptr;
 
-			if(path_covered && name_covered && dirty_covered && empty_dir_covered && flat_covered && only_deleted_covered)
+			if(path_covered
+			   && name_covered
+			   && dirty_covered
+			   && empty_dir_covered
+			   && flat_covered
+			   && only_deleted_covered
+			   && socket_covered)
 			{
 			    filesystem_restore::action_done_for_data data_restored = filesystem_restore::done_no_change_no_data; // will be true if file's data have been restored (depending on overwriting policy)
 			    bool ea_restored = false; // will be true if file's EA have been restored (depending on overwriting policy)
@@ -427,7 +436,7 @@ namespace libdar
 			{
 			    if(display_skipped)
 			    {
-				if(!path_covered || !name_covered || !dirty_covered)
+				if(!path_covered || !name_covered || !dirty_covered || !socket_covered)
 				    dialog->message(string(gettext(SKIPPED)) + juillet.get_string());
 				else
 				    dialog->message(string(gettext(SQUEEZED)) + juillet.get_string());

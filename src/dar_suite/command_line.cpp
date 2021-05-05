@@ -332,6 +332,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
     p.iteration_count = 0; // will not touch the default API value if still set to zero
     p.kdf_hash = hash_algo::none;
     p.delta_sig_len.reset();
+    p.unix_sockets = false;
 
     if(!dialog)
 	throw SRC_BUG;
@@ -552,6 +553,9 @@ bool get_args(shared_ptr<user_interaction> & dialog,
 
         if(p.display_finished && p.op != create)
             dialog->message(gettext("-vf is only useful with -c option"));
+
+	if(p.unix_sockets && p.op != extract)
+	    dialog->message(gettext("-au is only useful with -c option"));
 
 	if(p.op == repairing)
 	{
@@ -1635,6 +1639,8 @@ static bool get_args_recursive(recursive_param & rec,
 		    p.header_only = true;
 		else if(strcasecmp("z", optarg) == 0 || strcasecmp("zeroing-negative-dates", optarg) == 0)
 		    p.zeroing_neg_dates = true;
+		else if(strcasecmp("u", optarg) == 0 || strcasecmp("unix-sockets", optarg) == 0)
+		    p.unix_sockets = true;
 		else
                     throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext("Unknown argument given to -a : %s"), optarg));
                 break;
