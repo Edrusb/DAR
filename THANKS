@@ -12,6 +12,10 @@ out of source code directory. Thanks again to Zach Adams for security
 enhancement suggestions. Thanks to Andrea Vai for his review of the
 the benchmark document.
 
+version 2.6.15
+--------------
+Thanks to Stefan Hammerl for feedback and fix.
+
 version 2.6.14
 --------------
 Thanks to Vladimir for feedback about Windows binary package

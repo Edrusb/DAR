@@ -66,6 +66,7 @@ from 2.6.14 to 2.6.15
   without sufficient write permission on the destination directory tree
   to perform the operation.
 - adding minor feature to avoid restoring unix sockets (-au option)
+- fixing dar-catalogue.dtd
 
 from 2.6.13 to 2.6.14
 - script used to build dar windows binary has been fixed to have the
