@@ -1,7 +1,7 @@
 version 2.6.14
 --------------
 Thanks to Vladimir for feedback about Windows binary package
-/etc/darrc issue.
+/etc/darrc issue. Thanks to Stefan Hammerl for feedback and fix.
 
 version 2.6.13
 --------------
