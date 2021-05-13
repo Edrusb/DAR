@@ -83,7 +83,9 @@ namespace libdar
 
     catalogue::catalogue(const std::shared_ptr<user_interaction> & ui,
 			 const datetime & root_last_modif,
-			 const label & data_name): mem_ui(ui), out_compare("/")
+			 const label & data_name): mem_ui(ui),
+						   out_compare("/"),
+						   in_place(".") // is absolute path when set
     {
 	contenu = nullptr;
 
@@ -114,7 +116,9 @@ namespace libdar
 			 compression default_algo,
 			 bool lax,
 			 const label & lax_layer1_data_name,
-			 bool only_detruit): mem_ui(ui), out_compare("/")
+			 bool only_detruit): mem_ui(ui),
+					     out_compare("/"),
+					     in_place(".")
     {
 	string tmp;
 	saved_status st;
@@ -146,6 +150,26 @@ namespace libdar
 		}
 		else
 		    ref_data_name.clear(); // a cleared data_name is emulated for older archives
+
+		if(reading_ver >= archive_version(11,1))
+		{
+		    string tmp;
+
+		    try
+		    {
+			tools_read_string(*pdesc.stack, tmp);
+			in_place = path(tmp);
+		    }
+		    catch(Erange & e)
+		    {
+			throw Erange("catalogue::catalogue(generic_file &)", gettext("incoherent catalogue structure"));
+		    }
+
+		    if(in_place.is_relative() && tmp != ".")
+			throw Erange("catalogue::catalogue(generic_file &)", gettext("incoherent catalogue structure"));
+		}
+		else
+		    in_place = path(".");
 
 		if(lax)
 		{
@@ -237,6 +261,7 @@ namespace libdar
 	    // now copying the catalogue's data
 
 	out_compare = ref.out_compare;
+	in_place = ref.in_place;
 	partial_copy_from(ref);
 
 	return *this;
@@ -1009,6 +1034,7 @@ namespace libdar
 	    try
 	    {
 		ref_data_name.dump(*pdesc.stack);
+		tools_write_string(*pdesc.stack, in_place.display());
 		contenu->dump(pdesc, false);
 	    }
 	    catch(...)
@@ -1281,6 +1307,29 @@ namespace libdar
 		}
 	    }
 	}
+    }
+
+    bool catalogue::get_in_place(path & arg) const
+    {
+	if(in_place.is_absolute())
+	{
+	    arg = in_place;
+	    return true;
+	}
+	else
+	    return false;
+    }
+
+    void catalogue::set_in_place(const path & arg)
+    {
+	if(arg.is_relative())
+	    throw SRC_BUG;
+	in_place = arg;
+    }
+
+    void catalogue::clear_in_place()
+    {
+	in_place = path(".");
     }
 
     void catalogue::change_location(const pile_descriptor & pdesc)

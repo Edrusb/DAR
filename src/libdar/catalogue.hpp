@@ -70,7 +70,7 @@ namespace libdar
 		  bool lax,
 		  const label & lax_layer1_data_name, // ignored unless in lax mode, in lax mode unless it is a cleared label, forces the catalogue label to be equal to the lax_layer1_data_name for it be considered a plain internal catalogue, even in case of corruption
 		  bool only_detruit = false); // if set to true, only directories and detruit objects are read from the archive
-        catalogue(const catalogue & ref) : mem_ui(ref), out_compare(ref.out_compare) { partial_copy_from(ref); };
+        catalogue(const catalogue & ref) : mem_ui(ref), out_compare(ref.out_compare), in_place(ref.in_place) { partial_copy_from(ref); };
 	catalogue(catalogue && ref) = delete;
         catalogue & operator = (const catalogue &ref);
 	catalogue & operator = (catalogue && ref) = delete;
@@ -236,6 +236,24 @@ namespace libdar
 	    /// remove delta signature from the catalogue object as if they had never been calculated
 	void drop_delta_signatures();
 
+
+	    /// returns whether an in-place path is stored in the catalogue
+	bool has_in_place() const { return in_place.is_absolute(); };
+
+	    /// get the in_place path when available
+
+	    /// \param[out] arg value of the in_place path
+	    /// \return true if the catalogue has a valid in_place value
+	    /// else false is returned an the argument is undefined
+	bool get_in_place(path & arg) const;
+
+	    /// set the in_place path for recording in the archive
+	virtual void set_in_place(const path & arg);
+
+	    /// clear the in_place path
+	virtual void clear_in_place();
+
+
     protected:
 	entree_stats & access_stats() { return stats; };
 	void copy_detruits_from(const catalogue & ref); // needed for escape_catalogue implementation only.
@@ -259,6 +277,7 @@ namespace libdar
         mutable signed int sub_count;             ///< count the depth in of read routine in the sub_tree
         entree_stats stats;                       ///< statistics catalogue contents
 	label ref_data_name;                      ///< name of the archive where is located the data
+	path in_place;                            ///< path of the directory used for root of the backup (at the time of the backup)
 
         void partial_copy_from(const catalogue &ref);
         void detruire();

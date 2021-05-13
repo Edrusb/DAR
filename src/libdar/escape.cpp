@@ -888,6 +888,8 @@ namespace libdar
 	    return 's';
 	case seqt_delta_sig:
 	    return 'd';
+	case seqt_in_place:
+	    return 'P';
 	default:
 	    throw SRC_BUG;
 	}
@@ -923,6 +925,8 @@ namespace libdar
 	    return seqt_fsa_crc;
 	case 'd':
 	    return seqt_delta_sig;
+	case 'P':
+	    return seqt_in_place;
 	default:
 	    throw Erange("escape::char2type", gettext("Unknown escape sequence type"));
 	}

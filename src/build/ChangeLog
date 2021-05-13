@@ -1,7 +1,13 @@
 from 2.7.0 to 2.7.1
 - fixed compilation script to require support for C++14 due to new features
-  introduces in 2.7.0 that rely on modern constructions. Updated
-  documentation accordingly about this new requirement.
+  introduces in 2.7.0 that rely on modern C++ constructions. Updated
+  documentation accordingly about this updated requirement.
+- fixed missing included header for compilation to suceed under MacOS X
+- fixed typo in man page
+- adding minor feature: storing the backup root (-R option) in the archive
+  to be able to restore 'in place' thanks to the new -ap option that
+  sets the -R path to the one stored in the archive.
+- merging fixes an enhancements brought by release 2.6.15
 
 from 2.6.x to 2.7.0
 - using the truncate system call whenever possible in place of skipping
@@ -55,6 +61,15 @@ from 2.6.x to 2.7.0
   an existing database.
 - Added a benchmark of dar versus tar and rsync for different use cases.
 - documentation review, update, cleanup, restructured and beautification.
+
+from 2.6.14 to 2.6.15
+- fixed error message formatting error leading message to contain garbage
+  in place of system error information.
+- fixing bug (internal error) met while trying restoring files and dirs
+  without sufficient write permission on the destination directory tree
+  to perform the operation.
+- adding minor feature to avoid restoring Unix sockets (-au option)
+- fixing dar-catalogue.dtd
 
 from 2.6.13 to 2.6.14
 - script used to build dar windows binary has been fixed to have the

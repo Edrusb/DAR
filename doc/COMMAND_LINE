@@ -30,12 +30,14 @@ a * alteration of operation		--alter	  argument:
 							    list-ea
 							    m[ask]
 							    n[o-case]
+							    p[lace]
 							    r[egex]
 						            s[aved]
 							    secu
 							    SI[-unit[s]]
 							    t[ape-marks]
 							    test-self-reported-bug
+							    u[nix-sockets]
 							    y abyte[s]
 							    z[eroing-negative-dates]
 b - terminal bell                       --bell

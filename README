@@ -8,8 +8,8 @@ PRESENTATION
 ================
 dar is a shell command, that makes backup of a directory tree and files.
 It has been tested under Linux, Windows (95, 2000, NT, XP, 7, 8, 10),
-OpenSolaris, FreeBSD and NetBSD, and has been reported as working under
-Mac OS X 10.3 and more recent.
+OpenSolaris, FreeBSD and NetBSD, it has been reported as working under
+Mac OS X as well as Android and on Rasperry Pi.
 
 External GUI exist (see homepage at http://dar.linux.free.fr/ for a list
 of references) thanks to the libdar library and its API that powers the

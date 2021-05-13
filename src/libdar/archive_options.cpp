@@ -1192,7 +1192,7 @@ namespace libdar
 	       || x_overwrite == nullptr
 	       || x_entrepot == nullptr
 	       || x_delta_mask == nullptr)
-		throw Ememory("archive_options_extract::copy_from");
+		throw Ememory("archive_options_merge::copy_from");
 
 	    x_ref = ref.x_ref;
 	    x_allow_over = ref.x_allow_over;
@@ -1331,6 +1331,8 @@ namespace libdar
 	    x_only_deleted = false;
 	    x_ignore_deleted = false;
 	    x_scope = all_fsa_families();
+	    x_ignore_unix_sockets = false;
+	    x_in_place = false;
 	}
 	catch(...)
 	{
@@ -1462,6 +1464,8 @@ namespace libdar
 	    x_only_deleted = ref.x_only_deleted;
 	    x_ignore_deleted = ref.x_ignore_deleted;
 	    x_scope = ref.x_scope;
+	    x_ignore_unix_sockets = ref.x_ignore_unix_sockets;
+	    x_in_place = ref.x_in_place;
 	}
 	catch(...)
 	{
@@ -1491,6 +1495,8 @@ namespace libdar
 	x_only_deleted = move(ref.x_only_deleted);
 	x_ignore_deleted = move(ref.x_ignore_deleted);
 	x_scope = move(ref.x_scope);
+	x_ignore_unix_sockets = move(ref.x_ignore_unix_sockets);
+	x_in_place = move(ref.x_in_place);
     }
 
 	/////////////////////////////////////////////////////////
@@ -1720,6 +1726,7 @@ namespace libdar
 	    x_hourshift = 0;
 	    x_compare_symlink_date = true;
 	    x_scope = all_fsa_families();
+	    x_in_place = false;
 	}
         catch(...)
         {
@@ -1856,6 +1863,7 @@ namespace libdar
 	    x_hourshift = ref.x_hourshift;
 	    x_compare_symlink_date = ref.x_compare_symlink_date;
 	    x_scope = ref.x_scope;
+	    x_in_place = ref.x_in_place;
 	}
 	catch(...)
 	{
@@ -1881,6 +1889,7 @@ namespace libdar
 	x_hourshift = move(ref.x_hourshift);
 	x_compare_symlink_date = move(ref.x_compare_symlink_date);
 	x_scope = move(ref.x_scope);
+	x_in_place = move(ref.x_in_place);
     }
 
 

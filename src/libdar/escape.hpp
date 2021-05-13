@@ -86,8 +86,9 @@ namespace libdar
 	    seqt_dirty,           ///< placed after data CRC if file is dirty
 	    seqt_failed_backup,   ///< placed after inode information if the file could not be openned at backup time
 	    seqt_fsa,             ///< placed before FSA data
-	    seqt_fsa_crc,         ///< place before the CRC of file's FSA
-	    seqt_delta_sig        ///< place before the delta signature of a file
+	    seqt_fsa_crc,         ///< placed before the CRC of file's FSA
+	    seqt_delta_sig,       ///< placed before the delta signature of a file
+	    seqt_in_place         ///< placed before the in_place path at the beginning of the archive
 	};
 
 	    // the archive layout of marks is for each entry:

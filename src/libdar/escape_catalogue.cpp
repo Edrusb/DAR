@@ -24,6 +24,7 @@
 #include "escape_catalogue.hpp"
 #include "macro_tools.hpp"
 #include "cat_all_entrees.hpp"
+#include "tools.hpp"
 
 using namespace std;
 
@@ -108,6 +109,62 @@ namespace libdar
 		else
 		    set_data_name(cont_data->get_data_name());
 	    }
+
+	    // considering the in_place path
+	if(x_ver.get_edition() >= archive_version(11,1))
+	{
+	    if(pdesc->esc->skip_to_next_mark(escape::seqt_in_place, false))
+	    {
+		string tmp_s;
+		path in_place(".");
+
+		try
+		{
+		    tools_read_string(*(pdesc->esc), tmp_s);
+		    in_place = path(tmp_s);
+		    if(in_place.is_relative())
+			if(in_place == path("."))
+			    catalogue::clear_in_place();
+			else
+			    throw Erange("escape_catalogue::escape_catalogue", gettext("invalid in-place path value"));
+		    else
+			catalogue::set_in_place(in_place);
+		}
+		catch(Egeneric & e)
+		{
+		    if(!lax)
+		    {
+			e.prepend_message(gettext("Error while reading in-place path using tape marks"));
+			throw;
+		    }
+		    else
+		    {
+			get_ui().message(gettext("LAX MODE: Could not read in-place path information, assuming corruption occurred or no in-path place was present"));
+			catalogue::clear_in_place();
+		    }
+		}
+		catch(...)
+		{
+		    if(!lax)
+			throw SRC_BUG;
+		    else
+		    {
+			get_ui().message(gettext("LAX MODE: unexpected exception met when reading in-path place using tape marks, ignoring in-path info and continuing"));
+			catalogue::clear_in_place();
+		    }
+		}
+	    }
+	    else // failed finding the in_place path
+	    {
+		if(!lax)
+		    throw Erange("escape_catalogue::escape_catalogue", gettext("Could not find tape mark for the in-place path"));
+		else
+		{
+		    get_ui().message("LAX MODE: Could not find the in-place path information as it should be found for this archive format, assuming it no in-place path is present so for older format");
+		    catalogue::clear_in_place();
+		}
+	    }
+	}
     }
 
     escape_catalogue & escape_catalogue::operator = (const escape_catalogue &ref)
@@ -736,6 +793,36 @@ namespace libdar
     {
 	reset_reading_process();
 	catalogue::tail_catalogue_to_current_read();
+    }
+
+    void escape_catalogue::set_in_place(const path & arg)
+    {
+	string path_s(arg.display());
+
+	catalogue::set_in_place(arg);
+
+	if(status != ec_completed)
+	    throw SRC_BUG;
+	    // the in_place info should be drop at the
+	    // very begining of the archive
+
+	    // writing down the in_place path
+	pdesc->esc->add_mark_at_current_position(escape::seqt_in_place);
+	tools_write_string(*(pdesc->esc), path_s);
+    }
+
+    void escape_catalogue::clear_in_place()
+    {
+	catalogue::clear_in_place();
+
+	if(status != ec_completed)
+	    throw SRC_BUG;
+	    // the in_place info should be drop at the
+	    // very begining of the archive
+
+	    // writing down the absence of in_place path
+	pdesc->esc->add_mark_at_current_position(escape::seqt_in_place);
+	tools_write_string(*(pdesc->esc), ".");
     }
 
     void escape_catalogue::set_esc_and_stack(const pile_descriptor & x_pdesc)

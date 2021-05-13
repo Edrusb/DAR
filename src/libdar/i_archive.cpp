@@ -836,7 +836,7 @@ namespace libdar
 	    op_create_in_sub(oper_repair,
 			     chem_dst,
 			     sauv_path_t,
-			     src.pimpl->cat,             // ref1
+			     src.pimpl->cat,      // ref1
 			     nullptr,             // ref2
 			     initial_pause,
 			     bool_mask(true),     // selection
@@ -933,6 +933,7 @@ namespace libdar
         statistics st = false;  // false => no lock for this internal object
 	statistics *st_ptr = progressive_report == nullptr ? &st : progressive_report;
 	comparison_fields wtc = options.get_what_to_check();
+	path real_fs_root(".");
 
         try
         {
@@ -960,6 +961,15 @@ namespace libdar
 	    fs_root.explode_undisclosed();
 	    enable_natural_destruction();
 
+	    if(options.get_in_place())
+	    {
+		if(!get_cat().get_in_place(real_fs_root))
+		    throw Erange("op_extract", gettext("Cannot use in-place restoration as no in-place path is stored in the archive"));
+	    }
+	    else
+		real_fs_root = fs_root;
+
+
 		/// calculating and setting the " recursive_has_changed" fields of directories to their values
 	    if(options.get_empty_dir() == false)
 		get_cat().launch_recursive_has_changed_update();
@@ -972,7 +982,7 @@ namespace libdar
 			       options.get_selection(),
 			       options.get_subtree(),
 			       get_cat(),
-			       tools_relative2absolute_path(fs_root, tools_getcwd()),
+			       tools_relative2absolute_path(real_fs_root, tools_getcwd()),
 			       options.get_warn_over(),
 			       options.get_info_details(),
 			       options.get_display_treated(),
@@ -989,7 +999,8 @@ namespace libdar
 			       options.get_dirty_behavior(),
 			       options.get_only_deleted(),
 			       options.get_ignore_deleted(),
-			       options.get_fsa_scope());
+			       options.get_fsa_scope(),
+			       options.get_ignore_unix_sockets());
 	    }
 	    catch(Euser_abort & e)
 	    {
@@ -1087,6 +1098,12 @@ namespace libdar
 	    if(only_contains_an_isolated_catalogue())
 		get_ui().printf(gettext("\nWARNING! This archive only contains the catalogue of another archive, it can only be used as reference for differential backup or as rescue in case of corruption of the original archive's content. You cannot restore any data from this archive alone\n"));
 
+	    string in_place = sum.get_in_place();
+	    if(!in_place.empty())
+		get_ui().printf(gettext("in-place path: %S"), & in_place);
+	    else
+		get_ui().message(gettext("no in-place path recorded"));
+
 	    sum.get_contents().listing(get_ui());
 	}
 	catch(...)
@@ -1107,6 +1124,8 @@ namespace libdar
 	infinint last_slice_size;
 	infinint slice_number;
 	infinint archive_size;
+
+	path tmp(".");
 
 	    // sanity checks
 
@@ -1170,6 +1189,14 @@ namespace libdar
 	    throw SRC_BUG;
 	ret.set_storage_size(get_cat().get_contenu()->get_storage_size());
 	ret.set_data_size(get_cat().get_contenu()->get_size());
+	if(get_cat().get_in_place(tmp))
+	{
+	    if(tmp.is_relative())
+		throw SRC_BUG;
+	    ret.set_in_place(tmp.display());
+	}
+	else
+	    ret.set_in_place(""); // empty string when in_place is not set
 
 	ret.set_contents(get_cat().get_stats());
 
@@ -1341,6 +1368,7 @@ namespace libdar
         statistics st = false;  // false => no lock for this internal object
 	statistics *st_ptr = progressive_report == nullptr ? &st : progressive_report;
 	bool isolated_mode = false;
+	path real_fs_root(".");
 
         try
         {
@@ -1363,13 +1391,22 @@ namespace libdar
 
 	    fs_root.explode_undisclosed();
             enable_natural_destruction();
+
+	    if(options.get_in_place())
+	    {
+		if(!get_cat().get_in_place(real_fs_root))
+		    throw Erange("op_extract", gettext("Cannot use in-place restoration as no in-place path is stored in the archive"));
+	    }
+	    else
+		real_fs_root = fs_root;
+
             try
             {
                 filtre_difference(get_pointer(),
 				  options.get_selection(),
 				  options.get_subtree(),
 				  get_cat(),
-				  tools_relative2absolute_path(fs_root, tools_getcwd()),
+				  tools_relative2absolute_path(real_fs_root, tools_getcwd()),
 				  options.get_info_details(),
 				  options.get_display_treated(),
 				  options.get_display_treated_only_dir(),
@@ -2344,6 +2381,9 @@ namespace libdar
 
 		    // *********** now we can perform the data filtering operation (adding data to the archive) *************** //
 
+		path ref1_in_place(".");
+		path ref2_in_place(".");
+
 		try
 		{
 		    catalogue *void_cat = nullptr;
@@ -2352,6 +2392,10 @@ namespace libdar
 		    switch(op)
 		    {
 		    case oper_create:
+
+			    // setting in_place
+			cat->set_in_place(fs_root);
+
 			if(ref_cat1 == nullptr)
 			{
 				// using a empty catalogue as reference if no reference is given
@@ -2364,6 +2408,22 @@ namespace libdar
 			    if(void_cat == nullptr)
 				throw Ememory("archive::i_archive::op_create_in_sub");
 			    ref_cat_ptr = void_cat;
+			}
+			else
+			{
+			    if(ref_cat1->get_in_place(ref1_in_place))
+			    {
+				if(ref1_in_place != fs_root)
+				{
+				    string ref1 = ref1_in_place.display();
+				    string actual = fs_root.display();
+				    get_ui().printf(gettext("Warning making a differential/incremental backup with a different root directory: %S <-> %S"),
+						    &ref1,
+						    &actual);
+				}
+				    // else we cannot check (old archive format or merged archive
+			    }
+
 			}
 
 			try
@@ -2431,6 +2491,23 @@ namespace libdar
 			}
 			break;
 		    case oper_merge:
+
+			if(ref_cat2 == nullptr || ! ref_cat2->get_in_place(ref2_in_place))
+			    if(ref_cat1->get_in_place(ref1_in_place))
+				cat->set_in_place(ref1_in_place); // keeping the in-place of ref1
+			    else
+				cat->clear_in_place();
+			else // ref_cat2 exists and has an in_place path stored in ref2_in_place
+			    if(ref_cat1->get_in_place(ref1_in_place))
+				if(ref1_in_place == ref2_in_place)
+				    cat->set_in_place(ref1_in_place); // both the same in_place
+				else
+				    cat->clear_in_place(); // different in-place paths, merging without it
+			    else
+				cat->set_in_place(ref2_in_place); // only ref2 has in_place path
+
+			if(ref_cat1->get_in_place(ref1_in_place))
+
 			if(info_details)
 			    get_ui().message(gettext("Processing files for merging..."));
 
@@ -2463,6 +2540,16 @@ namespace libdar
 				     sig_block_len);
 			break;
 		    case oper_repair:
+			if(ref_cat2 != nullptr)
+			    throw SRC_BUG;
+			if(ref_cat1 == nullptr)
+			    throw SRC_BUG;
+
+			if(ref_cat1->get_in_place(ref1_in_place))
+			    cat->set_in_place(ref1_in_place);
+			else
+			    cat->clear_in_place();
+
 			if(info_details)
 			    get_ui().message(gettext("Processing files for fixing..."));
 
