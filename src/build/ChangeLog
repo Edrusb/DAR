@@ -4,6 +4,9 @@ from 2.7.0 to 2.7.1
   documentation accordingly about this new requirement.
 - fixed missing included header for compilation to suceed under MacOS X
 - fixed typo in man page
+- adding minor feature: storing the backup root (-R option) in the archive
+  to be able to restore 'in place' thanks to the new -ap option that
+  sets the -R path to the one stored in the archive.
 - merging fixes brought by release 2.6.15
 
 from 2.6.x to 2.7.0
