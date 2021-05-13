@@ -1901,23 +1901,30 @@ msgstr "chemin d'origine de backup invalide"
 
 #: src/libdar/escape_catalogue.cpp:137
 msgid "Error while reading in-place path using tape marks"
-msgstr "Impossible de lire séquentiellement le chemin d'origine de la sauvegarde : "
+msgstr ""
+"Impossible de lire séquentiellement le chemin d'origine de la sauvegarde : "
 
 #: src/libdar/escape_catalogue.cpp:142
 msgid ""
 "LAX MODE: Could not read in-place path information, assuming corruption "
 "occurred or no in-path place was present"
-msgstr "MODE RELAX : impossible de lire le chemin d'origine, une corruption de données a eu lieu ou aucun chemin n'est enregistré"
+msgstr ""
+"MODE RELAX : impossible de lire le chemin d'origine, une corruption de "
+"données a eu lieu ou aucun chemin n'est enregistré"
 
 #: src/libdar/escape_catalogue.cpp:152
 msgid ""
 "LAX MODE: unexpected exception met when reading in-path place using tape "
 "marks, ignoring in-path info and continuing"
-msgstr "MODE RELAX : exception inattendue lors de la lecture en mode séquentiel du chemin d'origine, on ignore la présence d'un chemin d'origine et on continue"
+msgstr ""
+"MODE RELAX : exception inattendue lors de la lecture en mode séquentiel du "
+"chemin d'origine, on ignore la présence d'un chemin d'origine et on continue"
 
 #: src/libdar/escape_catalogue.cpp:160
 msgid "Could not find tape mark for the in-place path"
-msgstr "Impossible de trouver la séquence d'échappement pour le chemin d'origine de la sauvegarde"
+msgstr ""
+"Impossible de trouver la séquence d'échappement pour le chemin d'origine de "
+"la sauvegarde"
 
 #: src/libdar/escape_catalogue.cpp:546
 msgid ""
@@ -4033,7 +4040,9 @@ msgstr ""
 #: src/libdar/i_archive.cpp:967 src/libdar/i_archive.cpp:1398
 msgid ""
 "Cannot use in-place restoration as no in-place path is stored in the archive"
-msgstr "Impossible d'utiliser le chemin d'origine pour la restoration car il est n'est enregistré dans l'archive"
+msgstr ""
+"Impossible d'utiliser le chemin d'origine pour la restoration car il est "
+"n'est enregistré dans l'archive"
 
 #: src/libdar/i_archive.cpp:1017
 msgid "Error while restoring data: "
@@ -4262,7 +4271,9 @@ msgstr "Erreur lors de la recherche d'informations pour %S : "
 msgid ""
 "Warning making a differential/incremental backup with a different root "
 "directory: %S <-> %S"
-msgstr "Attention création d'une archive différentielle/incrémentale avec un chemin racine (chemin d'origine) différent : %S <-> %S"
+msgstr ""
+"Attention création d'une archive différentielle/incrémentale avec un chemin "
+"racine (chemin d'origine) différent : %S <-> %S"
 
 #: src/libdar/i_archive.cpp:2432
 msgid "Processing files for backup..."
@@ -7584,7 +7595,8 @@ msgstr ""
 #: src/dar_suite/command_line.cpp:428
 msgid ""
 "-ap/--alter=place option is only available for restoration and comparison"
-msgstr "-ap/--alter=place n'est disponible que pour restoration et la comparaison"
+msgstr ""
+"-ap/--alter=place n'est disponible que pour restoration et la comparaison"
 
 #: src/dar_suite/command_line.cpp:430
 msgid "-ap/--alter=place option is incompatible with -R/--fs-root option"
