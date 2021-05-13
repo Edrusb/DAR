@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002-2020 Denis Corbin
+// Copyright (C) 2002-2021 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -165,6 +165,7 @@ struct line_param
     infinint iteration_count;     ///< iteration count used when creating/isolating/merging an encrypted archive (key derivation)
     hash_algo kdf_hash;           ///< hash algo used for key derivation function
     delta_sig_block_size delta_sig_len; ///< block len to used for delta signature computation
+    bool unix_sockets;            ///< whether to restore unix-sockets
 
 	// constructor for line_param
     line_param()

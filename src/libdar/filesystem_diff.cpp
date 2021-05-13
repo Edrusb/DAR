@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002-2020 Denis Corbin
+// Copyright (C) 2002-2021 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -119,10 +119,6 @@ extern "C"
 #include "fichier_local.hpp"
 #include "generic_rsync.hpp"
 #include "null_file.hpp"
-
-#ifndef UNIX_PATH_MAX
-#define UNIX_PATH_MAX 104
-#endif
 
 using namespace std;
 

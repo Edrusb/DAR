@@ -38,12 +38,12 @@
 
 <!ELEMENT File (Attributes)>
 <!ATTLIST File name CDATA #REQUIRED>             <!-- string, entry name             -->
-<!ATTLIST File size CDATA #REQUIRED>             <!-- decimal, file size in bytes    -->
+<!ATTLIST File size CDATA "" >                   <!-- decimal, file size in bytes    -->
 <!ATTLIST File stored CDATA "" >                 <!-- decimal, stored size in bytes  -->
 <!ATTLIST File crc CDATA "" >                    <!-- hexadecimal, crc sum of file   -->
-<!ATTLIST File dirty CDATA #REQUIRED>            <!-- string, whether file changed during backup -->
-<!ATTLIST File sparse CDATA #REQUIRED>	         <!-- string, whether file is sparse -->
-<!ATTLIST File delta_sig CDATA #REQUIRED>        <!-- string, whether delta signature is present -->
+<!ATTLIST File dirty CDATA "" >                  <!-- string, whether file changed during backup -->
+<!ATTLIST File sparse CDATA "" >	         <!-- string, whether file is sparse -->
+<!ATTLIST File delta_sig CDATA "" >              <!-- string, whether delta signature is present -->
 <!ATTLIST File patch_base_crc CDATA "">          <!-- hexadecimal, crc sum of the delta patch when present -->
 <!ATTLIST File patch_result_crc CDATA "">        <!-- hexadecimal, crc sum of the delta patch resulting file when present -->
 

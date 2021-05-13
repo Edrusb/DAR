@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002-2020 Denis Corbin
+// Copyright (C) 2002-2021 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -2295,7 +2295,7 @@ namespace libdar
 	{
 	    string err = tools_strerror_r(errno);
 
-	    throw Erange("tools_unlink", tools_printf(gettext("Error unlinking %S: %s"), &filename, &err));
+	    throw Erange("tools_unlink", tools_printf(gettext("Error unlinking %S: %S"), &filename, &err));
 	}
     }
 

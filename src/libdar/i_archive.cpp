@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002-2020 Denis Corbin
+// Copyright (C) 2002-2021 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -947,7 +947,8 @@ namespace libdar
 			       options.get_dirty_behavior(),
 			       options.get_only_deleted(),
 			       options.get_ignore_deleted(),
-			       options.get_fsa_scope());
+			       options.get_fsa_scope(),
+			       options.get_ignore_unix_sockets());
 	    }
 	    catch(Euser_abort & e)
 	    {

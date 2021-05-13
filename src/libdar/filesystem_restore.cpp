@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002-2020 Denis Corbin
+// Copyright (C) 2002-2021 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -123,10 +123,6 @@ extern "C"
 #include "compile_time_features.hpp"
 #include "op_tools.hpp"
 
-#ifndef UNIX_PATH_MAX
-#define UNIX_PATH_MAX 104
-#endif
-
 using namespace std;
 
 namespace libdar
@@ -221,16 +217,25 @@ namespace libdar
 	    current_dir->pop(tmp);
 	    if(!stack_dir.empty())
 	    {
-		if(!empty && stack_dir.back().get_restore_date())
+		try
 		{
-		    string chem = (current_dir->append(stack_dir.back().get_name())).display();
-		    filesystem_tools_make_date(stack_dir.back(), chem, what_to_check, get_fsa_scope());
-		    filesystem_tools_make_owner_perm(get_ui(), stack_dir.back(), chem, what_to_check, get_fsa_scope());
+		    if(!empty && stack_dir.back().get_restore_date())
+		    {
+			string chem = (current_dir->append(stack_dir.back().get_name())).display();
+			filesystem_tools_make_date(stack_dir.back(), chem, what_to_check, get_fsa_scope());
+			filesystem_tools_make_owner_perm(get_ui(), stack_dir.back(), chem, what_to_check, get_fsa_scope());
+		    }
 		}
+		catch(...)
+		{
+		    stack_dir.pop_back();
+		    throw;
+		}
+		stack_dir.pop_back();
 	    }
 	    else
 		throw SRC_BUG;
-	    stack_dir.pop_back();
+
 	    return;
 	}
 
@@ -1214,7 +1219,7 @@ namespace libdar
 	    stack_dir.pop_back();
 	}
 	if(stack_dir.size() > 0)
-    throw SRC_BUG;
+	    throw SRC_BUG;
     }
 
 

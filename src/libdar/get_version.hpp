@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002-2020 Denis Corbin
+// Copyright (C) 2002-2021 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -55,7 +55,7 @@ namespace libdar
 	///  libdar Medium version defined at compilation time
     constexpr U_I LIBDAR_COMPILE_TIME_MEDIUM = 2;
 	///  libdar Minor version defined at compilation time
-    constexpr U_I LIBDAR_COMPILE_TIME_MINOR = 7;
+    constexpr U_I LIBDAR_COMPILE_TIME_MINOR = 8;
 
 
 	////////////////////////////////////////////////////////////////////////
