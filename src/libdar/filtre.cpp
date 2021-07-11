@@ -3990,6 +3990,9 @@ namespace libdar
 			catch(...)
 			{
 			    val = pdesc.stack->get_crc(); // this keeps "" in a coherent status
+			    ino->fsa_set_crc(*val);
+			    ino->fsa_set_offset(start);
+				// and we also keep ino in a coherent status
 			    throw;
 			}
 
