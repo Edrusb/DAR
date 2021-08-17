@@ -1,3 +1,13 @@
+from 2.7.1 to 2.7.2
+- fixed bug met when a user command returns an error while dar is
+  saving an inode's fsa attributes (this conjunction make it a unfrequent
+  situation)
+- fixed typo in documentation
+- fixed remaining bug from 2.7.1 met when compiling dar/libdar with a
+  compiler (clang-5.0 here) that requires a flag to activate C++14 support
+  while complaining (for a good reason) when this flag is passed too while
+  compiling C code.
+
 from 2.7.0 to 2.7.1
 - fixed compilation script to require support for C++14 due to new features
   introduces in 2.7.0 that rely on modern C++ constructions. Updated
