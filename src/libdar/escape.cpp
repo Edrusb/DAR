@@ -852,10 +852,39 @@ namespace libdar
 
     void escape::inherited_truncate(const infinint & pos)
     {
-	x_below->truncate(pos);
-	if(pos < get_position())
-	  if(!skip(pos))
-	    throw SRC_BUG;
+	if(pos <= below_position) // truncating before the write_buffer
+	{
+	    write_buffer_size = 0; // dropping content of the write_buffer
+	    escaped_data_count_since_last_skip = 0;
+	    x_below->truncate(pos);
+	    below_position = x_below->get_position();
+	}
+	else if(below_position + write_buffer_size <= pos) // truncated after write_buffer
+	{
+	    x_below->truncate(pos);
+	    if(x_below->get_position() != below_position)
+		throw SRC_BUG; // current offset should not have changed
+
+		// escaped_data_count_since_last_skip is still valid, not resetting it
+	}
+	else // truncating in the middle of the write_buffer
+	{
+	    infinint i_buf_size = pos - below_position;
+	    U_I buf_size = 0;
+
+	    i_buf_size.unstack(buf_size);
+	    if(!i_buf_size.is_zero())
+		throw SRC_BUG;
+
+	    if(buf_size > write_buffer_size)
+		throw SRC_BUG; // not coherent with truncating inside the write_buffer
+	    write_buffer_size = buf_size;
+	    x_below->truncate(pos);
+	    if(x_below->get_position() != below_position)
+		throw SRC_BUG; // current offset should not have changed
+
+		// escaped_data_count_since_last_skip is still valid, not resetting it
+	}
     }
 
     char escape::type2char(sequence_type x)
