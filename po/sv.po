@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: sv\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612&atid=511612\n"
-"POT-Creation-Date: 2021-08-17 22:49+0200\n"
+"POT-Creation-Date: 2021-09-08 23:33+0200\n"
 "PO-Revision-Date: 2012-04-15 11:28+0200\n"
 "Last-Translator: Peter Landgren <peter.talken@telia.com>\n"
 "Language-Team: Swedish <kde-i18n-doc@kde.org>\n"
@@ -5250,7 +5250,7 @@ msgstr ""
 "Lägga till en tydlig escape-sekvens av typen 'seqt_not_a_sequence' är "
 "förbjudet"
 
-#: src/libdar/escape.cpp:931
+#: src/libdar/escape.cpp:960
 msgid "Unknown escape sequence type"
 msgstr "Okänd escape-sekvenstyp"
 
@@ -7493,8 +7493,8 @@ msgstr ""
 #: src/libdar/parallel_block_compressor.cpp:781
 #: src/libdar/parallel_block_compressor.cpp:795
 #: src/libdar/parallel_block_compressor.cpp:831
-#: src/libdar/block_compressor.cpp:300 src/libdar/block_compressor.cpp:315
-#: src/libdar/block_compressor.cpp:319 src/libdar/block_compressor.cpp:324
+#: src/libdar/block_compressor.cpp:305 src/libdar/block_compressor.cpp:320
+#: src/libdar/block_compressor.cpp:324 src/libdar/block_compressor.cpp:329
 msgid "incoherent compressed block structure, compressed data corruption"
 msgstr ""
 
@@ -7966,7 +7966,7 @@ msgstr "Fel vid jämförelse mellan arkiv och filsystem: "
 msgid "Library used for blowfish encryption does not respect RFC 3962"
 msgstr "Bibliotek, som används för blowfish-kryptering respekterar ej RFC 3962"
 
-#: src/libdar/block_compressor.cpp:303
+#: src/libdar/block_compressor.cpp:308
 msgid ""
 "incoherent compressed block structure, compressed block size in archive too "
 "large"
