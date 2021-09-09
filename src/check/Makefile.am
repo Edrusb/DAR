@@ -66,10 +66,13 @@ bnonzero_SOURCES = bnonzero.c
 clean-local:
 	rm -rf target_*
 	rm -f $(MY_MAKEFILE) $(MY_ENV)
-	rm -f compressible_file
+	rm -f compressible_file uncompressible_file
 
-all-local: compressible_file
+all-local: compressible_file uncompressible_file
 
 compressible_file: bnonzero
 	rm -f compressible_file
 	./bnonzero compressible_file 1 2048
+
+uncompressible_file:
+	bzip2 -c9 < `which sh` > uncompressible_file
