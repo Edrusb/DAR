@@ -26,7 +26,10 @@ if [ $# -ne 2 ] ; then
   exit 1
 fi
 
-COMP_FILE="`dirname $0`/compressible_file"
+DIRNAME=`pwd`/`dirname $0`
+
+COMP_FILE="$DIRNAME/compressible_file"
+UNCOMP_FILE="$DIRNAME/uncompressible_file"
 
 if [ ! -f $COMP_FILE ] ; then
     echo "missing file: $COMP_FILE"
@@ -87,5 +90,6 @@ ln blockdev blockdev_hard
 echo "another simple plain file" > plain_file2.txt
 chgrp root plain_file2.txt
 # need a bigger file to test compression, and a easy one but non-sparse to compress
-cp $COMP_FILE .
-
+cp "$COMP_FILE" .
+# need an uncompressible file to test skip back upon poor compression
+cp "$UNCOMP_FILE" .

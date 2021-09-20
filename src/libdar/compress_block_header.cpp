@@ -39,10 +39,17 @@ namespace libdar
 	size.dump(f);
     }
 
-    void compress_block_header::set_from(generic_file & f)
+    bool compress_block_header::set_from(generic_file & f)
     {
-	f.read(&type, 1);
-	size.read(f);
+	bool ret = (f.read(&type, 1) == 1);
+
+	if(ret)
+	    size.read(f);
+	    // if read() fails for size while
+	    // it succeeded for type, an exception
+	    // is thrown calling size.read(f)
+
+	return ret;
     }
 
 } // end of namespace

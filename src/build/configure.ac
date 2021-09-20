@@ -22,7 +22,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.69)
-AC_INIT([DAR], [2.7.1], [[http://sourceforge.net/tracker/?group_id=65612&atid=511612]])
+AC_INIT([DAR], [2.7.2], [[http://sourceforge.net/tracker/?group_id=65612&atid=511612]])
 AC_CONFIG_HEADERS([config.h])
 AC_LANG([C++])
 AC_CONFIG_SRCDIR([src/libdar/catalogue.cpp])
@@ -1302,7 +1302,7 @@ AS_IF(         [test "x$enable_libcurl_linking" != "xyes"],
                           AC_DEFINE(HAVE_LIBCURL, 1, [Libcurl library availability])
                         ])
 
-                  CPPFLAGS__cache="$CFLAGS"
+                  CPPFLAGS__cache="$CPPFLAGS"
                   CPPFLAGS="$LIBCURL_CFLAGS $CPPFLAGS"
                   LIBS___cache="$LIBS"
                   LIBS="$LIBCURL_LIBS $LIBS"
@@ -2067,13 +2067,13 @@ AS_IF(
 
 
 CPPFLAGS__cache="$CPPFLAGS"
-CPPFLAGS="$CPPFLAGS $GPGME_CFLAGS $LIBCURL_CFLAGS $LIBTHREADAR_CFLAGS $CXXSTDFLAGS"
+CPPFLAGS="$CPPFLAGS $GPGME_CFLAGS $LIBCURL_CFLAGS $LIBTHREADAR_CFLAGS"
 CXXFLAGS__cache="$CXXFLAGS"
 CXXFLAGS="$CXXFLAGS"
 LDFLAGS__cache="$LDFLAGS"
 LDFLAGS="$LDFLAGS -static"
 LIBS__cache="$LIBS"
-LIBS="$LIBS $GPGME_LIBS $LIBCURL_LIBS $LIBTHREADAR_LIBS $CXXSTDFLAGS"
+LIBS="$LIBS $GPGME_LIBS $LIBCURL_LIBS $LIBTHREADAR_LIBS"
 AC_MSG_CHECKING([static linking])
 AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                                                 #if HAVE_STDIO_H

@@ -289,7 +289,12 @@ namespace libdar
 	U_I bs;
 	compress_block_header bh;
 
-	bh.set_from(*compressed);
+	if(!bh.set_from(*compressed))
+	{
+	    current->reset();
+	    reof = true;
+	    return;
+	}
 
 	switch(bh.type)
 	{

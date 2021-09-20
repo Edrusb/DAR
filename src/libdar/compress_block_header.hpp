@@ -51,7 +51,13 @@ namespace libdar
 	    infinint size;         ///< size of the following compressed block of data
 
 	    void dump(generic_file & f);
-	    void set_from(generic_file & f);
+
+		/// read the block header from a generic_file (an archive)
+
+		/// \return true of a whole block header could be read.
+		/// False is returned only if no data could be read at all (eof)
+		/// else an exception is thrown
+	    bool set_from(generic_file & f);
 	};
 
 

@@ -1,3 +1,22 @@
+from 2.7.1 to 2.7.2
+- fixed bug met when a user command returns an error while dar is
+  saving fsa attributes of inodes (this conjunction make it an infrequent
+  situation)
+- fixed typo in documentation
+- fixed remaining bug from 2.7.1 met when compiling dar/libdar with a
+  compiler (clang-5.0 here) that requires a flag to activate C++14 support
+  while complaining (for a good reason) when this flag is passed too while
+  compiling C code.
+- fixed self reported bug escape.cpp line 858 met when using lzo compression
+  or multi-threaded compression while creating a backup to stdout.
+- fixed bug met when creating a backup to stdout that lead libdar to corrupt
+  data when trying to re-save a file uncompressed due to poor compression
+  result
+- fixed minor bug met when setting --mincompr to zero and using
+  block_compressor (lzo algo or any algo in block compression): empty files
+  were reported as truncated due to the lack of block header (compressed
+  empty file being stored as an empty file)
+
 from 2.7.0 to 2.7.1
 - fixed compilation script to require support for C++14 due to new features
   introduces in 2.7.0 that rely on modern C++ constructions. Updated
