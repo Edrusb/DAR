@@ -605,7 +605,7 @@ fi
 if echo $* | grep "G2" > /dev/null ; then
 mkfifo $todar
 mkfifo $toslave
-$DAR_SLAVE -i $toslave -o $todar $slave_digits $piped &
+$DAR_SLAVE -Q -i $toslave -o $todar $slave_digits $piped &
 GO "G2-1" 0 $ROUTINE_DEBUG $DAR -N -d - -R $src -B $OPT -i $todar -o $toslave
 fi
 
@@ -622,15 +622,15 @@ fi
 # H1 - modifying an archive with dar_xform
 #
 if echo $* | grep "H1" > /dev/null ; then
-GO "H1-1" 0 $ROUTINE_DEBUG $DAR_XFORM $hash_xform $xform_digits -s 1G $full $xformed1
+GO "H1-1" 0 $ROUTINE_DEBUG $DAR_XFORM -Q $hash_xform $xform_digits -s 1G $full $xformed1
 GO "H1-2" 0 $ROUTINE_DEBUG check_hash $hash $xformed1.*.dar
 GO "H1-3" 0 $ROUTINE_DEBUG $DAR -N -t $xformed1 -B $OPT
 GO "H1-4" 0 $ROUTINE_DEBUG $DAR -N -t $xformed1 -A $catf_fly -B $OPT
-GO "H1-5" 0 $ROUTINE_DEBUG $DAR_XFORM $hash_xform $xform_digits $xformed1 $xformed2
+GO "H1-5" 0 $ROUTINE_DEBUG $DAR_XFORM -Q $hash_xform $xform_digits $xformed1 $xformed2
 GO "H1-6" 0 $ROUTINE_DEBUG check_hash $hash $xformed2.*.dar
 GO "H1-7" 0 $ROUTINE_DEBUG $DAR -N -t $xformed2 -A $catf_fly -B $OPT
 if [ ! -z "$slicing" ] ; then
-GO "H1-8" 0 $ROUTINE_DEBUG $DAR_XFORM $hash_xform $slicing $xform_digits $xformed2 $xformed3
+GO "H1-8" 0 $ROUTINE_DEBUG $DAR_XFORM -Q $hash_xform $slicing $xform_digits $xformed2 $xformed3
 GO "H1-9" 0 $ROUTINE_DEBUG check_hash $hash $xformed3.*.dar
 GO "H1-A" 0 $ROUTINE_DEBUG $DAR -N -t $xformed3 -A $catf_fly -B $OPT
 GO "H1-B" 0 $ROUTINE_DEBUG $DAR -N -t $xformed3 -B $OPT
