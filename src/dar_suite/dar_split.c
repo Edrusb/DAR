@@ -231,10 +231,10 @@ static void usage(char *a)
     fprintf(stderr, "\nusage: %s [-b <block size>] [-r <rate>] { [-c <count>] %s | [-s] %s } <filename>\n\n", a, KEY_INPUT, KEY_OUTPUT);
     fprintf(stderr, "- in %s mode, the data sent to %s's input is copied to the given filename\n  which may possibly be a non permanent output (retrying to write in case of failure)\n", KEY_OUTPUT, a);
     fprintf(stderr, "- in %s mode, the data is read from the given filename which may possibly\n  be non permanent input (retrying to read in case of failure) and copied to\n  %s's output\n", KEY_INPUT, a);
-    fprintf(stderr, "\nThe -s option for %s mode leads %s to make SYNC writes, this avoid\n  operating system's caching to wrongly report a write as successful. This flag\n  reduces write performances but may be necessary when the end of tape is not\n  properly detected by %s\n", KEY_OUTPUT, a, a);
+    fprintf(stderr, "\nThe -s option for %s mode leads %s to issue SYNC writes, this avoids\n  the operating system's caching to wrongly report a write as successful.\n  This flag reduces write performances but may be necessary when the end of tape is not\n  properly detected by %s\n", KEY_OUTPUT, a, a);
     fprintf(stderr, "With -b option the amount of bytes sent per read or write system call does\n  not exceed this amount in byte\n");
     fprintf(stderr, "With -r option the transfer is limited to the given byte/second rate\n");
-    fprintf(stderr, "With -c option dar_split will assume there is at most <count> tape and not ask\n   for further \n");
+    fprintf(stderr, "With -c option dar_split will assume there is at most <count> tapes and not ask\n   for further ones\n");
 }
 
 static void show_version(char *a)
@@ -257,7 +257,7 @@ static int init()
     fd_inter = open(tty, O_RDONLY);
     if(fd_inter < 0)
     {
-	fprintf(stderr, "Cannot open filedscriptor to provide user interaction: %s\n", strerror(errno));
+	fprintf(stderr, "Cannot open filedescriptor to provide user interaction: %s\n", strerror(errno));
 	return 0; /* false */
     }
     else
@@ -305,7 +305,7 @@ static void stop_and_wait()
 
 static void pipe_handle_pause(int x)
 {
-    fprintf(stderr, "No reader to pipe we output data to, do something!\n");
+    fprintf(stderr, "No reader to pipe the output data to, do something!\n");
     stop_and_wait();
 }
 
@@ -384,7 +384,7 @@ static void normal_read_to_multiple_write(char *filename, int sync_mode, unsigne
 			sync();
 #endif
 			close(fd);
-			fprintf(stderr, "No space left on destination after having written %lu bytes, please to something!\n", (unsigned long)tape_size);
+			fprintf(stderr, "No space left on destination after having written %lu bytes, please do something!\n", (unsigned long)tape_size);
 			tape_size = 0;
 			step = lu;
 			stop_and_wait();
