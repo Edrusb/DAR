@@ -432,7 +432,7 @@ namespace libdar
 			    if(fsa_restored)
 				st.incr_fsa_treated();
 			}
-			else // oject not covered by filters
+			else // object not covered by filters
 			{
 			    if(display_skipped)
 			    {

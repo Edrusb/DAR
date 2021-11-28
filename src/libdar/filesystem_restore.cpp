@@ -399,7 +399,7 @@ namespace libdar
 							     get_fsa_scope());
 			}
 
-			    // 6 - trying re-setting EA after awnership restoration to set back linux capabilities
+			    // 6 - trying re-setting EA after ownership restoration to set back linux capabilities
 
 			if(has_ea_saved && !empty)
 			{

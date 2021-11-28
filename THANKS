@@ -22,6 +22,11 @@ out of source code directory. Thanks again to Zach Adams for security
 enhancement suggestions. Thanks to Andrea Vai for his review of the
 the benchmark document.
 
+version 2.6.16
+--------------
+A big thank to John Goerzen for feedback and help providing means to easily
+reproduce and troubleshooting the bug he reported.
+
 version 2.6.15
 --------------
 Thanks to Stefan Hammerl for feedback and fix.
