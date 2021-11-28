@@ -117,6 +117,39 @@ namespace libdar
 	recursive_has_changed = true; // need to call recursive_has_changed_update() first if this fields has to be used
 	updated_sizes = false;
 
+	if(only_detruit)
+	{
+		// only detruit is used in sequential read mode
+		// when the in-lined metadata has been completely
+		// read. Then catalogue at end of file is read
+		// using "only_detruit" to build a directory tree
+		// only containing the detruit objects (file removed
+		// since backup of reference was made).
+		//
+		// if sequential read mode is used over a pipe
+		// we must drop the EA and FSA of the directories,
+		// to avoid having the calling filtre_restore routine
+		// to try restoring them. First they have already been
+		// restored during the in-lined data/metadata reading
+		// of the backup and doing so here would lead the
+		// fitre_restore to ask to skip backward in the archive
+		// to fetch EA and FSA
+		//
+		// if the underlying structure is a pipe, this will
+		// fail, leading dar warning that skipping backward
+		// on a pipe is not possible.
+		//
+		// for that reason, in "only_detruit" mode the catalogue
+		// need to drop all EA and FSA of its directories
+		// this is what is done here:
+
+	    if(ea_get_saved_status() == ea_saved_status::full)
+		ea_set_saved_status(ea_saved_status::partial);
+
+	    if(fsa_get_saved_status() == fsa_saved_status::full)
+		fsa_set_saved_status(fsa_saved_status::partial);
+	}
+
 	try
 	{
 	    while(fin == nullptr && !lax_end)
