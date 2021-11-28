@@ -1,3 +1,10 @@
+from 2.6.15 to 2.6.16
+- fixed bug met when restoring files in sequential-read mode and feeding
+  the backup to dar on its stdin: When dar had to remove a file that had
+  been deleted at the time of the backup since the backup of reference
+  was made, dar aborted the restoration reporting it could not skip
+  backward on a pipe.
+
 from 2.6.14 to 2.6.15
 - fixed error message formatting error leading message to contain garbage
   in place of system error information.
