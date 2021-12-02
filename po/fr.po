@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: DAR 2.6.0\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612&atid=511612\n"
-"POT-Creation-Date: 2021-09-20 20:49+0200\n"
+"POT-Creation-Date: 2021-12-02 19:09+0100\n"
 "PO-Revision-Date: 2021-05-13 16:50+0200\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
@@ -8708,7 +8708,7 @@ msgstr "%S [%c] [ ENTREÉ SUPPR. ] (%S)  %S"
 msgid "      Extended Attribute: ["
 msgstr "      Attribut Étendu : ["
 
-#: src/libdar/cat_directory.cpp:142
+#: src/libdar/cat_directory.cpp:175
 msgid ""
 "LAX MODE: Error met building a catalogue entry, skipping this entry and "
 "continuing. Skipped error is: "
@@ -8716,11 +8716,11 @@ msgstr ""
 "MODE RELAX : Erreur lors de la construction d'une entrée du catalogue, on "
 "ignore et on passe à la suivante. L'erreur rencontrée était : "
 
-#: src/libdar/cat_directory.cpp:185
+#: src/libdar/cat_directory.cpp:218
 msgid "missing data to build a cat_directory"
 msgstr "il manque des données pour construire un répertoire"
 
-#: src/libdar/cat_directory.cpp:443
+#: src/libdar/cat_directory.cpp:476
 #, c-format
 msgid "Cannot remove nonexistent entry %S from catalogue"
 msgstr "Ne peut pas supprimer l'entrée %S du catalogue car elle n'y existe pas"

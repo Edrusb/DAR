@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: sv\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612&atid=511612\n"
-"POT-Creation-Date: 2021-09-20 20:49+0200\n"
+"POT-Creation-Date: 2021-12-02 19:09+0100\n"
 "PO-Revision-Date: 2012-04-15 11:28+0200\n"
 "Last-Translator: Peter Landgren <peter.talken@telia.com>\n"
 "Language-Team: Swedish <kde-i18n-doc@kde.org>\n"
@@ -8417,7 +8417,7 @@ msgstr "%S [%c] [ FLYTTAD ENTRY ] (%S)  %S\n"
 msgid "      Extended Attribute: ["
 msgstr "      Extended Attribut: ["
 
-#: src/libdar/cat_directory.cpp:142
+#: src/libdar/cat_directory.cpp:175
 msgid ""
 "LAX MODE: Error met building a catalogue entry, skipping this entry and "
 "continuing. Skipped error is: "
@@ -8425,12 +8425,12 @@ msgstr ""
 "LAX MODE: fel vid skapnde av mapp, hoppar över detta data och fortsätter. "
 "Överhoppat fel var: "
 
-#: src/libdar/cat_directory.cpp:185
+#: src/libdar/cat_directory.cpp:218
 #, fuzzy
 msgid "missing data to build a cat_directory"
 msgstr "data saknas till att bygga en mapp"
 
-#: src/libdar/cat_directory.cpp:443
+#: src/libdar/cat_directory.cpp:476
 #, c-format
 msgid "Cannot remove nonexistent entry %S from catalogue"
 msgstr "Kan ej flytta obefintligt data %S från katalog"
