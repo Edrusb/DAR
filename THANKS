@@ -1,6 +1,8 @@
 version 2.7.3
 -------------
-Thanks to yhaenggi at github for feedback and patch
+Thanks to yhaenggi at github for feedback and patch. Thanks to
+"Ole G" at sourceforge for feedback about issues with the windows
+binary.
 
 version 2.7.2
 --------------
