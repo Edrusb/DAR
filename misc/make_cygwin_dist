@@ -15,22 +15,22 @@ set version=$1
 set winflavor=$2
 set darflavor=$3
 
-if (-z "$LDFLAGS") then
-  setenv LDFLAGS -L/usr/local/lib
+if (! $?LDFLAGS) then
+  setenv LDFLAGS "-L/usr/local/lib"
 else
-  setenv LDFLAGS "LDFLAGS:-L/usr/local/lib"
+  setenv LDFLAGS "${LDFLAGS}:-L/usr/local/lib"
 endif
 
-if (-z "$LD_LIBRARY_PATH") then
-  setenv LD_LIBRARY_PATH /usr/local/lib
+if (! $?LD_LIBRARY_PATH) then
+  setenv LD_LIBRARY_PATH "/usr/local/lib"
 else
-  setenv LD_LIBRARY_PATH "$LD_LIBRARY_PATH:/usr/local/lib"
+  setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:/usr/local/lib"
 endif
 
-if(-z "$CXXFLAGS") then
-  setenv CXXFLAGS -I/usr/local/include
+if(! $?CXXFLAGS) then
+  setenv CXXFLAGS "-I/usr/local/include"
 else
-  setenv CXXFLAGS "$CXXFLAGS:-I/usr/local/include"
+  setenv CXXFLAGS "${CXXFLAGS}:-I/usr/local/include"
 endif
 
 set dir_name="dar$darflavor-$version-$winflavor"
