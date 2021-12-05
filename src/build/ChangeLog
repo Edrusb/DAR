@@ -5,6 +5,7 @@ from 2.7.2 to 2.7.3
   was made, dar aborted the restoration reporting it could not skip
   backward on a pipe.
 - fixed several typos in bug, messages and comments
+- fixed script used to build windows binary to match recent cygwin dll
 
 from 2.7.1 to 2.7.2
 - fixed bug met when a user command returns an error while dar is
