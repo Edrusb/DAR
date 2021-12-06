@@ -18,7 +18,7 @@ set darflavor=$3
 if (! $?LDFLAGS) then
   setenv LDFLAGS "-L/usr/local/lib"
 else
-  setenv LDFLAGS "${LDFLAGS}:-L/usr/local/lib"
+  setenv LDFLAGS "${LDFLAGS} -L/usr/local/lib"
 endif
 
 if (! $?LD_LIBRARY_PATH) then
@@ -30,7 +30,7 @@ endif
 if(! $?CXXFLAGS) then
   setenv CXXFLAGS "-I/usr/local/include"
 else
-  setenv CXXFLAGS "${CXXFLAGS}:-I/usr/local/include"
+  setenv CXXFLAGS "${CXXFLAGS} -I/usr/local/include"
 endif
 
 set dir_name="dar$darflavor-$version-$winflavor"
