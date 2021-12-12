@@ -867,7 +867,7 @@ If entries are not of the same type, if the 'to be added' entry is a directory t
 -/ "{!T}[{~D}[Oo] Pp] ; Aa"
 In this case instead, if entry are of the same type, the user will be asked what to.
 .TP 5
--/ "{!T|!I}[{R}[Pp] Oo] {S}[{~S}[{R}[P*] O*] P*] {~S}[O*] {R}[P*] O*] ; {s}[{~s}[{r}[*p] *o] *p] {~s}[*o] {r}[*p] *o]"
+-/ "{!T|!I}[{R}[Pp] Oo] {I&~I}[{S}[{~S}[{R}[P*] O*] P*] {~S}[O*] {R}[P*] O* ; {s}[{~s}[{r}[*p] *o] *p] {~s}[*o] ] {r}[*p] *o"
 Well this may seems a bit too complex but just see it as an illustration of what is possible to do: If both 'in place' and 'to be added' are not of the same type we keep data and EA of the most recent file (last modification date). Else, both are of the same type. If both are inode we evaluate a two expressions chain (expressions are separated by a semi-column ';') we will see in detail further. Else if they are of same type but are not inode we take the EA and data of the most recent entry (this is the last 10 chars of the string). Well, now let's see the case of inode: The first expression in the chain sets the action for data and keep the action for EA undefined. While the seconds, is the exact equivalent but instead it leaves the action for data undefined '*' and set the action for EA. These two expressions follow the same principle: If both entries are saved (by opposition to be marked as unchanged since the archive of reference) in the archives, the most recent EA/Data is kept, else, the one of the inode that is saved is kept, but if none is saved in the archive the most recent entry (mtime/ctime) is kept.
 .RE
 .TP 20
