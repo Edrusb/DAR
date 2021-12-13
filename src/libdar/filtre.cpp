@@ -3461,7 +3461,7 @@ namespace libdar
 				{
 				    infinint current_pos_tmp = pdesc.stack->get_position();
 
-				    if(current_pos_tmp <= rewinder)
+				    if(current_pos_tmp < rewinder)
 					throw SRC_BUG; // we are positionned before the start of the current inode dump!
 				    if(pdesc.stack->skippable(generic_file::skip_backward, current_pos_tmp - rewinder))
 				    {
