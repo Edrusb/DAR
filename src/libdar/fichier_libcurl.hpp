@@ -90,7 +90,7 @@ namespace libdar
 	fichier_libcurl & operator = (fichier_libcurl && ref) = delete;
 
 	    /// destructor
-	~fichier_libcurl() noexcept { detruit(); };
+	~fichier_libcurl() noexcept { kill(); join(); detruit(); };
 
 	    /// change the permission of the file
 	virtual void change_permission(U_I perm) override;

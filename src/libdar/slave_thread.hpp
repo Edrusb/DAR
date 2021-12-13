@@ -59,7 +59,7 @@ namespace libdar
 	slave_thread(slave_thread && ref) noexcept = delete;
 	slave_thread & operator = (const slave_thread & ref) = delete;
 	slave_thread & operator = (slave_thread && ref) noexcept = delete;
-	~slave_thread() noexcept {};
+	~slave_thread() noexcept { kill(); join(); };
 
 	    /// true if the thread has suspended waiting for a new order (no data to write, no read_ahead to perform)
 	bool wake_me_up() const { if(wake_me) { const_cast<slave_thread *>(this)->wake_me = false; return true; } else return false; };
