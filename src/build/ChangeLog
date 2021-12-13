@@ -4,6 +4,9 @@ from 2.6.15 to 2.6.16
   been deleted at the time of the backup since the backup of reference
   was made, dar aborted the restoration reporting it could not skip
   backward on a pipe.
+- adding call to kill() then join() in destructor of class slave_thread
+  and fichier_libcurl to avoid the risk of SEGFAULT in rare conditions
+  under Cygwin (Windows)
 
 from 2.6.14 to 2.6.15
 - fixed error message formatting error leading message to contain garbage
