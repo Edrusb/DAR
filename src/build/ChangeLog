@@ -7,6 +7,9 @@ from 2.6.15 to 2.6.16
 - adding call to kill() then join() in destructor of class slave_thread
   and fichier_libcurl to avoid the risk of SEGFAULT in rare conditions
   under Cygwin (Windows)
+- fixed bug met when removing tape marks (-at option) and due to poor
+  compression, dar skips back to resave file uncompressed leading to
+  self reported bug (due to an error in the sanity check).
 
 from 2.6.14 to 2.6.15
 - fixed error message formatting error leading message to contain garbage
