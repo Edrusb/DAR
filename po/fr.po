@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: DAR 2.6.0\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612&atid=511612\n"
-"POT-Creation-Date: 2021-12-02 19:09+0100\n"
+"POT-Creation-Date: 2021-12-13 23:01+0100\n"
 "PO-Revision-Date: 2021-05-13 16:50+0200\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
@@ -7745,9 +7745,9 @@ msgstr ""
 msgid "No mask available"
 msgstr "Aucun masque disponible"
 
-#: src/libdar/parallel_block_compressor.cpp:781
-#: src/libdar/parallel_block_compressor.cpp:795
-#: src/libdar/parallel_block_compressor.cpp:831
+#: src/libdar/parallel_block_compressor.cpp:801
+#: src/libdar/parallel_block_compressor.cpp:815
+#: src/libdar/parallel_block_compressor.cpp:851
 #: src/libdar/block_compressor.cpp:305 src/libdar/block_compressor.cpp:320
 #: src/libdar/block_compressor.cpp:324 src/libdar/block_compressor.cpp:329
 msgid "incoherent compressed block structure, compressed data corruption"
