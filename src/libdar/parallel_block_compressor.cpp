@@ -107,10 +107,10 @@ namespace libdar
             // creating the worker threads objects
 
         for(U_I i = 0 ; i < num_w ; ++i)
-            travailleurs.push_back(zip_worker(disperse,
-                                              rassemble,
-                                              zipper->clone(),
-                                              get_mode() == gf_write_only));
+            travailleurs.push_back(make_unique<zip_worker>(disperse,
+							   rassemble,
+							   zipper->clone(),
+							   get_mode() == gf_write_only));
 
             // no other thread than the one executing this code is running at this point!!!
     }
@@ -435,8 +435,13 @@ namespace libdar
                 // exception
 
             reader->join();
-            for(deque<zip_worker>::iterator it = travailleurs.begin(); it != travailleurs.end(); ++it)
-                it->join();
+            for(deque<unique_ptr<zip_worker> >::iterator it = travailleurs.begin(); it != travailleurs.end(); ++it)
+	    {
+		if((*it) != nullptr)
+		    (*it)->join();
+		else
+		    throw SRC_BUG;
+	    }
         }
     }
 
@@ -459,8 +464,13 @@ namespace libdar
                 send_flag_to_workers(compressor_block_flags::eof_die);
 
                 writer->join();
-                for(deque<zip_worker>::iterator it = travailleurs.begin(); it !=travailleurs.end(); ++it)
-                    it->join();
+                for(deque<unique_ptr<zip_worker> >::iterator it = travailleurs.begin(); it !=travailleurs.end(); ++it)
+		{
+		    if((*it) != nullptr)
+			(*it)->join();
+		    else
+			throw SRC_BUG;
+		}
             }
         }
     }
@@ -492,8 +502,13 @@ namespace libdar
                 throw SRC_BUG;
             reader->reset();
             reader->run();
-            for(deque<zip_worker>::iterator it = travailleurs.begin(); it !=travailleurs.end(); ++it)
-                it->run();
+            for(deque<unique_ptr<zip_worker> >::iterator it = travailleurs.begin(); it !=travailleurs.end(); ++it)
+	    {
+		if((*it) != nullptr)
+		    (*it)->run();
+		else
+		    throw SRC_BUG;
+	    }
             running_threads = true;
         }
     }
@@ -508,8 +523,13 @@ namespace libdar
                 throw SRC_BUG;
             writer->reset();
             writer->run();
-            for(deque<zip_worker>::iterator it = travailleurs.begin(); it !=travailleurs.end(); ++it)
-                it->run();
+            for(deque<unique_ptr<zip_worker> >::iterator it = travailleurs.begin(); it !=travailleurs.end(); ++it)
+	    {
+		if((*it) != nullptr)
+		    (*it)->run();
+		else
+		    throw SRC_BUG;
+	    }
             running_threads = true;
         }
     }

@@ -208,7 +208,7 @@ namespace libdar
 
 	std::unique_ptr<zip_below_read> reader;
 	std::unique_ptr<zip_below_write> writer;
-	std::deque<zip_worker> travailleurs;
+	std::deque<std::unique_ptr<zip_worker> > travailleurs;
 
 
 	    // private methods
@@ -244,6 +244,8 @@ namespace libdar
 			generic_file *dest,
 			const std::shared_ptr<heap<crypto_segment> > & xtas,
 			U_I num_workers);
+
+	~zip_below_write() { kill(); join(); };
 
 
 	    /// consulted by the main thread, set to true by the zip_below_write thread
@@ -292,6 +294,8 @@ namespace libdar
 		       const std::shared_ptr<heap<crypto_segment> > & xtas,
 		       U_I num_workers);
 
+	~zip_below_read() { kill(); join(); };
+
 	    /// this will trigger the sending of N eof_die blocks and thread termination
 	void do_stop() { should_i_stop = true; };
 
@@ -332,6 +336,8 @@ namespace libdar
 		   std::shared_ptr<libthreadar::ratelier_gather <crypto_segment> > & write_size,
 		   std::unique_ptr<compress_module> && ptr,
 		   bool compress);
+
+	~zip_worker() { kill(); join(); };
 
     protected:
 	virtual void inherited_run() override;

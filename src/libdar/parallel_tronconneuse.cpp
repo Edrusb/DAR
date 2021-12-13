@@ -120,11 +120,11 @@ namespace libdar
 		// creating and running the sub-thread objects
 
 	    for(U_I i = 0; i < workers; ++i)
-		travailleur.push_back(crypto_worker(scatter,
-						    gather,
-						    waiter,
-						    crypto->clone(),
-						    get_mode() == gf_write_only)
+		travailleur.push_back(make_unique<crypto_worker>(scatter,
+								 gather,
+								 waiter,
+								 crypto->clone(),
+								 get_mode() == gf_write_only)
 		    );
 
 	    switch(get_mode())
@@ -1157,10 +1157,13 @@ namespace libdar
 	lus_eof = false;
 	check_bytes_to_skip = true;
 
-	deque<crypto_worker>::iterator it = travailleur.begin();
+	deque<unique_ptr<crypto_worker> >::iterator it = travailleur.begin();
 	while(it != travailleur.end())
 	{
-	    it->run();
+	    if((*it) != nullptr)
+		(*it)->run();
+	    else
+		throw SRC_BUG;
 	    ++it;
 	}
 
@@ -1215,11 +1218,14 @@ namespace libdar
 
     void parallel_tronconneuse::join_workers_only()
     {
-	deque<crypto_worker>::iterator it = travailleur.begin();
+	deque<unique_ptr<crypto_worker> >::iterator it = travailleur.begin();
 
 	while(it != travailleur.end())
 	{
-	    it->join();
+	    if((*it)  != nullptr)
+		(*it)->join();
+	    else
+		throw SRC_BUG;
 	    ++it;
 	}
     }

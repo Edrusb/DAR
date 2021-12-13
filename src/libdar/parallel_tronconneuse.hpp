@@ -53,8 +53,8 @@ namespace libdar
         /// \addtogroup Private
         /// @{
 
-        // those class are used the parallel_tronconneuse class to wrap the different
-        // type of threads. They are defined after the parallel_tronconneuse definition
+        // those class are used by the parallel_tronconneuse class to wrap the different
+        // type of threads. They are defined just after the parallel_tronconneuse definition
     class read_below;
     class write_below;
     class crypto_worker;
@@ -228,7 +228,7 @@ namespace libdar
 
             // the child threads
 
-        std::deque<crypto_worker> travailleur;
+        std::deque<std::unique_ptr<crypto_worker> > travailleur;
         std::unique_ptr<read_below> crypto_reader;
         std::unique_ptr<write_below> crypto_writer;
 
@@ -335,7 +335,7 @@ namespace libdar
             trailing_clear_data(nullptr)
         { flag = tronco_flags::normal; };
 
-        ~read_below() { if(ptr) tas->put(move(ptr)); };
+        ~read_below() { if(ptr) tas->put(move(ptr)); kill(); join(); };
 
             /// let the caller give a callback function that given a generic_file with mixed cyphered and clear data, is able
             /// to return the offset of the first clear byte located *after* all the cyphered data, this
@@ -454,6 +454,8 @@ namespace libdar
 	    error_block(0)
 	{ if(encrypted == nullptr) throw SRC_BUG; };
 
+	~write_below() { kill(); join(); };
+
 	bool exception_pending() const { return error; };
 	const infinint & get_error_block() const { return error_block; };
 
@@ -498,6 +500,8 @@ namespace libdar
 	    do_encrypt(encrypt),
 	    abort(status::fine)
 	{ if(!reader || !writer || !waiting || !crypto) throw SRC_BUG; };
+
+	virtual ~crypto_worker() { kill(); join(); };
 
     protected:
 	virtual void inherited_run() override;
