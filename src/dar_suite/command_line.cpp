@@ -855,7 +855,7 @@ static bool get_args_recursive(recursive_param & rec,
                 if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(p.filename != "" || p.sauv_root != nullptr)
-                    throw Erange("get_args", gettext(" Only one option of -c -d -t -l -C -x or -+ is allowed"));
+                    throw Erange("get_args", gettext(" Only one option of -c -d -t -l -C -x -+ or -y is allowed"));
                 if(string(optarg) != string(""))
 		{
 		    string path_basename;
