@@ -1,3 +1,7 @@
+from 2.7.3 to 2.7.4
+- fixed excessive context control that led libdar to report a bug
+  when an filesystem I/O error was returned but the operating system
+
 from 2.7.2 to 2.7.3
 - fixed bug met when restoring files in sequential-read mode and feeding
   the backup to dar on its stdin: When dar had to remove a file that had
