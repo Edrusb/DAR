@@ -521,12 +521,20 @@ namespace libdar
     void cache::inherited_truncate(const infinint & pos)
     {
 	if(pos >= buffer_offset + last) // truncate after the cache
-	    ref->truncate(pos); // no impact on the cached data
-	else if(pos < buffer_offset) // truncate before the cache
 	{
+	    flush_write(); // writing pending data if any
 	    next = 0;   // emptying the cache
 	    last = 0;   // emptying the cache
+	    ref->truncate(pos);
+	    buffer_offset = ref->get_position();
+	    if(buffer_offset != pos)
+		throw SRC_BUG;
+	}
+	else if(pos < buffer_offset) // truncate before the cache
+	{
 	    first_to_write = size; // dropping data pending for writing
+	    next = 0;   // emptying the cache
+	    last = 0;   // emptying the cache
 	    ref->truncate(pos);
 	    buffer_offset = ref->get_position();
 	    if(buffer_offset != pos)
@@ -544,69 +552,75 @@ namespace libdar
 
 	    if(first_to_write < size) // some data was pending for writing
 	    {
-		if(first_to_write >= max_off) // but since this truncate request there is nothing more pending for writing
+		if(first_to_write >= max_off) // but after this truncate request there will be nothing pending for writing
 		{
 		    U_I backward = first_to_write - max_off;
 
 		    first_to_write = size; // disabling first_to_write
-		    if(backward > 0
-		       && ref->skippable(generic_file::skip_backward, backward))
+		    if(last > max_off)
+			last = max_off;
+		    if(next > max_off)
+			next = max_off;
+		    if(backward > 0)
 		    {
-			if(ref->truncatable(pos))
-			    ref->truncate(pos);
-			    // else we will overwrite assuming we can skip back to "pos":
+			ref->truncate(pos);
 			if(ref->get_position() != pos)
 			    throw SRC_BUG; // position should be moved backward to the new EOF
 		    }
-		    else
-			throw SRC_BUG;
-			// cannot skip ref to the new requested EOF
-			// escape::truncatable() should have prevented this call
-			// to truncate() or it has not been invoked just before!
-		}
-		// else some data still pending for writing:
-		// we must not propagate the truncate() call
-		// to the underlying layer, as it has not
-		// yet reached this offset (or maybe if
-		// skipping backward was performed earlier
-		// but some data is pending to write and we
-		// must not change the offset of the layer
-		// below until it has not been written.
-	    }
-	    else // all data up to "next" was written to "ref"
-	    {
-		if(next > max_off) // truncating below the last written byte
-		{
-		    U_I backward = next - max_off;
-
-		    if(backward > 0
-		       && ref->skippable(generic_file::skip_backward, backward))
-		    {
-			if(ref->truncatable(pos))
-			    ref->truncate(pos);
-			    // else we will overwrite assuming we ca skop back to "pos":
-			if(ref->get_position() != pos)
-			    throw SRC_BUG; // position should be moved backward to the new EOF
-		    }
-		    else
-			throw SRC_BUG;
-			// see comment above for first_to_write
+			// else nothing to do
+			// there is no need to skip backward the
+			// underlying object pointed to by "ref"
+			// the truncate() only takes place in the
+			// data pending for writing in the cache
 		}
 		else
 		{
-			// we don't need to skip back
-			// as we truncate after the current
-			// position but we have to propagate truncate
-			// if supported:
-		    if(ref->truncatable(pos))
-			ref->truncate(pos);
+			// truncate takes either in the middle or
+			// after data pending for writing
+
+		    if(last > max_off)
+			last = max_off;
+		    if(next > max_off)
+			next = max_off;
+
+			// we have not to propagate the truncate() call
+			// to the underlying layer, as it has not
+			// yet reached this offset (or maybe if
+			// skipping backward was performed earlier
+			// but some data is pending to write and we
+			// must not change the offset of the layer
+			// below until it has not been written.
 		}
 	    }
+	    else // all data up to "next" was written to "ref"
+	    {
+		if(next > max_off) // truncating before the last written byte
+		{
+		    U_I backward = next - max_off;
 
-	    if(last > max_off)
-		last = max_off;
-	    if(next > max_off)
-		next = max_off;
+		    if(last > max_off)
+			last = max_off;
+		    if(next > max_off)
+			next = max_off;
+		    if(backward > 0)
+		    {
+			ref->truncate(pos);
+			if(ref->get_position() != pos)
+			    throw SRC_BUG; // position should be moved backward to the new EOF
+		    }
+			// else nothing to do as seen above when
+			// first_to_write < size
+		}
+		else // truncating after the last written byte, we clear the cache to avoid skipping
+		{
+		    next = 0;   // emptying the cache
+		    last = 0;   // emptying the cache
+		    ref->truncate(pos);
+		    buffer_offset = ref->get_position();
+		    if(buffer_offset != pos)
+			throw SRC_BUG;
+		}
+	    }
 	}
     }
 
