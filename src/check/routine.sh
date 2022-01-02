@@ -2,7 +2,7 @@
 
 #######################################################################
 # dar - disk archive - a backup/restoration program
-# Copyright (C) 2002-2021 Denis Corbin
+# Copyright (C) 2002-2022 Denis Corbin
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
