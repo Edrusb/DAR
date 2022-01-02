@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: sv\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612MSGID_BUGS_ADDRESS =atid=511612\n"
-"POT-Creation-Date: 2021-12-13 22:52+0100\n"
+"POT-Creation-Date: 2022-01-02 12:18+0100\n"
 "PO-Revision-Date: 2012-04-15 11:28+0200\n"
 "Last-Translator: Peter Landgren <peter.talken@telia.com>\n"
 "Language-Team: Swedish <kde-i18n-doc@kde.org>\n"
@@ -1888,7 +1888,8 @@ msgid "Parse error: "
 msgstr "Analysfel: "
 
 #: src/dar_suite/command_line.cpp:858
-msgid " Only one option of -c -d -t -l -C -x or -+ is allowed"
+#, fuzzy
+msgid " Only one option of -c -d -t -l -C -x -+ or -y is allowed"
 msgstr " Endast ett alternativ av -c -d -t -l -C -x eller -+ är tillåtet"
 
 #: src/dar_suite/command_line.cpp:911
