@@ -8,7 +8,7 @@ from 2.6.15 to 2.6.16
   and fichier_libcurl to avoid the risk of SEGFAULT in rare conditions
   under Cygwin (Windows)
 - fixed bug met when removing tape marks (-at option) and due to poor
-  compression, dar skips back to resave file uncompressed leading to
+  compression, dar skips back to re-save file uncompressed leading to
   self reported bug (due to an error in the sanity check).
 - fixing error message display by dar when -y option is used with another
   command (-c/-t/-l/-d/-x/-+/-C)
