@@ -54,6 +54,8 @@ namespace libdar
 	    return "sha512";
 	case hash_algo::argon2:
 	    return "argon2";
+	case hash_algo::whirlpool:
+	    return "whirlpool";
 	default:
 	    throw SRC_BUG;
 	}
@@ -71,6 +73,8 @@ namespace libdar
 	    val = hash_algo::none;
 	else if(strcasecmp(arg.c_str(), "argon2") == 0)
 	    val = hash_algo::argon2;
+	else if(strcasecmp(arg.c_str(), "whirlpool") == 0)
+	    val = hash_algo::whirlpool;
 	else
 	    return false;
 	return true;
@@ -121,6 +125,8 @@ namespace libdar
 	    return '5';
 	case hash_algo::argon2:
 	    return 'a';
+	case hash_algo::whirlpool:
+	    return 'w';
 	default:
 	    throw SRC_BUG;
 	}
@@ -140,6 +146,8 @@ namespace libdar
 	    return hash_algo::none;
 	case 'a':
 	    return hash_algo::argon2;
+	case 'w':
+	    return hash_algo::whirlpool;
 	default:
 	    throw Erange("char_to_hash_algo", tools_printf(gettext("unknown hash algorithm corresponding to char `%c'"), arg));
 	}
