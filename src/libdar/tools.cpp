@@ -1215,7 +1215,7 @@ namespace libdar
 					     bool dry_run)
     {
         const string c_chemin = ent.get_url();
-	const string file_mask = string("^") + tools_escape_chars_in_string(basename, "[].+|!*?{}()^$-,\\") + "\\.[0-9]+\\." + extension + "(\\.(md5|sha1|sha512))?$";
+	const string file_mask = string("^") + tools_escape_chars_in_string(basename, "[].+|!*?{}()^$-,\\") + "\\.[0-9]+\\." + extension + "(\\.(md5|sha1|sha512|whirlpool))?$";
         if(tools_do_some_files_match_mask_regex(ent, file_mask))
         {
             if(!allow_overwriting)
