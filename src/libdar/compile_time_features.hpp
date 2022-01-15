@@ -149,6 +149,9 @@ namespace libdar
 	    /// returns whether remote repository feature is available
 	bool remote_repository() noexcept;
 
+	    /// returns whether whirlpool hash algorithm is available
+	bool whirlpool_hash() noexcept;
+
     } // end of compile_time namespace
 
         /// @}

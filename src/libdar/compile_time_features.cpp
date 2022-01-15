@@ -329,5 +329,14 @@ namespace libdar
 #endif
 	}
 
+	bool whirlpool_hash() noexcept
+	{
+#if RHASH_AVAILABLE
+	    return true;
+#else
+	    return false;
+#endif
+	}
+
     } // end of compile_time nested namespace
 } // end of libdar namespace
