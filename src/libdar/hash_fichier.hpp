@@ -40,6 +40,10 @@ extern "C"
 #endif
 #include <gcrypt.h>
 #endif
+
+#if HAVE_RHASH_H
+#include <rhash.h>
+#endif
 }
 
 #include <string>
@@ -126,10 +130,16 @@ namespace libdar
 #if CRYPTO_AVAILABLE
 	gcry_md_hd_t hash_handle;
 #endif
+#if RHASH_AVAILABLE
+	rhash rhash_ctxt;
+#endif
 	std::string ref_filename;
 	U_I hash_gcrypt;
 	bool eof;
 	bool hash_dumped;
+	hash_algo algor;
+
+	void write_hash_in_hexa(void const* digest, U_I digest_size);
     };
 
 	/// @}
