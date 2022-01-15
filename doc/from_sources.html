@@ -167,6 +167,10 @@
 	    provides a security enhancement for key derivation fonction (strong
 	    encryption)
 	  </li>
+	  <li>
+	    <a href="http://rhash.sourceforge.net">librhash</a> provides whirlpool
+	    hash algorithm
+	  </li>
 	</ul>
 
 	<p>
@@ -260,6 +264,9 @@
 	    algorithms to generate
 	    a strong key based on a random salt and the password you provide.
 	  </li>
+	  <li>
+	    if you lack <b>librhash</b> dar/libdar will not be able to compute whirlpool
+	    hash
 	</ul>
 
 	<h3>Dependencies in distro packages</h3>
@@ -418,6 +425,14 @@
 	    </th>
 	    <td>
 	      libargon2-dev
+	    </td>
+	  </tr>
+	  <tr>
+	    <th>
+	      whirlpool hash algorithm
+	    </th>
+	    <td>
+	      librhash-dev
 	    </td>
 	  </tr>
 	</table>
@@ -758,6 +773,13 @@
 	      </td>
 	      <td>
 		Disable linking with libcurl, thus remote repository support using ftp or sftp will not be available
+	      </td>
+	    </tr>
+	    <tr>
+	      <td class=desc>--disable-librhash-linking
+	      </td>
+	      <td>
+		Disable linking with librhash, thus whirlpool hash will not be available
 	      </td>
 	    </tr>
 	    <tr>
