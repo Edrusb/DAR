@@ -1074,6 +1074,53 @@ AS_IF(      [test "x$enable_libgcrypt_linking" != "xyes"],
            ]
      )
 
+AC_ARG_ENABLE( [librhash-linking],
+	       AS_HELP_STRING(--disable-librhash-linking, [disable linking with librhash which disable whrirlpool hash support]),
+	       [explicit_librhash_linking=yes],
+	       [enable_librhash_linking=yes])
+
+AS_IF(	       [test "x$enable_librhash_linking" != "xyes"],
+	       [
+		  AC_MSG_WARN([whirlpool hash support has been disabled by user])
+		  local_rhash="no"
+	       ],
+	       [
+	         AC_CHECK_LIB(rhash, [rhash_init], [], [])
+		 AC_CHECK_HEADER(rhash.h, [local_rhash="yes"
+                                           AC_DEFINE(HAVE_RHASH_H, 1, [rhash.h header file is available])
+					  ],
+					  [AC_MSG_WARN([Cannot find rhash.h header file])
+					   local_rhash="no"
+					  ])
+		if test "$local_rhash" = "yes" ; then
+		  AC_MSG_CHECKING([for librhash usability])
+		  AC_RUN_IFELSE([AC_LANG_PROGRAM([[ extern "C"
+		                                    {
+						      #if HAVE_RHASH_H
+						      #include <rhash.h>
+						      #endif
+						    }
+						  ]],
+						  [[
+						     rhash ctx = rhash_init(RHASH_WHIRLPOOL);
+						     rhash_update(ctx, "hello", 5);
+						     rhash_free(ctx);
+						     return 0;
+						  ]])
+				],
+				[
+				  AC_DEFINE(RHASH_AVAILABLE, 1, [header and linking are available for whirlpool/librhash hash to work])
+				  AC_MSG_RESULT([ok])
+				],
+				[
+				  AC_MSG_RESULT([failed: librhash is unusable, disabling whirlpool hash])
+				  local_rhash="no"
+				])
+		else
+		  AC_MSG_WARN([whirpool hash is not available, librhash abstent])
+		fi
+	       ]
+    )
 
 AC_ARG_ENABLE(  [ea-support],
                 AS_HELP_STRING(--disable-ea-support,[disable Extended Attributes support]),
@@ -2500,8 +2547,15 @@ else
   echo "NO"
 fi
 
-printf "   Argon2 hashing algorithm   : "
+printf "   Argon2 hash algorithm      : "
 if [ "$local_argon2" = "yes" ] ; then
+  echo "YES"
+else
+  echo "NO"
+fi
+
+printf "   Whirlpool hash algorithm   : "
+if [ "$local_rhash" = "yes" ] ; then
   echo "YES"
 else
   echo "NO"
