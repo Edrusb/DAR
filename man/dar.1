@@ -1143,6 +1143,10 @@ At the difference of the listing context (see below), in the context of archive 
 .RS
 Without --kdf-param the KDF fonction uses 200,000 iterations for md5, sha1 and sha512 (PBKDF2 from PKCS#5 v2) but only 10,000 for argon2. If libargon2 is present, this is the default hash algorithm, else sha1 is used with PBKDF2. Valid parameters are "sha1", "sha512", "md5" and "argon2" for the hash algorithms and a value greater than 1 for the iteration count. However it is advise to use a value equal or greater to the default values mentionned previously. The suffixes described for -s option are also available here (k, M, G, T, P, ...) however pay attention to the -aSI/-abinary mode which default to binary, in which case "-T 1k" is equivalent to "-T 1024". Example of use: --kdf-param 20k:argon2
 .RE
+.P
+.TP 20
+-anru, --alter=never-resave-uncompressed
+At creation time or when re-compressing data at merging time (thus when option -ak is not used), by default dar tries to re-save file uncompressed if the compression result takes more space than the uncompressed original data. This has the drawback to lead dar to skip back the archive about to be created, the advantage is to not waste storage space. This option let you disable this feature: dar will then not skip back and will keep files compressed even if their compressed data takes more space as what they would take uncompressed.
 .PP
 .PP
 .B RESTORATION SPECIFIC OPTIONS (to use with -x)
