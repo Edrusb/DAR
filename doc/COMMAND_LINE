@@ -30,6 +30,7 @@ a * alteration of operation		--alter	  argument:
 							    list-ea
 							    m[ask]
 							    n[o-case]
+							    nru [never-resave-uncompressed]
 							    p[lace]
 							    r[egex]
 						            s[aved]
@@ -38,7 +39,7 @@ a * alteration of operation		--alter	  argument:
 							    t[ape-marks]
 							    test-self-reported-bug
 							    u[nix-sockets]
-							    y abyte[s]
+							    y byte[s]
 							    z[eroing-negative-dates]
 b - terminal bell                       --bell
 c + create archive                      --create

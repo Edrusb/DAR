@@ -334,6 +334,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
     p.delta_sig_len.reset();
     p.unix_sockets = false;
     p.in_place = false;
+    p.never_resave_uncompr = false;
 
     if(!dialog)
 	throw SRC_BUG;
@@ -1652,6 +1653,8 @@ static bool get_args_recursive(recursive_param & rec,
 		    p.unix_sockets = true;
 		else if(strcasecmp("p", optarg) == 0 || strcasecmp("place", optarg) == 0)
 		    p.in_place = true;
+		else if(strcasecmp("nru", optarg) == 0 || strcasecmp("never-resave-uncompressed", optarg) == 0)
+		    p.never_resave_uncompr = true;
 		else
                     throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext("Unknown argument given to -a : %s"), optarg));
                 break;
