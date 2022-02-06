@@ -388,6 +388,7 @@ namespace libdar
 		x_iteration_count = default_iteration_count;
 	    }
 	    x_sig_block_len.reset();
+	    x_never_resave_uncompressed = false;
 	}
 	catch(...)
 	{
@@ -657,6 +658,7 @@ namespace libdar
 	x_iteration_count = ref.x_iteration_count;
 	x_kdf_hash = ref.x_kdf_hash;
 	x_sig_block_len = ref.x_sig_block_len;
+	x_never_resave_uncompressed = ref.x_never_resave_uncompressed;
     }
 
     void archive_options_create::move_from(archive_options_create && ref) noexcept
@@ -730,6 +732,7 @@ namespace libdar
 	x_iteration_count = move(ref.x_iteration_count);
 	x_kdf_hash = move(ref.x_kdf_hash);
 	x_sig_block_len = move(ref.x_sig_block_len);
+	x_never_resave_uncompressed = move(ref.x_never_resave_uncompressed);
     }
 
 	/////////////////////////////////////////////////////////
@@ -1014,6 +1017,7 @@ namespace libdar
 		x_iteration_count = default_iteration_count;
 	    }
 	    x_sig_block_len.reset();
+	    x_never_resave_uncompressed = false;
 	}
 	catch(...)
 	{
@@ -1235,6 +1239,7 @@ namespace libdar
 	    x_iteration_count = ref.x_iteration_count;
 	    x_kdf_hash = ref.x_kdf_hash;
 	    x_sig_block_len = ref.x_sig_block_len;
+	    x_never_resave_uncompressed = ref.x_never_resave_uncompressed;
 	}
 	catch(...)
 	{
@@ -1294,6 +1299,7 @@ namespace libdar
 	x_iteration_count = move(ref.x_iteration_count);
 	x_kdf_hash = move(ref.x_kdf_hash);
 	x_sig_block_len = move(ref.x_sig_block_len);
+	x_never_resave_uncompressed = move(ref.x_never_resave_uncompressed);
     }
 
     void archive_options_merge::nullifyptr() noexcept

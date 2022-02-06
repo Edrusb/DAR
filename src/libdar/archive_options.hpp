@@ -582,6 +582,8 @@ namespace libdar
 	    /// block size to use to build delta signatures
 	void set_sig_block_len(delta_sig_block_size val) { val.check(); x_sig_block_len = val; };
 
+	    /// never try resaving uncompressed when compression ratio is bad
+	void set_never_resave_uncompressed(bool val) { x_never_resave_uncompressed = val; };
 
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
@@ -654,6 +656,7 @@ namespace libdar
 	const infinint & get_iteration_count() const { return x_iteration_count; };
 	hash_algo get_kdf_hash() const { return x_kdf_hash; };
 	delta_sig_block_size get_sig_block_len() const { return x_sig_block_len; };
+	bool get_never_resave_uncompressed() const { return x_never_resave_uncompressed; };
 
     private:
 	std::shared_ptr<archive> x_ref_arch; ///< just contains the address of an existing object, no local copy of object is done here
@@ -725,6 +728,7 @@ namespace libdar
 	infinint x_iteration_count;
 	hash_algo x_kdf_hash;
 	delta_sig_block_size x_sig_block_len;
+	bool x_never_resave_uncompressed;
 
 	void nullifyptr() noexcept;
 	void destroy() noexcept;
@@ -1174,6 +1178,9 @@ namespace libdar
 	    /// block size to use to build delta signatures
 	void set_sig_block_len(delta_sig_block_size val) { val.check(); x_sig_block_len = val; };
 
+	    /// never try resaving uncompressed when compression ratio is bad
+	void set_never_resave_uncompressed(bool val) { x_never_resave_uncompressed = val; };
+
 
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
@@ -1226,7 +1233,7 @@ namespace libdar
 	const infinint & get_iteration_count() const { return x_iteration_count; };
 	hash_algo get_kdf_hash() const { return x_kdf_hash; };
 	delta_sig_block_size get_sig_block_len() const { return x_sig_block_len; };
-
+	bool get_never_resave_uncompressed() const { return x_never_resave_uncompressed; };
 
     private:
 	std::shared_ptr<archive> x_ref;
@@ -1277,6 +1284,7 @@ namespace libdar
 	infinint x_iteration_count;
 	hash_algo x_kdf_hash;
 	delta_sig_block_size x_sig_block_len;
+	bool x_never_resave_uncompressed;
 
 	void destroy() noexcept;
 	void copy_from(const archive_options_merge & ref);
