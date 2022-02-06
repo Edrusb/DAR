@@ -1,5 +1,8 @@
 from 2.7.x to 2.8.0
 - added whirlpool hash algorithm (requires librhash library)
+- new feature: -anru option leads dar to Never Re-save Uncompressed a file
+  which compression ratio was bad (compressed data taking more space than
+  the corresponding uncompressed one.
 
 from 2.7.3 to 2.7.4
 - fixed excessive context control that led libdar to report a bug
