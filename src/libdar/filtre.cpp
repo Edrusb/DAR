@@ -84,7 +84,8 @@ namespace libdar
 			   infinint & new_wasted_bytes,  //< new amount of wasted bytes to return to the caller.
 			   set<string> ignored_as_symlink, //< list of file to ignore as symlink and fetch the proper mtime
 			   bool repair_mode,         //< if set, try to fix CRC and size problem flagging such fixed files as dirty
-			   U_I signature_block_size); //< block size of delta signatures
+			   U_I signature_block_size,
+			   bool never_resave_uncompressed); //< block size of delta signatures
 
     static bool save_ea(const shared_ptr<user_interaction> & dialog,
 			const string & info_quoi,
@@ -575,7 +576,8 @@ namespace libdar
 			   bool auto_zeroing_neg_dates,
 			   const set<string> & ignored_symlinks,
 			   modified_data_detection mod_data_detect,
-			   const delta_sig_block_size & delta_sig_block_len)
+			   const delta_sig_block_size & delta_sig_block_len,
+			   bool never_resave_uncompressed)
     {
 	if(!dialog)
 	    throw SRC_BUG; // dialog points to nothing
@@ -943,7 +945,8 @@ namespace libdar
 						       wasted_bytes,
 						       ignored_symlinks,
 						       false,
-						       sig_bl))
+						       sig_bl,
+						       never_resave_uncompressed))
 					    st.incr_tooold(); // counting a new dirty file in archive
 
 					st.set_byte_amount(wasted_bytes);
@@ -1685,7 +1688,8 @@ namespace libdar
 		      bool build_delta_sig,
 		      const infinint & delta_sig_min_size,
 		      const mask & delta_mask,
-		      const delta_sig_block_size & signature_block_size)
+		      const delta_sig_block_size & signature_block_size,
+		      bool never_resave_uncompressed)
     {
 	crit_action *decr = nullptr; // will point to a locally allocated crit_action
 	    // for decremental backup (argument overwrite is ignored)
@@ -1750,7 +1754,8 @@ namespace libdar
 			   abort,
 			   thr_cancel,
 			   false,
-			   signature_block_size);
+			   signature_block_size,
+			   never_resave_uncompressed);
     }
 
     void filtre_merge_step0(const shared_ptr<user_interaction> & dialog,
@@ -2664,7 +2669,8 @@ namespace libdar
 			    bool & abort,
 			    thread_cancellation & thr_cancel,
 			    bool repair_mode,
-			    const delta_sig_block_size & signature_block_size)
+			    const delta_sig_block_size & signature_block_size,
+			    bool never_resave_uncompressed)
     {
 	compression stock_algo = pdesc.compr->get_algo();
 	defile juillet = FAKE_ROOT;
@@ -2855,7 +2861,8 @@ namespace libdar
 				   fake_repeat,   // current_wasted_bytes
 				   set<string>(), // empty list for ignored_as_symlink
 				   repair_mode,
-				   sig_bl))
+				   sig_bl,
+				   never_resave_uncompressed))
 
 			throw SRC_BUG;
 		    else // succeeded saving
@@ -3038,7 +3045,8 @@ namespace libdar
 			   infinint & current_wasted_bytes,
 			   set<string> ignored_as_symlink,
 			   bool repair_mode,
-			   U_I signature_block_size)
+			   U_I signature_block_size,
+			   bool never_resave_uncompressed)
     {
 	bool ret = true;
 	infinint current_repeat_count = 0;
@@ -3048,7 +3056,7 @@ namespace libdar
 	cat_inode *ino = dynamic_cast<cat_inode *>(e);
 	cat_file *fic = dynamic_cast<cat_file *>(ino);
 	const cat_file *ref_fic = dynamic_cast<const cat_file *>(ref);
-	bool resave_uncompressed = false;
+	bool resave_uncompressed = false; // per file status (while never_resave_uncompressed arg is global to the whole operation)
 	infinint rewinder; // we skip back here if data must be saved uncompressed
 	shared_ptr<memory_file> delta_sig_ref; // holds the delta_signature that will be used as reference for delta patch later on
 	U_I sig_ref_block_len;
@@ -3478,7 +3486,8 @@ namespace libdar
 				    //////////////////////////////
 				    // checking if compressed data is smaller than uncompressed one
 
-				if(fic->get_size() <= storage_size
+				if(! never_resave_uncompressed
+				   && fic->get_size() <= storage_size
 				   && keep_mode != cat_file::keep_compressed
 				   && fic->get_compression_algo_write() != compression::none
 				   && !repair_mode)

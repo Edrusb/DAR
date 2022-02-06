@@ -516,6 +516,7 @@ namespace libdar
 				   options.get_iteration_count(),
 				   options.get_kdf_hash(),
 				   options.get_sig_block_len(),
+				   options.get_never_resave_uncompressed(),
 				   progressive_report);
 		exploitable = false;
 		stack.terminate();
@@ -751,6 +752,7 @@ namespace libdar
 				 options.get_iteration_count(),
 				 options.get_kdf_hash(),
 				 options.get_sig_block_len(),
+				 options.get_never_resave_uncompressed(),
 				 st_ptr);
 
 		exploitable = false;
@@ -906,6 +908,7 @@ namespace libdar
 			     src.pimpl->ver.get_iteration_count(),
 			     src.pimpl->ver.get_kdf_hash(),
 			     delta_sig_block_size(), // sig block size is not used for repairing, build_delta_sig is set to false above
+			     false,               // this has not importance as we keep data compressed
 			     &not_filled);        // statistics
 
 		// stealing src's catalogue, our's is still empty at this step
@@ -2018,6 +2021,7 @@ namespace libdar
 						const infinint & iteration_count,
 						hash_algo kdf_hash,
 						const delta_sig_block_size & sig_block_len,
+						bool never_resave_uncompressed,
 						statistics * progressive_report)
     {
         statistics st = false;  // false => no lock for this internal object
@@ -2183,6 +2187,7 @@ namespace libdar
 			 iteration_count,
 			 kdf_hash,
 			 sig_block_len,
+			 never_resave_uncompressed,
 			 st_ptr);
 
 	return *st_ptr;
@@ -2261,6 +2266,7 @@ namespace libdar
 					      const infinint & iteration_count,
 					      hash_algo kdf_hash,
 					      const delta_sig_block_size & sig_block_len,
+					      bool never_resave_uncompressed,
 					      statistics * st_ptr)
     {
 	try
@@ -2472,7 +2478,8 @@ namespace libdar
 					      zeroing_neg_date,
 					      ignored_symlinks,
 					      mod_data_detect,
-					      sig_block_len);
+					      sig_block_len,
+					      never_resave_uncompressed);
 				// build_delta_sig is not used for archive creation it is always implied when delta_signature is set
 			}
 			catch(...)
@@ -2537,7 +2544,8 @@ namespace libdar
 				     build_delta_sig,
 				     delta_sig_min_size,
 				     delta_mask,
-				     sig_block_len);
+				     sig_block_len,
+				     never_resave_uncompressed);
 			break;
 		    case oper_repair:
 			if(ref_cat2 != nullptr)
@@ -2585,7 +2593,8 @@ namespace libdar
 					       aborting,
 					       thr_cancel,
 					       true,
-					       delta_sig_block_size()); // we will not recalculate delta signature upon repairing
+					       delta_sig_block_size(), // we will not recalculate delta signature upon repairing
+					       never_resave_uncompressed);
 
 				// at this step, cat (the current archive's catalogue) is still empty
 				// we will need to add ref_cat1's content at the end of the archive

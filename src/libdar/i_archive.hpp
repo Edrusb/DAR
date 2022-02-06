@@ -294,6 +294,7 @@ namespace libdar
 				const infinint & iteration_count,
 				hash_algo kdf_hash,
 				const delta_sig_block_size & sig_block_len,
+				bool never_resave_uncompressed,
 				statistics * progressive_report);
 
 	void op_create_in_sub(operation op,                     ///< the filter operation to bind to
@@ -369,6 +370,7 @@ namespace libdar
 			      const infinint & iteration_count, ///< for key derivation
 			      hash_algo kdf_hash,               ///< hash used for key derivation
 			      const delta_sig_block_size & sign_block_len, ///< block len for signature
+			      bool never_resave_uncompressed,   ///< avoid trying resaving uncompressed when compression ratio was bad
 			      statistics * st_ptr             ///< statistics must not be nullptr !
 	    );
 

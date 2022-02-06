@@ -109,7 +109,8 @@ namespace libdar
 				  bool auto_zeroing_neg_dates,
 				  const std::set<std::string> & ignored_symlinks,
 				  modified_data_detection mod_data_detect,
-				  const delta_sig_block_size & delta_sig_block_len);
+				  const delta_sig_block_size & delta_sig_block_len,
+				  bool never_resave_uncompressed);
 
     extern void filtre_difference(const std::shared_ptr<user_interaction> & dialog,
 				  const mask &filtre,
@@ -167,7 +168,8 @@ namespace libdar
 			     bool build_delta_sig,
 			     const infinint & delta_sig_min_size,
 			     const mask & delta_mask,
-			     const delta_sig_block_size & signature_block_size);
+			     const delta_sig_block_size & signature_block_size,
+			     bool never_resave_uncompressed);
 
 
 	/// initialize variables used for merging in step1 and step2
@@ -204,7 +206,7 @@ namespace libdar
 				   thread_cancellation & thr_cancel);
 
 
-        /// copies data of "cat" catalogue to the pdesc of a brand new archive
+        /// copies data of "cat" catalogue to the pdesc of a brand-new archive
 
 	/// \note also used for repairing
     extern void filtre_merge_step2(const std::shared_ptr<user_interaction> & dialog,
@@ -224,7 +226,8 @@ namespace libdar
 				   bool & abort,
 				   thread_cancellation & thr_cancel,
 				   bool repair_mode,
-				   const delta_sig_block_size & signature_block_size);
+				   const delta_sig_block_size & signature_block_size,
+				   bool never_resave_uncompressed);
 
 
     void filtre_sequentially_read_all_catalogue(catalogue & cat,
