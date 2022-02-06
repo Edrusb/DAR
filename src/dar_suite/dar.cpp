@@ -492,6 +492,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    if(param.kdf_hash != hash_algo::none)
 			create_options.set_kdf_hash(param.kdf_hash);
 		    create_options.set_sig_block_len(param.delta_sig_len);
+		    create_options.set_never_resave_uncompressed(param.never_resave_uncompr);
 
 		    cur.reset(new (nothrow) archive(dialog,
 						    *param.fs_root,
@@ -560,6 +561,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    if(param.kdf_hash != hash_algo::none)
 			merge_options.set_kdf_hash(param.kdf_hash);
 		    merge_options.set_sig_block_len(param.delta_sig_len);
+		    merge_options.set_never_resave_uncompressed(param.never_resave_uncompr);
 
 		    cur.reset(new (nothrow) archive(dialog,            // user_interaction &
 						    *param.sauv_root,  //const path &
