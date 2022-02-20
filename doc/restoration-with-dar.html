@@ -967,7 +967,7 @@
 	  <e>proc on /proc type proc (rw,nosuid,nodev,noexec,relatime)</e>
 	  <e>sys on /sys type sysfs (rw,nosuid,nodev,noexec,relatime)</e>
 	  <e>dev on /dev type devtmpfs (rw,nosuid,relatime,size=4060004k,nr_inodes=1015001,mode=755)</e>
-	  run on /run type tmpfs (rw,nosuid,nodev,relatime,mode=755)
+	  <e>run on /run type tmpfs (rw,nosuid,nodev,relatime,mode=755)</e>
 	  <e>efivarfs on /sys/firmware/efi/efivars type efivarfs (rw,nosuid,nodev,noexec,relatime)</e>
 	  /dev/sr0 on /run/archiso/bootmnt type iso9660 (ro,relatime,nojoliet,check=s,map=n,blocksize=2048)
 	  cowspace on /run/archiso/cowspace type tmpfs (rw,relatime,size=262144k,mode=755)
@@ -1005,10 +1005,10 @@
 	  <b>[root@sysresccd /mnt/R]# mount --bind /proc proc</b>
 	  <b>[root@sysresccd /mnt/R]# mount --bind /sys sys</b>
 	  <b>[root@sysresccd /mnt/R]# mount --bind /dev dev</b>
+	  <b>[root@sysresccd /mnt/R]# mount --bind /run run</b>
 	  <b>[root@sysresccd /mnt/R]# mount --bind /sys/firmware/efi/efivars sys/firmware/efi/efivars</b>
 	  <b>[root@sysresccd /mnt/R]# chroot . /bin/bash</b>
 	  <b>root@sysresccd:/#</b>
-
 	</code>
 	<p>
 	  If not done previously you can now edit <code>/etc/fstab</code> with your favorite text editor available in the system under restoration.
@@ -1034,6 +1034,14 @@
 	  exit
 	  <b>[root@sysresccd /mnt/R]#</b>
 
+	</code>
+
+	<p>
+	  If you get the following warning when running <code>update-grub</code>, you probably missed
+	  to bind-mount /run as described in the previous paragraph:
+	</p>
+	<code class=block>
+	  WARNING: Device /dev/XYZ not initialized in udev database even after waiting 10000000 microseconds.
 	</code>
 
 	<h3>Checking the motherboard when rebooting</h3>
