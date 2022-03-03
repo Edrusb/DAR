@@ -1965,6 +1965,48 @@ AS_IF(       [ test "x$enable_threadar" != "xyes" ],
             ]
      )
 
+AS_IF(
+  [ test "$local_threadar" = "yes" ],
+  [
+    CPPFLAGS__cache="$CPPFLAGS"
+    CPPFLAGS="$LIBTHREADAR_CFLAGS $CPPFLAGS"
+    CXXFLAGS__cache="$CXXFLAGS"
+    CXXFLAGS="$LIBTHREADAR_CFLAGS $CXXFLAGS"
+    LIBS__cache="$LIBS"
+    LIBS="$LIBTHREADAR_LIBS $LIBS"
+
+    AC_RUN_IFELSE(
+     [
+       AC_LANG_PROGRAM( [[
+                        #if HAVE_LIBTHREADAR_LIBTHREADAR_HPP
+                        #include <libthreadar/libthreadar.hpp>
+                        #endif
+                       ]],
+                       [[
+		        unsigned int maj, med, min;
+                        libthreadar::get_version(maj, med, min);
+			if(libthreadar::barrier::used_implementation() != "")
+			    return 0;
+			else
+			    return 1;
+		       ]])
+     ],
+     [
+	local_threadar_barrier_mac=yes
+	AC_DEFINE(LIBTHREADAR_BARRIER_MAC, 1, [if libthreadar has different possible implementation])
+     ],
+     [
+        local_threadar_barrier_mac=no
+     ]
+    )
+    CPPFLAGS="$CPPFLAGS__cache"
+    unset CPPFLAGS__cache
+    CXXFLAGS="$CXXFLAGS__cache"
+    unset CXXFLAGS__cache
+    LIBS="$LIBS__cache"
+    unset LIBS__cache
+  ]
+)
 
 AC_ARG_ENABLE([libargon2-linking],
               AC_HELP_STRING(--disable-libargon2-linking, [avoid linking with libargon2 if available to prevent the argon2 hashing algorithm to be used]),
@@ -2495,7 +2537,11 @@ fi
 
 printf "   Remote repository support  : "
 if [ "$local_libcurl" = "yes" -a "$local_threadar" = "yes" ] ; then
-  echo "YES"
+  if [ "$local_threadar_barrier_mac" = "yes" ] ; then
+    echo "YES (+ barrier implementations for MAC OS)"
+  else
+    echo "YES"
+  fi
 else
   echo "NO"
 fi
