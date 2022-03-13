@@ -99,7 +99,7 @@ namespace libdar
 
     void fichier_libcurl::change_permission(U_I perm)
     {
-	struct mycurl_slist headers;
+	mycurl_slist headers;
 	string order = tools_printf("site CHMOD %o", perm);
 
 	switch_to_metadata(true);
