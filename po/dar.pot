@@ -6,10 +6,10 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: dar 2.7.3\n"
+"Project-Id-Version: dar 2.7.4\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612&atid=511612\n"
-"POT-Creation-Date: 2022-01-02 19:12+0100\n"
+"POT-Creation-Date: 2022-03-13 16:22+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -6782,6 +6782,11 @@ msgstr ""
 
 #: src/libdar/list_entry.cpp:56 src/libdar/list_entry.cpp:73
 msgid "[InRef]"
+msgstr ""
+
+#: src/libdar/compile_time_features.cpp:310
+#, c-format
+msgid "barrier using %S"
 msgstr ""
 
 #: src/libdar/data_dir.cpp:74

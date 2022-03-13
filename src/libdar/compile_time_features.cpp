@@ -305,7 +305,13 @@ namespace libdar
 	    unsigned int min, med, maj;
 
 	    libthreadar::get_version(maj, med, min);
-	    ret = tools_printf("%d.%d.%d", maj, med, min);
+#ifdef LIBTHREADAR_BARRIER_MAC
+	    std::string barrier_flavor = libthreadar::barrier::used_implementation();
+	    std::string barrier_impl = tools_printf(gettext("barrier using %S"), &barrier_flavor);
+#else
+	    std::string barrier_impl = "";
+#endif
+	    ret = tools_printf("%d.%d.%d - %S", maj, med, min, &barrier_impl);
 #endif
 	    return ret;
 	}

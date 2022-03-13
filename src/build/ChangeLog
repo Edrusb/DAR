@@ -6,7 +6,13 @@ from 2.7.x to 2.8.0
 
 from 2.7.3 to 2.7.4
 - fixed excessive context control that led libdar to report a bug
-  when an filesystem I/O error was returned but the operating system
+  when an file-system I/O error was returned by the operating system
+- fixed mini-digits auto-detection, which only worked when slice number 1
+  was present, even if subsequent slices could be used to detect its
+  value
+- fixed typos and minor incoherence in documentation
+- update version information to display libthreadar barrier implementation
+  used, info available since its release 1.4.0
 
 from 2.7.2 to 2.7.3
 - fixed bug met when restoring files in sequential-read mode and feeding

@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: sv\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612&atid=511612\n"
-"POT-Creation-Date: 2022-01-02 19:12+0100\n"
+"POT-Creation-Date: 2022-03-13 16:22+0100\n"
 "PO-Revision-Date: 2012-04-15 11:28+0200\n"
 "Last-Translator: Peter Landgren <peter.talken@telia.com>\n"
 "Language-Team: Swedish <kde-i18n-doc@kde.org>\n"
@@ -7514,6 +7514,11 @@ msgstr ""
 #: src/libdar/list_entry.cpp:56 src/libdar/list_entry.cpp:73
 msgid "[InRef]"
 msgstr "[InRef]"
+
+#: src/libdar/compile_time_features.cpp:310
+#, c-format
+msgid "barrier using %S"
+msgstr ""
 
 #: src/libdar/data_dir.cpp:74
 msgid "Unexpected end of file"
