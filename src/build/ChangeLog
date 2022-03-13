@@ -1,6 +1,9 @@
 from 2.7.3 to 2.7.4
 - fixed excessive context control that led libdar to report a bug
   when an filesystem I/O error was returned by the operating system
+- fixed mini-digits autodection, which only worked when slice number 1
+  was present, even if subsequent slices could be used to detect its
+  value.
 
 from 2.7.2 to 2.7.3
 - fixed bug met when restoring files in sequential-read mode and feeding
