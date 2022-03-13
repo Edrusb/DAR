@@ -160,7 +160,6 @@ namespace libdar
 	bool has_maxpos;                  ///< true if maxpos is set
 	infinint maxpos;                  ///< in read mode this is the filesize, in write mode this the offset where to append data (not ovewriting)
 	bool append_write;                ///< whether we should append to data (and not replace) when uploading
-	char meta_tampon[tampon_size];    ///< trash in transit data used to carry metadata
 	U_I meta_inbuf;                   ///< amount of byte available in "meta_tampon"
 	U_I wait_delay;                   ///< time in second to wait before retrying in case of network error
 	infinint network_block;           ///< maximum amount of data read at once from the network (only read by subthread)
