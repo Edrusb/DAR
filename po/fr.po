@@ -9,7 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612&atid=511612\n"
 "POT-Creation-Date: 2022-01-02 19:12+0100\n"
-"PO-Revision-Date: 2022-01-02 19:19+0100\n"
+"PO-Revision-Date: 2022-03-13 16:16+0100\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
 "Language: fr\n"
@@ -2009,7 +2009,6 @@ msgid "Parse error: "
 msgstr "Erreur de syntaxe : "
 
 #: src/dar_suite/command_line.cpp:888
-#, fuzzy
 msgid " Only one option of -c -d -t -l -C -x -+ or -y is allowed"
 msgstr " Une seule option parmi -c -d -t -l -C, -x, -+ ou -y est permise"
 
