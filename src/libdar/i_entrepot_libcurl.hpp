@@ -71,8 +71,8 @@ namespace libdar
 	    );
 	i_entrepot_libcurl(const i_entrepot_libcurl & ref) = default;
 	i_entrepot_libcurl(i_entrepot_libcurl && ref) = default;
-	i_entrepot_libcurl & operator = (const i_entrepot_libcurl & ref) = default;
-	i_entrepot_libcurl & operator = (i_entrepot_libcurl && ref) noexcept = default;
+	i_entrepot_libcurl & operator = (const i_entrepot_libcurl & ref) = delete;
+	i_entrepot_libcurl & operator = (i_entrepot_libcurl && ref) noexcept = delete;
 	~i_entrepot_libcurl() throw () {};
 
 
