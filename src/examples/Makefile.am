@@ -36,8 +36,8 @@ endif
 noinst_PROGRAMS = factoriel prime formula
 dist_noinst_DATA = README
 
-LDADD = ../libdar/$(MYLIB).la $(GPGME_LIBS)
-AM_LDFLAGS = $(LTLIBINTL) $(LIBCURL_LIBS) $(LIBTHREADAR_LIBS)
+LDADD = ../libdar/$(MYLIB).la $(LIBCURL_LIBS) $(GPGME_LIBS) $(LIBTHREADAR_LIBS) $(LTLIBINTL)
+AM_LDFLAGS =
 
 factoriel_SOURCES = factoriel.cpp
 factoriel_LDADD =  ../dar_suite/dar_suite.o ../dar_suite/line_tools.o $(LDADD)
