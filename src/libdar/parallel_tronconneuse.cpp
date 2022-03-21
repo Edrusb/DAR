@@ -418,7 +418,7 @@ namespace libdar
 
 		if(mycallback != nullptr)
 		{
-		    unique_ptr<crypto_segment> & current = lus_data.front();
+		    unique_ptr<crypto_segment> current(move(lus_data.front()));
 		    if(!current)
 			throw SRC_BUG;
 
