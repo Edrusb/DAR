@@ -206,7 +206,7 @@ namespace libdar
 
 
             // the following stores data from the ratelier_gather to be provided for read() operation
-            // the lus_data/lus_flags is what is extracted from the ratelier_gather, both constitue
+            // the lus_data/lus_flags is what is extracted from the ratelier_gather, both constitute
             // the feedback channel from sub-threads to provide order acks and normal data
 
         std::deque<std::unique_ptr<crypto_segment> > lus_data;
