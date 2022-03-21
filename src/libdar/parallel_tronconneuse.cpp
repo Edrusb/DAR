@@ -497,7 +497,9 @@ namespace libdar
 									   current->crypted_data.get_data_size(),
 									   current->clear_data.get_addr(),
 									   current->clear_data.get_max_size()));
-		    current->clear_data.rewind_read();
+
+			// if no exception arose, we probably hit a bug
+		    throw SRC_BUG;
 		}
 		break;
 	    case tronco_flags::exception_below:
