@@ -430,31 +430,47 @@ namespace libdar
 			lus_flags.pop_front();
 			read_refill(); // to be sure we will have the next available segment
 
-			if(lus_flags.front() == static_cast<int>(tronco_flags::normal)
-			   || lus_flags.front() == static_cast<int>(tronco_flags::data_error))
+			try
 			{
-			    if(lus_data.empty())
-				throw SRC_BUG; // an element should be as lus_flags is not empty
-			    unique_ptr<crypto_segment> & opt = lus_data.front(); // this is a reference on an unique_ptr
+			    if(lus_flags.size() > 0
+			       &&
+			       (lus_flags.front() == static_cast<int>(tronco_flags::normal)
+				|| lus_flags.front() == static_cast<int>(tronco_flags::data_error)
+				   )
+				)
+			    {
+				if(lus_data.empty())
+				    throw SRC_BUG; // an element should be present, as lus_flags is not empty
+				unique_ptr<crypto_segment> & opt = lus_data.front();
+				    // this is a reference on an unique_ptr
+				    // the unique_ptr pointed to by 'opt' stays managed by lus_data
 
-			    remove_trailing_clear_data_from_encrypted_buf(crypt_offset,
-									  reading_ver,
-									  initial_shift,
-									  mycallback,
-									  current,
-									  opt,
-									  lus_eof);
+				remove_trailing_clear_data_from_encrypted_buf(crypt_offset,
+									      reading_ver,
+									      initial_shift,
+									      mycallback,
+									      current,
+									      opt,
+									      lus_eof);
+			    }
+			    else // we ignore this next segment (eof reached at an exact segment size boundary)
+			    {
+				unique_ptr<crypto_segment> opt = nullptr;
+				remove_trailing_clear_data_from_encrypted_buf(crypt_offset,
+									      reading_ver,
+									      initial_shift,
+									      mycallback,
+									      current,
+									      opt,
+									      lus_eof);
+			    }
 			}
-			else // we ignore this next segment (eof reached at an exact segment size boundary)
+			catch(Erange & e)
 			{
-			    unique_ptr<crypto_segment> opt = nullptr;
-			    remove_trailing_clear_data_from_encrypted_buf(crypt_offset,
-									  reading_ver,
-									  initial_shift,
-									  mycallback,
-									  current,
-									  opt,
-									  lus_eof);
+				// we must change this exception message
+				// to something more relevant to the context
+			    throw Erange("parallel_tronconneuse::inherited_read",
+					 gettext("data deciphering failed"));
 			}
 			current->clear_data.set_data_size(crypto->decrypt_data(current->block_index,
 									       current->crypted_data.get_addr(),
