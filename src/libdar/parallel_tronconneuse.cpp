@@ -416,6 +416,11 @@ namespace libdar
 		if(!lus_data.front())
 		    throw SRC_BUG; // front does not point to any crypto_segment pointed object
 
+		    // we must check that the deciphering error
+		    // is not due to the fact some clear data (archive terminator)
+		    // has been mixed with the encrypted data and tried
+		    // to be decrypted
+
 		if(mycallback != nullptr)
 		{
 		    unique_ptr<crypto_segment> current(move(lus_data.front()));
@@ -426,9 +431,12 @@ namespace libdar
 		    {
 			infinint crypt_offset = current->block_index * crypto->encrypted_block_size_for(clear_block_size) + initial_shift;
 
+			    // now fetching the next segment following 'current' if any
+			    // in order to append it to current and remove trailing clear data at the tail
+
 			lus_data.pop_front();
 			lus_flags.pop_front();
-			read_refill(); // to be sure we will have the next available segment
+			read_refill(); // this is be sure we will have the next available segment
 
 			try
 			{
@@ -472,6 +480,11 @@ namespace libdar
 			    throw Erange("parallel_tronconneuse::inherited_read",
 					 gettext("data deciphering failed"));
 			}
+
+			    // now current should have possible clear data removed
+			    // from the tail and only contain encrypted data
+			    // retrying the deciphering that failed in the worker:
+
 			current->clear_data.set_data_size(crypto->decrypt_data(current->block_index,
 									       current->crypted_data.get_addr(),
 									       current->crypted_data.get_data_size(),
@@ -484,12 +497,23 @@ namespace libdar
 			tas->put(move(current));
 			throw;
 		    }
+
+			// we reached this statement means no exception took place
+			// thus deciphering succeeded and we can reinsert the 'current'
+			// crypto_segment at the front of lus_data with a normal flag:
+
 		    lus_data.push_front((move(current)));
 		    lus_flags.push_front(static_cast<int>(tronco_flags::normal));
 		}
-		else
+		else // mycallback == nullptr
 		{
-		    unique_ptr<crypto_segment> & current = lus_data.front(); // current is here a reference to an unique_ptr
+			// without callback we cannot remove possible clear data at the tail
+			// so we try to reproduce the exception met by the worker for it
+			// propagates to our caller:
+
+		    unique_ptr<crypto_segment> & current = lus_data.front();
+			// 'current' is here a reference to an unique_ptr
+			// and stays managed by lus_data
 
 			// this should throw the exception met by the worker
 		    current->clear_data.set_data_size(crypto->decrypt_data(current->block_index,
