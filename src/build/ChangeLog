@@ -1,6 +1,6 @@
 from 2.7.4 to 2.7.5
 - fixed double free error met when deciphering an archive with a
-  wrong password/passphrase and when multithreading is used for that.
+  wrong password/passphrase and when multi-threading is used.
 
 from 2.7.3 to 2.7.4
 - fixed excessive context control that led libdar to report a bug
