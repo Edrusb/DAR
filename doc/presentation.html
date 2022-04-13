@@ -59,11 +59,11 @@
       </dd>
 
       <dt class=void>Suitable for Live filesystem backup</dt><dd>
-	Thanks to its ability to detect file change during backup it can
-	retry the backup of a particular file, but has also some mechanism
-	that let the user define some actions for before and after saving
-	a given type of file, before or after entering a given directory,
-	and so on. Such action can be a simple user script or a more complex
+        Thanks to its ability to detect file change during backup it can
+        retry the backup of a particular file, but has also some mechanism
+        that let the user define some actions for before and after saving
+        a given type of file, before or after entering a given directory,
+        and so on. Such action can be a simple user script or a more complex
 	executable, there is no constraint.
       </dd>
 
@@ -248,15 +248,22 @@
 	<a href="http://sourceforge.net/projects/baras">Baras</a> by Aaron D.
 	Marasco it a rewriting in Perl of SaraB.
       </li>
+
+      <li>
+        <span style="font-weight: bold; color: red;">
+          new in 2022:
+        </span>
+        <a href="https://github.com/per2jensen/dar-backup">dar-backup</a> by
+        Per Jensen, to automate and simplify the use of dar with redundancy,
+        remote backup, backup testing after transfer and many other interesting
+        features, like for example the <i>backup definitions</i> and logs management
+      </li>
       <li>
 	<a rel="colleague" href="http://danmbox.github.io/dar-incdec-repo/">Dar-incdec-repo</a>
 	by Dan A. Muresan is a framework for doing periodic DAR backups with
 	minimal fuss
       </li>
       <li>
-	<span style="font-weight: bold; color: red;">
-	  new in 2020:
-	</span>
 	<a href="https://gitlab.com/notEvil/dar_fuse">dar_fuse</a> by <i>!evil</i>.
 	<i>dar_fuse</i> provides a faster AVFS equivalent thanks to its direct
 	use of libdar python API and fusepy module.
