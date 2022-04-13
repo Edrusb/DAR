@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: sv\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612&atid=511612\n"
-"POT-Creation-Date: 2022-03-13 16:22+0100\n"
+"POT-Creation-Date: 2022-04-13 15:46+0200\n"
 "PO-Revision-Date: 2012-04-15 11:28+0200\n"
 "Last-Translator: Peter Landgren <peter.talken@telia.com>\n"
 "Language-Team: Swedish <kde-i18n-doc@kde.org>\n"
@@ -8126,6 +8126,10 @@ msgstr ""
 
 #: src/libdar/secu_string.cpp:193
 msgid "Out of range index requested for a secu_string"
+msgstr ""
+
+#: src/libdar/parallel_tronconneuse.cpp:481
+msgid "data deciphering failed"
 msgstr ""
 
 #: src/libdar/entree_stats.cpp:140
