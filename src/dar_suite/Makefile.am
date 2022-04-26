@@ -24,7 +24,7 @@
 #
 
 if BUILD_DAR_STATIC
-    ALSO_BUILD = dar_static
+    ALSO_BUILD = dar_static dar_cp_static
 else
     ALSO_BUILD =
 endif
@@ -124,3 +124,7 @@ dar_split_CPPFLAGS = -I'$(srcdir)/../libdar' -DDAR_LOCALEDIR=\"$(localedir)\" -D
 dar_static_SOURCES =  command_line.cpp command_line.hpp config_file.cpp config_file.hpp dar.cpp dar.hpp dar_suite.cpp dar_suite.hpp hide_file.cpp hide_file.hpp no_comment.cpp no_comment.hpp getopt_decision.h my_getopt_long.h line_tools.hpp line_tools.cpp crit_action_cmd_line.cpp crit_action_cmd_line.hpp
 dar_static_DEPENDENCIES = ../libdar/$(MYLIB).la
 dar_static_LDFLAGS = -all-static $(AM_LDFLAGS)
+
+dar_cp_static_SOURCES = dar_suite.cpp dar_suite.hpp dar_cp.cpp line_tools.hpp line_tools.cpp
+dar_cp_static_DEPENDENCIES = ../libdar/$(MYLIB).la
+dar_cp_static_LDFLAGS = -all-static $(AM_LDFLAGS)
