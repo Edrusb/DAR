@@ -3,7 +3,7 @@
 .SH NAME
 dar_cp \- 'cp' clone command that is able to copy data located after an I/O error
 .SH SYNOPSIS
-dar_cp <source file> <destination file>
+dar_cp [-f] <source file> <destination file>
 .P
 dar_cp -h
 .P
@@ -29,6 +29,12 @@ Displays help usage.
 .TP 20
 -V
 Displays version information.
+.TP 20
+-f
+without -f option, dar_cp will abort if the destination file exists, this is to prevent human error. However it may be useful to have a special
+device as destination like when facing a disk corruption in a unused block. dar_cp can then copy the content of a this disk to another one
+of equal or larger size, but in that case the destination is also a special device and has to exists before dar_cp runs where from the need
+of -f option. Once the disk copy has finished, one can then eventually resize partitions and file-systems to leverage the new larger disk.
 
 .SH EXIT CODES
 .B dar_cp
