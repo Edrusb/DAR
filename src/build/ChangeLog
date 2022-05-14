@@ -2,6 +2,7 @@ from 2.7.5 to 2.7.6
 - adding -f option to dar_cp
 - adding static version of dar_cp (dar_cp_static) as compilation outcome
 - added FAQ for tape usage with dar
+- fixing error in libdar header file installation
 
 from 2.7.4 to 2.7.5
 - fixed double free error met when deciphering an archive with a
