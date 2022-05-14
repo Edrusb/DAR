@@ -86,7 +86,7 @@ dist_noinst_DATA = libdar.hpp archive.hpp database.hpp libdar_xform.hpp libdar_s
 install-data-local:
 	mkdir -p $(DESTDIR)$(pkgincludedir)
 	cp ../../config.h $(DESTDIR)$(pkgincludedir)/libdar_config.h
-	sed -e 's%../config.h%libdar_config.h%g' -e 's%HAVE_CONFIG_H%1%g' -e 's%MY_CONFIG_H%LIBDAR_MY_CONFIG_H%g' '$(srcdir)/../my_config.h'  > ./libdar_my_config.h
+	sed -e 's%config.h%libdar_config.h%g' -e 's%HAVE_CONFIG_H%1%g' -e 's%MY_CONFIG_H%LIBDAR_MY_CONFIG_H%g' '$(srcdir)/../my_config.h'  > ./libdar_my_config.h
 	cp '$(srcdir)/../gettext.h' .
 	for file in $(dist_noinst_DATA) gettext.h libdar_my_config.h ; do if [ -e $(srcdir)/$$file ] ; then src=$(srcdir)/$$file ; else src=$$file ; fi	; sed -e 's%#include \"../my_config.h\"%INC_MY_CONFIG_FILE_H%g' -e "s%#include \"%#include \"$(pkgincludedir)/%g" -e "s%INC_MY_CONFIG_FILE_H%#include \"$(pkgincludedir)/libdar_my_config.h\"%g" "$$src" > $(DESTDIR)$(pkgincludedir)/"$$file" ; done
 	rm libdar_my_config.h gettext.h
