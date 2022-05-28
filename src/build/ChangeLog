@@ -3,6 +3,9 @@ from 2.7.5 to 2.7.6
 - adding static version of dar_cp (dar_cp_static) as compilation outcome
 - added FAQ for tape usage with dar
 - fixing error in libdar header file installation
+- fixed bug met when interrupting the creation of a block compressed
+  backup (always used by lzo compression and by other algorithm only
+  when performing multi-threaded compression)
 
 from 2.7.4 to 2.7.5
 - fixed double free error met when deciphering an archive with a
