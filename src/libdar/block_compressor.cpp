@@ -278,9 +278,22 @@ namespace libdar
 		// it is not expected that compressed data, that to say some information
 		// get compressed as a result of no information at all
 
-	    bh.dump(*compressed);
-	    compressed->write(current->crypted_data.get_addr(), current->crypted_data.get_data_size());
-	    current->reset();
+	    try
+	    {
+		bh.dump(*compressed);
+		compressed->write(current->crypted_data.get_addr(), current->crypted_data.get_data_size());
+		current->reset();
+	    }
+	    catch(Ethread_cancel & e)
+	    {
+		current->reset();
+		throw;
+	    }
+	    catch(Euser_abort & e)
+	    {
+		current->reset();
+		throw;
+	    }
 	}
     }
 
