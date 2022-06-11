@@ -88,7 +88,7 @@ static void f2()
     where->set_location(path("./test"));
     try
     {
-        sar sar2(ui, "destination", "txt", where, 0, false);
+        sar sar2(ui, "destination", "txt", where, false, 0, false, false);
         fichier_local dst = fichier_local(ui, "./test/destination.txt", gf_write_only, 0777, false, true, false);
 
         sar2.copy_to(dst);
@@ -108,7 +108,7 @@ static void f3()
 
     try
     {
-        sar sar3(ui, "destination", "txt", where, 0, false);
+        sar sar3(ui, "destination", "txt", where, false, 0, false, false);
         fichier_local src = fichier_local(ui, "./test/source.txt", gf_read_only, 0666, false, false, false);
 
         display(sar3.get_position());

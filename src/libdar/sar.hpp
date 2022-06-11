@@ -84,6 +84,7 @@ namespace libdar
 	    const std::shared_ptr<entrepot> & where,
 	    bool by_the_end,
 	    const infinint & x_min_digits,
+	    bool sequential_read,
 	    bool lax = false,
 	    const std::string & execute = "");
 
@@ -221,6 +222,7 @@ namespace libdar
         infinint pause;              ///< do we pause between slices
 	bool lax;                    ///< whether to try to go further reading problems
 	infinint to_read_ahead;      ///< amount of data to read ahead for next slices
+	bool seq_read;               ///< whether sequential read has been requested
 
         bool skip_forward(U_I x);                    ///< skip forward in sar global contents
         bool skip_backward(U_I x);                   ///< skip backward in sar global contents
