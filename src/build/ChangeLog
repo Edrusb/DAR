@@ -6,6 +6,9 @@ from 2.7.5 to 2.7.6
 - fixed bug met when interrupting the creation of a block compressed
   backup (always used by lzo compression and by other algorithm only
   when performing multi-threaded compression)
+- typo fixes in documentation
+- fixed message in lax mode used to obtain from the user the archive format
+  when this information is corrupted in the archive.
 
 from 2.7.4 to 2.7.5
 - fixed double free error met when deciphering an archive with a
