@@ -28,6 +28,8 @@ extern "C"
 #endif
 } // end extern "C"
 
+#include <cstring>
+
 #include "compressor_zstd.hpp"
 #include "erreurs.hpp"
 #include "tools.hpp"
