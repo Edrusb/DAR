@@ -857,7 +857,7 @@ namespace libdar
 		    if(!h.get_first_slice_size(slicing.first_size))
 			slicing.first_size = slicing.other_size;
 
-		    if(slicing.first_size.is_zero() || slicing.other_size.is_zero()) // only possible to reach this statment in lax mode
+		    if(lax && (slicing.first_size.is_zero() || slicing.other_size.is_zero()))
 		    {
 			try
 			{
