@@ -12,6 +12,8 @@ from 2.7.5 to 2.7.6
 - fixing lax mode condition that poped up without being requested
 - fixing bug met when reading slice an special block device by mean of
   a symlink
+- adapting sanity checks to the case of a backup read from a special
+  device in sequential-read mode.
 
 from 2.7.4 to 2.7.5
 - fixed double free error met when deciphering an archive with a

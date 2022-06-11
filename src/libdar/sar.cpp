@@ -902,9 +902,15 @@ namespace libdar
                     slicing.first_slice_header = of_fd->get_position();
 		    slicing.other_slice_header = h.is_old_header() ? header::min_size() : slicing.first_slice_header;
 		    if(slicing.first_slice_header >= slicing.first_size && !lax)
-			throw Erange("sar::sar", gettext("Incoherent slice header: First slice size too small"));
+		    {
+			if(! seq_read || ! slicing.first_size.is_zero() || slicing.first_size != slicing.other_size)
+			    throw Erange("sar::sar", gettext("Incoherent slice header: First slice size too small"));
+		    }
 		    if(slicing.other_slice_header >= slicing.other_size && !lax)
-			throw Erange("sar::sar", gettext("incoherent slice header: Slice size too small"));
+		    {
+			if( ! seq_read || ! slicing.other_size.is_zero())
+			    throw Erange("sar::sar", gettext("incoherent slice header: Slice size too small"));
+		    }
 		    slicing.older_sar_than_v8 = h.is_old_header();
                 }
                 catch(Erange & e)
