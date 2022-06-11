@@ -2111,8 +2111,9 @@
       </p>
       <ul>
 	<li>
-	  Espetially	to be able to read dar backup through pipes in
-	  sequential mode, dar inserts so-called "escape sequence" to know
+	  Especially to be able to read dar backup through pipes in
+	  sequential mode, dar inserts so-called "escape sequence" (also referred as
+	  tape mark) to know
 	  for example when a new file starts. This way dar can skip to the next
 	  mark upon backup corruption or if the given file has not to be
 	  restored. However, if such a sequence of byte is found into a file's
