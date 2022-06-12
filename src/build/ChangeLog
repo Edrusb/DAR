@@ -14,6 +14,8 @@ from 2.7.5 to 2.7.6
   a symlink
 - adapting sanity checks to the case of a backup read from a special
   device in sequential-read mode.
+- fixed bug that lead dar to report CRC error while reading a backup
+  from a pipe with the help of an isolated catalogue
 
 from 2.7.4 to 2.7.5
 - fixed double free error met when deciphering an archive with a
