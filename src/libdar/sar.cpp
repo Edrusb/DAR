@@ -128,6 +128,7 @@ namespace libdar
 	     const shared_ptr<entrepot> & where,
 	     bool by_the_end,
 	     const infinint & x_min_digits,
+	     bool sequential_read,
 	     bool x_lax,
 	     const string & execute) : generic_file(gf_read_only), mem_ui(dialog)
     {
@@ -143,9 +144,13 @@ namespace libdar
 	hash = hash_algo::none;
 	lax = x_lax;
 	min_digits = x_min_digits;
+	seq_read = sequential_read;
 	entr = where;
 	force_perm = false;
 	to_read_ahead = 0;
+
+	if(seq_read && by_the_end)
+	    throw SRC_BUG; // not possible to read sequentially and read by the end at the same time
 
         open_file_init();
 	try
@@ -857,7 +862,7 @@ namespace libdar
 		    if(!h.get_first_slice_size(slicing.first_size))
 			slicing.first_size = slicing.other_size;
 
-		    if(slicing.first_size.is_zero() || slicing.other_size.is_zero()) // only possible to reach this statment in lax mode
+		    if(lax && (slicing.first_size.is_zero() || slicing.other_size.is_zero()))
 		    {
 			try
 			{
@@ -897,9 +902,15 @@ namespace libdar
                     slicing.first_slice_header = of_fd->get_position();
 		    slicing.other_slice_header = h.is_old_header() ? header::min_size() : slicing.first_slice_header;
 		    if(slicing.first_slice_header >= slicing.first_size && !lax)
-			throw Erange("sar::sar", gettext("Incoherent slice header: First slice size too small"));
+		    {
+			if(! seq_read || ! slicing.first_size.is_zero() || slicing.first_size != slicing.other_size)
+			    throw Erange("sar::sar", gettext("Incoherent slice header: First slice size too small"));
+		    }
 		    if(slicing.other_slice_header >= slicing.other_size && !lax)
-			throw Erange("sar::sar", gettext("incoherent slice header: Slice size too small"));
+		    {
+			if( ! seq_read || ! slicing.other_size.is_zero())
+			    throw Erange("sar::sar", gettext("incoherent slice header: Slice size too small"));
+		    }
 		    slicing.older_sar_than_v8 = h.is_old_header();
                 }
                 catch(Erange & e)
@@ -933,32 +944,43 @@ namespace libdar
 		infinint current_pos = of_fd->get_position();
 		char end_flag;
 
-		of_fd->skip_to_eof();
-		of_fd->skip_relative(-1);
-		of_fd->read(&end_flag, 1); // reading the last char of the slice
-		if(bytheend)
-		    of_fd->skip_relative(-1);
-		else
-		    of_fd->skip(current_pos);
-
-		switch(end_flag)
+		if(!seq_read)
 		{
-		case flag_type_terminal:
-		case flag_type_non_terminal:
-		    h.get_set_flag() = end_flag;
-		    break;
-		case flag_type_located_at_end_of_slice:
-		    if(!lax)
-			throw Erange("sar::open_readonly", gettext("Data corruption met at end of slice, forbidden flag found at this position"));
+		    of_fd->skip_to_eof();
+		    of_fd->skip_relative(-1);
+		    of_fd->read(&end_flag, 1); // reading the last char of the slice
+		    if(bytheend)
+			of_fd->skip_relative(-1);
 		    else
+			of_fd->skip(current_pos);
+
+		    switch(end_flag)
+		    {
+		    case flag_type_terminal:
+		    case flag_type_non_terminal:
 			h.get_set_flag() = end_flag;
-		    break;
-		default:
-		    if(!lax)
-			throw Erange("sar::open_readonly", gettext("Data corruption met at end of slice, unknown flag found"));
-		    else
-			h.get_set_flag() = end_flag;
-		    break;
+			break;
+		    case flag_type_located_at_end_of_slice:
+			if(!lax)
+			    throw Erange("sar::open_readonly", gettext("Data corruption met at end of slice, forbidden flag found at this position"));
+			else
+			    h.get_set_flag() = end_flag;
+			break;
+		    default:
+			if(!lax)
+			    throw Erange("sar::open_readonly", gettext("Data corruption met at end of slice, unknown flag found"));
+			else
+			    h.get_set_flag() = end_flag;
+			break;
+		    }
+		}
+		else
+		{
+		    h.get_set_flag() = flag_type_non_terminal;
+			// to pass the following sanity checks
+			// and be coherent (we do not know the
+			// wether this is the last slice of the
+			// backup or not at this point in time
 		}
 	    }
 	    else // old slice without flag at end of slice

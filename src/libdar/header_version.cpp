@@ -35,8 +35,7 @@ extern "C"
 #include "deci.hpp"
 #include "header_flags.hpp"
 
-
-#define LIBDAR_URL_VERSION "http://dar.linux.free.fr/pre-release/doc/Notes.html#Dar_version_naming"
+#define LIBDAR_URL_VERSION "http://dar.linux.free.fr/doc/Notes.html#Dar_version_naming"
 
 using namespace std;
 
@@ -100,25 +99,28 @@ namespace libdar
 	{
 	    if(lax_mode)
 	    {
-		string answ;
-		U_I equivalent;
+		string answ, answ2;
+		U_I equivalent, equivalent2;
 		bool ok = false;
 
-		dialog.message(gettext("LAX MODE: Failed to read the archive header's format version."));
+		dialog.message(gettext("LAX MODE: Failed to read the archive format version."));
 		do
 		{
-		    answ = dialog.get_string(tools_printf(gettext("LAX MODE: Please provide the archive format: You can use the table at %s to find the archive format depending on the release version, (for example if this archive has been created using dar release 2.3.4 to 2.3.7 answer \"6\" without the quotes here): "), LIBDAR_URL_VERSION), true);
-		    if(tools_my_atoi(answ.c_str(), equivalent))
+		    dialog.message(gettext("LAX MODE: archive format is composed of two parts, the major number and the minor number, separated by a dot. For example with a format of \"11.1\", the major is 11 and a the minor is 1. If no dot is specified like in \"6\" this means a major of 6 with a minor is zero."));
+		    dialog.message(tools_printf(gettext("LAX MODE: To determine the archive format, use the table at %s to find it out depending on the release version, (for example if this archive has been created using dar release 2.3.4 to 2.3.7 the format is 6 (major = 6, minor = 0)"), LIBDAR_URL_VERSION));
+		    answ = dialog.get_string(tools_printf(gettext("LAX MODE: Please provide the format MAJOR number: ")), true);
+		    answ2 = dialog.get_string(tools_printf(gettext("LAX MODE: Please provide the format MINOR number: ")), true);
+		    if(tools_my_atoi(answ.c_str(), equivalent) && tools_my_atoi(answ2.c_str(), equivalent2))
 			edition = equivalent;
 		    else
 		    {
-			dialog.pause(tools_printf(gettext("LAX MODE: \"%S\" is not a valid archive format"), &answ));
+			dialog.pause(tools_printf(gettext("LAX MODE: \"%S.%S\" is not a valid format"), &answ, &answ2));
 			continue;
 		    }
 
 		    try
 		    {
-			dialog.pause(tools_printf(gettext("LAX MODE: Using archive format \"%d\"?"), equivalent));
+			dialog.pause(tools_printf(gettext("LAX MODE: Using archive format \"%d.%d\"?"), equivalent, equivalent2));
 			ok = true;
 		    }
 		    catch(Euser_abort & e)

@@ -4,6 +4,25 @@ from 2.7.x to 2.8.0
   which compression ratio was bad (compressed data taking more space than
   the corresponding uncompressed one.
 
+from 2.7.5 to 2.7.6
+- adding -f option to dar_cp
+- adding static version of dar_cp (dar_cp_static) as compilation outcome
+- added FAQ for tape usage with dar
+- fixing error in libdar header file installation
+- fixed bug met when interrupting the creation of a block compressed
+  backup (always used by lzo compression and by other algorithm only
+  when performing multi-threaded compression)
+- typo fixes in documentation
+- fixed message in lax mode used to obtain from the user the archive format
+  when this information is corrupted in the archive.
+- fixing lax mode condition that poped up without being requested
+- fixing bug met when reading slice an special block device by mean of
+  a symlink
+- adapting sanity checks to the case of a backup read from a special
+  device in sequential-read mode.
+- fixed bug that lead dar to report CRC error while reading a backup
+  from a pipe with the help of an isolated catalogue
+
 from 2.7.4 to 2.7.5
 - fixed double free error met when deciphering an archive with a
   wrong password/passphrase and when multi-threading is used.

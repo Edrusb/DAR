@@ -87,6 +87,7 @@
 	<a href="#too_large"><code>Cannot open catalogue: Cannot handle such a too large integer.</code> What to do?</a><br/>
 	<a href="#sftppubkey">I have sftp pubkey authentication working with ssh/sftp, how to have dar using too this public key authentication for sftp?</a><br/>
 	<a href="#full-from-diff">I have a diff/incremental backup and I want to convert it to a full backup, how to do that?</a><br/>
+	<a href="#tapes">How to use dar with tapes (like LTO tapes)?</a><br/>
       </div>
     </div>
 
@@ -2110,8 +2111,9 @@
       </p>
       <ul>
 	<li>
-	  Espetially	to be able to read dar backup through pipes in
-	  sequential mode, dar inserts so-called "escape sequence" to know
+	  Especially to be able to read dar backup through pipes in
+	  sequential mode, dar inserts so-called "escape sequence" (also referred as
+	  tape mark) to know
 	  for example when a new file starts. This way dar can skip to the next
 	  mark upon backup corruption or if the given file has not to be
 	  restored. However, if such a sequence of byte is found into a file's
@@ -3308,6 +3310,204 @@
 	this method but you first need to create the full backup from the incremental/differential
 	backup that has been used as reference for this incremental backup. Thus the process should
 	follow the same order used to create backups.
+      </p>
+
+      <a name="tapes"><b>How to use dar with tapes (like LTO tapes)?</b></a><br/>
+
+      <p>
+	<code>dar</code> (Disk Archive) was designed to replace <code>tar</code> (Tape archive) to leverage
+	the direct access brought by disks, something <code>tar</code> was not able to use. A tape by nature does not
+	allow to jump to a given position (or at least, it is so inefficient to skip back and forth,
+	that this is barely used). That said, <code>dar</code> has also evolved to replace <code>tar</code> when
+	it comes to use tapes (like LTO tapes) as backup media. The advantage of <code>dar</code> here is the
+	integrated ciphering, efficient compression (no need to compress already compressed files), resiliency,
+	redundancy and CRC data protection for the most interesting features.
+      </p>
+
+      <p><b><u>Backup operation</u></b></p>
+
+      <p>
+	<code>dar</code> can produce a backup on its stdout, which can be piped or redirected to a tape device.
+	That's easy:
+      </p>
+      <code class=block>
+	dar -c - (other options)... > /dev/tape
+	dar -c - (other options) | some_command > /dev/tape
+      </code>
+      <p>
+	Thing get more complicated when the backup exceeds the size of a single tape. For that reason
+	<code>dar_split</code> has been added to the suite of dar programs. Its purpose it to
+	receive the backup produce by dar on its standard input and write it to a given file
+	up to the time the write fails due to lack of space. At that time, it records what
+	was written and what still remains to be written down, close the descriptor for the target file,
+	display a message to the user and waits for the user to hit enter. Then it reopens the file and
+	continues writing the pending
+	data to that target file. The user is expected to have made the necessary for further writing to
+	this same file (or special device) to work, for example by replacing the tape by a new one
+	rewound at its beginning, tape that will be overwritten by the continuation of the dar
+	backup:
+      </p>
+      <code class=block>
+	dar -c - (other options)... | dar_split split_output /dev/tape
+      </code>
+
+      <p><b><u>Testing operation</u></b></p>
+      <p>
+	Assuming you have completed your backup over three tapes, you should now be
+	concerned by testing the backup:
+      </p>
+      <code class=block>
+	dar_split split_input /de/tape | dar -t - --sequential-read
+      </code>
+      <p>
+	Before running the previous call, you should have rewound all your tapes at the offset
+	they had when you used them to write the dar backup (their beginning, most of the time).
+	The first tape should have been inserted in the drive ready for reading. <code>dar</code>
+	nor <code>dar_split</code> know about the location of the data on tape, they will not
+	seek the tape forth or backward, they will just sequentially read (or write depending on
+	the requested operation).
+      </p>
+      <p>
+	when <code>dar_split</code> readings will reach the end of the tape, the process pause and let you swap
+	the tape with the following one. You can also take the time to rewind the tape before swapping it,
+	if you want. Once
+	the next tape is ready in the drive and set at the properly offset, just hit enter in the
+	<code>dar_split</code> terminal for the process to continue.
+      </p>
+
+      <p>
+	At the end of the testing <code>dar</code> will report the backup status (hopefully the
+	backup test will succeed) but <code>dar_split</code> does not know anything about that and still
+	continues to try providing data to dar, so you will have to hit CTRL-C to stop it.
+      </p>
+      <p>
+	to avoid stopping <code>dar_split</code> by hand, you can indicate to <code>dar_split</code>
+	the number of tapes used for the backup, by mean of <code>-s</code> option. If after the last tape at backup
+	time you wrote an EOF tape mark <code>mt -f /dev/tape weof</code> then <code>dar_split</code>
+	will stop by itself after that number of tape. In our example, the backup expanded over three tapes,
+	where from the <code>-c 3</code> option:
+      </p>
+      <code class=block>
+	dar_split <b>-c 3</b> split_input /dev/tape | dar -t - --sequential-read
+      </code>
+
+      <p><b><u>Listing operation</u></b></p>
+      <p>
+	Listing operation can be done the same way as the testing operation seen above, just replacing
+	<code>-t</code> by <code>-l</code>:
+      </p>
+      <code class=block>
+	dar_split split_input /dev/tape | dar <b>-l</b> - --sequential-read
+      </code>
+      <p>
+	But what a pity not to use
+	the isolated <i>catalogue</i> feature! <I>Catalogue</I> isolation let you keep on disk (not on tape) a
+	small file containing the table of content of the backup. Such small backup can be used as
+	backup of the internal <i>catalogue</i> of the backup (which resided on tape) to recovery corruption
+	of that part of the backup (this gives an additional level of protection for backup metadata).
+	It can also be used for backup content listing, it can be provided to <code>dar_manager</code> and
+	most interesting can be used as reference for incremental or differential backups in place of reading the
+	reference backup content from tapes.
+      </p>
+      <p>
+	Assuming you did not created an isolated <i>catalogue</i> at the time of the backup, let's do
+	it once the backup has been written to tape:
+      </p>
+      <code class=block>
+	dar_split split_input /dev/tape | dar -A - --sequential-read <b>-C isolated</b> -z
+      </code>
+      <p>
+	This will lead <code>dar</code> to read the whole backup. Thus, it is more efficient to create it "on-fly",
+	which means during the backup creation process, in order to avoid this additional reading operation:
+      </p>
+      <code class=block>
+	dar -c - <b>--on-fly-isolate isolated</b> (other options)... | dar_split split_output /dev/tape
+      </code>
+      <p>
+	You will get a small <code>isolated.1.dar</code> file (you can replace <i>isolated</i> after <code>-C</code>
+	or <code>--on-fly-isolate</code> options, by a more meaningful name of course),
+	file located in the current directory by default, while your backup will be sent to tapes, as already seen earlier.
+      </p>
+      <p>
+	The isolated <i>catalogue</i> can now be used in place of the backup on tapes, the process becomes much much faster
+	for listing the backup content:
+      </p>
+      <code class=block>
+	dar -l isolated (other options like filters)...
+      </code>
+
+      <p><b><u>Restoration operation</u></b></p>
+
+      <p>
+	You can perform a restoration the same way we did the backup testing above, just replacing <code>-t</code>
+	by <code>-x</code>:
+      </p>
+      <code class=block>
+	dar_split split_input /dev/tape | dar <b>-x</b> - --sequential-read (other options like --fs-root and so on)
+      </code>
+      <p>
+	But better
+	leverage an isolated <i>catalogue</i>, in particular if you only plan to restore a few files. Without
+	isolated <i>catalogue</i> dar will have to read the whole backup up to its end (the same as tar does but
+	for other reasons)
+	to reach the internal <i>catalogue</i> that contains additional information (like files that have been
+	remove since backup of reference was made). Using an isolated <i>catalogue</i> avoids that and let <code>dar</code>
+	to stop reading earlier, that's to say, once the last file to restore will have been reached in the backup.
+	So if this file is located near the beginning of the backup, you can save a lot of time using an isolated <i>catalogue</i>!
+      </p>
+      <code class=block>
+	dar_split split_input /dev/tape | dar -x - <b>-A isolated</b> --sequential-read (other options, like --fs-root and so on)
+      </code>
+
+      <p><b><u>Rate limiting</u></b></p>
+      <p>
+	It is sometime necessary to rate limit the output from and to tapes. <code>dar_split</code>
+	has a <code>-r</code> option for that purpose:
+      </p>
+      <code class=block>
+	dar_split <b>-r 10240000</b> split_input /dev/tape | dar ...
+	dar ... | dar_split <b>-r 20480000</b> split_output /dev/tape
+      </code>
+      <p>
+	Argument to <code>-r</code> option is expected in bytes per second.
+      </p>
+
+      <p><b><u>Block size</u></b></p>
+      <p>
+	Some tape device do not behave well if the data requested or sent to them uses large block of data
+	at once. Usually the operating system knows about that and split application provided data in smaller
+	blocks, if necessary. Sometimes this is not the case, where from
+	the <code>-b</code> option that receives the maximum block size in bytes that <code>dar_split</code> will use.
+	It does not matter whether the block size used when writing is different from the one use at reading time, both must
+	just not exceed the block size supported by the tape device:
+      </p>
+      <code class=block>
+	dar_split <b>-b 1048576</b> split_input /dev/tape | dar ...
+	dar ... | dar_split <b>-b 1048576</b> split_output /dev/tape
+      </code>
+
+      <p><b><u>Differential and incremental backups</u></b></p>
+      <p>
+	Differential and incremental backups are built the same way: providing the backup of reference
+	at the time of the backup creation, by mean of dar's <code>-A</code> option. One could use
+	<code>dar_split</code> twice for that: once to read the backup of reference from a set of tapes, operation
+	that precedes the backup itself, then a second <code>dar_split</code> command to send the backup to tapes...
+	The problem is that the second backup will open the tape device for writing while it has first
+	to be open for reading by the first <code>dar_split</code> command, in order to fetch the backup of reference.
+      </p>
+      <p>
+	Thus, in this context, we have no choice (unless we have two tape drives): we must rely on an isolated <i>catalogue</i>
+	of the backup of reference:
+      </p>
+      <code class=block>
+	dar -c - <b>-A isolated_cat_of_ref_backup</b> (other options)... | dar_split split_output /dev/tape
+      </code>
+
+      <p><b><u>dar_split and tar</u></b></p>
+      <p>
+	<code>dar_split</code> is by design a separated command from <code>dar</code>. You can thus use it with
+	any other command than <code>dar</code>, in particular, yes, you can use it with <code>tar</code>
+	if you don't want to rely on the additional features and resiliency <code>dar</code> provides.
       </p>
     </div>
   </body>

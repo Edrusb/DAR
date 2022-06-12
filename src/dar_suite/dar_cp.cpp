@@ -63,14 +63,14 @@ extern "C"
 #include "libdar.hpp"
 #include "thread_cancellation.hpp"
 
-#define DAR_CP_VERSION "1.2.13"
+#define DAR_CP_VERSION "1.3.0"
 
 using namespace libdar;
 using namespace std;
 
 static void show_usage(user_interaction & dialog, char *argv0);
 static void show_version(user_interaction & dialog, char *argv0);
-static int open_files(user_interaction & dialog, char *src, char *dst, int *fds, int *fdd);
+static int open_files(user_interaction & dialog, char *src, char *dst, int *fds, int *fdd, bool force);
 static int copy_max(user_interaction & dialog, int src, int dst);
 static void xfer_before_error(int block, char *buffer, int src, int dst);
 static int skip_to_next_readable(int block, char *buffer, int src, int dst, off_t & missed);
@@ -84,7 +84,7 @@ int main(int argc, char * const argv[], const char **env)
     return dar_suite_global(argc,
 			    argv,
 			    env,
-			    "h",
+			    "hf",
 #if HAVE_GETOPT_LONG
 			    nullptr,
 #endif
@@ -103,13 +103,20 @@ static int little_main(shared_ptr<user_interaction> & dialog, int argc, char * c
         ret = EXIT_OK;
     }
     else
-	if(argc != 3 || string(argv[1]) == string("-h"))
+    {
+	bool force = (argc > 1 && string(argv[1]) == string("-f"));
+
+	if((argc != 3 && !force) || (argc != 4 && force) || string(argv[1]) == string("-h"))
 	{
 	    show_usage(*dialog, argv[0]);
 	    ret = EXIT_SYNTAX;
 	}
 	else
-	    if(open_files(*dialog, argv[1], argv[2], &fds, &fdd))
+	{
+	    char *src = force ? argv[2] : argv[1];
+	    char *dst = force ? argv[3] : argv[2];
+
+	    if(open_files(*dialog, src, dst, &fds, &fdd, force))
 	    {
 		try
 		{
@@ -124,13 +131,15 @@ static int little_main(shared_ptr<user_interaction> & dialog, int argc, char * c
 	    }
 	    else
 		ret = EXIT_ERROR;
+	}
+    }
 
     return ret;
 }
 
 static void show_usage(user_interaction & dialog, char *argv0)
 {
-    dialog.message(tools_printf(gettext("usage : %s <source> <destination>\n"), argv0));
+    dialog.message(tools_printf(gettext("usage : %s [-f] <source> <destination>\n"), argv0));
 }
 
 static void show_version(user_interaction & dialog, char *argv0)
@@ -156,7 +165,7 @@ static void show_version(user_interaction & dialog, char *argv0)
 /* END of C++ syntax used*/
 }
 
-static int open_files(user_interaction & dialog, char *src, char *dst, int *fds, int *fdd)
+static int open_files(user_interaction & dialog, char *src, char *dst, int *fds, int *fdd, bool force)
 {
     struct stat buf;
     int val = stat(dst, &buf);
@@ -189,7 +198,7 @@ static int open_files(user_interaction & dialog, char *src, char *dst, int *fds,
         return 0; // error
     }
 
-    *fdd = ::open(dst, O_WRONLY|O_CREAT|O_EXCL|O_BINARY, 0666);
+    *fdd = ::open(dst, O_WRONLY|O_CREAT|(force ? 0 : O_EXCL)|O_BINARY, 0666);
     if(tmp != nullptr)
         free(tmp);
     if(*fdd < 0)

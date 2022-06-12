@@ -21,16 +21,16 @@
 
     /// \file thread_cancellation.hpp
     /// \brief to be able to cancel libdar operation while running in a given thread.
-    /// \ingroup Private
-    /// \note API included module due to dependencies
+    /// \ingroup API
 
     /// the class thread_cancellation implemented in this module
-    /// permits to define checkpoints where is looked whether the current
+    /// permits both the definition of checkpoints where is looked whether the current
     /// thread has been marked as to be canceled by the user
+    /// *and* the interface that let the user request a thread to be cancelled
     /// The advantage of this class is that it then throws a Euser_abort
     /// exception which properly terminates the libdar operation in the thread
     /// freeing allocated memory and release mutex properly. Note that the thread
-    /// is not canceled but libdar call in this thread returns as soon as a checkpoint
+    /// is not cancelled but the libdar call in this thread returns as soon as a checkpoint
     /// is met during the execution.
 
 #ifndef THREAD_CANCELLATION_HPP

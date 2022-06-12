@@ -21,8 +21,6 @@
 
 #include "../my_config.h"
 
-#define LIBDAR_URL_VERSION "http://dar.linux.free.fr/doc/Notes.html#Dar_version_naming"
-
 extern "C"
 {
 #if HAVE_STDLIB_H
@@ -509,6 +507,7 @@ namespace libdar
 						  where,
 						  !sequential_read, // not openned by the end in sequential read mode
 						  min_digits,
+						  sequential_read,
 						  lax,
 						  execute);
 		if(tmp_sar != nullptr)
