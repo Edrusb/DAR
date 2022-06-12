@@ -461,7 +461,6 @@ namespace libdar
 		if((U_I)lu < step)
 		    eof = true;
 		u_step -= lu;
-		position += lu;
 	    }
 	    if(!eof)
 	    {
