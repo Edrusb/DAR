@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: DAR 2.7.0\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612&atid=511612\n"
-"POT-Creation-Date: 2022-06-12 00:16+0200\n"
+"POT-Creation-Date: 2022-06-12 17:01+0200\n"
 "PO-Revision-Date: 2022-06-12 00:45+0200\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
@@ -6245,7 +6245,7 @@ msgstr ""
 msgid "Error opening pipe: "
 msgstr "Erreur lors de l'ouverture du tube : "
 
-#: src/libdar/tuyau.cpp:511
+#: src/libdar/tuyau.cpp:510
 msgid "File mode is neither read nor write"
 msgstr "Le mode d'ouverture du fichier n'est ni en lecture ni en écriture"
 
