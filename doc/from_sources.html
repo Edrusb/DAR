@@ -107,7 +107,7 @@
 	  </li>
 	  <li>
 	    <a href="https://facebook.github.io/zstd/">Zstandard library</a>
-	    (version greater or equal to 1.3.0) for xz/lzma compression support
+	    (version greater or equal to 1.3.0) for zstd compression support
 	  </li>
 	  <li>
 	    <a href="https://github.com/lz4/lz4">LZ4 library</a> for lz4 compression
@@ -170,98 +170,173 @@
 	  </li>
 	</ul>
 
-	<p>
-	  The consequences of building dar without these optional tools are the
-	  following:
-	</p>
+	<h3>Requirements for the Optional Features</h3>
 
-	<ul>
-	  <li>
-	    If you lack <b>libz</b>
-	    library, dar will compile but will not be able to compress or
-	    uncompress an archive using the gzip algorithm
-	  </li>
-	  <li>
-	    If you lack <b>libbzip2</b>
-	    library dar will compile but will not be able to compress or uncompress
-	    an archive using the bzip2 algorithm
-	  </li>
-	  <li>
-	    If you lack <b>liblzo2</b>
-	    library dar will compile but will not be able to compress or uncompress
-	    an archive using the lzo algorithm
-	  </li>
-	  <li>
-	    if you lack <b>liblzma5</b> library dar
-	    will compile but will not be able to compress or uncompress an archive
-	    using the xz algorithm
-	  </li>
-	  <li>
-	    if you lack <b>libzstd</b> library dar
-	    will compile but will not be able to compress or uncompress an archive
-	    using the zstd algorithm
-	  </li>
-	  <li>
-	    if you lack <b>liblz4</b> library dar
-	    will compile but will not be able to compress or uncompress an archive
-	    using the lz4 algorithm
-	  </li>
-	  <li>
-	    If you lack <b>libgcrypt </b>dar
-	    will still compile but you will not be able to use strong encryption
-	    nor hash file generation for each slice
-	  </li>
-	  <li>
-	    if you lack <b>gpgme</b> dar
-	    will still compile but you will not be able to use strong encryption
-	    and signature with public keys
-	  </li>
-	  <li>
-	    If you lack <b>Doxygen</b>
-	    dar will still compile but you will not have the reference
-	    documentation for libdar after calling
-	    <i>make</i>
-	  </li>
-	  <li>
-	    If you lack <b>upx</b>
-	    dar will still compile but the resulting binary will not be compressed
-	    after calling <i>make install-strip</i>
-	  </li>
-	  <li>
-	    If you lack <b>groff</b> dar will not
-	    generate man pages in html format
-	  </li>
-	  <li>
-	    If you lack <b>extX file system libraries</b>
-	    you will not be able to save and restore Linux FSA, nor to avoid
-	    saving files having their nodump flag set
-	  </li>
-	  <li>
-	    if you lack <b>libthreadar</b> libdar
-	    will execute each action in a single thread,
-	    nor you will be able to use remote ftp or sftp embedded in libdar
-	  </li>
-	  <li>
-	    if you lack <b>librsync</b>
-	    library dar will still compile but you will not be able to create
-	    archive with binary delta nor to read/restore files stored with binary
-	    delta
-	  </li>
-	  <li>
-	    if you lack <b>libcurl</b> you won't
-	    be able to remotely read or write a archive stored using ftp or sftp
-	  </li>
-	  <li>
-	    if you lack <b>python3</b> or
-	    <b>pybind11</b> you won't be able to access
-	    libdar from python environment
-	  </li>
-	  <li>
-	    if you lack <b>libargon2</b> you will only have md5, sha1 and sha512
-	    algorithms to generate
-	    a strong key based on a random salt and the password you provide.
-	  </li>
-	</ul>
+	<table class=center style="width: 100%;">
+	  <tr>
+	    <th style="width:35%;" class=center>
+	      Feature
+	    </th>
+	    <th class=center>
+	      Requirements
+	    </th>
+	  </tr>
+	  <tr>
+	    <th>
+	      zlib compression
+	    </th>
+	    <td>
+	      libz library headers and library
+	    </td>
+	  </tr>
+	  <tr>
+	    <th>
+	      bzip2 compression
+	    </th>
+	    <td>
+	      libbzip2 library headers and library
+	    </td>
+	  </tr>
+	  <tr>
+	    <th>
+	      lzo compression
+	    </th>
+	    <td>
+	      liblzo2 library headers and library
+	    </td>
+	  </tr>
+	  <tr>
+	    <th>
+	      xz/lzma compression
+	    </th>
+	    <td>
+	      libxz library headers and library
+	    </td>
+	  </tr>
+	  <tr>
+	    <th>
+	      zstd compression
+	    </th>
+	    <td>
+	      libzstd library headers and library
+	    </td>
+	  </tr>
+	  <tr>
+	    <th>
+	      lz4 compression
+	    </th>
+	    <td>
+	      liblz4 library headers and library
+	    </td>
+	  </tr>
+	  <tr>
+	    <th>
+	      strong symmetric encryption
+	    </th>
+	    <td>
+	      libgcrypt library headers and library
+	    </td>
+	  </tr>
+	  <tr>
+	    <th>
+	      strong asymmetric encryption
+	    </th>
+	    <td>
+	      libgcrypt library headers and library</br>
+	      libgpgme library headers and library
+	    </td>
+	  </tr>
+	  <tr>
+	    <th>
+	      documentation building
+	    </th>
+	    <td>
+	      the <i>doxygen</i> and<br/>
+	      and <i>dot</i> executables at compilation time
+	    </td>
+	  </tr>
+	  <tr>
+	    <th>
+	      upx-compressed dar binaries
+	    </th>
+	    <td>
+	      the <i>upx</i> executable at compilation time
+	    </td>
+	  </tr>
+	  <tr>
+	    <th>
+	      man page in html format
+	    </th>
+	    <td>
+	      the <i>groff</i> excutable at compilation time
+	    </td>
+	  </tr>
+	  <tr>
+	    <th>
+	      save/restore linux Filesystem Specific Attributes
+	    </th>
+	    <td>
+	      libext2fs library headers and library
+	    </td>
+	  </tr>
+	  <tr>
+	    <th>
+	      dar's --nodump option support
+	    </th>
+	    <td>
+	      libext2fs library headers and library
+	    </td>
+	  </tr>
+	  <tr>
+	    <th>
+	      remote repositories support (ftp, sftp)
+	    </th>
+	    <td>
+	      libthreadar library headers and library<br>
+	      libcurl library headers and library
+	    </td>
+	  </tr>
+	  <tr>
+	    <th>
+	      binary delta support
+	    </th>
+	    <td>
+	      librsync library headers and library
+	    </td>
+	  </tr>
+	  <tr>
+	    <th>
+	      multi-thread compression/decompression
+	    </th>
+	    <td>
+	      libthreadar library headers and library
+	    </td>
+	  </tr>
+	  <tr>
+	    <th>
+	      multi-thread ciphering/deciphering
+	    </th>
+	    <td>
+	      libthreadar library headers and library
+	    </td>
+	  </tr>
+	  <tr>
+	    <th>
+	      python 3 API
+	    </th>
+	    <td>
+	      pybind11 headers and library
+	    </td>
+	  </tr>
+	  <tr>
+	    <th>
+	      key derivation function based on argon2 algorithm
+	    </th>
+	    <td>
+	      libargon2 headers and library
+	    </td>
+	  </tr>
+	</table>
 
 	<h3>Dependencies in distro packages</h3>
 	<p>
@@ -272,14 +347,14 @@
 	  updated.
 	</p>
 
-	<table class=center>
+	<table class=center style="width: 100%;">
 	  <tr>
 	    <th>Distro</th>
 	    <th>Debian/Devuan/Ubuntu</th>
 	  </tr>
 	  <tr>
 	    <th>
-	      gzip compression
+	      libz library
 	    </th>
 	    <td>
 	      zlib1g-dev
@@ -287,7 +362,7 @@
 	  </tr>
 	  <tr>
 	    <th>
-	      bzip2 compression
+	      libbzip2 library
 	    </th>
 	    <td>
 	      libbz2-dev
@@ -295,7 +370,7 @@
 	  </tr>
 	  <tr>
 	    <th>
-	      lzo compression
+	      liblzo2 library
 	    </th>
 	    <td>
 	      liblzo2-dev
@@ -303,7 +378,7 @@
 	  </tr>
 	  <tr>
 	    <th>
-	      xz compression
+	      libxz library
 	    </th>
 	    <td>
 	      liblzma-dev
@@ -311,7 +386,7 @@
 	  </tr>
 	  <tr>
 	    <th>
-	      zstd compression
+	      libzstd library
 	    </th>
 	    <td>
 	      libzstd-dev
@@ -319,7 +394,7 @@
 	  </tr>
 	  <tr>
 	    <th>
-	      lz4 compression
+	      liblz4 library
 	    </th>
 	    <td>
 	      liblz4-dev
@@ -327,7 +402,7 @@
 	  </tr>
 	  <tr>
 	    <th>
-	      symmetric strong encryption
+	      libgcrypt library
 	    </th>
 	    <td>
 	      libgcrypt-dev
@@ -335,7 +410,7 @@
 	  </tr>
 	  <tr>
 	    <th>
-	      asymmetric strong encryption
+	      libgpgme library
 	    </th>
 	    <td>
 	      libgpgme-dev
@@ -343,7 +418,7 @@
 	  </tr>
 	  <tr>
 	    <th>
-	      documentation buiding
+	      doxygen binary
 	    </th>
 	    <td>
 	      doxygen
@@ -351,7 +426,7 @@
 	  </tr>
 	  <tr>
 	    <th>
-	      graphs in documentation
+	      dot binary
 	    </th>
 	    <td>
 	      graphviz
@@ -359,7 +434,7 @@
 	  </tr>
 	  <tr>
 	    <th>
-	      upx compressed binaries
+	      upx binary
 	    </th>
 	    <td>
 	      upx
@@ -367,7 +442,7 @@
 	  </tr>
 	  <tr>
 	    <th>
-	      man page in html
+	      groff binary
 	    </th>
 	    <td>
 	      groff
@@ -375,7 +450,7 @@
 	  </tr>
 	  <tr>
 	    <th>
-	      ext2/3/4 specific support
+	      libext2fs library
 	    </th>
 	    <td>
 	      libext2fs-dev
@@ -383,7 +458,7 @@
 	  </tr>
 	  <tr>
 	    <th>
-	      multi-threading
+	      libthreadar library
 	    </th>
 	    <td>
 	      libthreadar has to be installed manually
@@ -391,7 +466,7 @@
 	  </tr>
 	  <tr>
 	    <th>
-	      binary delta
+	      librsync library
 	    </th>
 	    <td>
 	      librsync-dev
@@ -399,7 +474,7 @@
 	  </tr>
 	  <tr>
 	    <th>
-	      embedded sftp and ftp support
+	      libcurl library
 	    </th>
 	    <td>
 	      libcurl-dev
@@ -407,7 +482,7 @@
 	  </tr>
 	  <tr>
 	    <th>
-	      python binding
+	      pybind11 library
 	    </th>
 	    <td>
 	      pybind11-dev
@@ -415,7 +490,7 @@
 	  </tr>
 	  <tr>
 	    <th>
-	      argon key derivation fonction
+	      libargon2 library
 	    </th>
 	    <td>
 	      libargon2-dev
@@ -497,8 +572,8 @@
 	  it will look for <code>/etc/darrc</code> and not
 	  <code>/some/where/etc/darrc</code>. You can thus build a package from
 	  files under <code>/some/where</code> by mean of a
-	  pakage management tool, then install/remove this package as if it was
-	  provided by your distro maintainer.
+	  pakage management tool, then install/remove this package with the distro
+	  package management tools.
 	</p>
 
 
