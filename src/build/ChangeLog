@@ -9,7 +9,7 @@ from 2.7.5 to 2.7.6
 - typo fixes in documentation
 - fixed message in lax mode used to obtain from the user the archive format
   when this information is corrupted in the archive.
-- fixing lax mode condition that poped up without being requested
+- fixing lax mode condition that popped up without being requested
 - fixing bug met when reading slice an special block device by mean of
   a symlink
 - adapting sanity checks to the case of a backup read from a special
