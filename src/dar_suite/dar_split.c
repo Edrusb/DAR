@@ -91,7 +91,7 @@
 
 #define KEY_INPUT "split_input"
 #define KEY_OUTPUT "split_output"
-#define DAR_SPLIT_VERSION "1.2.1"
+#define DAR_SPLIT_VERSION "1.2.2"
 
 #define ERR_SYNTAX 1
 #define ERR_TIMER 2
@@ -131,7 +131,7 @@ int main(int argc, char *argv[])
 
 	/* command line parsing */
 
-    while((lu = getopt(argc, argv, "-sb:hvr:c:")) != EOF)
+    while((lu = getopt(argc, argv, "-sb:hvVr:c:")) != EOF)
     {
 	switch(lu)
 	{
@@ -170,6 +170,7 @@ int main(int argc, char *argv[])
 	    usage(argv[0]);
 	    return 0;
 	case 'v':
+	case 'V':
 	    show_version(argv[0]);
 	    return 0;
 	case ':':
