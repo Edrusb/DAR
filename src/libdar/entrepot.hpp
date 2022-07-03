@@ -112,6 +112,7 @@ namespace libdar
 	    /// \param[in] fail_if_exists tells whether the underlying implementation have to fail throwing Erange("exists") if the file already exist when write access is required
 	    /// \param[in] erase tells whether the underlying implementation will empty an existing file before writing to it
 	    /// \param[in] algo defines the hash file to create, other value than hash_none are accepted only in writeonly mode with erase or fail_if_exist set
+	    /// \param[in] provide_a_plain_file if true a plainly seekable object is returned which mimics the available features of a plain file, else a pipe-like object which has limited seek features but which can still record the offset position is returned and is suitable to be used on real named/anonymous pipes (if the provided filename is expected to be of such type for example)
 	    /// \return upon success returns an object from a class inherited from fichier_global that the caller has the duty to delete, else an exception is thrown (most of the time it should be a Esystem object)
 	    /// by the called inherited class
 	fichier_global *open(const std::shared_ptr<user_interaction> & dialog,
@@ -121,7 +122,8 @@ namespace libdar
 			     U_I permission,
 			     bool fail_if_exists,
 			     bool erase,
-			     hash_algo algo) const;
+			     hash_algo algo,
+			     bool provide_a_plain_file = true) const;
 
 	    /// routines to read existing files in the current directory (see set_location() / set_root() methods)
 	virtual void read_dir_reset() const = 0;
