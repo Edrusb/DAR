@@ -578,9 +578,16 @@ namespace libdar
 	    if(of_fd != nullptr)
 	    {
 		tmp = of_fd->read(a+lu, sz-lu);
-		if(!slicing.older_sar_than_v8 && of_fd->get_position() == size_of_current)
-		    if(tmp > 0)
-			--tmp; // we do not "read" the terminal flag
+		if(!slicing.older_sar_than_v8)
+		{
+			// we must avoir reading the terminal flag
+			// when we reach an end of slice
+
+		    if((!size_of_current.is_zero() && of_fd->get_position() == size_of_current)  // eof of slice reached
+		       || (size_of_current.is_zero() && tmp < sz-lu)) // eof slice in sequential read mode when slice size cannot be know
+			if(tmp > 0)
+			    --tmp; // we do not "read" the terminal flag
+		}
 	    }
 	    else
 		tmp = 0; // simulating an end of slice
