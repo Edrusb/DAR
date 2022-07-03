@@ -110,7 +110,7 @@ namespace libdar
 
 	    /// a partial writing is allowed when no space is available for writing
 	    /// this let global_ficher interact with the user asking whether it can make place
-	    /// or if (s)he wants to abord
+	    /// or if (s)he wants to abort
 	    /// \param[in] a points to the start of the area of data to write
 	    /// \param[in] size is the size in byte of the data to write
 	    /// \return the amount of byte wrote. If the returned value is less than size, this
