@@ -121,13 +121,8 @@ namespace libdar
 		else
 		    ret = nullptr; // now managed by pipe_g
 
-		ret = new (nothrow) cache_global(dialog,
-						 pipe_g,
-						 true);
-		if(ret == nullptr)
-		    throw Ememory("entrepot::open");
-		else
-		    pipe_g = nullptr; // now managed by cache_g
+		ret = pipe_g;
+		pipe_g = nullptr;
 	    }
 
 	    if(algo != hash_algo::none)
