@@ -757,8 +757,20 @@ namespace libdar
 				   !seq_read);
 		if(of_fd == nullptr)
 		    throw SRC_BUG;
-		of_fd->fadvise(fichier_global::advise_normal);
-		    // we have no advise to give to the system when reading a slice
+		if(!seq_read)
+		{
+		    try
+		    {
+			of_fd->fadvise(fichier_global::advise_normal);
+			    // we have no advise to give to the system when reading a slice
+		    }
+		    catch(Erange & e)
+		    {
+			    // we silently ignore fadvise error
+			    // this is not crucial
+		    }
+		}
+
 		size_of_current = of_fd->get_size();
 	    }
 	    catch(Euser_abort & e)

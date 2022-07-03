@@ -396,10 +396,18 @@ namespace libdar
 			if(crc_dyn != nullptr)
 			    delete crc_dyn;
 
-			    // nop we do not sync before, so maybe some pages
-			    // will be kept in cache for Linux, maybe not for
-			    // other systems that support fadvise(2)
-			dest.fadvise(fichier_global::advise_dontneed);
+			try
+			{
+				// nop we do not sync before, so maybe some pages
+				// will be kept in cache for Linux, maybe not for
+				// other systems that support fadvise(2)
+			    dest.fadvise(fichier_global::advise_dontneed);
+			}
+			catch(Erange & e)
+			{
+				// silently ignoring any fadvise error
+				// this is not crucial anyway
+			}
 		    }
 		    catch(...)
 		    {
