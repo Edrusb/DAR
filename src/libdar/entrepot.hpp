@@ -21,10 +21,13 @@
 
     /// \file entrepot.hpp
     /// \brief defines the entrepot interface.
-
+    ///
     /// Entrepot interface defines a generic way to interact with files (slices)
-    /// on a filesystem. It is used to instanciate file-like objects (from classes inherited
+    /// on a filesystem. It is used to instantiate file-like objects (from classes inherited
     /// from class fichier_global), in order to read or write data to such files.
+    /// \note only the constructors of class entrepot are part of libdar API
+    /// the other methods may change without notice and are not expected to be used
+    /// from external applications.
     /// \ingroup API
 
 #ifndef ENTREPOT_HPP
