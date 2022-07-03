@@ -746,7 +746,8 @@ namespace libdar
 				   0,     //< permission to enforce (not used here)
 				   false, //<  fail if exists
 				   false, //<  erase
-				   hash_algo::none);
+				   hash_algo::none,
+				   !seq_read);
 		if(of_fd == nullptr)
 		    throw SRC_BUG;
 		of_fd->fadvise(fichier_global::advise_normal);
