@@ -21,14 +21,10 @@
 
     /// \file entrepot.hpp
     /// \brief defines the entrepot interface.
+
     /// Entrepot interface defines a generic way to interact with files (slices)
-    /// on a filesystem. It is used to instanciate file-like objects (from class inherited
-    /// from class fichier_global, in order to read or write data to such file.
-    /// The entrepot_local and fichier_local classes are the only one classes
-    /// available from libdar to implement the entrepot and fichier classes interfaces
-    /// respectively. External applications like webdar can implement entrepot_ftp
-    /// and fichier_ftp classes to provide transparent access to dar backup localted on a
-    /// remote ftp server. More can follow in the future.
+    /// on a filesystem. It is used to instanciate file-like objects (from classes inherited
+    /// from class fichier_global), in order to read or write data to such files.
     /// \ingroup API
 
 #ifndef ENTREPOT_HPP
