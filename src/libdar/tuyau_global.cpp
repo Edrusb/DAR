@@ -106,7 +106,8 @@ namespace libdar
 
     bool tuyau_global::fichier_global_inherited_read(char *a, U_I size, U_I & read, std::string & message)
     {
-	current_pos += ptr->read(a, size);
+	read = ptr->read(a, size);
+	current_pos += read;
 	return true;
     }
 
