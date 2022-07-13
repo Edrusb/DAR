@@ -11,12 +11,13 @@ loopit=0
 sleeptime=10
 
 while ! $* ; do
+    # we reset the terminal:
+    reset
     loopit=$(( $loopit + 1 ))
     echo "Failure number $loopit. Sleeping $sleeptime seconds and retring"
     sleep $sleeptime
 done
 
-reset
 if [ $loopit -eq 0 ] ; then
     echo "The command [$*] has completed without retry"
 else
