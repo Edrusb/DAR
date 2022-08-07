@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: DAR 2.7.0\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612&atid=511612\n"
-"POT-Creation-Date: 2022-06-19 13:43+0200\n"
-"PO-Revision-Date: 2022-06-12 00:45+0200\n"
+"POT-Creation-Date: 2022-08-07 12:43+0200\n"
+"PO-Revision-Date: 2022-08-07 12:17+0200\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
 "Language: fr\n"
@@ -3082,7 +3082,7 @@ msgstr ""
 "Le répertoire %S n'existe pas ou est un lien symbolic pointant nulle part"
 
 #: src/libdar/trivial_sar.cpp:224 src/libdar/trivial_sar.cpp:242
-#: src/libdar/sar.cpp:1164 src/libdar/sar.cpp:1235 src/libdar/sar.cpp:1246
+#: src/libdar/sar.cpp:1184 src/libdar/sar.cpp:1255 src/libdar/sar.cpp:1266
 #, c-format
 msgid "Failed creating slice %S: "
 msgstr "Échec de création d'une tranche %S: "
@@ -3988,11 +3988,17 @@ msgstr ""
 msgid "Copied data does not match CRC"
 msgstr "Les données copiées ne correspondent pas au CRC"
 
-#: src/libdar/filtre.cpp:3542
+#: src/libdar/filtre.cpp:3399
+#, c-format
+msgid "Failed to set fadvise() for file %S, this is not crucial, no problem"
+msgstr ""
+"Echec de fadvise() pour le fichier %S, ce n'est pas crucial, pas de problème"
+
+#: src/libdar/filtre.cpp:3550
 msgid " : Failed resaving uncompressed the inode data"
 msgstr " : Echec de la sauvegarde sans compression des données de l'inode"
 
-#: src/libdar/filtre.cpp:3552
+#: src/libdar/filtre.cpp:3560
 msgid ""
 " : Resaving uncompressed the inode data to gain space is not possible, "
 "keeping data compressed"
@@ -4000,7 +4006,7 @@ msgstr ""
 " : Resauver sans compression les données de l'inode pour gagner de la place "
 "n'est pas possible, on conserve les données compressées"
 
-#: src/libdar/filtre.cpp:3596
+#: src/libdar/filtre.cpp:3604
 #, c-format
 msgid ""
 "File has disappeared while we were reading it, cannot check whether it has "
@@ -4009,13 +4015,13 @@ msgstr ""
 "Le fichier a disparu alors que nous étions en train de le lire, impossible "
 "de vérifier s'il a changé lors de sa sauvegarde : %S"
 
-#: src/libdar/filtre.cpp:3654
+#: src/libdar/filtre.cpp:3662
 #, c-format
 msgid ""
 "WARNING! File modified while reading it for backup. Performing retry %i of %i"
 msgstr "ATTENTION ! Fichier modifié pendant sa sauvegarde. Tentative %i sur %i"
 
-#: src/libdar/filtre.cpp:3671
+#: src/libdar/filtre.cpp:3679
 msgid ""
 "WARNING! File modified while reading it for backup. No more retry for that "
 "file to not exceed the wasted byte limit. File is "
@@ -4024,22 +4030,22 @@ msgstr ""
 "nouvelle tentative pour ce fichier afin de de pas dépasser la taille "
 "maximale de gaspillage autorisée. Le fichier est "
 
-#: src/libdar/filtre.cpp:3678
+#: src/libdar/filtre.cpp:3686
 msgid ""
 "WARNING! File modified while reading it for backup, but no more retry "
 "allowed: "
 msgstr ""
 "ATTENTION ! Fichier modifié pendant sa sauvegarde, plus de nouvelle tentative"
 
-#: src/libdar/filtre.cpp:3700
+#: src/libdar/filtre.cpp:3708
 msgid "Dumping delta signature structure for saved file: "
 msgstr "Enregistrement de la signature delta pour le fichier : "
 
-#: src/libdar/filtre.cpp:3856
+#: src/libdar/filtre.cpp:3864
 msgid "Saving Extended Attributes for "
 msgstr "Sauvegarde des Attributs Étendus de "
 
-#: src/libdar/filtre.cpp:3891
+#: src/libdar/filtre.cpp:3899
 #, c-format
 msgid ""
 "Computed EA CRC for file %S differs from what was stored in the archive, "
@@ -4048,11 +4054,11 @@ msgstr ""
 "Le CRC calculé pour sur EA du fichier %S diffère de celui stocké dans "
 "l'archive, les EA de ce fichier sont probablement corrompus"
 
-#: src/libdar/filtre.cpp:3938
+#: src/libdar/filtre.cpp:3946
 msgid "Error saving Extended Attributes for "
 msgstr "Erreur lors de la sauvegarde des Attributs Étendus de "
 
-#: src/libdar/filtre.cpp:3942
+#: src/libdar/filtre.cpp:3950
 msgid ""
 "be advised that a CRC error will be reported for the EA of that file while "
 "sequentially reading the repaired archive"
@@ -4060,12 +4066,12 @@ msgstr ""
 "Nota bene : une erreur de CRC sera signalée pour les EA de ce fichier lors "
 "d'une lecture séquentielle de l'archive réparée"
 
-#: src/libdar/filtre.cpp:3977
+#: src/libdar/filtre.cpp:3985
 msgid "Saving Filesystem Specific Attributes for "
 msgstr ""
 "Sauvegarde des attributs spécifiques au système de fichier Étendus pour "
 
-#: src/libdar/filtre.cpp:4010
+#: src/libdar/filtre.cpp:4018
 #, c-format
 msgid ""
 "Computed FSA CRC for file %S differs from what was stored in the archive, "
@@ -4074,11 +4080,11 @@ msgstr ""
 "Le CRC calculé sur les FSA du fichier %S diffère de celui stocké dans "
 "l'archive, les FSA de ce fichier sont probablement corrompus"
 
-#: src/libdar/filtre.cpp:4055
+#: src/libdar/filtre.cpp:4063
 msgid "Error saving Filesystem Specific Attributes for "
 msgstr "Erreur lors de la sauvegarde des FSA de "
 
-#: src/libdar/filtre.cpp:4059
+#: src/libdar/filtre.cpp:4067
 msgid ""
 "be advised that a CRC error will be reported for the FSA of that file while "
 "sequentially reading the repaired archive"
@@ -4086,15 +4092,15 @@ msgstr ""
 "Nota bene : une erreur de CRC sera signalée pour les FSA de ce fichier lors "
 "d'une lecture séquentielle de l'archive réparée"
 
-#: src/libdar/filtre.cpp:4617
+#: src/libdar/filtre.cpp:4625
 msgid "Copying delta signature structure from the archive of reference: "
 msgstr "Copie des signature delta depuis l'archive de référence : "
 
-#: src/libdar/filtre.cpp:4656
+#: src/libdar/filtre.cpp:4664
 msgid "Calculating delta signature from filesystem: "
 msgstr "Calcul de signature delta à partir du système de fichiers : "
 
-#: src/libdar/filtre.cpp:4736
+#: src/libdar/filtre.cpp:4744
 #, c-format
 msgid ""
 "Furtive read mode requires either root permission and FOWNER capability, "
@@ -6668,38 +6674,38 @@ msgstr "impossible de fournir des données pour un fichier non sauvegardé"
 msgid "data has been cleaned, object is now empty"
 msgstr "données purgées, l'objet est maintenant vide"
 
-#: src/libdar/cat_file.cpp:877
+#: src/libdar/cat_file.cpp:885
 msgid "can't read data CRC: No escape mark found for that file"
 msgstr ""
 "Ne peut lire le CRC sur les données : aucune séquence d'échappement trouvée "
 "pour ce fichier"
 
-#: src/libdar/cat_file.cpp:1080
+#: src/libdar/cat_file.cpp:1088
 msgid "can't find mark for delta signature"
 msgstr "Marque pour signature delta introuvable"
 
-#: src/libdar/cat_file.cpp:1097
+#: src/libdar/cat_file.cpp:1105
 msgid "Error while retrieving delta signature from the archive: "
 msgstr "Erreur lors de la récupération de signature delta depuis l'archive : "
 
-#: src/libdar/cat_file.cpp:1203
+#: src/libdar/cat_file.cpp:1211
 #, c-format
 msgid "not same size: %i <--> %i"
 msgstr "tailles différentes : %i <--> %i"
 
-#: src/libdar/cat_file.cpp:1210 src/libdar/cat_inode.cpp:417
+#: src/libdar/cat_file.cpp:1218 src/libdar/cat_inode.cpp:417
 #, c-format
 msgid "difference of last modification date: %S <--> %S"
 msgstr "différence de date de dernière modification : %S <--> %S"
 
-#: src/libdar/cat_file.cpp:1271
+#: src/libdar/cat_file.cpp:1279
 #, c-format
 msgid "different file data, offset of first difference is: %i"
 msgstr ""
 "les donnes ne correspondent pas: position de la première différence au sein "
 "du fichier: %i"
 
-#: src/libdar/cat_file.cpp:1279
+#: src/libdar/cat_file.cpp:1287
 msgid ""
 "Same data but CRC value could not be verified because we did not guessed "
 "properly its width (sequential read restriction)"
@@ -6707,28 +6713,28 @@ msgstr ""
 "Données identiques mais CRC non vérifié, car sa largeur n'a pas été devinée "
 "correctement (restriction due à la lecture sequentielle)"
 
-#: src/libdar/cat_file.cpp:1281
+#: src/libdar/cat_file.cpp:1289
 msgid "Same data but stored CRC does not match the data!?!"
 msgstr ""
 "Même donnée, mais le CRC enregistré ne correspond pas à ces données !?!"
 
-#: src/libdar/cat_file.cpp:1322
+#: src/libdar/cat_file.cpp:1330
 msgid "Delta signature do not match"
 msgstr "Les signatures delta ne correspondent pas"
 
-#: src/libdar/cat_file.cpp:1364
+#: src/libdar/cat_file.cpp:1372
 #, c-format
 msgid "Delta signature do not have the same size: %i <--> %i"
 msgstr "tailles différentes des signatures delta : %i <--> %i"
 
 #
-#: src/libdar/cat_file.cpp:1366
+#: src/libdar/cat_file.cpp:1374
 msgid "Delta signature have the same size but do not match"
 msgstr ""
 "Les signatures delta ont bien la même taille mais leurs contenus ne "
 "correspondent pas"
 
-#: src/libdar/cat_file.cpp:1409
+#: src/libdar/cat_file.cpp:1417
 msgid "CRC difference concerning file's data"
 msgstr "Difference de CRC pour les données du fichier"
 
@@ -7121,11 +7127,11 @@ msgstr "Taille de fichier trop petite"
 msgid "First file size too small"
 msgstr "Taille du premier fichier trop petite"
 
-#: src/libdar/sar.cpp:760
+#: src/libdar/sar.cpp:780
 msgid "LAX MODE: Caught exception: "
 msgstr "MODE RELAX : Exception attrapée : "
 
-#: src/libdar/sar.cpp:761
+#: src/libdar/sar.cpp:781
 #, c-format
 msgid ""
 "LAX MODE: %S is missing, You have the possibility to create a zero byte "
@@ -7140,13 +7146,13 @@ msgstr ""
 "cette tranche, mais au moins libdar pourra continuer. Peut on continuer "
 "maintenant ?"
 
-#: src/libdar/sar.cpp:773
+#: src/libdar/sar.cpp:793
 #, c-format
 msgid "%S is required for further operation, please provide the file."
 msgstr ""
 "%S est requis pour la suite des opérations, merci de fournir ce fichier."
 
-#: src/libdar/sar.cpp:775
+#: src/libdar/sar.cpp:795
 #, c-format
 msgid ""
 "%S is required for further operation, please provide the file if you have it."
@@ -7154,17 +7160,17 @@ msgstr ""
 "%S est requis pour la suite des opérations, merci de fournir ce fichier si "
 "vous l'avez."
 
-#: src/libdar/sar.cpp:780
+#: src/libdar/sar.cpp:800
 #, c-format
 msgid "Failed reading slice %S: "
 msgstr "Echec de lecture de la tranche %S : "
 
-#: src/libdar/sar.cpp:823
+#: src/libdar/sar.cpp:843
 #, c-format
 msgid "%S has a bad or corrupted header, please provide the correct file."
 msgstr "%S a un en-tête corrompu ou malformé, merci de fournir le bon fichier."
 
-#: src/libdar/sar.cpp:827
+#: src/libdar/sar.cpp:847
 #, c-format
 msgid ""
 "LAX MODE: %S has a bad or corrupted header, trying to guess original values "
@@ -7173,7 +7179,7 @@ msgstr ""
 "MODE RELAX : %S a un en-tête corrompu, tentative de détermination des "
 "valeurs d'origine puis on continue si c'est possible"
 
-#: src/libdar/sar.cpp:837
+#: src/libdar/sar.cpp:857
 #, c-format
 msgid ""
 "%S is not a valid file (wrong magic number), please provide the good file."
@@ -7181,7 +7187,7 @@ msgstr ""
 "%S n'est pas un fichier valide (mauvais numéro magique), merci de fournir le "
 "bon fichier."
 
-#: src/libdar/sar.cpp:841
+#: src/libdar/sar.cpp:861
 #, c-format
 msgid ""
 "LAX MODE: In spite of its name, %S does not appear to be a dar slice, "
@@ -7190,14 +7196,14 @@ msgstr ""
 "MODE RELAX : En dépit de son nom, %S ne semble pas être une tranche "
 "d'archive, on suppose qu'une corruption des données a eu lieu et on continue"
 
-#: src/libdar/sar.cpp:845
+#: src/libdar/sar.cpp:865
 msgid ""
 "This is an old archive, it can only be opened starting by the first slice"
 msgstr ""
 "Ceci est une ancienne archive, elle doit être ouverte en lisant d'abord la "
 "première tranche"
 
-#: src/libdar/sar.cpp:872
+#: src/libdar/sar.cpp:892
 msgid ""
 "LAX MODE: Due to probable data corruption, dar could not determine the "
 "correct size of slices in this archive. For recent archive, this information "
@@ -7209,55 +7215,55 @@ msgstr ""
 "information est dupliquée dans chaque tranche. Voulez-vous essayer de lire "
 "une autre tranche pour récupérer cette information ?"
 
-#: src/libdar/sar.cpp:876
+#: src/libdar/sar.cpp:896
 msgid "LAX MODE: Please provide the slice number to read: "
 msgstr "MODE RELAX : Merci de fournir le numéro de la tranche à lire : "
 
-#: src/libdar/sar.cpp:884
+#: src/libdar/sar.cpp:904
 msgid "LAX MODE: Please provide an strictly positive integer number"
 msgstr "MODE RELAX : Merci de fournir un nombre entier strictement positif"
 
-#: src/libdar/sar.cpp:890
+#: src/libdar/sar.cpp:910
 #, c-format
 msgid "LAX MODE: opening slice %i to read its slice header"
 msgstr ""
 "MODE RELAX : ouverture de la tranche %i afin de lire l'en-tête de tranche"
 
-#: src/libdar/sar.cpp:892
+#: src/libdar/sar.cpp:912
 #, c-format
 msgid "LAX MODE: closing slice %i, header properly fetched"
 msgstr ""
 "MODE RELAX : fermeture de la tranche %i, l'en-tête a pu être lu correctement"
 
-#: src/libdar/sar.cpp:898
+#: src/libdar/sar.cpp:918
 msgid ""
 "LAX MODE: In spite of a the absence of a known slice size, continuing anyway"
 msgstr ""
 "MODE RELAX : On continue malgré l'absence d'information à propos de la "
 "taille des tranches"
 
-#: src/libdar/sar.cpp:907
+#: src/libdar/sar.cpp:927
 msgid "Incoherent slice header: First slice size too small"
 msgstr "En-tête de tranche incohérent : taille de première tranche trop petite"
 
-#: src/libdar/sar.cpp:912
+#: src/libdar/sar.cpp:932
 msgid "incoherent slice header: Slice size too small"
 msgstr "En-tête de tranche incohérent : taille de tranche trop petite"
 
-#: src/libdar/sar.cpp:919
+#: src/libdar/sar.cpp:939
 #, c-format
 msgid "Error opening %S : "
 msgstr "Erreur d'ouverture de %S : "
 
-#: src/libdar/sar.cpp:919
+#: src/libdar/sar.cpp:939
 msgid " . Retry ?"
 msgstr " . Essayer à nouveau ?"
 
-#: src/libdar/sar.cpp:930
+#: src/libdar/sar.cpp:950
 msgid " is a slice from another backup, please provide the correct slice."
 msgstr " est une tranche d'une autre archive, merci de fournir le bon fichier."
 
-#: src/libdar/sar.cpp:935
+#: src/libdar/sar.cpp:955
 msgid ""
 "LAX MODE: internal name of the slice leads dar to consider it is not member "
 "of the same archive. Assuming data corruption occurred and relying on the "
@@ -7267,18 +7273,18 @@ msgstr ""
 "pas partie de la même archive. On suppose qu'il s'agit d'une corruption de "
 "données et on ignore cette erreur"
 
-#: src/libdar/sar.cpp:965
+#: src/libdar/sar.cpp:985
 msgid ""
 "Data corruption met at end of slice, forbidden flag found at this position"
 msgstr ""
 "Corruption de données rencontré en fin de tranche, drapeau interdit à cet "
 "endroit"
 
-#: src/libdar/sar.cpp:971
+#: src/libdar/sar.cpp:991
 msgid "Data corruption met at end of slice, unknown flag found"
 msgstr "Corruption de données rencontrée en fin de tranche, drapeau inconnu"
 
-#: src/libdar/sar.cpp:1000
+#: src/libdar/sar.cpp:1020
 #, c-format
 msgid ""
 "Two different slices (%i and %i) are marked as the last slice of the backup!"
@@ -7286,7 +7292,7 @@ msgstr ""
 "Deux tranches différentes %i et %i sont toutes les deux marquées comme la "
 "dernière de l'archive !"
 
-#: src/libdar/sar.cpp:1003
+#: src/libdar/sar.cpp:1023
 #, c-format
 msgid ""
 "LAX MODE: slices %i and %i are both recorded as last slice of the archive, "
@@ -7296,13 +7302,13 @@ msgstr ""
 "dernière de l'archive, on considère que la dernière est celle de numéro le "
 "plus élevé"
 
-#: src/libdar/sar.cpp:1026
+#: src/libdar/sar.cpp:1046
 #, c-format
 msgid "Slice %S has an unknown flag (neither terminal nor non_terminal file)."
 msgstr ""
 "La tranche %S possède un drapeau inconnu (ni terminal ni non-terminal)."
 
-#: src/libdar/sar.cpp:1036
+#: src/libdar/sar.cpp:1056
 #, c-format
 msgid ""
 "Due to data corruption, it is not possible to know if slice %S is the last "
@@ -7317,19 +7323,19 @@ msgstr ""
 "selon la nature de cette tranche (vous pouvez-aussi répondre par \"stop\" "
 "pour arrêter le programme immédiatement) : "
 
-#: src/libdar/sar.cpp:1038 src/libdar/sar.cpp:1042
+#: src/libdar/sar.cpp:1058 src/libdar/sar.cpp:1062
 msgid "last"
 msgstr "dernier"
 
-#: src/libdar/sar.cpp:1038
+#: src/libdar/sar.cpp:1058
 msgid "notlast"
 msgstr "non dernier"
 
-#: src/libdar/sar.cpp:1038 src/libdar/sar.cpp:1040
+#: src/libdar/sar.cpp:1058 src/libdar/sar.cpp:1060
 msgid "abort"
 msgstr "stop"
 
-#: src/libdar/sar.cpp:1054
+#: src/libdar/sar.cpp:1074
 msgid ""
 "LAX MODE: Slice flag corrupted, but a slice of higher number has been seen, "
 "thus the header flag was surely not indicating this slice as the last of the "
@@ -7339,43 +7345,43 @@ msgstr ""
 "numéro supérieur a déjà été vu, ce drapeau ne pouvait pas indiquer cette "
 "tranche comme la dernière de l'archive, on continue"
 
-#: src/libdar/sar.cpp:1098
+#: src/libdar/sar.cpp:1118
 #, c-format
 msgid "failed openning slice %S: %S. Will try to erase it first, if allowed"
 msgstr ""
 "Echec d'ouverture de la tranche %S: %S. Nouvelle tentative avec écrasement "
 "préalable, si autorisé"
 
-#: src/libdar/sar.cpp:1185
+#: src/libdar/sar.cpp:1205
 msgid "file exists, and DONT_ERASE option is set."
 msgstr "le fichier existe et l'option contre l'écrasement a été activée."
 
-#: src/libdar/sar.cpp:1190
+#: src/libdar/sar.cpp:1210
 msgid " is about to be overwritten."
 msgstr " est sur le point d'être écrasé."
 
-#: src/libdar/sar.cpp:1270
+#: src/libdar/sar.cpp:1290
 msgid ""
 "First slice size is too small to even just be able to drop the slice header"
 msgstr ""
 "La taille de la première tranche est trop petite pour être en mesure "
 "contenir ne serait-ce que l'en-tête de tranche"
 
-#: src/libdar/sar.cpp:1272
+#: src/libdar/sar.cpp:1292
 msgid "Slice size is too small to even just be able to drop the slice header"
 msgstr ""
 "La taille de tranche est trop petite pour être en mesure de contenir ne "
 "serait-ce que l'en-tête de tranche"
 
-#: src/libdar/sar.cpp:1338
+#: src/libdar/sar.cpp:1358
 msgid "Finished writing to file "
 msgstr "Écriture terminée dans le fichier "
 
-#: src/libdar/sar.cpp:1338
+#: src/libdar/sar.cpp:1358
 msgid ", ready to continue ? "
 msgstr ", prêt à continuer ? "
 
-#: src/libdar/sar.cpp:1343
+#: src/libdar/sar.cpp:1363
 msgid ""
 "If you really want to abort the archive creation hit CTRL-C, then press "
 "enter."
@@ -7383,19 +7389,19 @@ msgstr ""
 "Si vous voulez vraiment arrêter la création de l'archive, appuyez sur CTRL+C "
 "puis appuyez sur la touche entrée"
 
-#: src/libdar/sar.cpp:1375
+#: src/libdar/sar.cpp:1395
 msgid "file not open"
 msgstr "Fichier non ouvert"
 
-#: src/libdar/sar.cpp:1409
+#: src/libdar/sar.cpp:1429
 msgid "The last file of the set is not present in "
 msgstr "Le dernier fichier (tranche) de l'archive n'est pas présent dans "
 
-#: src/libdar/sar.cpp:1409
+#: src/libdar/sar.cpp:1429
 msgid " , please provide it."
 msgstr " , veuillez le fournir."
 
-#: src/libdar/sar.cpp:1423
+#: src/libdar/sar.cpp:1443
 #, c-format
 msgid ""
 "No backup file is present in %S for archive %S, please provide the last file "
@@ -7435,7 +7441,7 @@ msgstr ""
 msgid "Bad CRC, data corruption occurred"
 msgstr "Mauvais CRC, une corruption des données a eu lieu"
 
-#: src/libdar/filesystem_hard_link_write.cpp:435
+#: src/libdar/filesystem_hard_link_write.cpp:443
 #, c-format
 msgid ""
 "error restoring Unix socket %s, path too long to be stored properly, socket "
@@ -7444,19 +7450,19 @@ msgstr ""
 "Erreur de création de la prise Unix %s: chemin trop long, la prise sera crée "
 "comme %s, OK ?"
 
-#: src/libdar/filesystem_hard_link_write.cpp:437
+#: src/libdar/filesystem_hard_link_write.cpp:445
 msgid "Error creating Unix socket file: "
 msgstr "Erreur lors de la création de la prise Unix : "
 
-#: src/libdar/filesystem_hard_link_write.cpp:457
+#: src/libdar/filesystem_hard_link_write.cpp:465
 msgid "Could not create inode: "
 msgstr "Création d'une inode impossible : "
 
-#: src/libdar/filesystem_hard_link_write.cpp:459
+#: src/libdar/filesystem_hard_link_write.cpp:467
 msgid "Cannot create inode: "
 msgstr "Création d'une inode impossible : "
 
-#: src/libdar/filesystem_hard_link_write.cpp:459
+#: src/libdar/filesystem_hard_link_write.cpp:467
 msgid " Ready to continue ?"
 msgstr " Prêt à continuer ?"
 
@@ -8573,11 +8579,11 @@ msgstr "données compressées corrompues"
 msgid "compressed data CRC error"
 msgstr "erreur de CRC sur les données compressées"
 
-#: src/libdar/entrepot.cpp:69
+#: src/libdar/entrepot.cpp:71
 msgid "root's entrepot must be an absolute path: "
 msgstr "La racine de l'entrepot doit être une chemin absolu: "
 
-#: src/libdar/entrepot.cpp:156
+#: src/libdar/entrepot.cpp:173
 msgid "Error met while creating the hash file: "
 msgstr "Erreur lors de la cration du fichier de hashage : "
 

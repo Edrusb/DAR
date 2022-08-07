@@ -3397,8 +3397,16 @@ namespace libdar
 						// a bit more slower.).
 					}
 					fichier_global *s_fic = dynamic_cast<fichier_global *>(source);
-					if(s_fic != nullptr)
-					    s_fic->fadvise(fichier_global::advise_dontneed);
+					try
+					{
+					    if(s_fic != nullptr)
+						s_fic->fadvise(fichier_global::advise_dontneed);
+					}
+					catch(Erange & e)
+					{
+					    dialog->message(tools_printf(gettext("Failed to set fadvise() for file %S, this is not crucial, no problem"), &info_quoi));
+					}
+
 					source->terminate();
 
 					    // we need this for amount of data written to be properly calculated

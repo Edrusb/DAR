@@ -533,9 +533,17 @@ namespace libdar
 		if(mode != normal && mode != plain)
 		    throw SRC_BUG; // keep compressed/keep_hole is not possible on an inode take from a filesystem
 		ret = tmp = new (nothrow) fichier_local(chemin, furtive_read_mode);
-		if(tmp != nullptr)
-			// telling *tmp to flush the data from the cache as soon as possible
-		    tmp->fadvise(fichier_global::advise_dontneed);
+		try
+		{
+		    if(tmp != nullptr)
+			    // telling *tmp to flush the data from the cache as soon as possible
+			tmp->fadvise(fichier_global::advise_dontneed);
+		}
+		catch(Erange & e)
+		{
+			// silently ignoring fadvise related error,
+			// this is not crucial
+		}
 
 		if(delta_sig_mem || delta_ref)
 		{

@@ -4,6 +4,12 @@ from 2.7.x to 2.8.0
   which compression ratio was bad (compressed data taking more space than
   the corresponding uncompressed one.
 
+from 2.7.6 to 2.7.7
+- added support for sequential reading more of sliced backup, to
+  accommodate tape support used with slices (at the opposite of dar_split)
+- fixing few typos in doc
+- making libdar more tolerant when calls to fadvise fail
+
 from 2.7.5 to 2.7.6
 - adding -f option to dar_cp
 - adding static version of dar_cp (dar_cp_static) as compilation outcome

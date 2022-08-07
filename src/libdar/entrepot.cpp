@@ -42,6 +42,8 @@ extern "C"
 #include "cygwin_adapt.hpp"
 #include "tools.hpp"
 #include "hash_fichier.hpp"
+#include "cache_global.hpp"
+#include "tuyau_global.hpp"
 
 using namespace std;
 
@@ -85,29 +87,44 @@ namespace libdar
 				   U_I permission,
 				   bool fail_if_exists,
 				   bool erase,
-				   hash_algo algo) const
+				   hash_algo algo,
+				   bool provide_a_plain_file) const
     {
 	fichier_global *ret = nullptr;
+	tuyau_global *pipe_g = nullptr;
 
 	    // sanity check
 	if(algo != hash_algo::none && (mode != gf_write_only || (!erase && !fail_if_exists)))
 	    throw SRC_BUG; // if hashing is asked, we cannot accept to open an existing file without erasing its contents
 
-
-	    // creating the file to read from or write to data
-	ret = inherited_open(dialog,
-			     filename,
-			     mode,
-			     force_permission,
-			     permission,
-			     fail_if_exists,
-			     erase);
-
-	if(ret == nullptr)
-	    throw SRC_BUG;
-
 	try
 	{
+		// creating the file to read from or write to data
+	    ret = inherited_open(dialog,
+				 filename,
+				 mode,
+				 force_permission,
+				 permission,
+				 fail_if_exists,
+				 erase);
+
+	    if(ret == nullptr)
+		throw SRC_BUG;
+
+	    if(!provide_a_plain_file)
+	    {
+		pipe_g = new (nothrow) tuyau_global(dialog,
+						    ret);
+
+		if(pipe_g == nullptr)
+		    throw Ememory("entrepot::open");
+		else
+		    ret = nullptr; // now managed by pipe_g
+
+		ret = pipe_g;
+		pipe_g = nullptr;
+	    }
+
 	    if(algo != hash_algo::none)
 	    {
 		fichier_global *hash_file = nullptr;
@@ -164,6 +181,11 @@ namespace libdar
 	    {
 		delete ret;
 		ret = nullptr;
+	    }
+	    if(pipe_g != nullptr)
+	    {
+		delete pipe_g;
+		pipe_g = nullptr;
 	    }
 	    throw;
 	}

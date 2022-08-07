@@ -75,7 +75,7 @@ namespace libdar
 	    /// header that contain informations about
 	    /// the first slice size (used starting archive format "08"), Else, the slice size
 	    /// is not possible to open as the offset
-	    /// of the data cannot be determin. If slice header is too old the sar class will
+	    /// of the data cannot be determined. If slice header is too old the sar class will
 	    /// fallback openning the first slice and
 	    /// directly get the first slice.
         sar(const std::shared_ptr<user_interaction> & dialog,
