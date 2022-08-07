@@ -1,6 +1,8 @@
 from 2.7.6 to 2.7.7
 - added support for sequential reading more of sliced backup, to
-  accomodate tape support used with slices (at the opposite of dar_split)
+  accommodate tape support used with slices (at the opposite of dar_split)
+- fixing few typos in doc
+- making libdar more tolerant when calls to fadvise fail
 
 from 2.7.5 to 2.7.6
 - adding -f option to dar_cp
