@@ -47,6 +47,7 @@ extern "C"
 #include "cygwin_adapt.hpp"
 #include "fichier_local.hpp"
 #include "nls_swap.hpp"
+#include "eols.hpp"
 
 using namespace std;
 
@@ -62,18 +63,24 @@ namespace libdar
 	{
 	    try
 	    {
-		case_s = case_sensit;              //< object's field
-		including = include;               //< object's field
-		fichier_local source = filename_list_st; //< where we read data from
-		char *buffer = nullptr;               //< hold the just read data
-		static const U_I buf_size = 20480; //< size of buffer: we read at most this number of bytes at a time
-		list <string> tmp;                 //< list of all raw lines read, without any prefix
-		U_I lu = 0, curs;                  //< cursor used as cisors to split data in line
-		char *beg = nullptr;                  //< points to the beginning of the next line inside buffer, when more than one line can be found in buffer
-		string str_beg;                    //< holds the std::string copy of beg, eventually uppercased
-		string current_entry = "";         //< holds the current line converted to string between each read()
-		path prefix = prefix_t;            //< the prefix to add to relative paths
+		case_s = case_sensit;              ///< object's field
+		including = include;               ///< object's field
+		fichier_local source = filename_list_st; ///< where we read data from
+		char *buffer = nullptr;               ///< hold the just read data
+		static const U_I buf_size = 20480; ///< size of buffer: we read at most this number of bytes at a time
+		list <string> tmp;                 ///< list of all raw lines read, without any prefix
+		U_I lu = 0, curs;                  ///< cursor used as cisors to split data in line
+		char *beg = nullptr;                  ///< points to the beginning of the next line inside buffer, when more than one line can be found in buffer
+		string str_beg;                    ///< holds the std::string copy of beg, eventually uppercased
+		string current_entry = "";         ///< holds the current line converted to string between each read()
+		path prefix = prefix_t;            ///< the prefix to add to relative paths
 
+		deque <string> end_of_lines;
+		end_of_lines.push_back("\n");
+		end_of_lines.push_back("\n\r");
+		eols cutter(end_of_lines);
+		U_I eol_len;
+		U_I eol_over;
 
 
 		    /////////////
@@ -108,60 +115,114 @@ namespace libdar
 
 			if(lu > 0)
 			{
+			    string refill; ///< over-read bytes when looking for end of line
+			    U_I refill_nc = 0; ///< next char to read from refill
+			    U_I refill_fc = 0; ///< first char to add back to current_entry
+
 			    curs = 0;
 			    beg = buffer;
 
 			    do
 			    {
-				while(curs < lu && buffer[curs] != '\n' && buffer[curs] != '\0')
-				    curs++;
-
-				if(curs < lu)
+				if(!refill.empty())
 				{
-				    if(buffer[curs] == '\0')
-					throw Erange("mask_list::mask_list", tools_printf(gettext("Found '\0' character in %S, not a plain file, aborting"), &filename_list_st));
-				    if(buffer[curs] == '\n')
+				    while(refill_nc < refill.size() && !cutter.eol_reached(refill[refill_nc], eol_len, eol_over))
+					++refill_nc;
+
+					// appending to current_entry the bytes read so far
+				    current_entry += string(refill.begin() + refill_fc, refill.begin() + refill_nc);
+
+				    if(refill_nc < refill.size())
 				    {
-					buffer[curs] = '\0';
-					if(!case_s)
-					    tools_to_upper(beg, str_beg);
-					else
-					    str_beg = string(beg);
-					current_entry += str_beg;
-					if(current_entry != "")
-					    tmp.push_back(current_entry);
-					current_entry = "";
+					++refill_nc; // passing over the last char of the eol
+					refill_fc = refill_nc;
+				    }
+
+				    if(refill_nc == refill.size())
+				    {
+					refill.clear();
+					refill_nc = 0;
+					refill_fc = 0;
+				    }
+				}
+				else
+				{
+				    while(curs < lu && !cutter.eol_reached(buffer[curs], eol_len, eol_over))
+					curs++;
+
+				    if(curs < lu)
+				    {
+					if(eol_over <= lu)
+					{
+					    lu -= eol_over;
+					    eol_over = 0;
+					}
+					    // else we will put the extra read by into refill
+					if(eol_len == 0)
+					    throw SRC_BUG;
+				    }
+				    else // no eol reached yet
+				    {
+					eol_len = 0;
+					eol_over = 0;
+				    }
+
+					// appending to current_entry the bytes read so far
+				    current_entry += string(beg, beg + curs);
+
+					// passing over the last byte of eol seq (or the last overread byte which will go into refill)
+				    if(curs < lu)
+				    {
 					curs++;
 					beg = buffer + curs;
 				    }
-				    else
-					throw SRC_BUG;
+					// else, no need to advance beg as we have
+					// read the whole buffer, so we should exit from
+					// this loop
 				}
-				else // reached end of buffer
+
+
+				if(eol_len > 0) // we have reached an 'End of Line' char
 				{
-				    if(lu == buf_size && beg == buffer)
+				    if(current_entry.size() <= eol_len + eol_over)
+					throw SRC_BUG;
+
+					// recycling over read data
+				    if(eol_over > 0)
 				    {
-					buffer[buf_size - 1] = '\0';
-					throw Erange("mask_list::mask_list",
-						     tools_printf(gettext("line exceeding the maximum of %d characters in listing file %S, aborting. Concerned line starts with: %s"),
-								  buf_size - 1,
-								  &filename_list_st,
-								  buffer));
+					if(! refill.empty())
+					{
+					    refill = string(refill.begin() + refill_fc, refill.begin() + (refill.size() - refill_fc));
+					    refill_fc = 0;
+					    refill_nc = 0;
+					}
+					refill = current_entry.substr(current_entry.size() - eol_over, eol_over) + refill;
+					current_entry.erase(current_entry.size() - eol_over, eol_over);
 				    }
-				    buffer[lu] = '\0';
+
+					// truncating out the end of line sequence
+				    current_entry.erase(current_entry.size() - eol_len, eol_len);
+
 				    if(!case_s)
-					tools_to_upper(beg, str_beg);
-				    else
-					str_beg = string(beg);
-				    current_entry += str_beg;
+				    {
+					string tmp;
+					tools_to_upper(current_entry, tmp);
+					current_entry = tmp;
+				    }
+
+					// adding current_entry to the list
+				    if(! current_entry.empty())
+					tmp.push_back(current_entry);
+				    current_entry.clear();
 				}
 			    }
-			    while(curs < lu);
+			    while(curs < lu || refill_nc < refill.size());
 			}
 		    }
 		    while(lu > 0);
 
-		    if(current_entry != "")
+			// adding the last line to the list (it may not be followed by EoL)
+		    if(! current_entry.empty())
 			tmp.push_back(current_entry);
 		}
 		catch(...)
@@ -171,8 +232,6 @@ namespace libdar
 		}
 		delete [] buffer;
 		buffer = nullptr;
-
-
 
 
 		    /////////////
@@ -191,22 +250,6 @@ namespace libdar
 		    {
 			try
 			{
-
-				// checking for trailing \r
-
-			    if(it->size() < 1)
-				throw SRC_BUG; // we should not have empty string in the list
-			    if((*it)[it->size() - 1] == '\r') // last char of the string is a '\r'
-			    {
-				it->erase(it->size() - 1, 1); // removing the last char (thus removing \r here)
-				if(it->empty())
-				{
-				    it = tmp.erase(it);
-					// removing the string if "it" got empty
-					// and having "it" pointing to the next string in the list
-				    continue;  // and looping back
-				}
-			    }
 
 				// adding prefix path
 
