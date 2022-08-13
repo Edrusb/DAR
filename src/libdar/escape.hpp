@@ -29,11 +29,11 @@
     /// At reading time, this class revert backs modification done to file's data
     /// containing escape sequences for they contain the original data. This class
     /// also provides the feature to skip to the next (real) escape sequence.
-    /// This class inherits of generic files and its objects are to be used in a
+    /// This class inherits from generic files and its objects are to be used in a
     /// stack of generic file's objects. The object below contains modified data
     /// and escape sequences, the file over gets the normal file data and does
     /// never see escape sequences. Expected implementation is to have a compressor
-    /// above an escape object and a sar or scrambler/blowfish/... object above it.
+    /// above an escape object and a sar or scrambler/blowfish/... object below it.
 
 
 #ifndef ESCAPE_HPP
