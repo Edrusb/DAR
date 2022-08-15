@@ -56,7 +56,11 @@ namespace libdar
 
     static bool modified_lexicalorder_a_lessthan_b(const std::string & a, const std::string & b);
 
-    mask_list::mask_list(const string & filename_list_st, bool case_sensit, const path & prefix_t, bool include)
+    mask_list::mask_list(const string & filename_list_st,
+			 bool case_sensit,
+			 const path & prefix_t,
+			 bool include,
+			 const deque<string> & eol_list): cutter(eol_list)
     {
 	NLS_SWAP_IN;
 	try
@@ -75,13 +79,14 @@ namespace libdar
 		string current_entry = "";         ///< holds the current line converted to string between each read()
 		path prefix = prefix_t;            ///< the prefix to add to relative paths
 
-		deque <string> end_of_lines;
-		end_of_lines.push_back("\n");
-		end_of_lines.push_back("\n\r");
-		eols cutter(end_of_lines);
 		U_I eol_len;
 		U_I eol_over;
 
+		if(eol_list.size() == 0)
+		{
+		    cutter.add_sequence("\n");
+		    cutter.add_sequence("\n\r");
+		}
 
 		    /////////////
 		    // changing the prefix to uppercase if case sensitivity is disabled

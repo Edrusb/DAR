@@ -32,8 +32,10 @@
 #include "../my_config.h"
 
 #include "mask.hpp"
+#include "eols.hpp"
 
 #include <string>
+#include <deque>
 
 namespace libdar
 {
@@ -60,7 +62,14 @@ namespace libdar
 	    /// prefix should be either absolute, or "<ROOT>" (in case of operations
 	    /// on an existing archive)
 	    /// \param[in] include whether the mask_list is used for file inclusion or file exclusion
-        mask_list(const std::string & filename_list_st, bool case_sensit, const path & prefix, bool include);
+	    /// \param[in] eol_list list of string that mean the end of a line
+	    /// providing an empty list as is the default value, means the list { "\n" ,  "\n\r" }
+	    /// for backward compatibility
+        mask_list(const std::string & filename_list_st,
+		  bool case_sensit,
+		  const path & prefix,
+		  bool include,
+		  const std::deque<std::string> & eol_list = std::deque<std::string>() );
 	mask_list(const mask_list & ref) = default;
 	mask_list(mask_list && ref) = default;
 	mask_list & operator = (const mask_list & ref) = default;
@@ -84,6 +93,7 @@ namespace libdar
         U_I taille;
         bool case_s;
         bool including;   // mask is used for including files (not for excluding files)
+	eols cutter;
     };
 
         /// @}
