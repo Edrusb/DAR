@@ -49,11 +49,14 @@ namespace libdar
     public:
 	eols(const std::deque<std::string> & end_sequences);
 
-	eols(const eols & ref) = delete;
-	eols(eols && ref) noexcept = delete;
-	eols & operator = (const eols & ref) = delete;
-	eols & operator = (eols && ref) = delete;
+	eols(const eols & ref) { copy_from(ref); };
+	eols(eols && ref) noexcept = default;
+	eols & operator = (const eols & ref) { copy_from(ref); return *this; };
+	eols & operator = (eols && ref) = default;
 	~eols() = default;
+
+	    /// add a new sequence for End of Line
+	void add_sequence(const std::string & seq);
 
 	    /// reset the detection to be beginning of each EOL sequence
 	void reset_detection() const;
@@ -83,22 +86,22 @@ namespace libdar
 	    in_progress(const std::string & val): ref(val) { reset(); };
 
 		// methods
-	    void reset() { next_to_match = ref.begin(); bypass = false; passed = 0; larger = false; };
-	    bool match(char next_read_byte);
+	    void reset() const { next_to_match = ref.begin(); bypass = false; passed = 0; larger = false; };
+	    bool match(char next_read_byte) const;
 	    U_I progression() const; ///< returns the number of matching bytes so far
-	    bool set_bypass(U_I prog); ///< set bypass if progression < prog or has_matched()
-	    void set_larger() { larger = true; };
+	    bool set_bypass(U_I prog) const; ///< set bypass if progression < prog or has_matched()
+	    void set_larger() const { larger = true; };
 	    bool has_matched() const { return next_to_match == ref.end(); };
 
 		// fields
-	    const std::string ref;                     ///< ending sequence
-	    std::string::const_iterator next_to_match; ///< next byte to read from that sequence (previously read bytes matched this sequence)
-	    bool bypass;                               ///< when set match() does nothing except counting bytes
-	    U_I passed;                                ///< number of bytes bypassed (read after end of sequence)
-	    bool larger;                               ///< another in_progress has matched we may also match as a larger sequence
+	    std::string ref;                                   ///< ending sequence
+	    mutable std::string::const_iterator next_to_match; ///< next byte to read from that sequence (previously read bytes matched this sequence)
+	    mutable bool bypass;                               ///< when set match() does nothing except counting bytes
+	    mutable U_I passed;                                ///< number of bytes bypassed (read after end of sequence)
+	    mutable bool larger;                               ///< another in_progress has matched we may also match as a larger sequence
 	};
 
-	mutable std::deque<in_progress> eols_curs;
+	std::deque<in_progress> eols_curs;
 	mutable U_I ref_progression;
 
 	    /// set bypass flag for all in_progress of eols_curs that progression is less than or equal 'prog'
@@ -107,6 +110,7 @@ namespace libdar
 	bool bypass_or_larger(U_I prog) const;
 	bool all_bypassed_or_matched() const;
 	bool find_larger_match(U_I & seq_length, U_I & read_after_eol) const;
+	void copy_from(const eols & ref);
     };
 
         /// @}

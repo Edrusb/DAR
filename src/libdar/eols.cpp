@@ -32,6 +32,7 @@ using namespace std;
 
 namespace libdar
 {
+
     eols::eols(const deque<string> & end_sequences)
     {
 	eols_curs.clear();
@@ -42,16 +43,21 @@ namespace libdar
 	deque<string>::const_iterator it = end_sequences.begin();
 	while(it != end_sequences.end())
 	{
-	    if(it->empty())
-		throw Erange("eols::eols", gettext("Empty string cannot be provided as sequence defining an end of line"));
-	    eols_curs.push_back(in_progress(*it));
+	    add_sequence(*it);
 	    ++it;
 	}
     }
 
+    void eols::add_sequence(const std::string & seq)
+    {
+	if(seq.empty())
+	    throw Erange("eols::add_sequence", gettext("Empty string cannot be provided as sequence defining an end of line"));
+	eols_curs.push_back(in_progress(seq));
+    }
+
     void eols::reset_detection() const
     {
-	deque<in_progress>::iterator it = eols_curs.begin();
+	deque<in_progress>::const_iterator it = eols_curs.begin();
 	while(it != eols_curs.end())
 	{
 	    it->reset();
@@ -68,7 +74,7 @@ namespace libdar
 	bool new_match = false;
 	bool all_done = false;
 
-	deque<in_progress>::iterator it = eols_curs.begin();
+	deque<in_progress>::const_iterator it = eols_curs.begin();
 	while(it != eols_curs.end())
 	{
 	    if(it->match(next_read_byte))
@@ -104,7 +110,7 @@ namespace libdar
 	return false;
     }
 
-    bool eols::in_progress::match(char next_read_byte)
+    bool eols::in_progress::match(char next_read_byte) const
     {
 	if(bypass)
 	{
@@ -138,7 +144,7 @@ namespace libdar
 	return next_to_match - ref.begin();
     }
 
-    bool eols::in_progress::set_bypass(U_I prog)
+    bool eols::in_progress::set_bypass(U_I prog) const
     {
 	if(bypass)
 	    return true;
@@ -156,7 +162,7 @@ namespace libdar
     {
 	bool ret = true;
 
-	deque<in_progress>::iterator it = eols_curs.begin();
+	deque<in_progress>::const_iterator it = eols_curs.begin();
 	while(it != eols_curs.end())
 	{
 	    if(! it->set_bypass(prog))
@@ -172,7 +178,7 @@ namespace libdar
 
     bool eols::all_bypassed_or_matched() const
     {
-	deque<in_progress>::iterator it = eols_curs.begin();
+	deque<in_progress>::const_iterator it = eols_curs.begin();
 
 	while(it != eols_curs.end() && (it->bypass || it->has_matched()))
 	    ++it;
@@ -184,7 +190,7 @@ namespace libdar
     {
 	bool ret = false;
 
-	deque<in_progress>::iterator it = eols_curs.begin();
+	deque<in_progress>::const_iterator it = eols_curs.begin();
 
 	while(it != eols_curs.end() && (! it->has_matched() || it->progression() < ref_progression))
 	    ++it;
@@ -201,5 +207,19 @@ namespace libdar
 
 	return ret;
     }
+
+    void eols::copy_from(const eols & ref)
+    {
+	deque<in_progress>::iterator it;
+
+	eols_curs = ref.eols_curs;
+	it = eols_curs.begin();
+	while(it != eols_curs.end())
+	{
+	    it->reset();
+	    ++it;
+	}
+    }
+
 
 } // end of namespace
