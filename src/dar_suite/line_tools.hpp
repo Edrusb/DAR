@@ -192,7 +192,7 @@ extern void line_tools_read_from_pipe(std::shared_ptr<user_interaction> & dialog
     /// \exception Ememory can be thrown if memory allocation failed
 extern void line_tools_extract_basename(const char *command_name, std::string & basename);
 
-    /// give a pointer to the last character of the given value in the given string
+    /// give a pointer to the first character of the given value in the given string
 
     /// \param[in] s is the given string
     /// \param[in] v is the given char value
@@ -200,6 +200,15 @@ extern void line_tools_extract_basename(const char *command_name, std::string & 
     /// \note the arguments are not modified neither the data they are pointing to. However the const statement has not been used to
     /// be able to return a iterator on the string (and not a const_interator). There is probably other ways to do that (using const_cast) for example
 extern std::string::iterator line_tools_find_first_char_of(std::string &s, unsigned char v);
+
+    /// give a pointer to the last character of the given value in the given string
+
+    /// \param[in] s is the given string
+    /// \param[in] v is the given char value
+    /// \return a interator on s, pointing on the last char of s equal to v or a pointing to s.end() if no such char could be found is "s"
+    /// \note the arguments are not modified neither the data they are pointing to. However the const statement has not been used to
+    /// be able to return a iterator on the string (and not a const_interator). There is probably other ways to do that (using const_cast) for example
+extern std::string::iterator line_tools_find_last_char_of(std::string &s, unsigned char v);
 
     /// split a given full path in path part and basename part
 

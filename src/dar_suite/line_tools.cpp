@@ -907,6 +907,21 @@ string::iterator line_tools_find_first_char_of(string &s, unsigned char v)
     return it;
 }
 
+string::iterator line_tools_find_last_char_of(string & s, unsigned char v)
+{
+    string::iterator ret = s.end();
+    string::iterator it = s.begin();
+
+    while(it != s.end())
+    {
+	if(*it == v)
+	    ret = it;
+	++it;
+    }
+
+    return ret;
+}
+
 void line_tools_split_path_basename(const char *all, path * &chemin, string & base)
 {
     chemin = nullptr;
