@@ -85,7 +85,7 @@ namespace libdar
 		if(eol_list.size() == 0)
 		{
 		    cutter.add_sequence("\n");
-		    cutter.add_sequence("\n\r");
+		    cutter.add_sequence("\r\n");
 		}
 
 		    /////////////
