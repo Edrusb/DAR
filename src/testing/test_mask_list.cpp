@@ -79,11 +79,13 @@ int main(int argc, char *argv[])
 
 void f1(const shared_ptr<user_interaction> & dialog, const char *filename)
 {
-    mask_list m = mask_list(filename, true, path("/toto/tutu"), true);
+    deque<string> eol = { "abc", "abcuabcabe" };
+    mask_list m = mask_list(filename, true, path("/toto/tutu"), true, eol);
     string tester;
     U_I count = 10;
 
     cout << "taille : " << m.size() << endl;
+
 
     while(--count)
     {
