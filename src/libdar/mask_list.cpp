@@ -134,14 +134,14 @@ namespace libdar
 				    while(refill_nc < refill.size() && !cutter.eol_reached(refill[refill_nc], eol_len, eol_over))
 					++refill_nc;
 
+				    if(refill_nc < refill.size())
+					++refill_nc; // passing over the last char of the eol
+
 					// appending to current_entry the bytes read so far
 				    current_entry += string(refill.begin() + refill_fc, refill.begin() + refill_nc);
 
 				    if(refill_nc < refill.size())
-				    {
-					++refill_nc; // passing over the last char of the eol
 					refill_fc = refill_nc;
-				    }
 
 				    if(refill_nc == refill.size())
 				    {
@@ -157,9 +157,9 @@ namespace libdar
 
 				    if(curs < lu)
 				    {
-					if(eol_over <= lu)
+					if(eol_over <= curs)
 					{
-					    lu -= eol_over;
+					    curs -= eol_over;
 					    eol_over = 0;
 					}
 					    // else we will put the extra read by into refill
@@ -172,37 +172,45 @@ namespace libdar
 					eol_over = 0;
 				    }
 
-					// appending to current_entry the bytes read so far
-				    current_entry += string(beg, beg + curs);
-
 					// passing over the last byte of eol seq (or the last overread byte which will go into refill)
 				    if(curs < lu)
-				    {
-					curs++;
+					++curs;
+
+					// appending to current_entry the bytes read so far
+					// (including eol seq and possible over read bytes!)
+				    current_entry += string(beg, buffer + curs);
+
+				    if(curs < lu)
 					beg = buffer + curs;
-				    }
+
 					// else, no need to advance beg as we have
 					// read the whole buffer, so we should exit from
 					// this loop
 				}
-
 
 				if(eol_len > 0) // we have reached an 'End of Line' char
 				{
 				    if(current_entry.size() <= eol_len + eol_over)
 					throw SRC_BUG;
 
-					// recycling over read data
+					// recycling overread data
 				    if(eol_over > 0)
 				    {
 					if(! refill.empty())
 					{
+						// removing already read data from refill
 					    refill = string(refill.begin() + refill_fc, refill.begin() + (refill.size() - refill_fc));
+
+						// and resetting index to the start of refill
 					    refill_fc = 0;
 					    refill_nc = 0;
 					}
+					    // prepending the over read bytes to refill string
 					refill = current_entry.substr(current_entry.size() - eol_over, eol_over) + refill;
+
+					    // dropping the over read string from current_entry
 					current_entry.erase(current_entry.size() - eol_over, eol_over);
+					eol_over = 0;
 				    }
 
 					// truncating out the end of line sequence
@@ -219,6 +227,11 @@ namespace libdar
 				    if(! current_entry.empty())
 					tmp.push_back(current_entry);
 				    current_entry.clear();
+				}
+				else
+				{
+				    if(eol_over > 0)
+					throw SRC_BUG;
 				}
 			    }
 			    while(curs < lu || refill_nc < refill.size());
