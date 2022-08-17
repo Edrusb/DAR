@@ -136,19 +136,25 @@ namespace libdar
 
 				    if(refill_nc < refill.size())
 					++refill_nc; // passing over the last char of the eol
+				    else
+				    {
+					eol_len = 0;
+					eol_over = 0;
+				    }
 
 					// appending to current_entry the bytes read so far
 				    current_entry += string(refill.begin() + refill_fc, refill.begin() + refill_nc);
 
 				    if(refill_nc < refill.size())
 					refill_fc = refill_nc;
-
-				    if(refill_nc == refill.size())
+				    else if(refill_nc == refill.size())
 				    {
 					refill.clear();
 					refill_nc = 0;
 					refill_fc = 0;
 				    }
+				    else
+					throw SRC_BUG;
 				}
 				else
 				{
@@ -199,7 +205,7 @@ namespace libdar
 					if(! refill.empty())
 					{
 						// removing already read data from refill
-					    refill = string(refill.begin() + refill_fc, refill.begin() + (refill.size() - refill_fc));
+					    refill = string(refill.begin() + refill_fc, refill.begin() + refill.size());
 
 						// and resetting index to the start of refill
 					    refill_fc = 0;
