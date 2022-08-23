@@ -3091,9 +3091,14 @@ static mask *make_include_exclude_name(const string & x, mask_opt opt)
 static mask *make_exclude_path_ordered(const string & x, mask_opt opt)
 {
     mask *ret = nullptr;
+
     if(opt.file_listing)
     {
-        ret = new (nothrow) mask_list(x, opt.case_sensit, opt.prefix, false);
+	deque<string> eols;
+	string filename_list;
+
+	line_tools_split_mask_list_from_eols(x, filename_list, eols);
+        ret = new (nothrow) mask_list(filename_list, opt.case_sensit, opt.prefix, false, eols);
         if(ret == nullptr)
             throw Ememory("make_exclude_path");
     }
@@ -3128,7 +3133,13 @@ static mask *make_exclude_path_unordered(const string & x, mask_opt opt)
     mask *ret = nullptr;
 
     if(opt.file_listing)
-        ret = new (nothrow) mask_list(x, opt.case_sensit, opt.prefix, false);
+    {
+	deque<string> eols;
+	string filename_list;
+
+	line_tools_split_mask_list_from_eols(x, filename_list, eols);
+        ret = new (nothrow) mask_list(filename_list, opt.case_sensit, opt.prefix, false, eols);
+    }
     else
         if(opt.glob_exp)
             ret = new (nothrow) simple_mask((opt.prefix + x).display(), opt.case_sensit);
@@ -3145,7 +3156,13 @@ static mask *make_include_path(const string & x, mask_opt opt)
     mask *ret = nullptr;
 
     if(opt.file_listing)
-        ret = new (nothrow) mask_list(x, opt.case_sensit, opt.prefix, true);
+    {
+	deque<string> eols;
+	string filename_list;
+
+	line_tools_split_mask_list_from_eols(x, filename_list, eols);
+        ret = new (nothrow) mask_list(filename_list, opt.case_sensit, opt.prefix, true, eols);
+    }
     else
         ret = new (nothrow) simple_path_mask(opt.prefix + x, opt.case_sensit);
     if(ret == nullptr)
