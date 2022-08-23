@@ -84,8 +84,8 @@ namespace libdar
 			   infinint & new_wasted_bytes,  //< new amount of wasted bytes to return to the caller.
 			   set<string> ignored_as_symlink, //< list of file to ignore as symlink and fetch the proper mtime
 			   bool repair_mode,         //< if set, try to fix CRC and size problem flagging such fixed files as dirty
-			   U_I signature_block_size,
-			   bool never_resave_uncompressed); //< block size of delta signatures
+			   U_I signature_block_size, //< block size of delta signatures
+			   bool never_resave_uncompressed);
 
     static bool save_ea(const shared_ptr<user_interaction> & dialog,
 			const string & info_quoi,
