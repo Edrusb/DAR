@@ -467,6 +467,11 @@ extern void line_tools_split_compression_algo(const char *arg,     ///< input st
 					      U_I & block_size     ///< returned compression block size
     );
 
+    /// convert --include-from-file / --exclude-from-file argument to its different components
+extern void line_tools_split_mask_list_from_eols(const std::string & arg, std::string & filename, std::deque<std::string> & eols);
+
+    /// replace escape sequences by their real byte value
+extern std::string line_tools_replace_escape_sequences(const std::string & arg);
 
     /// @}
 

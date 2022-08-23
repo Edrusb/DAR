@@ -61,6 +61,9 @@ static bool is_a_slice_available(user_interaction & ui, const string & base, con
 static string retreive_basename(const string & base, const string & extension);
 static string retreive_basename2(const string & base);
 static void tools_localtime(const time_t & timep, struct tm *result);
+static char extract_octal_from_string(string::const_iterator & x);
+static char extract_hexa_from_string(string::const_iterator & x);
+
 
 ////
 
@@ -1834,6 +1837,170 @@ void line_tools_split_compression_algo(const char *arg, U_I base, compression & 
     }
 }
 
+void line_tools_split_mask_list_from_eols(const string & arg, string & filename, deque<string> & eols)
+{
+    string local_arg = arg;
+    string::iterator sep = line_tools_find_last_char_of(local_arg, ':');
+
+    filename = string(local_arg.begin(), sep);
+    if(sep != local_arg.end())
+    {
+	string eols_str = string(++sep, local_arg.end());
+
+	    // split eols based on comma, stick toghether with a piece that ends with a backslash
+	line_tools_split(eols_str, ',', eols);
+
+
+	    // we'll now check each sequence
+
+	deque<string>::iterator it = eols.begin();
+
+	while(it != eols.end())
+	{
+	    bool last_is_escaped = false; // true if last backslash of the sequence has been escaped
+	    string::iterator eolit = it->begin();
+
+		// 1 - remove the first backslask from "\\"
+
+	    while(eolit != it->end())
+	    {
+		if(*eolit == '\\')
+		{
+		    string::iterator nextone = eolit + 1;
+
+		    if(nextone != it->end())
+		    {
+			eolit = nextone;
+			last_is_escaped = true;
+		    }
+		    else
+			last_is_escaped = false;
+		}
+		else
+		    last_is_escaped = false;
+
+		++eolit;
+	    }
+
+	    	// if the sequence ends with \ we stick it with the next one (the comma was escaped)
+	    if(it->size() > 0 && (*it)[it->size() - 1] == '\\' && !last_is_escaped)
+	    {
+		deque<string>::iterator nextone = it + 1;
+
+		it->pop_back(); // remove the last char of the string: i.e. the '\' char
+		if(nextone != eols.end())
+		{
+		    *it = *it + ',' + *nextone;
+		    eols.erase(nextone);
+		    continue; // to avoid incrementing 'it'
+		}
+		else
+		    *it = *it + ',';
+	    }
+
+	    *it = line_tools_replace_escape_sequences(*it);
+
+	    ++it;
+	}
+    }
+    else
+	eols.clear();
+}
+
+string line_tools_replace_escape_sequences(const string & arg)
+{
+    string ret;
+    string::const_iterator it = arg.begin();
+
+	// doubling any % met in string for they cast back as an single % by sprintf
+
+    while(it != arg.end())
+    {
+	if(*it == '\\')
+	{
+	    string::const_iterator nextone = it + 1;
+
+	    if(nextone != arg.end())
+	    {
+		switch(*nextone)
+		{
+		case '\'':
+		case '\"':
+		case '\\':
+		    ret += *nextone;
+		    it = nextone + 1;
+		    break;
+		case 'n':
+		    ret += '\n';
+		    it = nextone + 1;
+		    break;
+		case 'r':
+		    ret += '\r';
+		    it = nextone + 1;
+		    break;
+		case 't':
+		    ret += '\t';
+		    it = nextone + 1;
+		    break;
+		case 'b':
+		    ret += '\b';
+		    it = nextone + 1;
+		    break;
+		case 'f':
+		    ret += '\f';
+		    it = nextone + 1;
+		    break;
+		case 'v':
+		    ret += '\v';
+		    it = nextone + 1;
+		    break;
+		case '0':  // octal notation
+		    ++nextone;
+		    if(nextone == arg.end())
+			ret += '\0';
+		    else
+		    {
+			ret += extract_octal_from_string(nextone);
+			it = nextone;
+		    }
+		    break;
+		case 'x':
+		    ++nextone;
+		    if(nextone == arg.end())
+			throw Erange("line_tools_replace_escape_sequences",
+				     tools_printf(gettext("Do not know how to handle \\x at end of string: %s"), arg.c_str()));
+		    else
+		    {
+			try
+			{
+			    ret += extract_hexa_from_string(nextone);
+			    it = nextone;
+			}
+			catch(Erange & e)
+			{
+			    e.prepend_message(tools_printf(gettext("Error in string %s: "), arg.c_str()));
+			    throw;
+			}
+		    }
+		    break;
+		default:
+		    throw Erange("line_tools_replace_escape_sequences", tools_printf(gettext("Unknown escape character: \\%c"), *nextone));
+		}
+	    }
+	    else
+		throw Erange("line_tools_replace_escape_sequences",
+			     tools_printf(gettext("Do not know how to handle a single backslash at end of string, either use double it or remove it: %s"), arg.c_str()));
+	}
+	else
+	{
+	    ret += *it;
+	    ++it;
+	}
+    }
+
+    return ret;
+}
+
 ///////////////////
 
 static string build(string::iterator a, string::iterator b)
@@ -1929,4 +2096,47 @@ static void tools_localtime(const time_t & timep, struct tm *result)
 
     *result = *ret;
 #endif
+}
+
+static char extract_octal_from_string(string::const_iterator & x)
+{
+    char ret = 0;
+    U_I digit = 0;
+
+    while((*x >= '0' && *x <= '7') && digit < 3)
+    {
+	ret *= 8;
+	ret += *x - '0';
+	++digit;
+	++x;
+    }
+
+    return ret;
+
+}
+
+static char extract_hexa_from_string(string::const_iterator & x)
+{
+    char ret = 0;
+    U_I digit = 0;
+    U_I val;
+
+    while(digit < 2)
+    {
+	if(*x >= '0' && *x <= '9')
+	    val = *x - '0';
+	else if(*x >= 'A' && *x <= 'F')
+	    val = *x - 'A' + 10;
+	else if(*x > 'a' && *x <= 'f')
+	    val = *x - 'a' + 10;
+	else
+	    throw Erange("extract_hexa_from_string", gettext("uncomplete hexadecimal number in escape sequence"));
+	ret *= 16;
+	ret += val;
+	++digit;
+	++x;
+    }
+
+    return ret;
+
 }
