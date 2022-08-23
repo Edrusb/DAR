@@ -3,6 +3,10 @@ from 2.7.x to 2.8.0
 - new feature: -anru option leads dar to Never Re-save Uncompressed a file
   which compression ratio was bad (compressed data taking more space than
   the corresponding uncompressed one.
+- extended the syntax of --include-from-file and --exclude-from-file options
+  to let the user define what are the possible sequences of chars that can
+  define the end of a line (by default it stays "\n" and "\r\n" for backward
+  compatibility)
 
 from 2.7.6 to 2.7.7
 - added support for sequential reading more of sliced backup, to
