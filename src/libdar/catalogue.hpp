@@ -168,7 +168,7 @@ namespace libdar
             // structure defined by the following calls to this routine, this to be able to know when
             // the last available directory is back the current one when changing to parent directory,
             // and then proceed with normal comparison of inode. In this laps of time, the call will
-            // always return false, while it temporary stores the missing directory structure
+            // always return false, while it temporarily stores the missing directory structure
 
 
 
