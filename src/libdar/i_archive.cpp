@@ -1700,13 +1700,14 @@ namespace libdar
     {
 	if(exploitable && sequential_read) // the catalogue is not even yet read, so we must first read it entirely
 	{
+	    if(cat == nullptr)
+		throw SRC_BUG;;
+
 	    if(only_contains_an_isolated_catalogue())
 		    // this is easy... asking just an entry
 		    //from the catalogue makes its whole being read
 	    {
 		const cat_entree *tmp;
-		if(cat == nullptr)
-		    throw SRC_BUG;
 		cat->read(tmp); // should be enough to have the whole catalogue being read
 		cat->reset_read();
 	    }
