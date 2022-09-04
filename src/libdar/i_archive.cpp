@@ -448,6 +448,11 @@ namespace libdar
 		}
 	    }
 
+	    if(options.get_reference().get() != nullptr
+	       && options.get_reference().get()->pimpl != nullptr
+	       && options.get_reference().get()->pimpl->cat != nullptr
+	       && options.get_reference().get()->pimpl->cat->get_early_memory_release())
+		throw Erange("i_archive::i_archive (create)", gettext("Early memory release is not possible for a backup of reference"));
 
 	    try
 	    {
@@ -672,6 +677,12 @@ namespace libdar
 
 		if(ref_cat1 == nullptr)
 		    throw SRC_BUG;
+
+		if(ref_cat1->get_early_memory_release())
+		    throw Erange("i_archive::i_archive (merge)", gettext("Early memory release is not compatible with the merging operation"));
+
+		if(ref_cat2 != nullptr && ref_cat2->get_early_memory_release())
+		    throw Erange("i_archive::i_archive (merge)", gettext("Early memory release is not compatible with the merging operation"));
 
 		if(options.get_delta_signature())
 		{
@@ -1720,6 +1731,9 @@ namespace libdar
 
 	if(fetch_ea && sequential_read)
 	    throw Erange("archive::i_archive::get_children_of", gettext("Fetching EA value while listing an archive is not possible in sequential read mode"));
+	if(cat != nullptr && cat->get_early_memory_release())
+	    throw Erange("i_archive::load_catalogue", gettext("get_children_of is not possible on a catalogue set with early memory release"));
+
 	load_catalogue();
 	    // OK, now that we have the whole catalogue available in memory, let's rock!
 
@@ -1753,6 +1767,10 @@ namespace libdar
 
 	if(fetch_ea && sequential_read)
 	    throw Erange("archive::i_archive::get_children_of", gettext("Fetching EA value while listing an archive is not possible in sequential read mode"));
+
+	if(cat != nullptr && cat->get_early_memory_release())
+	    throw Erange("i_archive::load_catalogue", gettext("get_children_in_table is not possible on a catalogue set with early memory release"));
+
 	me->load_catalogue();
 
 	const cat_directory* parent = get_dir_object(dir);
@@ -1846,6 +1864,9 @@ namespace libdar
 
 	if(cat == nullptr)
 	    throw SRC_BUG;
+
+	if(cat->get_memory_released())
+	    throw Erange("i_archive::load_catalogue", gettext("cannot get catalogue which memory has been (early) released"));
 
 	return *cat;
     }
