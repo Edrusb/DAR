@@ -147,6 +147,7 @@ namespace libdar
 	if(!x_ref_entrepot)
 	    throw Ememory("archive_options_read::clear");
 	x_header_only = false;
+	x_early_memory_release = false;
     }
 
     void archive_options_read::set_default_crypto_size()
@@ -231,6 +232,7 @@ namespace libdar
 	    throw SRC_BUG;
 	x_ref_entrepot = ref.x_ref_entrepot;
 	x_header_only = ref.x_header_only;
+	x_early_memory_release = ref.x_early_memory_release;
     }
 
     void archive_options_read::move_from(archive_options_read && ref) noexcept
@@ -260,6 +262,7 @@ namespace libdar
 	x_ref_slice_min_digits = move(ref.x_ref_slice_min_digits);
 	x_ref_entrepot = move(ref.x_ref_entrepot);
 	x_header_only = move(ref.x_header_only);
+	x_early_memory_release = move(ref.x_early_memory_release);
     }
 
 
