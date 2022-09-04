@@ -95,6 +95,9 @@ namespace libdar
 	    /// will be returned the next time read_children() is invoked.
 	void remove(const std::string & name);
 
+	    /// remove all entries contained in this directory (recursively)
+	void clear();
+
         cat_directory * get_parent() const { return parent; };
         bool search_children(const std::string &name, const cat_nomme *&ref) const;
 
@@ -168,7 +171,6 @@ namespace libdar
 	mutable bool recursive_has_changed;
 
 	void init() noexcept;
-	void clear();
 	void recursive_update_sizes() const;
 	void recursive_flag_size_to_update() const;
 	void erase_ordered_fils(std::deque<cat_nomme *>::const_iterator debut,
