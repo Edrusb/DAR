@@ -92,6 +92,9 @@ namespace libdar
 	    /// new operation like the 'on-fly-isolate' of the dar command line.
 	void set_early_memory_release() { early_mem_release = true; };
 
+	    /// get early memory release status
+	bool get_early_memory_release() const { return early_mem_release; };
+
 	    // reading methods. The reading is iterative and uses the current_read cat_directory pointer
 
         virtual void reset_read() const; // set the reading cursor to the beginning of the catalogue
