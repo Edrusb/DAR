@@ -127,6 +127,8 @@ namespace libdar
 	crc *calc_crc = nullptr;
 	crc *read_crc = nullptr;
 	contenu = nullptr;
+	early_mem_release = false;
+	mem_released = false;
 
 	pdesc.check(false);
 
@@ -263,12 +265,16 @@ namespace libdar
 	out_compare = ref.out_compare;
 	in_place = ref.in_place;
 	partial_copy_from(ref);
+	early_mem_release = ref.early_mem_release;
+	mem_released = ref.mem_released;
 
 	return *this;
     }
 
     void catalogue::reset_read() const
     {
+	if(mem_released)
+	    throw Erange("catalogue::reset_read", gettext("early memory release has completed, cannot read again"));
 	current_read = contenu;
 	contenu->reset_read_children();
     }
@@ -277,6 +283,11 @@ namespace libdar
     {
 	current_read = contenu;
 	contenu->end_read();
+	if(early_mem_release)
+	{
+	    contenu->clear();
+	    mem_released = true;
+	}
     }
 
     void catalogue::skip_read_to_parent_dir() const
@@ -285,6 +296,8 @@ namespace libdar
 
 	if(tmp == nullptr)
 	    throw Erange("catalogue::skip_read_to_parent_dir", gettext("root does not have a parent directory"));
+	if(early_mem_release)
+	    tmp->remove(current_read->get_name());
 	current_read = tmp;
     }
 
@@ -308,9 +321,16 @@ namespace libdar
 	    cat_directory *papa = current_read->get_parent();
 	    ref = &r_eod;
 	    if(papa == nullptr)
+	    {
+		if(early_mem_release)
+		    mem_released = true;
 		return false; // we reached end of root, no cat_eod generation
+	    }
 	    else
 	    {
+
+		if(early_mem_release)
+		    papa->remove(current_read->get_name());
 		current_read = papa;
 		return true;
 	    }
@@ -325,10 +345,16 @@ namespace libdar
 	    throw Erange("catalogue::read_if_present", gettext("no current directory defined"));
 	if(name == nullptr) // we have to go to parent directory
 	{
-	    if(current_read->get_parent() == nullptr)
+	    cat_directory* parent = current_read->get_parent();
+
+	    if(parent == nullptr)
 		throw Erange("catalogue::read_if_present", gettext("root directory has no parent directory"));
 	    else
-		current_read = current_read->get_parent();
+	    {
+		if(early_mem_release)
+		    parent->remove(current_read->get_name());
+		current_read = parent;
+	    }
 	    ref = nullptr;
 	    return true;
 	}
@@ -537,6 +563,8 @@ namespace libdar
 
     void catalogue::reset_compare() const
     {
+	if(mem_released)
+	    throw Erange("catalogue::reset_compare", gettext("early memory release has completed, cannot read again"));
 	if(contenu == nullptr)
 	    throw SRC_BUG;
 	current_compare = contenu;
