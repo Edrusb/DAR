@@ -382,9 +382,13 @@ namespace libdar
 			}
 		    }
 		}
+
 		if(!options.get_ignore_signature_check_failure())
 		    check_gnupg_signed();
 		exploitable = true;
+
+		if(options.get_early_memory_release())
+		    cat->set_early_memory_release();
 	    }
 	    catch(...)
 	    {
