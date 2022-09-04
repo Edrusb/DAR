@@ -95,6 +95,9 @@ namespace libdar
 	    /// get early memory release status
 	bool get_early_memory_release() const { return early_mem_release; };
 
+	    /// return true if the catalogue has been released from memory
+	bool get_memory_released() const { return mem_released; };
+
 	    // reading methods. The reading is iterative and uses the current_read cat_directory pointer
 
         virtual void reset_read() const; // set the reading cursor to the beginning of the catalogue
