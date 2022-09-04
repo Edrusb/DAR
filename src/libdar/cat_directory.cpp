@@ -526,19 +526,30 @@ namespace libdar
 	    // removed one, if it would have been the next entry to be read
 	if(it == ot)
 	    it = ordered_fils.erase(ot);
-	else // not removing the next to read object (the one pointed to by 'it')
+	else // not removing the next to read object
 	{
+		// erase() will invalidate 'it' we must record the wat is the object pointed to by 'it'
+		// and have 'it' pointing to it again after the call to erase()
+	    cat_nomme* it_points_to = (it == ordered_fils.end()) ? nullptr : *it;
+
 	    (void)ordered_fils.erase(ot);
 
-		// however if we remove the last item of the deque
-		// we must set 'it' to end() to avoid 'it' becoming
-		// a dangling pointer:
-	    if(ordered_fils.empty())
+	    if(it_points_to == nullptr)
 		it = ordered_fils.end();
+	    else
+	    {
+		it = ordered_fils.begin();
+		while(it != ordered_fils.end() && *it != it_points_to)
+		    ++it;
+
+		if(it == ordered_fils.end())
+		    throw SRC_BUG;
+	    }
 	}
 
 	    // destroying the object itself
 	delete obj;
+
 	recursive_flag_size_to_update();
     }
 
