@@ -99,6 +99,8 @@ namespace libdar
 	    current_read = contenu;
 	    sub_tree = nullptr;
 	    ref_data_name = data_name;
+	    early_mem_release = false;
+	    mem_released = false;
 	}
 	catch(...)
 	{
