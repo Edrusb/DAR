@@ -119,12 +119,6 @@ namespace libdar
 	    // by read().
 	virtual void tail_catalogue_to_current_read();
 
-
-        void reset_sub_read(const path &sub); // initialise sub_read to the given directory
-        bool sub_read(user_interaction & ui, const cat_entree * &ref); // sequential read of the catalogue, ignoring all that
-            // is not part of the subdirectory specified with reset_sub_read
-            // the read include the inode leading to the sub_tree as well as the pending cat_eod
-
 	    // return true if the last read entry has already been read
 	    // and has not to be counted again. This is never the case for catalogue but may occur
 	    // with escape_catalogue (where from the 'virtual').
