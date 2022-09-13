@@ -333,6 +333,9 @@ namespace libdar
 
 		if(early_mem_release)
 		    papa->remove(current_read->get_name());
+		    // this unlink current_read from 'papa'
+		    // but also delete the object and all
+		    // its children if any
 		current_read = papa;
 		return true;
 	    }

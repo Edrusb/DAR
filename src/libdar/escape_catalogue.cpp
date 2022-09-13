@@ -471,7 +471,7 @@ namespace libdar
 	bool stop = false;
 
 	    // if we have already read the whole archive contents (included detruits object),
-	    // we do not need inspect the archive again, we instead use the data in memory
+	    // we do not need inspecting the archive again, we instead use the data in memory
 	if(status == ec_completed)
 	    return catalogue::read(ref);
 

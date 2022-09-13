@@ -785,6 +785,8 @@ namespace libdar
 	}
     }
 
+	// reparation constructor
+
     archive::i_archive::i_archive(const std::shared_ptr<user_interaction> & dialog,
 				  const path & chem_src,
 				  const string & basename_src,
