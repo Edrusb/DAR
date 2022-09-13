@@ -385,6 +385,8 @@ namespace libdar
 
     void catalogue::tail_catalogue_to_current_read()
     {
+	if(early_mem_release)
+	    throw SRC_BUG;
 	while(current_read != nullptr)
 	{
 	    current_read->tail_to_read_children();
