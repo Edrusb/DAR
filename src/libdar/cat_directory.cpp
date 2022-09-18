@@ -503,7 +503,7 @@ namespace libdar
 	    it = ordered_fils.erase(ot);
 	else // not removing the next to read object
 	{
-		// erase() will invalidate 'it' we must record the wat is the object pointed to by 'it'
+		// erase() will invalidate 'it' we must record what is the object pointed to by 'it'
 		// and have 'it' pointing to it again after the call to erase()
 	    cat_nomme* it_points_to = (it == ordered_fils.end()) ? nullptr : *it;
 

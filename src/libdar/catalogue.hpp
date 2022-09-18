@@ -121,7 +121,7 @@ namespace libdar
 
 	    // return true if the last read entry has already been read
 	    // and has not to be counted again. This is never the case for catalogue but may occur
-	    // with escape_catalogue (where from the 'virtual').
+	    // with escape_catalogue inherited class (where from the 'virtual').
 	    // last this method gives a valid result only if the last read() entry is a directory as
 	    // only directory may be read() twice.
 	virtual bool read_second_time_dir() const { return false; };
@@ -172,7 +172,7 @@ namespace libdar
 
 
 
-	    // non interative methods
+	    // non-iterative methods:
 
 
 	    /// add into "this" detruit object corresponding to object of ref absent in "this"
