@@ -824,7 +824,13 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		read_options.set_multi_threaded_compress(param.multi_threaded_compress);
 		if(repo)
 		    read_options.set_entrepot(repo);
-		read_options.set_early_memory_release(true);
+		if(param.sequential_read)
+		    read_options.set_early_memory_release(true);
+		    // early memory release is useless out of sequential read
+		    // as the whole catalogue gets loaded into memory, releasing
+		    // it earlier during the reading process does not free memory
+		    // from at the heap level of the process for most (if not all)
+		    // operating systems.
 
 		if(param.ref_filename != nullptr && param.ref_root != nullptr)
 		{
@@ -937,7 +943,8 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		read_options.set_multi_threaded_compress(param.multi_threaded_compress);
 		if(repo)
 		    read_options.set_entrepot(repo);
-		read_options.set_early_memory_release(true);
+		if(param.sequential_read)
+		    read_options.set_early_memory_release(true);
 
 		if(param.ref_filename != nullptr && param.ref_root != nullptr)
 		{
@@ -1024,7 +1031,8 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		read_options.set_multi_threaded_compress(param.multi_threaded_compress);
 		if(repo)
 		    read_options.set_entrepot(repo);
-		read_options.set_early_memory_release(true);
+		if(param.sequential_read)
+		    read_options.set_early_memory_release(true);
 
 		if(param.ref_filename != nullptr && param.ref_root != nullptr)
 		{
@@ -1103,7 +1111,8 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		if(repo)
 		    read_options.set_entrepot(repo);
 		read_options.set_header_only(param.header_only);
-		read_options.set_early_memory_release(true);
+		if(param.sequential_read)
+		    read_options.set_early_memory_release(true);
 
 		arch.reset(new (nothrow) archive(dialog,
 						 *param.sauv_root,
