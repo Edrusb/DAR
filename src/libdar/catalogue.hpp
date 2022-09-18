@@ -288,6 +288,9 @@ namespace libdar
 	    /// provide to inherited class the access to the early mem release mode and fields
 	bool is_mem_released() const { return mem_released; };
 
+	    /// let inherited class tell when memory release has completed
+	void set_mem_released() { mem_released = true; };
+
     private :
         cat_directory *contenu;                   ///< catalogue contents
         mutable path out_compare;                 ///< stores the missing directory structure, when extracting
