@@ -266,7 +266,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    if(param.op == merging && param.aux_root != nullptr && param.info_details)
 			dialog->message(gettext("Considering the (first) archive of reference:"));
 		    if(param.sequential_read && param.delta_diff)
-			throw Erange("little_main",gettext("Sequential reading of the archive of reference is not possible when delta difference is requested, you need to read the archive of reference in direct access mode (default mode)"));
+			throw Erange("little_main",gettext("Sequential reading of the archive of reference is not possible when delta difference is requested, you need either to read the archive of reference in direct access mode (without \'--sequential-read\' option) or disable binary delta (adding \'--delta no-patch\' option)"));
 
 		    read_options.clear();
 		    if(no_cipher_given)

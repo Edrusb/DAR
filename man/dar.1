@@ -1105,7 +1105,7 @@ option to be set. By default, this minimum size is 10 kio. The same option suffi
 In the context of differential backup, this option leads dar to never consider files for delta binary even if delta signatures are present. By default delta binary (rsync-like) operation is performed when a file has changed since the archive of reference was made *and* if a delta signature could be found in the archive of reference for that file (or in the isolated catalogue used as reference for the incremental/differential backup). If no delta signature could be found or if --delta no-patch is used, the normal behavior is done, which consist of saving that whole file in the archive. Note that if the archive of reference is read in sequential mode, the
 .B
 --delta no patch
-is implicitly used as reading in sequential mode an archive does not let skipping backward to fetch the delta signature necessary to setup a delta patch.
+is required, dar will refuse to execute the operation: sequential read and binary delta are not compatible, because reading in sequential mode an archive does not let skipping backward to fetch the delta signature necessary to setup a delta patch.
 .P
 Binary delta options usage and best practices:
 .RS
