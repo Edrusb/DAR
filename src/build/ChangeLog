@@ -1,5 +1,8 @@
 from 2.7.7 to 2.7.8
 - adapted code to workaround clang 10.0.1 bug under FreeBSD 12
+- updating code and man page about how to solve the conflict of
+  sequentially reading the archive of reference with implicit binary
+  delta present for differential/incremental backups
 
 from 2.7.6 to 2.7.7
 - added support for sequential reading more of sliced backup, to
