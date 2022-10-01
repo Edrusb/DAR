@@ -38,19 +38,20 @@ namespace libdar
 #if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
 
     entrepot_libcurl::i_entrepot_libcurl::i_entrepot_libcurl(const shared_ptr<user_interaction> & dialog,         //< for user interaction
-					   mycurl_protocol proto,             //< network protocol to use
-					   const string & login,              //< user login on remote host
-					   const secu_string & password,      //< user password on remote host (empty for file auth or user interaction)
-					   const string & host,               //< the remote server to connect to
-					   const string & port,               //< TCP/UDP port to connec to (empty string for default)
-					   bool auth_from_file,               //< whether to check $HOME/.netrc for password
-					   const string & sftp_pub_keyfile,   //< where to fetch the public key (sftp only)
-					   const string & sftp_prv_keyfile,   //< where to fetch the private key (sftp only)
-					   const string & sftp_known_hosts,   //< location of the known_hosts file (empty string to disable this security check)
-					   U_I waiting_time): mem_ui(dialog),
-							      x_proto(proto),
-							      base_URL(build_url_from(proto, host, port)),
-							      wait_delay(waiting_time)
+							     mycurl_protocol proto,             //< network protocol to use
+							     const string & login,              //< user login on remote host
+							     const secu_string & password,      //< user password on remote host (empty for file auth or user interaction)
+							     const string & host,               //< the remote server to connect to
+							     const string & port,               //< TCP/UDP port to connec to (empty string for default)
+							     bool auth_from_file,               //< whether to check $HOME/.netrc for password
+							     const string & sftp_pub_keyfile,   //< where to fetch the public key (sftp only)
+							     const string & sftp_prv_keyfile,   //< where to fetch the private key (sftp only)
+							     const string & sftp_known_hosts,   //< location of the known_hosts file (empty string to disable this security check)
+							     U_I waiting_time,
+							     bool verbose): mem_ui(dialog),
+									    x_proto(proto),
+									    base_URL(build_url_from(proto, host, port)),
+									    wait_delay(waiting_time)
     {
 	current_dir.clear();
 	reading_dir_tmp.clear();
@@ -78,9 +79,9 @@ namespace libdar
 				   sftp_prv_keyfile,
 				   sftp_known_hosts);
 
-#ifdef LIBDAR_NO_OPTIMIZATION
-	easyh.setopt_global(CURLOPT_VERBOSE,(long)1);
-#endif
+
+	if(verbose)
+	    easyh.setopt_global(CURLOPT_VERBOSE,(long)1);
     }
 
     void entrepot_libcurl::i_entrepot_libcurl::read_dir_reset() const

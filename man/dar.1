@@ -227,7 +227,9 @@ is equivalent to -vm -vs -vt, see also -Q and -q options below. Note: When using
 .TP 20
 -vmasks, --verbose=masks
 Display raw information about the masks set by dar and passed to libdar
-
+.TP 20
+-avc, --alter=verbose-libcurl
+activate verbose output from libcurl (remote repositories context). This is to be considered as a debug option relative to remote connection problems.
 .TP 20
 -q, --quiet
 Suppress the final statistics report. If no verbose output is asked beside this option, nothing is displayed if the operation succeeds. When using dar from a script better use dar's exit status to know which way the operation has ended (seen EXIT CODES at the end of this document)

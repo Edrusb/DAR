@@ -324,6 +324,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
     p.remote.clear();
     p.ref_remote.clear();
     p.aux_remote.clear();
+    p.remote_verbose = false;
     p.sizes_in_bytes = false;
     p.header_only = false;
     p.zeroing_neg_dates = false;
@@ -1652,6 +1653,8 @@ static bool get_args_recursive(recursive_param & rec,
 		    p.unix_sockets = true;
 		else if(strcasecmp("p", optarg) == 0 || strcasecmp("place", optarg) == 0)
 		    p.in_place = true;
+		else if(strcasecmp("vc", optarg) == 0 || strcasecmp("verbose-libcurl", optarg) == 0)
+		    p.remote_verbose = true;
 		else
                     throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext("Unknown argument given to -a : %s"), optarg));
                 break;

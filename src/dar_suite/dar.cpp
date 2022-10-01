@@ -212,6 +212,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 							  sftp_pub_filekey,
 							  sftp_prv_filekey,
 							  sftp_known_hosts,
+							  param.remote_verbose,
 							  param.remote.network_retry));
 		if(!repo)
 		    throw Ememory("little_main");
@@ -229,6 +230,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 							      sftp_pub_filekey,
 							      sftp_prv_filekey,
 							      sftp_known_hosts,
+							      param.remote_verbose,
 							      param.ref_remote.network_retry));
 		if(!ref_repo)
 		    throw Ememory("little_main");
@@ -246,6 +248,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 							      sftp_pub_filekey,
 							      sftp_prv_filekey,
 							      sftp_known_hosts,
+							      param.remote_verbose,
 							      param.aux_remote.network_retry));
 		if(!aux_repo)
 		    throw Ememory("little_main");

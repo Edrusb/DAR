@@ -38,6 +38,7 @@ a * alteration of operation		--alter	  argument:
 							    t[ape-marks]
 							    test-self-reported-bug
 							    u[nix-sockets]
+							    vc / verbose-libcurl
 							    y abyte[s]
 							    z[eroing-negative-dates]
 b - terminal bell                       --bell
