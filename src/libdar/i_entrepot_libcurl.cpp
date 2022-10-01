@@ -123,6 +123,11 @@ namespace libdar
 	    node->setopt(CURLOPT_WRITEFUNCTION, (void*)get_ftp_listing_callback);
 	    node->setopt(CURLOPT_WRITEDATA, (void*)(this));
 	    node->apply(get_pointer(), wait_delay);
+		// libcurl will invoke our the callback function 'get_ftp_listing_callback'
+		// passed above as argument which will fill the directory content
+		// in the std::deque current_dir, the reading_dir_tmp is the currently
+		// or the latest entry name of the directory that was under the process of
+		// being spelled...
 
 	    if(!reading_dir_tmp.empty())
 	    {
