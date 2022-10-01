@@ -407,9 +407,13 @@ bool get_args(shared_ptr<user_interaction> & dialog,
         if(p.filename != "-")
 	{
 	    bool creation = (p.op == create || p.op == isolate || p.op == merging || p.op == repairing);
-            line_tools_check_basename(*dialog, *p.sauv_root, p.filename, EXTENSION, creation);
-	    if(!creation && p.num_digits.is_zero())
-		line_tools_check_min_digits(*dialog, *p.sauv_root, p.filename, EXTENSION, p.num_digits);
+	    bool local = p.remote.ent_proto.empty();
+	    if(local)
+	    {
+		line_tools_check_basename(*dialog, *p.sauv_root, p.filename, EXTENSION, creation);
+		if(!creation && p.num_digits.is_zero())
+		    line_tools_check_min_digits(*dialog, *p.sauv_root, p.filename, EXTENSION, p.num_digits);
+	    }
 	}
         if((p.op == merging || p.op == create) && p.aux_filename != nullptr)
         {
