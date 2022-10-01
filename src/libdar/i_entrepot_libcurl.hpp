@@ -108,6 +108,7 @@ namespace libdar
 	std::deque<std::string> current_dir;
 	std::string reading_dir_tmp;
 	U_I wait_delay;
+	bool verbosity;
 
 	std::string get_libcurl_URL() const;
 	void set_libcurl_authentication(user_interaction & dialog,         ///< for user interaction

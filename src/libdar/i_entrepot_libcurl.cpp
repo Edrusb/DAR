@@ -53,6 +53,8 @@ namespace libdar
 									    base_URL(build_url_from(proto, host, port)),
 									    wait_delay(waiting_time)
     {
+	verbosity = verbose;
+
 	current_dir.clear();
 	reading_dir_tmp.clear();
 
@@ -79,9 +81,17 @@ namespace libdar
 				   sftp_prv_keyfile,
 				   sftp_known_hosts);
 
-
 	if(verbose)
+	{
 	    easyh.setopt_global(CURLOPT_VERBOSE,(long)1);
+	    get_ui().printf(gettext("repository parameters passed to libcurl:"));
+	    get_ui().printf(gettext("  hostname\t: %s\n  port   \t: %s\n  login   \t: %s\n  password\t: (hidden)"),
+			    host.c_str(),
+			    port.c_str(),
+			    login.c_str());
+	    get_ui().printf(gettext("  base URL\t: %s"),
+			    base_URL.c_str());
+	}
     }
 
     void entrepot_libcurl::i_entrepot_libcurl::read_dir_reset() const
@@ -96,6 +106,9 @@ namespace libdar
 	node = me->easyh.alloc_instance();
 	if(!node)
 	    throw SRC_BUG;
+
+	if(verbosity)
+	    get_ui().printf("Asking libcurl to read directory content at %s", get_libcurl_URL().c_str());
 
 	me->current_dir.clear();
 	me->reading_dir_tmp = "";
@@ -166,6 +179,9 @@ namespace libdar
 	}
 
 	string chemin = (path(get_url(), true).append(filename)).display();
+
+	if(verbosity)
+	    get_ui().printf("Asking libcurl to open the file %s", chemin.c_str());
 
 	if(hidden_mode == gf_read_write)
 	    hidden_mode = gf_write_only;
@@ -248,6 +264,9 @@ namespace libdar
 	node = me->easyh.alloc_instance();
 	if(!node)
 	    throw SRC_BUG;
+
+	if(verbosity)
+	    get_ui().printf("Asking libcurl to delete file %s", filename.c_str());
 
 	switch(x_proto)
 	{
