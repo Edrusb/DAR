@@ -81,7 +81,7 @@ namespace libdar
 
 	    /// \note this is expected to have a double slash after the host:port
 	    /// like ftp://www.some.where:8021//tmp/sub/dir
-	virtual std::string get_url() const override { return base_URL + get_full_path().display(); };
+	virtual std::string get_url() const override { return base_URL + get_full_path().display_without_root(); };
 	virtual void read_dir_reset() const override;
 	virtual bool read_dir_next(std::string & filename) const override;
 	virtual entrepot *clone() const override { return new (std::nothrow) i_entrepot_libcurl(*this); };
