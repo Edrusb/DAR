@@ -1412,7 +1412,7 @@ namespace libdar
 
 		while(of_fd == nullptr || of_flag != flag_type_terminal)
 		{
-		    if(sar_tools_get_higher_number_in_dir(*entr, base, min_digits, ext, num))
+		    if(sar_tools_get_higher_number_in_dir(get_ui(), *entr, base, min_digits, ext, num))
 		    {
 			open_file(num, bytheend);
 			if(of_flag != flag_type_terminal)
