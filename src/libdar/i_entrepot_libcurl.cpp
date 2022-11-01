@@ -351,7 +351,7 @@ namespace libdar
 	if(auth_from_file)
 	{
 	    easyh.setopt_global(CURLOPT_USERNAME, real_login);
-	    easyh.setopt_global(CURLOPT_NETRC, CURL_NETRC_OPTIONAL);
+	    easyh.setopt_global(CURLOPT_NETRC, (long)(CURL_NETRC_OPTIONAL));
 	}
 	else // login + password authentication
 	{
