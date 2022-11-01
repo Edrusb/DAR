@@ -10,6 +10,8 @@ from 2.7.7 to 2.7.8
 - exposing libcurl version to the version output (new API call added
   for that, leading upgrading libdar API version to 6.5.0)
 - remove extra slash (/) found after hostname in URL passed to libcurl
+- fixed self test reported error about mycurl_easyhandle_node.cpp line 176
+- improved error message when libcurl fails to connect to sftp server
 
 from 2.7.6 to 2.7.7
 - added support for sequential reading more of sliced backup, to
