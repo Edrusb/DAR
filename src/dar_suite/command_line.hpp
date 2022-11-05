@@ -161,6 +161,7 @@ struct line_param
     ent_params remote;            ///< remote entrepot coordinates
     ent_params ref_remote;        ///< remote entrepot coordinates for archive of reference
     ent_params aux_remote;        ///< remote entrepot coordinates for the auxiliary archive
+    bool remote_verbose;          ///< whether to have verbose output from libcurl
     bool sizes_in_bytes;          ///< whether to display sizes in bytes of to the larges unit (Mo, Go, To,...)
     bool header_only;             ///< whether we just display the header of archives to be read
     bool zeroing_neg_dates;       ///< whether to automatically zeroing negative dates while reading inode from filesystem

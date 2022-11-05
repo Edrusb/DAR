@@ -40,16 +40,18 @@ namespace libdar
 {
 
     entrepot_libcurl::entrepot_libcurl(const shared_ptr<user_interaction> & dialog,         //< for user interaction
-				       mycurl_protocol proto,             //< network protocol to use
-				       const string & login,              //< user login on remote host
-				       const secu_string & password,      //< user password on remote host (empty for file auth or user interaction)
-				       const string & host,               //< the remote server to connect to
-				       const string & port,               //< TCP/UDP port to connec to (empty string for default)
-				       bool auth_from_file,               //< whether to check $HOME/.netrc for password
-				       const string & sftp_pub_keyfile,   //< where to fetch the public key (sftp only)
-				       const string & sftp_prv_keyfile,   //< where to fetch the private key (sftp only)
-				       const string & sftp_known_hosts,   //< location of the known_hosts file (empty string to disable this security check)
-				       U_I waiting_time)
+				       mycurl_protocol proto,             ///< network protocol to use
+				       const string & login,              ///< user login on remote host
+				       const secu_string & password,      ///< user password on remote host (empty for file auth or user interaction)
+				       const string & host,               ///< the remote server to connect to
+				       const string & port,               ///< TCP/UDP port to connec to (empty string for default)
+				       bool auth_from_file,               ///< whether to check $HOME/.netrc for password
+				       const string & sftp_pub_keyfile,   ///< where to fetch the public key (sftp only)
+				       const string & sftp_prv_keyfile,   ///< where to fetch the private key (sftp only)
+				       const string & sftp_known_hosts,   ///< location of the known_hosts file (empty string to disable this security check)
+				       U_I waiting_time,
+				       bool verbose                       ///< whether to have verbose messages from libcurl
+	)
     {
 #if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
 
@@ -66,7 +68,8 @@ namespace libdar
 							 sftp_pub_keyfile,
 							 sftp_prv_keyfile,
 							 sftp_known_hosts,
-							 waiting_time));
+							 waiting_time,
+							 verbose));
 
 	    if(!pimpl)
 		throw Ememory("entrepot_libcurl::entrepot_libcurl");

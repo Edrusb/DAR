@@ -109,7 +109,7 @@ namespace libdar
 	    try
 	    {
 		ret = std::make_unique<mycurl_param_element<T> >(val);
-		if(ret == nullptr)
+		if(!ret)
 		    throw Ememory("mycurl_param_list::clone");
 	    }
 	    catch(...)

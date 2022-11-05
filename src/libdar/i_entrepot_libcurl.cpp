@@ -38,20 +38,23 @@ namespace libdar
 #if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
 
     entrepot_libcurl::i_entrepot_libcurl::i_entrepot_libcurl(const shared_ptr<user_interaction> & dialog,         //< for user interaction
-					   mycurl_protocol proto,             //< network protocol to use
-					   const string & login,              //< user login on remote host
-					   const secu_string & password,      //< user password on remote host (empty for file auth or user interaction)
-					   const string & host,               //< the remote server to connect to
-					   const string & port,               //< TCP/UDP port to connec to (empty string for default)
-					   bool auth_from_file,               //< whether to check $HOME/.netrc for password
-					   const string & sftp_pub_keyfile,   //< where to fetch the public key (sftp only)
-					   const string & sftp_prv_keyfile,   //< where to fetch the private key (sftp only)
-					   const string & sftp_known_hosts,   //< location of the known_hosts file (empty string to disable this security check)
-					   U_I waiting_time): mem_ui(dialog),
-							      x_proto(proto),
-							      base_URL(build_url_from(proto, host, port)),
-							      wait_delay(waiting_time)
+							     mycurl_protocol proto,             //< network protocol to use
+							     const string & login,              //< user login on remote host
+							     const secu_string & password,      //< user password on remote host (empty for file auth or user interaction)
+							     const string & host,               //< the remote server to connect to
+							     const string & port,               //< TCP/UDP port to connec to (empty string for default)
+							     bool auth_from_file,               //< whether to check $HOME/.netrc for password
+							     const string & sftp_pub_keyfile,   //< where to fetch the public key (sftp only)
+							     const string & sftp_prv_keyfile,   //< where to fetch the private key (sftp only)
+							     const string & sftp_known_hosts,   //< location of the known_hosts file (empty string to disable this security check)
+							     U_I waiting_time,
+							     bool verbose): mem_ui(dialog),
+									    x_proto(proto),
+									    base_URL(build_url_from(proto, host, port)),
+									    wait_delay(waiting_time)
     {
+	verbosity = verbose;
+
 	current_dir.clear();
 	reading_dir_tmp.clear();
 
@@ -78,9 +81,17 @@ namespace libdar
 				   sftp_prv_keyfile,
 				   sftp_known_hosts);
 
-#ifdef LIBDAR_NO_OPTIMIZATION
-	easyh.setopt_global(CURLOPT_VERBOSE,(long)1);
-#endif
+	if(verbose)
+	{
+	    easyh.setopt_global(CURLOPT_VERBOSE,(long)1);
+	    get_ui().printf(gettext("repository parameters passed to libcurl:"));
+	    get_ui().printf(gettext("  hostname\t: %s\n  port   \t: %s\n  login   \t: %s\n  password\t: (hidden)"),
+			    host.c_str(),
+			    port.c_str(),
+			    login.c_str());
+	    get_ui().printf(gettext("  base URL\t: %s"),
+			    base_URL.c_str());
+	}
     }
 
     void entrepot_libcurl::i_entrepot_libcurl::read_dir_reset() const
@@ -96,6 +107,9 @@ namespace libdar
 	if(!node)
 	    throw SRC_BUG;
 
+	if(verbosity)
+	    get_ui().printf("Asking libcurl to read directory content at %s", get_libcurl_URL().c_str());
+
 	me->current_dir.clear();
 	me->reading_dir_tmp = "";
 
@@ -109,6 +123,11 @@ namespace libdar
 	    node->setopt(CURLOPT_WRITEFUNCTION, (void*)get_ftp_listing_callback);
 	    node->setopt(CURLOPT_WRITEDATA, (void*)(this));
 	    node->apply(get_pointer(), wait_delay);
+		// libcurl will invoke our the callback function 'get_ftp_listing_callback'
+		// passed above as argument which will fill the directory content
+		// in the std::deque current_dir, the reading_dir_tmp is the currently
+		// or the latest entry name of the directory that was under the process of
+		// being spelled...
 
 	    if(!reading_dir_tmp.empty())
 	    {
@@ -165,6 +184,9 @@ namespace libdar
 	}
 
 	string chemin = (path(get_url(), true).append(filename)).display();
+
+	if(verbosity)
+	    get_ui().printf("Asking libcurl to open the file %s", chemin.c_str());
 
 	if(hidden_mode == gf_read_write)
 	    hidden_mode = gf_write_only;
@@ -248,6 +270,9 @@ namespace libdar
 	if(!node)
 	    throw SRC_BUG;
 
+	if(verbosity)
+	    get_ui().printf("Asking libcurl to delete file %s", filename.c_str());
+
 	switch(x_proto)
 	{
 	case proto_ftp:
@@ -326,7 +351,7 @@ namespace libdar
 	if(auth_from_file)
 	{
 	    easyh.setopt_global(CURLOPT_USERNAME, real_login);
-	    easyh.setopt_global(CURLOPT_NETRC, CURL_NETRC_OPTIONAL);
+	    easyh.setopt_global(CURLOPT_NETRC, (long)(CURL_NETRC_OPTIONAL));
 	}
 	else // login + password authentication
 	{

@@ -90,8 +90,7 @@ namespace libdar
     protected:
 	    /// get access to the user_interaction object
 
-	    /// \return a reference to the clone object. This reference stays valid during all
-	    /// the live of the object.
+	    /// \return a reference to the clone object.
 	user_interaction & get_ui() const { return *ui; };
 
 	    /// get access to the shared_ptr pointing to the user_interaction

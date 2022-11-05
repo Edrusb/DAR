@@ -126,7 +126,8 @@ namespace libdar
         }
     }
 
-    bool sar_tools_get_higher_number_in_dir(entrepot & entr,
+    bool sar_tools_get_higher_number_in_dir(user_interaction & ui,
+					    entrepot & entr,
 					    const string & base_name,
 					    const infinint & min_digits,
 					    const string & ext,
@@ -142,6 +143,8 @@ namespace libdar
 	}
 	catch(Erange & e)
 	{
+	    e.prepend_message(gettext("Error met while looking for slices: "));
+	    ui.message(e.get_message());
 	    return false;
 	}
 

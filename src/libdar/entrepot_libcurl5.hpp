@@ -78,6 +78,7 @@ namespace libdar5
 				     sftp_pub_keyfile,
 				     sftp_prv_keyfile,
 				     sftp_known_hosts,
+				     false,
 				     waiting_time)
 	{}
 

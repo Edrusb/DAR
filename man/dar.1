@@ -227,7 +227,9 @@ is equivalent to -vm -vs -vt, see also -Q and -q options below. Note: When using
 .TP 20
 -vmasks, --verbose=masks
 Display raw information about the masks set by dar and passed to libdar
-
+.TP 20
+-avc, --alter=verbose-libcurl
+activate verbose output from libcurl (remote repositories context). This is to be considered as a debug option relative to remote connection problems.
 .TP 20
 -q, --quiet
 Suppress the final statistics report. If no verbose output is asked beside this option, nothing is displayed if the operation succeeds. When using dar from a script better use dar's exit status to know which way the operation has ended (seen EXIT CODES at the end of this document)
@@ -1105,7 +1107,7 @@ option to be set. By default, this minimum size is 10 kio. The same option suffi
 In the context of differential backup, this option leads dar to never consider files for delta binary even if delta signatures are present. By default delta binary (rsync-like) operation is performed when a file has changed since the archive of reference was made *and* if a delta signature could be found in the archive of reference for that file (or in the isolated catalogue used as reference for the incremental/differential backup). If no delta signature could be found or if --delta no-patch is used, the normal behavior is done, which consist of saving that whole file in the archive. Note that if the archive of reference is read in sequential mode, the
 .B
 --delta no patch
-is implicitly used as reading in sequential mode an archive does not let skipping backward to fetch the delta signature necessary to setup a delta patch.
+is required, dar will refuse to execute the operation: sequential read and binary delta are not compatible, because reading in sequential mode an archive does not let skipping backward to fetch the delta signature necessary to setup a delta patch.
 .P
 Binary delta options usage and best practices:
 .RS

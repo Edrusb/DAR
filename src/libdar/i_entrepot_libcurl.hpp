@@ -67,7 +67,8 @@ namespace libdar
 			   const std::string & sftp_pub_keyfile,   ///< where to fetch the public key (sftp only)
 			   const std::string & sftp_prv_keyfile,   ///< where to fetch the private key (sftp only)
 			   const std::string & sftp_known_hosts,   ///< location of the known_hosts file (empty string to disable this security check)
-			   U_I waiting_time                        ///< time in second to wait before retrying in case of network error
+			   U_I waiting_time,                       ///< time in second to wait before retrying in case of network error
+			   bool verbose                           ///< whether to have verbose messages from libcurl
 	    );
 	i_entrepot_libcurl(const i_entrepot_libcurl & ref) = default;
 	i_entrepot_libcurl(i_entrepot_libcurl && ref) = default;
@@ -80,7 +81,7 @@ namespace libdar
 
 	    /// \note this is expected to have a double slash after the host:port
 	    /// like ftp://www.some.where:8021//tmp/sub/dir
-	virtual std::string get_url() const override { return base_URL + get_full_path().display(); };
+	virtual std::string get_url() const override { return base_URL + get_full_path().display_without_root(); };
 	virtual void read_dir_reset() const override;
 	virtual bool read_dir_next(std::string & filename) const override;
 	virtual entrepot *clone() const override { return new (std::nothrow) i_entrepot_libcurl(*this); };
@@ -107,6 +108,7 @@ namespace libdar
 	std::deque<std::string> current_dir;
 	std::string reading_dir_tmp;
 	U_I wait_delay;
+	bool verbosity;
 
 	std::string get_libcurl_URL() const;
 	void set_libcurl_authentication(user_interaction & dialog,         ///< for user interaction
