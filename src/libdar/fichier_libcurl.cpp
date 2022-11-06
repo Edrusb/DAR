@@ -441,7 +441,7 @@ namespace libdar
 		{
 		    ehandle->apply(thread_ui, wait_delay, end_data_mode);
 		}
-		while(!end_data_mode || still_data_to_write());
+		while(still_data_to_write());
 	    }
 	    else // reading by block to avoid having interrupting libcurl
 	    {
