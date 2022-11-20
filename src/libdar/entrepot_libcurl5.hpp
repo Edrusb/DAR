@@ -30,11 +30,6 @@
 
 extern "C"
 {
-#if LIBCURL_AVAILABLE
-#if HAVE_CURL_CURL_H
-#include <curl/curl.h>
-#endif
-#endif
 }
 
 #include <string>
