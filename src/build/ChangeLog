@@ -17,6 +17,8 @@ from 2.7.7 to 2.7.8
 - fixed bug in libdar when asking libcurl the size of the file we are
   writing (libcurl segfaults with ftp protocol). Now recording this info
   during the write process, avoiding the need to ask libcurl this info.
+- fixed bug met with very close and/or high bandwidth ftp and sftp repos
+  when --hash was used in certain conditions (race condition)
 
 from 2.7.6 to 2.7.7
 - added support for sequential reading more of sliced backup, to
