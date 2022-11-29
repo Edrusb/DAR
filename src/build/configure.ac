@@ -2570,7 +2570,12 @@ fi
 
 printf "   can uses multiple threads  : "
 if [ "$local_threadar" = "yes" ] ; then
-   echo "YES"
+  if [ "$local_threadar_barrier_mac" = "yes" ] ; then
+    echo "YES (+ barrier implementations for MAC OS)"
+  else
+    echo "YES"
+  fi
+
 else
    echo "NO"
 fi
@@ -2584,11 +2589,7 @@ fi
 
 printf "   Remote repository support  : "
 if [ "$local_libcurl" = "yes" -a "$local_threadar" = "yes" ] ; then
-  if [ "$local_threadar_barrier_mac" = "yes" ] ; then
-    echo "YES (+ barrier implementations for MAC OS)"
-  else
-    echo "YES"
-  fi
+  echo "YES"
 else
   echo "NO"
 fi

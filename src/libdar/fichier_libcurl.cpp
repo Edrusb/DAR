@@ -136,7 +136,7 @@ namespace libdar
 	if(me == nullptr)
 	    throw SRC_BUG;
 
-	if(!has_maxpos || get_mode() != gf_read_only)
+	if(!has_maxpos)
 	{
 	    try
 	    {
@@ -344,6 +344,11 @@ namespace libdar
 	if(current_offset > 0)
 	    append_write = true; // we can now ignore the request to erase data
 	    // and we now need to swap in write append mode
+	if(maxpos < current_offset)
+	{
+	    maxpos = current_offset;
+	    has_maxpos = true;
+	}
 
 	return wrote;
     }
@@ -436,7 +441,7 @@ namespace libdar
 		{
 		    ehandle->apply(thread_ui, wait_delay, end_data_mode);
 		}
-		while(!end_data_mode || still_data_to_write());
+		while(still_data_to_write());
 	    }
 	    else // reading by block to avoid having interrupting libcurl
 	    {

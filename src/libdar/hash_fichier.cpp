@@ -214,6 +214,7 @@ namespace libdar
 
     void hash_fichier::inherited_terminate()
     {
+	ref->terminate();
 	if(!hash_dumped)
 	{
 	    unsigned char *digest = nullptr;

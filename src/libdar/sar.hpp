@@ -67,6 +67,7 @@ namespace libdar
 	    /// the last slice else it will try starting from the first
 	    /// \param[in] x_min_digits is the minimum number of digits the slices number is
 	    /// stored with in the filename
+	    /// \param[in] sequential_read to be set to true for sequential reading
 	    /// \param[in] lax if set to true will try workaround problems that would otherwise
 	    /// lead the operation to fail
 	    /// \param[in] execute is the command to execute before trying to open each slice

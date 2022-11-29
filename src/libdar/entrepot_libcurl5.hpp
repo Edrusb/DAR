@@ -30,11 +30,6 @@
 
 extern "C"
 {
-#if LIBCURL_AVAILABLE
-#if HAVE_CURL_CURL_H
-#include <curl/curl.h>
-#endif
-#endif
 }
 
 #include <string>
@@ -78,6 +73,7 @@ namespace libdar5
 				     sftp_pub_keyfile,
 				     sftp_prv_keyfile,
 				     sftp_known_hosts,
+				     false,
 				     waiting_time)
 	{}
 

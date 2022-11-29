@@ -50,7 +50,8 @@ namespace libdar
 				      const std::string & ext,
 				      infinint & ret);
 
-    extern bool sar_tools_get_higher_number_in_dir(entrepot & entr,
+    extern bool sar_tools_get_higher_number_in_dir(user_interaction & ui,
+						   entrepot & entr,
 						   const std::string & base_name,
 						   const infinint & min_digits,
 						   const std::string & ext, infinint & ret);

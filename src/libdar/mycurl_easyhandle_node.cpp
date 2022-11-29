@@ -130,12 +130,12 @@ namespace libdar
 	list<CURLoption> changed = current.update_with(wanted);
 	list<CURLoption>::iterator it = changed.begin();
 	CURLcode err = CURLE_OK;
-	const string* t_string;
-	const secu_string *t_secu_string;
-	void * const * t_pointer;
-	const long* t_long;
-	const mycurl_slist* t_mycurl_slist;
-	const curl_off_t* t_curl_off_t;
+	const string* t_string = nullptr;
+	const secu_string *t_secu_string = nullptr;
+	void * const * t_pointer = nullptr;
+	const long* t_long = nullptr;
+	const mycurl_slist* t_mycurl_slist = nullptr;
+	const curl_off_t* t_curl_off_t = nullptr;
 
 	while(it != changed.end())
 	{

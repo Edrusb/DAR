@@ -29,6 +29,15 @@
 #include <libthreadar/libthreadar.hpp>
 #endif
 
+extern "C"
+{
+#if LIBCURL_AVAILABLE
+#if HAVE_CURL_CURL_H
+#include <curl/curl.h>
+#endif
+#endif
+}
+
 namespace libdar
 {
     namespace compile_time
@@ -341,6 +350,15 @@ namespace libdar
 	    return true;
 #else
 	    return false;
+#endif
+	}
+
+	std::string libcurl_version() noexcept
+	{
+#if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
+	    return curl_version();
+#else
+	    return "";
 #endif
 	}
 

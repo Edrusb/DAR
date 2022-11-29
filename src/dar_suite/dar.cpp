@@ -212,7 +212,8 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 							  sftp_pub_filekey,
 							  sftp_prv_filekey,
 							  sftp_known_hosts,
-							  param.remote.network_retry));
+							  param.remote.network_retry,
+							  param.remote_verbose));
 		if(!repo)
 		    throw Ememory("little_main");
 	    }
@@ -229,7 +230,8 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 							      sftp_pub_filekey,
 							      sftp_prv_filekey,
 							      sftp_known_hosts,
-							      param.ref_remote.network_retry));
+							      param.ref_remote.network_retry,
+							      param.remote_verbose));
 		if(!ref_repo)
 		    throw Ememory("little_main");
 	    }
@@ -246,7 +248,8 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 							      sftp_pub_filekey,
 							      sftp_prv_filekey,
 							      sftp_known_hosts,
-							      param.aux_remote.network_retry));
+							      param.aux_remote.network_retry,
+							      param.remote_verbose));
 		if(!aux_repo)
 		    throw Ememory("little_main");
 	    }
@@ -266,7 +269,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    if(param.op == merging && param.aux_root != nullptr && param.info_details)
 			dialog->message(gettext("Considering the (first) archive of reference:"));
 		    if(param.sequential_read && param.delta_diff)
-			throw Erange("little_main",gettext("Sequential reading of the archive of reference is not possible when delta difference is requested, you need to read the archive of reference in direct access mode (default mode)"));
+			throw Erange("little_main",gettext("Sequential reading of the archive of reference is not possible when delta difference is requested, you need either to read the archive of reference in direct access mode (without \'--sequential-read\' option) or disable binary delta (adding \'--delta no-patch\' option)"));
 
 		    read_options.clear();
 		    if(no_cipher_given)

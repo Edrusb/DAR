@@ -204,11 +204,17 @@
 	  can either add a swap partition or a swap file, which is less constraining
 	  but also a bit less efficient). Bob Barry provided a script that can
 	  give you a raw estimation of the required virtual memory
-	  (<a href="samples/index.html">doc/samples/dar_rqck.bash</a>).
+	  (<a href="samples/index.html">doc/samples/dar_rqck.bash</a>), it was
+	  working well with dar 2.2.x but since then and the newly added features, the
+	  amount of metadata per file is variable: The memory requirement per file also depends
+	  on the presence and amount of Extended Attributes and Filesystem specific attributes,
+	  which changes from file to file.
 	</li>
         <li>
 	  If this is not enough, or if you don't want/cannot add swap
 	  space, recompile dar giving --enable-mode=64 argument to the configure script.
+	  Note that since release 2.6.x this is the default compilation mode, thus you should
+	  be good now.
 	</li>
         <li>
 	  If this is not enough, and you have some money, you can add
@@ -221,7 +227,7 @@
       <p>
 	Last, there is always the workaround to make several smaller backups
 	of the files to save. For example, making a backup for all that is in
-	/usr/local, another one for all that is in /var and so on. These backup can be full
+	/usr/local, another one for all that is in /var and so on. These backups can be full
 	or differential. The drawback is not big as you can store these
 	backups side by side and use them at will. Moreover, you can feed a
 	unique dar_manager database with all these different backups
@@ -3241,7 +3247,7 @@
       </code>
       <p>
 	If you read "infinint" and see the above error message from dar, thanks to
-	<a href="index.html#reporting_a_bug">report a bug</a> this should never occur.
+	<a href="http://dar.linux.free.fr/feedback.html">report a bug</a> this should never occur.
 	Else the problem appear when
 	using dar before release 2.5.13 either at backup creation time when
 	dar met a file with a negative date, or at backup reading time,

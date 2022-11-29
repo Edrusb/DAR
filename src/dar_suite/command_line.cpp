@@ -324,6 +324,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
     p.remote.clear();
     p.ref_remote.clear();
     p.aux_remote.clear();
+    p.remote_verbose = false;
     p.sizes_in_bytes = false;
     p.header_only = false;
     p.zeroing_neg_dates = false;
@@ -407,9 +408,13 @@ bool get_args(shared_ptr<user_interaction> & dialog,
         if(p.filename != "-")
 	{
 	    bool creation = (p.op == create || p.op == isolate || p.op == merging || p.op == repairing);
-            line_tools_check_basename(*dialog, *p.sauv_root, p.filename, EXTENSION, creation);
-	    if(!creation && p.num_digits.is_zero())
-		line_tools_check_min_digits(*dialog, *p.sauv_root, p.filename, EXTENSION, p.num_digits);
+	    bool local = p.remote.ent_proto.empty();
+	    if(local)
+	    {
+		line_tools_check_basename(*dialog, *p.sauv_root, p.filename, EXTENSION, creation);
+		if(!creation && p.num_digits.is_zero())
+		    line_tools_check_min_digits(*dialog, *p.sauv_root, p.filename, EXTENSION, p.num_digits);
+	    }
 	}
         if((p.op == merging || p.op == create) && p.aux_filename != nullptr)
         {
@@ -1655,6 +1660,8 @@ static bool get_args_recursive(recursive_param & rec,
 		    p.in_place = true;
 		else if(strcasecmp("nru", optarg) == 0 || strcasecmp("never-resave-uncompressed", optarg) == 0)
 		    p.never_resave_uncompr = true;
+		else if(strcasecmp("vc", optarg) == 0 || strcasecmp("verbose-libcurl", optarg) == 0)
+		    p.remote_verbose = true;
 		else
                     throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext("Unknown argument given to -a : %s"), optarg));
                 break;

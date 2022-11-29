@@ -30,11 +30,6 @@
 
 extern "C"
 {
-#if LIBCURL_AVAILABLE
-#if HAVE_CURL_CURL_H
-#include <curl/curl.h>
-#endif
-#endif
 }
 
 #include <string>
@@ -64,8 +59,10 @@ namespace libdar
 			 const std::string & sftp_pub_keyfile,   ///< where to fetch the public key (sftp only)
 			 const std::string & sftp_prv_keyfile,   ///< where to fetch the private key (sftp only)
 			 const std::string & sftp_known_hosts,   ///< location of the known_hosts file (empty string to disable this security check)
-			 U_I waiting_time                        ///< time in second to wait before retrying in case of network error
+			 U_I waiting_time,                       ///< time in second to wait before retrying in case of network error
+			 bool verbose = false                    ///< whether to have verbose messages from libcurl
 	    );
+
 	entrepot_libcurl(const entrepot_libcurl & ref) = default;
 	entrepot_libcurl(entrepot_libcurl && ref) noexcept = default;
 	entrepot_libcurl & operator = (const entrepot_libcurl & ref) = default;

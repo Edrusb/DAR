@@ -146,11 +146,14 @@ namespace libdar
 	    /// returns whether delta compression is available and delta diff stuff with it
 	bool librsync() noexcept;
 
-	    /// returns whether remote repository feature is available
+	    /// returns whether remote repository feature is available (implemented using libcurl)
 	bool remote_repository() noexcept;
 
 	    /// returns whether whirlpool hash algorithm is available
 	bool whirlpool_hash() noexcept;
+
+	    /// returns the libcurl version used or empty string if not available
+	std::string libcurl_version() noexcept;
 
     } // end of compile_time namespace
 
