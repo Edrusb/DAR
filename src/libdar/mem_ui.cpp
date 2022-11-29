@@ -35,8 +35,15 @@ namespace libdar
 
     mem_ui::mem_ui(const std::shared_ptr<user_interaction> & dialog): ui(dialog)
     {
-	if(!ui)
-	    ui = make_shared<shell_interaction>(cerr, cerr, false);
+	try
+	{
+	    if(!ui)
+		ui = make_shared<shell_interaction>(cerr, cerr, false);
+	}
+	catch(std::bad_alloc & e)
+	{
+	    throw Ememory("mem_ui::mem_ui");
+	}
     }
 
 } // end of namespace
