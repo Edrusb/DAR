@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: sv\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612&atid=511612\n"
-"POT-Creation-Date: 2022-11-28 20:06+0100\n"
+"POT-Creation-Date: 2022-11-29 10:41+0100\n"
 "PO-Revision-Date: 2012-04-15 11:28+0200\n"
 "Last-Translator: Peter Landgren <peter.talken@telia.com>\n"
 "Language-Team: Swedish <kde-i18n-doc@kde.org>\n"
@@ -7549,9 +7549,9 @@ msgstr ""
 msgid "No mask available"
 msgstr ""
 
-#: src/libdar/parallel_block_compressor.cpp:801
-#: src/libdar/parallel_block_compressor.cpp:815
-#: src/libdar/parallel_block_compressor.cpp:851
+#: src/libdar/parallel_block_compressor.cpp:808
+#: src/libdar/parallel_block_compressor.cpp:822
+#: src/libdar/parallel_block_compressor.cpp:858
 #: src/libdar/block_compressor.cpp:318 src/libdar/block_compressor.cpp:333
 #: src/libdar/block_compressor.cpp:337 src/libdar/block_compressor.cpp:342
 msgid "incoherent compressed block structure, compressed data corruption"

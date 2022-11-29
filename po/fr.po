@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: DAR 2.7.0\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612&atid=511612\n"
-"POT-Creation-Date: 2022-11-28 20:06+0100\n"
+"POT-Creation-Date: 2022-11-29 10:41+0100\n"
 "PO-Revision-Date: 2022-11-28 20:16+0100\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
@@ -319,7 +319,11 @@ msgid ""
 "difference is requested, you need either to read the archive of reference in "
 "direct access mode (without '--sequential-read' option) or disable binary "
 "delta (adding '--delta no-patch' option)"
-msgstr "La lecture sequentielle d'une archive est impossible quand une comparaison des deltas binaires est demandée, l'archive doit être lue en mode direct (sans l'option --sequental-read) ou les deltas binaires doivent être désactivés (en ajoutant l'option '--delta no-patch'"
+msgstr ""
+"La lecture sequentielle d'une archive est impossible quand une comparaison "
+"des deltas binaires est demandée, l'archive doit être lue en mode direct "
+"(sans l'option --sequental-read) ou les deltas binaires doivent être "
+"désactivés (en ajoutant l'option '--delta no-patch'"
 
 #: src/dar_suite/dar.cpp:298 src/dar_suite/dar.cpp:352
 msgid ""
@@ -7795,9 +7799,9 @@ msgstr ""
 msgid "No mask available"
 msgstr "Aucun masque disponible"
 
-#: src/libdar/parallel_block_compressor.cpp:801
-#: src/libdar/parallel_block_compressor.cpp:815
-#: src/libdar/parallel_block_compressor.cpp:851
+#: src/libdar/parallel_block_compressor.cpp:808
+#: src/libdar/parallel_block_compressor.cpp:822
+#: src/libdar/parallel_block_compressor.cpp:858
 #: src/libdar/block_compressor.cpp:318 src/libdar/block_compressor.cpp:333
 #: src/libdar/block_compressor.cpp:337 src/libdar/block_compressor.cpp:342
 msgid "incoherent compressed block structure, compressed data corruption"
