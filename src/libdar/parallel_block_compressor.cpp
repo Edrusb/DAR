@@ -77,9 +77,16 @@ namespace libdar
 
             // creating inter thread communication structures
 
-        disperse = make_shared<ratelier_scatter<crypto_segment> >(get_ratelier_size(num_w));
-        rassemble = make_shared<ratelier_gather<crypto_segment> >(get_ratelier_size(num_w));
-        tas = make_shared<heap<crypto_segment> >(); // created empty
+	try
+	{
+	    disperse = make_shared<ratelier_scatter<crypto_segment> >(get_ratelier_size(num_w));
+	    rassemble = make_shared<ratelier_gather<crypto_segment> >(get_ratelier_size(num_w));
+	    tas = make_shared<heap<crypto_segment> >(); // created empty
+	}
+	catch(std::bad_alloc & e)
+	{
+	    throw Ememory("parallel_block_compressor::parallel_block_compressor");
+	}
 
             // now filling the head that was created empty
 

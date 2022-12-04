@@ -48,12 +48,6 @@ extern "C"
 #include <gcrypt.h>
 #endif
 
-#if LIBCURL_AVAILABLE
-#ifdef HAVE_CURL_CURL_H
-#include <curl/curl.h>
-#endif
-#endif
-
 #if HAVE_TIME_H
 #include <time.h>
 #endif

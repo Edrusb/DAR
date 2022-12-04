@@ -1,17 +1,26 @@
 from 2.7.7 to 2.7.8
 - adapted code to workaround clang 10.0.1 bug under FreeBSD 12
-- updating code and man page about how to solve the conflict of
-  sequentially reading the archive of reference with implicit binary
-  delta present for differential/incremental backups
-- added -avc option to troubleshoot libcurl problems
-- fixed bug in dar where sanity checks and slice min digit detection
-  were applied to the local filesystem when the backup was stored
-  remotely, this preventing the reading or remote backups
+- updating code and man page about the way to solve the conflict of
+  sequentially reading the archive of reference when binary delta is
+  implicitly present for differential/incremental backups
+- added -avc option to surface libcurl verbose messages
+- fixed bug in dar where a sanity check about slice min digit detection
+  was applied to the local filesystem when the backup was stored
+  remotely, this prevented the reading or remote backups
 - exposing libcurl version to the version output (new API call added
-  for that, leading upgrading libdar API version to 6.5.0)
+  for that, leading upgrading libdar API to version 6.5.0)
 - remove extra slash (/) found after hostname in URL passed to libcurl
-- fixed self test reported error about mycurl_easyhandle_node.cpp line 176
-- improved error message when libcurl fails to connect to sftp server
+- fixed self test reported error about mycurl_easyhandle_node.cpp
+  line 176
+- improved error message when libcurl fails to connect to an sftp server
+- fixed bug in libdar in the way libcurl is called for reading a file
+  using ftp protocol
+- fixed bug in libdar when asking libcurl the size of the file we are
+  writing (libcurl segfaults with ftp protocol). In addition, we now
+  record this info during the write process (faster and more efficient).
+- fixed bug met when creating a backup on very close and/or high
+  bandwidth ftp and sftp repos with the --hash option set, triggering a
+  race condition that led dar to sometime hang unexpectedly.
 
 from 2.7.6 to 2.7.7
 - added support for sequential reading more of sliced backup, to

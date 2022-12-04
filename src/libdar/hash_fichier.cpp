@@ -125,6 +125,7 @@ namespace libdar
 
     void hash_fichier::inherited_terminate()
     {
+	ref->terminate();
 	if(!hash_dumped)
 	{
 		// avoids subsequent writings (yeld a bug report if that occurs)
