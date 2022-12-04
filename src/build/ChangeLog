@@ -7,6 +7,11 @@ from 2.7.x to 2.8.0
   to let the user define what are the possible sequences of chars that can
   define the end of a line (by default it stays "\n" and "\r\n" for backward
   compatibility)
+- adding early_memory_release parameter in class archive, this reduces the
+  memory footprint in many cases, but avoids reusing an open archive to
+  another operation (like in-fly isolation done by dar)
+- using early_memory_release from dar CLI when sequential-read mode is used
+
 
 from 2.7.7 to 2.7.8
 - adapted code to workaround clang 10.0.1 bug under FreeBSD 12
