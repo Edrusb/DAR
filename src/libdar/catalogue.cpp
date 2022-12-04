@@ -99,6 +99,8 @@ namespace libdar
 	    current_read = contenu;
 	    sub_tree = nullptr;
 	    ref_data_name = data_name;
+	    early_mem_release = false;
+	    mem_released = false;
 	}
 	catch(...)
 	{
@@ -127,6 +129,8 @@ namespace libdar
 	crc *calc_crc = nullptr;
 	crc *read_crc = nullptr;
 	contenu = nullptr;
+	early_mem_release = false;
+	mem_released = false;
 
 	pdesc.check(false);
 
@@ -263,12 +267,16 @@ namespace libdar
 	out_compare = ref.out_compare;
 	in_place = ref.in_place;
 	partial_copy_from(ref);
+	early_mem_release = ref.early_mem_release;
+	mem_released = ref.mem_released;
 
 	return *this;
     }
 
     void catalogue::reset_read() const
     {
+	if(mem_released)
+	    throw Erange("catalogue::reset_read", gettext("early memory release has completed, cannot read again"));
 	current_read = contenu;
 	contenu->reset_read_children();
     }
@@ -277,6 +285,11 @@ namespace libdar
     {
 	current_read = contenu;
 	contenu->end_read();
+	if(early_mem_release)
+	{
+	    contenu->clear();
+	    mem_released = true;
+	}
     }
 
     void catalogue::skip_read_to_parent_dir() const
@@ -285,6 +298,8 @@ namespace libdar
 
 	if(tmp == nullptr)
 	    throw Erange("catalogue::skip_read_to_parent_dir", gettext("root does not have a parent directory"));
+	if(early_mem_release)
+	    tmp->remove(current_read->get_name());
 	current_read = tmp;
     }
 
@@ -308,9 +323,19 @@ namespace libdar
 	    cat_directory *papa = current_read->get_parent();
 	    ref = &r_eod;
 	    if(papa == nullptr)
+	    {
+		if(early_mem_release)
+		    mem_released = true;
 		return false; // we reached end of root, no cat_eod generation
+	    }
 	    else
 	    {
+
+		if(early_mem_release)
+		    papa->remove(current_read->get_name());
+		    // this unlink current_read from 'papa'
+		    // but also delete the object and all
+		    // its children if any
 		current_read = papa;
 		return true;
 	    }
@@ -325,10 +350,16 @@ namespace libdar
 	    throw Erange("catalogue::read_if_present", gettext("no current directory defined"));
 	if(name == nullptr) // we have to go to parent directory
 	{
-	    if(current_read->get_parent() == nullptr)
+	    cat_directory* parent = current_read->get_parent();
+
+	    if(parent == nullptr)
 		throw Erange("catalogue::read_if_present", gettext("root directory has no parent directory"));
 	    else
-		current_read = current_read->get_parent();
+	    {
+		if(early_mem_release)
+		    parent->remove(current_read->get_name());
+		current_read = parent;
+	    }
 	    ref = nullptr;
 	    return true;
 	}
@@ -354,6 +385,8 @@ namespace libdar
 
     void catalogue::tail_catalogue_to_current_read()
     {
+	if(early_mem_release)
+	    throw SRC_BUG;
 	while(current_read != nullptr)
 	{
 	    current_read->tail_to_read_children();
@@ -361,111 +394,6 @@ namespace libdar
 	}
 
 	current_read = contenu;
-    }
-
-    void catalogue::reset_sub_read(const path &sub)
-    {
-	if(! sub.is_relative())
-	    throw SRC_BUG;
-
-	if(sub_tree != nullptr)
-	    delete sub_tree;
-	sub_tree = new (nothrow) path(sub);
-	if(sub_tree == nullptr)
-	    throw Ememory("catalogue::reset_sub_read");
-	sub_count = -1; // must provide the path to subtree;
-	reset_read();
-    }
-
-    bool catalogue::sub_read(user_interaction & ui,
-			     const cat_entree * &ref)
-    {
-	string tmp;
-
-	if(sub_tree == nullptr)
-	    throw SRC_BUG; // reset_sub_read
-
-	switch(sub_count)
-	{
-	case 0 : // sending oed to go back to the root
-	    if(sub_tree->pop(tmp))
-	    {
-		ref = &r_eod;
-		return true;
-	    }
-	    else
-	    {
-		ref = nullptr;
-		delete sub_tree;
-		sub_tree = nullptr;
-		sub_count = -2;
-		return false;
-	    }
-	case -2: // reading is finished
-	    return false;
-	case -1: // providing path to sub_tree
-	    if(sub_tree->read_subdir(tmp))
-	    {
-		const cat_nomme *xtmp;
-
-		if(current_read->search_children(tmp, xtmp))
-		{
-		    ref = xtmp;
-		    const cat_directory *dir = dynamic_cast<const cat_directory *>(xtmp);
-
-		    if(dir != nullptr)
-		    {
-			current_read = const_cast<cat_directory *>(dir);
-			return true;
-		    }
-		    else
-			if(sub_tree->read_subdir(tmp))
-			{
-			    ui.message(sub_tree->display() + gettext(" is not present in the archive"));
-			    delete sub_tree;
-			    sub_tree = nullptr;
-			    sub_count = -2;
-			    return false;
-			}
-			else // subdir is a single file (no tree))
-			{
-			    sub_count = 0;
-			    return true;
-			}
-		}
-		else
-		{
-		    ui.message(sub_tree->display() + gettext(" is not present in the archive"));
-		    delete sub_tree;
-		    sub_tree = nullptr;
-		    sub_count = -2;
-		    return false;
-		}
-	    }
-	    else
-	    {
-		sub_count = 1;
-		current_read->reset_read_children();
-		    // now reading the sub_tree
-		    // no break !
-	    }
-
-	default:
-	    if(read(ref) && sub_count > 0)
-	    {
-		const cat_directory *dir = dynamic_cast<const cat_directory *>(ref);
-		const cat_eod *fin = dynamic_cast<const cat_eod *>(ref);
-
-		if(dir != nullptr)
-		    sub_count++;
-		if(fin != nullptr)
-		    sub_count--;
-
-		return true;
-	    }
-	    else
-		throw SRC_BUG;
-	}
     }
 
     void catalogue::reset_add()
@@ -537,6 +465,8 @@ namespace libdar
 
     void catalogue::reset_compare() const
     {
+	if(mem_released)
+	    throw Erange("catalogue::reset_compare", gettext("early memory release has completed, cannot read again"));
 	if(contenu == nullptr)
 	    throw SRC_BUG;
 	current_compare = contenu;

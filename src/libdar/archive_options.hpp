@@ -210,7 +210,8 @@ namespace libdar
 	    /// whether we only read the archive header and exit
 	void set_header_only(bool val) { x_header_only = val; };
 
-
+	    /// whether to perform early memory release of the catalogue
+	void set_early_memory_release(bool val) { x_early_memory_release = true; };
 
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods (mainly used inside libdar, but kept public and part of the API in the case it is needed)
@@ -242,7 +243,7 @@ namespace libdar
 	infinint get_ref_slice_min_digits() const { return x_ref_slice_min_digits; };
 	const std::shared_ptr<entrepot> & get_ref_entrepot() const { return x_ref_entrepot; };
 	bool get_header_only() const { return x_header_only; };
-
+	bool get_early_memory_release() const { return x_early_memory_release; };
 
     private:
 	crypto_algo x_crypto;
@@ -272,6 +273,7 @@ namespace libdar
 	infinint x_ref_slice_min_digits;
 	std::shared_ptr<entrepot> x_ref_entrepot;
 	bool x_header_only;
+	bool x_early_memory_release;
 
 	void copy_from(const archive_options_read & ref);
 	void move_from(archive_options_read && ref) noexcept;

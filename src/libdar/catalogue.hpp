@@ -76,6 +76,27 @@ namespace libdar
 	catalogue & operator = (catalogue && ref) = delete;
         virtual ~catalogue() { detruire(); };
 
+	    /// reduce memory footprint releasing from memory catalogue parts
+
+	    /// \note this only apply to read and compare relative operations
+	    /// and behaves the in following way: when reading a directory and
+	    /// exiting a directory (to read another entry a the parent level),
+	    /// this directory and all its content is removed from memory, this
+	    /// frees memory sooner but also forget about the existence of such
+	    /// directory.
+	    /// \note this option is not compatible when using a catalogue as reference
+	    /// as it is not possible anymore to detect which file have been removed
+	    /// since the backup of reference was made.
+	    /// \note if the reading process is reset if has completed, the catalogue
+	    /// is no more usable. Same thing when comparing. Thus you cannot perform
+	    /// new operation like the 'on-fly-isolate' of the dar command line.
+	void set_early_memory_release() { early_mem_release = true; };
+
+	    /// get early memory release status
+	bool get_early_memory_release() const { return early_mem_release; };
+
+	    /// return true if the catalogue has been released from memory
+	bool get_memory_released() const { return mem_released; };
 
 	    // reading methods. The reading is iterative and uses the current_read cat_directory pointer
 
@@ -98,15 +119,9 @@ namespace libdar
 	    // by read().
 	virtual void tail_catalogue_to_current_read();
 
-
-        void reset_sub_read(const path &sub); // initialise sub_read to the given directory
-        bool sub_read(user_interaction & ui, const cat_entree * &ref); // sequential read of the catalogue, ignoring all that
-            // is not part of the subdirectory specified with reset_sub_read
-            // the read include the inode leading to the sub_tree as well as the pending cat_eod
-
 	    // return true if the last read entry has already been read
 	    // and has not to be counted again. This is never the case for catalogue but may occur
-	    // with escape_catalogue (where from the 'virtual').
+	    // with escape_catalogue inherited class (where from the 'virtual').
 	    // last this method gives a valid result only if the last read() entry is a directory as
 	    // only directory may be read() twice.
 	virtual bool read_second_time_dir() const { return false; };
@@ -153,11 +168,11 @@ namespace libdar
             // structure defined by the following calls to this routine, this to be able to know when
             // the last available directory is back the current one when changing to parent directory,
             // and then proceed with normal comparison of inode. In this laps of time, the call will
-            // always return false, while it temporary stores the missing directory structure
+            // always return false, while it temporarily stores the missing directory structure
 
 
 
-	    // non interative methods
+	    // non-iterative methods:
 
 
 	    /// add into "this" detruit object corresponding to object of ref absent in "this"
@@ -267,6 +282,15 @@ namespace libdar
 	    /// catalogue and the catalogue given in argument.
 	void swap_stuff(catalogue & ref);
 
+	    /// provide to inherited class the access to the early mem release mode and fields
+	bool get_early_mem_release() const { return early_mem_release; };
+
+	    /// provide to inherited class the access to the early mem release mode and fields
+	bool is_mem_released() const { return mem_released; };
+
+	    /// let inherited class tell when memory release has completed
+	void set_mem_released() { mem_released = true; };
+
     private :
         cat_directory *contenu;                   ///< catalogue contents
         mutable path out_compare;                 ///< stores the missing directory structure, when extracting
@@ -278,6 +302,8 @@ namespace libdar
         entree_stats stats;                       ///< statistics catalogue contents
 	label ref_data_name;                      ///< name of the archive where is located the data
 	path in_place;                            ///< path of the directory used for root of the backup (at the time of the backup)
+	bool early_mem_release;                   ///< whether to release memory as soon as possible
+	mutable bool mem_released;                ///< wether the catalogue content has been released and the object is no more usable
 
         void partial_copy_from(const catalogue &ref);
         void detruire();

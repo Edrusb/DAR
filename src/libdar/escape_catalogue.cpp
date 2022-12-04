@@ -429,6 +429,7 @@ namespace libdar
 
 	ceci->reset_reading_process();
 	catalogue::reset_read();
+	    // mem_released check is handled at catalogue::reset_read()
     }
 
     void escape_catalogue::end_read() const
@@ -437,6 +438,7 @@ namespace libdar
 
 	ceci->reset_reading_process();
 	catalogue::end_read();
+	    // mem_released check is handled at catalogue::reset_read()
     }
 
     void escape_catalogue::skip_read_to_parent_dir() const
@@ -471,7 +473,7 @@ namespace libdar
 	bool stop = false;
 
 	    // if we have already read the whole archive contents (included detruits object),
-	    // we do not need inspect the archive again, we instead use the data in memory
+	    // we do not need inspecting the archive again, we instead use the data in memory
 	if(status == ec_completed)
 	    return catalogue::read(ref);
 
@@ -573,6 +575,17 @@ namespace libdar
 			{
 			    bool is_eod = ref_eod != nullptr;
 			    cat_entree *ref_nc = const_cast<cat_entree *>(ref);
+			    string current_dir_name;
+
+			    if(is_eod && get_early_mem_release())
+			    {
+				    // before adding the eod to the catalogue::add method right after this test
+				    // we must record the name of the current directory
+				    // once eod will be added and the catalogue parent class code will
+				    // have step back in parent directory, we will call catalogue::remove()
+				    // on that directory name we just exited from
+				current_dir_name = get_current_add_dir().get_name();
+			    }
 
 			    ceci->add(ref_nc);
 			    if(!wait_parent_depth.is_zero()) // we must not return this object as it is member of a skipped dir
@@ -590,7 +603,21 @@ namespace libdar
 			    }
 
 			    if(is_eod)
+			    {
 				ref = get_r_eod_address();
+
+				    // now we can remove the former current directory we
+				    // just exited from
+				if(get_early_mem_release())
+				{
+				    const cat_directory & here = get_current_add_dir();
+				    cat_directory *here_nc = const_cast<cat_directory*>(& here);
+				    if(here_nc != nullptr)
+					here_nc->remove(current_dir_name);
+				    else
+					throw SRC_BUG;
+				}
+			    }
 			}
 		    }
 		    else // no more file to read from in-sequence marks
@@ -661,7 +688,7 @@ namespace libdar
 			// and comparing the internal catalogue to inline catalogue content
 
 			// we only read detruit objects for internal catalogue
-			// if we have sequentially read data
+			// if we could sequentially read some data
 		    only_detruit = !is_empty();
 
 			// we will compare content if encryption has been used and some data
@@ -754,7 +781,10 @@ namespace libdar
 			// the end of the detruits
 		    if(!cat_det->read(ref))
 		    {
-			ceci->merge_cat_det();
+			if(!get_early_mem_release())
+			    ceci->merge_cat_det();
+			else
+			    ceci->set_mem_released();
 			ceci->status = ec_completed;
 			ref = nullptr;
 			stop = true;

@@ -382,9 +382,13 @@ namespace libdar
 			}
 		    }
 		}
+
 		if(!options.get_ignore_signature_check_failure())
 		    check_gnupg_signed();
 		exploitable = true;
+
+		if(options.get_early_memory_release())
+		    cat->set_early_memory_release();
 	    }
 	    catch(...)
 	    {
@@ -444,6 +448,11 @@ namespace libdar
 		}
 	    }
 
+	    if(options.get_reference().get() != nullptr
+	       && options.get_reference().get()->pimpl != nullptr
+	       && options.get_reference().get()->pimpl->cat != nullptr
+	       && options.get_reference().get()->pimpl->cat->get_early_memory_release())
+		throw Erange("i_archive::i_archive (create)", gettext("Early memory release is not possible for a backup of reference"));
 
 	    try
 	    {
@@ -670,6 +679,12 @@ namespace libdar
 		if(ref_cat1 == nullptr)
 		    throw SRC_BUG;
 
+		if(ref_cat1->get_early_memory_release())
+		    throw Erange("i_archive::i_archive (merge)", gettext("Early memory release is not compatible with the merging operation"));
+
+		if(ref_cat2 != nullptr && ref_cat2->get_early_memory_release())
+		    throw Erange("i_archive::i_archive (merge)", gettext("Early memory release is not compatible with the merging operation"));
+
 		if(options.get_delta_signature())
 		{
 		    if(options.get_keep_compressed() && options.get_has_delta_mask_been_set())
@@ -771,6 +786,8 @@ namespace libdar
 	    throw;
 	}
     }
+
+	// reparation constructor
 
     archive::i_archive::i_archive(const std::shared_ptr<user_interaction> & dialog,
 				  const path & chem_src,
@@ -1688,13 +1705,14 @@ namespace libdar
     {
 	if(exploitable && sequential_read) // the catalogue is not even yet read, so we must first read it entirely
 	{
+	    if(cat == nullptr)
+		throw SRC_BUG;;
+
 	    if(only_contains_an_isolated_catalogue())
 		    // this is easy... asking just an entry
 		    //from the catalogue makes its whole being read
 	    {
 		const cat_entree *tmp;
-		if(cat == nullptr)
-		    throw SRC_BUG;
 		cat->read(tmp); // should be enough to have the whole catalogue being read
 		cat->reset_read();
 	    }
@@ -1719,6 +1737,9 @@ namespace libdar
 
 	if(fetch_ea && sequential_read)
 	    throw Erange("archive::i_archive::get_children_of", gettext("Fetching EA value while listing an archive is not possible in sequential read mode"));
+	if(cat != nullptr && cat->get_early_memory_release())
+	    throw Erange("i_archive::load_catalogue", gettext("get_children_of is not possible on a catalogue set with early memory release"));
+
 	load_catalogue();
 	    // OK, now that we have the whole catalogue available in memory, let's rock!
 
@@ -1752,6 +1773,10 @@ namespace libdar
 
 	if(fetch_ea && sequential_read)
 	    throw Erange("archive::i_archive::get_children_of", gettext("Fetching EA value while listing an archive is not possible in sequential read mode"));
+
+	if(cat != nullptr && cat->get_early_memory_release())
+	    throw Erange("i_archive::load_catalogue", gettext("get_children_in_table is not possible on a catalogue set with early memory release"));
+
 	me->load_catalogue();
 
 	const cat_directory* parent = get_dir_object(dir);
@@ -1845,6 +1870,9 @@ namespace libdar
 
 	if(cat == nullptr)
 	    throw SRC_BUG;
+
+	if(cat->get_memory_released())
+	    throw Erange("i_archive::load_catalogue", gettext("cannot get catalogue which memory has been (early) released"));
 
 	return *cat;
     }
