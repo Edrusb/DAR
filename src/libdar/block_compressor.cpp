@@ -131,7 +131,7 @@ namespace libdar
 	current->reset();
 	reof = false;
 	need_eof = false;
-	return skip_relative(x);
+	return compressed->skip_relative(x);
     }
 
     bool block_compressor::truncatable(const infinint & pos) const
