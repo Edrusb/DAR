@@ -60,7 +60,7 @@ check()
 	exit 1
     fi
 
-    if [ ! -f configure -o ! -f configure.ac -o $(grep DAR_VERSION configure.ac | wc -l) -ne 1 ] ; then
+    if [ ! -f configure -o ! -f configure.ac ] || [ $(grep DAR_VERSION configure.ac | wc -l) -ne 1 ] ; then
 	echo "This script must be run from the root directory of the dar/libdar source package"
 	exit 1
     fi
