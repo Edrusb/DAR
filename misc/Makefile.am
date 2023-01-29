@@ -19,7 +19,7 @@
 # to contact the author, see the AUTHOR file
 #######################################################################
 
-dist_noinst_DATA = make_cygwin_dist batch_cygwin batch_linux batch_linux_ea README batch_solaris Args/Makefile Args/args.c prepare_install finish_install dar_check failer init
+dist_noinst_DATA = make_cygwin_dist batch_cygwin batch_linux batch_linux_ea README batch_solaris Args/Makefile Args/args.c prepare_install finish_install dar_check failer init dar_static_builder_with_musl_voidlinux.bash
 
 noinst_PROGRAMS=todos
 
