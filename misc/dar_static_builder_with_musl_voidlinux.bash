@@ -115,6 +115,10 @@ requirements()
 	echo "${HOGWEED_PC} not found"
 	exit 1
     fi
+
+    # optional but interesting to get a smaller dar_static binary
+    xbps-install -y upx || echo "" && echo "WARNING!" && echo "Failed to install upx, will do without" && echo && sleep 3
+
 }
 
 libthreadar()
