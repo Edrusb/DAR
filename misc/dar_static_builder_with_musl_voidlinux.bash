@@ -3,8 +3,10 @@
 
 # cconfig/ompilation/linking related variables
 
+export LOCAL_PKG_CONFIG_DIR="$(pwd)/pkgconfig"
+
 export MAKE_FLAGS="-j 8"
-export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:/lib/pkgconfig:/usr/lib/pkgconfig
+export PKG_CONFIG_PATH="${LOCAL_PKG_CONFIG_DIR}":/usr/local/lib/pkgconfig:/lib/pkgconfig:/usr/lib/pkgconfig
 export LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib64:/usr/lib
 
 #export LDFLAGS=-L/usr/local/lib
@@ -65,6 +67,15 @@ check()
        echo "${REPO} exists but is not a directory, aborting"
        exit 1
     fi
+
+    if [ ! -e "${LOCAL_PKG_CONFIG_DIR}" ] ; then
+	mkdir "${LOCAL_PKG_CONFIG_DIR}"
+    fi
+
+    if [ ! -d "${LOCAL_PKG_CONFIG_DIR}" ] ; then
+	echo "${LOCAL_PKG_CONFIG_DIR} exists but is not a directory, aborting"
+	exit 1
+    fi
 }
 
 requirements()
@@ -84,13 +95,20 @@ requirements()
     # needed to build static flavor of librsync
     xbps-install -y libb2-devel || exit 1
 
-    # needed to build gnutls
+    # needed to build static flavor of gnutls
     xbps-install -y  nettle-devel libtasn1-devel libunistring-devel unbound-devel unbound || exit 1
 
-
-    #needed for libcurl
+    #needed for static flavor of libcurl
     xbps-install -y libssp-devel || exit 1
 
+    # need to tweak the hogweed.pc file provided by the system, we do not modify the system but shadow it by a local version located in higher priority dir
+    HOGWEED_PC=/usr/lib/pkgconfig/hogweed.pc
+    if [ -e "${HOGWEED_PC}" ] ; then
+	sed -r -e 's/#\snettle/nettle/' < "${HOGWEED_PC}" > "${LOCAL_PKG_CONFIG_DIR}/$(basename ${HOGWEED_PC})"
+    else
+	echo "${HOGWEED_PC} not found"
+	exit 1
+    fi
 }
 
 libthreadar()
@@ -154,17 +172,6 @@ gnutls()
     unbound-anchor -a "/etc/unbound/root.key"
     make ${MAKE_FLAGS}
     make install
-
-    # need to tweak the gnutls.pc file due to error in dependency order (hogweed relies on nttle, thus nttle must come after hogweed on linker command line)
-    HOGWEED_PC=/usr/lib/pkgconfig/hogweed.pc
-    if [ -e "${HOGWEED_PC}" ] ; then
-	mv "${HOGWEED_PC}" "${HOGWEED_PC}.bak"
-	sed -r -e 's/#\snettle/nettle/' < "${HOGWEED_PC}.bak" > "${HOGWEED_PC}"
-	rm "${HOGWEED_PC}.bak"
-    else
-	echo "${HOGWEED_PC} not found"
-	exit 1
-    fi
     cd ..
     ldconfig
     rm -rf "gnutls-${GNUTLS_VERSION}"
