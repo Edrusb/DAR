@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if [ ! -z "$1" ] && [ "$1" -gt 1 ] ; then
+    export MAKE_FLAGS="-j $1"
+else
+    echo "usage: $0 <num CPU cores to use>"
+    exit 1
+fi
 
 # cconfig/ompilation/linking related variables
 
