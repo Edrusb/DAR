@@ -23,6 +23,7 @@ LIBSSH2_VERSION=1.10.0
 
 # wget options need for gnutls website that does not provide all chain of trust in its certificate
 GNUTLS_WGET_OPT="--no-check-certificate"
+REPO=$(pwd)/REPO
 
 #
 check()
@@ -49,6 +50,20 @@ check()
 	echo "Cannot find musl standard C library"
 	echo "static linking with glibc is broken, musl is needed"
 	exit 1
+    fi
+
+    if [ ! -f configure -o ! -f configure.ac -o $(grep DAR_VERSION configure.ac | wc -l) -ne 1 ] ; then
+	echo "This script must be run from the root directory of the dar/libdar source package"
+	exit 1
+    fi
+
+    if [ ! -e "${REPO}" ] ; then
+	mkdir "${REPO}"
+    fi
+
+    if [ ! -d "${REPO}" ] ; then
+       echo "${REPO} exists but is not a directory, aborting"
+       exit 1
     fi
 }
 
@@ -82,8 +97,8 @@ libthreadar()
 {
     local LIBTHREADAR_PKG=libthreadar-${LIBTHREADAR_VERSION}.tar.gz
 
-    if [ ! -e "${LIBTHREADAR_PKG}" ] ; then wget "https://dar.edrusb.org/libthreadar/Releases/${LIBTHREADAR_PKG}" || exit 1 ; fi
-    tar -xf ${LIBTHREADAR_PKG} || exit 1
+    if [ ! -e "${REPO}/${LIBTHREADAR_PKG}" ] ; then wget "https://dar.edrusb.org/libthreadar/Releases/${LIBTHREADAR_PKG}" && mv "${LIBTHREADAR_PKG}" "${REPO}" || exit 1 ; fi
+    tar -xf "${REPO}/${LIBTHREADAR_PKG}" || exit 1
     cd libthreadar-${LIBTHREADAR_VERSION} || exit 1
     ./configure && make ${MAKE_FLAGS} || exit 1
     make install
@@ -96,8 +111,8 @@ libgpg-error()
 {
     local LIBGPG_ERROR_PKG=libgpg-error-${LIBGPG_ERROR_VERSION}.tar.bz2
 
-    if [ ! -e "${LIBGPG_ERROR_PKG}" ] ; then wget https://www.gnupg.org/ftp/gcrypt/libgpg-error/${LIBGPG_ERROR_PKG} || exit 1 ; fi
-    tar -xf ${LIBGPG_ERROR_PKG}
+    if [ ! -e "${REPO}/${LIBGPG_ERROR_PKG}" ] ; then wget https://www.gnupg.org/ftp/gcrypt/libgpg-error/${LIBGPG_ERROR_PKG} && mv "${LIBGPG_ERROR_PKG}" "${REPO}" || exit 1 ; fi
+    tar -xf "${REPO}/${LIBGPG_ERROR_PKG}"
     cd libgpg-error-${LIBGPG_ERROR_VERSION}
     ./configure --enable-static
     make ${MAKE_FLAGS}
@@ -112,8 +127,8 @@ librsync()
 {
     local LIBRSYNC_PKG=v${LIBRSYNC_VERSION}.tar.gz
 
-    if [ ! -e "${LIBRSYNC_PKG}" ] ; then wget "https://github.com/librsync/librsync/archive/refs/tags/${LIBRSYNC_PKG}" || exit 1 ; fi
-    tar -xf ${LIBRSYNC_PKG}
+    if [ ! -e "${REPO}/${LIBRSYNC_PKG}" ] ; then wget "https://github.com/librsync/librsync/archive/refs/tags/${LIBRSYNC_PKG}" && mv "${LIBRSYNC_PKG}" "${REPO}" || exit 1 ; fi
+    tar -xf "${REPO}/${LIBRSYNC_PKG}"
     cd librsync-${LIBRSYNC_VERSION}
     cmake .
     make ${MAKE_FLAGS}
@@ -132,8 +147,8 @@ gnutls()
     local REPODIR=$(echo ${GNUTLS_VERSION} | sed -rn -e 's/^([0-9]+\.[0-9]+).*/\1/p')
 
     if [ -z "$REPODIR" ] ; then echo "empty repo dir for guntls, check GNUTLS_VERSION is correct" ; exit 1 ; fi
-    if [ ! -e "${GNUTLS_PKG}" ] ; then wget ${GNUTLS_WGET_OPT} "https://www.gnupg.org/ftp/gcrypt/gnutls/v${REPODIR}/${GNUTLS_PKG}" || exit 1 ; fi
-    tar -xf "${GNUTLS_PKG}"
+    if [ ! -e "${REPO}/${GNUTLS_PKG}" ] ; then wget ${GNUTLS_WGET_OPT} "https://www.gnupg.org/ftp/gcrypt/gnutls/v${REPODIR}/${GNUTLS_PKG}" && mv "${GNUTLS_PKG}" "${REPO}" || exit 1 ; fi
+    tar -xf "${REPO}/${GNUTLS_PKG}"
     cd "gnutls-${GNUTLS_VERSION}"
     ./configure --enable-static --without-p11-kit
     unbound-anchor -a "/etc/unbound/root.key"
@@ -149,7 +164,7 @@ gnutls()
     else
 	echo "${HOGWEED_PC} not found"
 	exit 1
-    fi    
+    fi
     cd ..
     ldconfig
     rm -rf "gnutls-${GNUTLS_VERSION}"
@@ -159,8 +174,8 @@ libssh2()
 {
     local LIBSSH2_PKG=libssh2-${LIBSSH2_VERSION}.tar.gz
 
-    if [ ! -e "${LIBSSH2_PKG}" ] ; then wget "https://www.libssh2.org/download/${LIBSSH2_PKG}" || exit 1 ; fi
-    tar -xf ${LIBSSH2_PKG}
+    if [ ! -e "${REPO}/${LIBSSH2_PKG}" ] ; then wget "https://www.libssh2.org/download/${LIBSSH2_PKG}" && mv "${LIBSSH2_PKG}" "${REPO}" || exit 1 ; fi
+    tar -xf "${REPO}/${LIBSSH2_PKG}"
     cd libssh2-${LIBSSH2_VERSION}
     ./configure --enable-shared --without-libssl --with-libz --with-crypto=libgcrypt
     make ${MAKE_FLAGS}
@@ -174,8 +189,8 @@ libcurl()
 {
     local LIBCURL_PKG=curl-${LIBCURL_VERSION}.tar.bz2
 
-    if [ ! -e "${LIBCURL_PKG}" ] ; then wget "https://curl.se/download/${LIBCURL_PKG}" || exit 1 ; fi
-    tar -xf ${LIBCURL_PKG}
+    if [ ! -e "${REPO}/${LIBCURL_PKG}" ] ; then wget "https://curl.se/download/${LIBCURL_PKG}" && mv "${LIBCURL_PKG}" "${REPO}" || exit 1 ; fi
+    tar -xf "${REPO}/${LIBCURL_PKG}"
     cd curl-${LIBCURL_VERSION}
     ./configure --with-gnutls --with-libssh2 --disable-shared
     make ${MAKE_FLAGS}
@@ -187,12 +202,8 @@ libcurl()
 
 dar_static()
 {
-    local dar_version=$(ls -ltr dar-*.tar.* | sed -rn -e 's/.*([0-9]+\.[0-9]+\.[0-9]+).*/\1/p' | tail -n 1)
-    local tmp_dir=/tmp
-    
-    rm -rf "dar-${dar_version}"
-    tar -xf "dar-${dar_version}.tar.gz"
-    cd "dar-${dar_version}"
+    make clean || /bin/true
+    make distclean || /bin/true
     ./configure --enable-static --disable-shared\
 		--enable-libz-linking\
 		--enable-libbz2-linking\
@@ -211,7 +222,7 @@ dar_static()
 		--prefix=/DAR || exit 1
     make ${MAKE_FLAGS} || exit 1
     make DESTDIR=${tmp_dir} install-strip || exit 1
-    mv ${tmp_dir}/DAR/bin/dar_static ..
+    mv ${tmp_dir}/DAR/bin/dar_static . && echo "dar_static binary is available in the current directory"
     rm -rf ${tmp_dir}/DAR
 }
 
