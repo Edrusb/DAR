@@ -6,7 +6,7 @@ from 2.7.8 to 2.7.9
   chance to express and would lead dar/libdar to loop forever
   consuming CPU.
 - adding the misc/dar_static_builder_with_musl_voidlinux.bash script
-  which automatically builds dat_static from source code under
+  which automatically builds dar_static from source code under
   VoidLinux/musl
 
 from 2.7.7 to 2.7.8
