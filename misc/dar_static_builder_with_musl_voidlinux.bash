@@ -105,7 +105,7 @@ requirements()
     xbps-install -y  nettle-devel libtasn1-devel libunistring-devel unbound-devel unbound || exit 1
 
     #needed for static flavor of libcurl
-    xbps-install -y libssp-devel || exit 1
+    xbps-install -y libssp-devel || echo "ignoring error if libssp-devel fails to install due to musl-devel already installed"
 
     # need to tweak the hogweed.pc file provided by the system, we do not modify the system but shadow it by a local version located in higher priority dir
     HOGWEED_PC=/usr/lib/pkgconfig/hogweed.pc
