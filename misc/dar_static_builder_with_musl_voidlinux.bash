@@ -7,7 +7,7 @@ else
     exit 1
 fi
 
-# cconfig/ompilation/linking related variables
+# config/compilation/linking related variables
 
 export LOCAL_PKG_CONFIG_DIR="$(pwd)/pkgconfig"
 
