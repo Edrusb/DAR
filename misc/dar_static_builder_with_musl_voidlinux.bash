@@ -27,7 +27,15 @@ LIBGPG_ERROR_VERSION=1.45
 GNUTLS_VERSION=3.7.8
 LIBCURL_VERSION=7.86.0
 LIBP11KIT_VERSION=0.24.1
+LIBSSH_VERSION=0.10.3
 LIBSSH2_VERSION=1.10.0
+
+# define whether to use libssh or libssh2
+# note that both libraries do support ssh version 2 protocol,
+# libssh even supports more recent ciphers than libssh2
+# LIBSSH=1
+LIBSSH=2
+
 
 # wget options need for gnutls website that does not provide all chain of trust in its certificate
 GNUTLS_WGET_OPT="--no-check-certificate"
@@ -187,6 +195,31 @@ gnutls()
     rm -rf "gnutls-${GNUTLS_VERSION}"
 }
 
+libssh()
+{
+    local LIBSSH_PKG=libssh-${LIBSSH_VERSION}.tar.xz
+    local REPODIR=$(echo ${LIBSSH_VERSION} | sed -rn -e 's/^([0-9]+\.[0-9]+).*/\1/p')
+    local builddir="outofbuild-libssh"
+
+    if [ ! -e "${REPO}/${LIBSSH_PKG}" ] ; then wget "https://www.libssh.org/files/${REPODIR}/${LIBSSH_PKG}" && mv "${LIBSSH_PKG}" "${REPO}" || exit 1 ; fi
+    tar -xf "${REPO}/${LIBSSH_PKG}"
+    cd libssh-${LIBSSH_VERSION}
+    mkdir ${builddir} || (echo "Failed creating build dir for libssh" && return 1)
+    cd ${builddir}
+    cmake -DUNIT_TESTING=OFF -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=OFF -DWITH_GCRYPT=ON ..
+    make ${MAKE_FLAGS}
+    make install
+    cd ../..
+    ldconfig
+    rm -rf libssh-${LIBSSH_VERSION}
+    local needed_libs="-lgcrypt -lgpg-error"
+    if [ -z "$LDFLAGS" ] ; then
+	export LDFLAGS="${needed_libs}"
+    else
+	export LDFLAGS="${LDFLAGS} ${needed_libs}"
+    fi
+}
+
 libssh2()
 {
     local LIBSSH2_PKG=libssh2-${LIBSSH2_VERSION}.tar.gz
@@ -209,7 +242,7 @@ libcurl()
     if [ ! -e "${REPO}/${LIBCURL_PKG}" ] ; then wget "https://curl.se/download/${LIBCURL_PKG}" && mv "${LIBCURL_PKG}" "${REPO}" || exit 1 ; fi
     tar -xf "${REPO}/${LIBCURL_PKG}"
     cd curl-${LIBCURL_VERSION}
-    ./configure --with-gnutls --with-libssh2 --disable-shared
+    ./configure --with-gnutls ${SSH_CURL_OPT} --disable-shared
     make ${MAKE_FLAGS}
     make install
     cd ..
@@ -248,7 +281,19 @@ requirements || (echo "Failed setting up requirements" && exit 1)
 libthreadar || (echo "Failed building libthreadar" && exit 1)
 libgpg-error || (echo "Failed building libgpg-error static version" && exit 1)
 librsync || (echo "Failed building librsync" && exit 1)
-libssh2 || (echo "Failed building libssh2" && exit 1)
 gnutls || (echo "Failed building gnutls" && exit 1)
+case "$LIBSSH" in
+    "1")
+	libssh || (echo "Failed building libssh" && exit 1)
+	SSH_CURL_OPT="--with-libssh"
+	;;
+    "2")
+	libssh2 || (echo "Failed building libssh2" && exit 1)
+	SSH_CURL_OPT="--with-libssh2"
+	;;
+    *)
+	echo "Unknow ssh library requested to build, aborting"
+	exit 1
+esac
 libcurl || (echo "Failed building libcurl" && exit 1)
 dar_static || (echo "Failed building dar_static" && exit 1)
