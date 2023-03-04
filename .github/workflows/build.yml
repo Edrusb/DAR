@@ -1,0 +1,30 @@
+name: build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: prepare
+      run: |
+        sudo apt-get update
+        sudo apt-get install make gcc g++ libtool intltool libattr1-dev libbz2-1.0 libbz2-dev libbz2-ocaml libbz2-ocaml-dev liblzo2-dev libgpgme-dev
+    - name: init
+      run: misc/init
+    - name: configure
+      run: ./configure --prefix=/usr
+    - name: make
+      run: make -j4
+    - name: install
+      run: sudo make install
+    - name: include test
+      run: |
+        echo "#include <dar/libdar.hpp>" >/tmp/test-libdar.cpp
+        g++ -c /tmp/test-libdar.cpp
+
