@@ -129,7 +129,8 @@ namespace libdar
 					 slice_layout & sl,    ///< slicing layout of the archive
 					 U_I multi_threaded_crypto,  ///< number of worker thread to run for cryptography (1 -> tronconneuse object, more -> parallel_tronconneuse object)
 					 U_I multi_threaded_compress,  ///< number of worker threads to compress/decompress (need compression_block_size > 0)
-					 bool header_only      ///< if true, stop the process before openning the encryption layer
+					 bool header_only,     ///< if true, stop the process before openning the encryption layer
+					 bool silent           ///< do not display some informational messages of low importance
 	);
         // all allocated objects (ret1, ret2, scram), must be deleted when no more needed by the caller of this routine
 

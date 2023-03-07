@@ -169,6 +169,8 @@ namespace libdar
 	    /// how much thread libdar will use for compression (need libthreadar too and compression_block_size > 0)
 	void set_multi_threaded_compress(U_I num) { x_multi_threaded_compress = num; };
 
+	    /// whether to avoid display low importance messages
+	void set_silent(bool val) { x_silent = val; };
 
 	    //////// what follows concerne the use of an external catalogue instead of the archive's internal one
 
@@ -213,6 +215,7 @@ namespace libdar
 	    /// whether to perform early memory release of the catalogue
 	void set_early_memory_release(bool val) { x_early_memory_release = val; };
 
+
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods (mainly used inside libdar, but kept public and part of the API in the case it is needed)
 
@@ -231,6 +234,7 @@ namespace libdar
 	bool get_ignore_signature_check_failure() const { return x_ignore_signature_check_failure; };
 	U_I get_multi_threaded_crypto() const { return x_multi_threaded_crypto; };
 	U_I get_multi_threaded_compress() const { return x_multi_threaded_compress; };
+	bool get_silent() const { return x_silent; };
 
 	    // All methods that follow concern the archive where to fetch the (isolated) catalogue from
 	bool is_external_catalogue_set() const { return external_cat; };
@@ -260,6 +264,7 @@ namespace libdar
 	bool x_ignore_signature_check_failure;
 	U_I x_multi_threaded_crypto;
 	U_I x_multi_threaded_compress;
+	bool x_silent;
 
 
 	    // external catalogue relative fields

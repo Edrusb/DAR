@@ -409,7 +409,8 @@ namespace libdar
 				  slice_layout & sl,
 				  U_I multi_threaded_crypto,
 				  U_I multi_threaded_compress,
-				  bool header_only)
+				  bool header_only,
+				  bool silent)
     {
 	secu_string real_pass = pass;
 	generic_file *tmp = nullptr;
@@ -926,7 +927,7 @@ namespace libdar
 	    if(info_details)
 		dialog->message(gettext("All layers have been created successfully"));
 
-	    if(ver.is_ciphered())
+	    if(ver.is_ciphered() && !silent)
 		dialog->printf(gettext("Warning, the archive %S has been encrypted. A wrong key is not possible to detect, it would cause DAR to report the archive as corrupted"),  &basename);
 	}
 	catch(...)

@@ -133,6 +133,7 @@ namespace libdar
 	x_ignore_signature_check_failure = false;
 	x_multi_threaded_crypto = 1;
 	x_multi_threaded_compress = 1;
+	x_silent = false;
 
 	    //
 	external_cat = false;
@@ -218,6 +219,8 @@ namespace libdar
 	x_ignore_signature_check_failure = ref.x_ignore_signature_check_failure;
 	x_multi_threaded_crypto = ref.x_multi_threaded_crypto;
 	x_multi_threaded_compress = ref.x_multi_threaded_compress;
+	x_silent = ref.x_silent;
+
 	    //
 
 	external_cat = ref.external_cat;
@@ -251,6 +254,7 @@ namespace libdar
 	x_ignore_signature_check_failure = move(ref.x_ignore_signature_check_failure);
 	x_multi_threaded_crypto = move(ref.x_multi_threaded_crypto);
 	x_multi_threaded_compress = move(ref.x_multi_threaded_compress);
+	x_silent = move(ref.x_silent);
 
 	external_cat = move(ref.external_cat);
 	x_ref_chem = move(ref.x_ref_chem);
