@@ -125,6 +125,7 @@ struct line_param
     bool keep_compressed;         ///< when merging, whether to not uncompress/re-compress data in the process
     infinint fixed_date;          ///< the data for the snapshot backup
     bool quiet;                   ///< whether to display final summary for the operation
+    bool quiet_crypto;            ///< do not display message about impossibility do detect wrong key when reading ciphered backup
     const crit_action * overwrite;///< the overwriting policy
     string slice_perm;            ///< permission to set when creating a slice
     string slice_user;            ///< user to set when creating a slice

@@ -11,6 +11,7 @@ from 2.7.x to 2.8.0
   memory footprint in many cases, but avoids reusing an open archive to
   another operation (like in-fly isolation done by dar)
 - using early_memory_release from dar CLI when sequential-read mode is used
+- adding -qcrypto option
 
 
 from 2.7.7 to 2.7.8

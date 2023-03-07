@@ -291,6 +291,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    read_options.set_ignore_signature_check_failure(param.blind_signatures);
 		    read_options.set_multi_threaded_crypto(param.multi_threaded_crypto);
 		    read_options.set_multi_threaded_compress(param.multi_threaded_compress);
+		    read_options.set_silent(param.quiet_crypto);
 
 		    if(param.sequential_read)
 		    {
@@ -347,6 +348,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 			read_options.set_ignore_signature_check_failure(param.blind_signatures);
 			read_options.set_multi_threaded_crypto(param.multi_threaded_crypto);
 			read_options.set_multi_threaded_compress(param.multi_threaded_compress);
+			read_options.set_silent(param.quiet_crypto);
 
 			if(param.sequential_read)
 			    throw Erange("little_main", gettext("Using sequential reading mode for archive source is not possible for merging operation"));
@@ -737,6 +739,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    read_options.set_entrepot(ref_repo);
 		    // yes this is "ref_repo" where is located the -A-pointed-to archive
 		    // -C-pointed-to archive is located in the "repo" entrepot
+		read_options.set_silent(param.quiet_crypto);
 
 		arch.reset(new (nothrow) archive(dialog,
 						 *param.ref_root,
@@ -836,6 +839,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    // it earlier during the reading process does not free memory
 		    // from at the heap level of the process for most (if not all)
 		    // operating systems.
+		read_options.set_silent(param.quiet_crypto);
 
 		if(param.ref_filename != nullptr && param.ref_root != nullptr)
 		{
@@ -861,6 +865,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    read_options.set_ref_slice_min_digits(param.ref_num_digits);
 		    if(ref_repo)
 			read_options.set_ref_entrepot(ref_repo);
+		    read_options.set_silent(param.quiet_crypto);
 		}
 
 		arch.reset(new (nothrow) archive(dialog,
@@ -950,6 +955,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    read_options.set_entrepot(repo);
 		if(param.sequential_read)
 		    read_options.set_early_memory_release(true);
+		read_options.set_silent(param.quiet_crypto);
 
 		if(param.ref_filename != nullptr && param.ref_root != nullptr)
 		{
@@ -1038,6 +1044,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    read_options.set_entrepot(repo);
 		if(param.sequential_read)
 		    read_options.set_early_memory_release(true);
+		read_options.set_silent(param.quiet_crypto);
 
 		if(param.ref_filename != nullptr && param.ref_root != nullptr)
 		{
@@ -1118,6 +1125,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		read_options.set_header_only(param.header_only);
 		if(param.sequential_read)
 		    read_options.set_early_memory_release(true);
+		read_options.set_silent(param.quiet_crypto);
 
 		arch.reset(new (nothrow) archive(dialog,
 						 *param.sauv_root,

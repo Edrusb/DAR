@@ -82,7 +82,7 @@ extern "C"
 #include "libdar.hpp"
 #include "fichier_local.hpp"
 
-#define OPT_STRING "c:A:x:d:t:l:v::z::y:nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT:E:F:K:J:Y:Z:B:fm:NH::a::eQG:M::g:#:*:,[:]:+:@:$:~:%:q/:^:_:01:2:.:3:9:<:>:=:4:5::6:7:8:{:}:j:\\:"
+#define OPT_STRING "c:A:x:d:t:l:v::z::y:nw::p::k::R:s:S:X:I:P:bhLWDru:U:VC:i:o:OT:E:F:K:J:Y:Z:B:fm:NH::a::eQG:M::g:#:*:,[:]:+:@:$:~:%:q::/:^:_:01:2:.:3:9:<:>:=:4:5::6:7:8:{:}:j:\\:"
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
 #define MISSING_ARG "Missing argument to -%c option"
@@ -285,6 +285,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
     p.keep_compressed = false;
     p.fixed_date = 0;
     p.quiet = false;
+    p.quiet_crypto = false;
     p.slice_perm = "";
     p.slice_user = "";
     p.slice_group = "";
@@ -1922,7 +1923,12 @@ static bool get_args_recursive(recursive_param & rec,
                 }
                 break;
             case 'q':
-                p.quiet = true;
+		if(optarg == nullptr)
+		    p.quiet = true;
+		else if(strcasecmp("crypto", optarg) == 0)
+		    p.quiet_crypto = true;
+		else
+		    throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext(INVALID_ARG), char(lu)));
                 break;
             case '.':
                 if(optarg == nullptr)
