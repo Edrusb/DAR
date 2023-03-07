@@ -211,7 +211,7 @@ namespace libdar
 	void set_header_only(bool val) { x_header_only = val; };
 
 	    /// whether to perform early memory release of the catalogue
-	void set_early_memory_release(bool val) { x_early_memory_release = true; };
+	void set_early_memory_release(bool val) { x_early_memory_release = val; };
 
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods (mainly used inside libdar, but kept public and part of the API in the case it is needed)
