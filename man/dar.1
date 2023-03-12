@@ -1006,7 +1006,7 @@ Called during a backup operation it leads dar to create delta signature for each
 But in any case, without
 .B
 --delta sig
-the resulting archive will hold no delta signature. Note that delta signature transfer is not possible when the archive of reference is read in sequential mode, thus delta signature is disabled when the archive of reference is read in sequential mode.
+the resulting archive will hold no delta signature. Note that delta signature transfer is not possible when the archive of reference is read in sequential mode (still here for backup operation), thus delta signature is disabled when the archive of reference is read in sequential mode.
 .P
 For isolation and merging operations, the behavior is slightly different:
 .B
