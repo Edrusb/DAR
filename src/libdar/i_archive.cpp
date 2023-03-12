@@ -1625,7 +1625,7 @@ namespace libdar
 		// note:
 		// an isolated catalogue keeps the data, EA and FSA pointers of the archive they come from
 		// but have their own copy of the delta signature if present, in order to be able to make
-		// a differential/incremental delta binary based on an isplated catalogue. The drawback is
+		// a differential/incremental delta binary based on an isolated catalogue. The drawback is
 		// that reading an archive with the help of an isolated catalogue, the delta signature used
 		// will always be those of the isolated catalogue, not those of the archive the catalogue
 		// has been isolated from.
