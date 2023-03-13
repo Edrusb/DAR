@@ -61,7 +61,7 @@ asym="${15}"
 #echo "hash = [$hash]"
 #echo "multi-thread = [$multi_thread]"
 
-ALL_TESTS="A1 A2 A3 B1 B2 B3 B4 C1 C2 C3 C4 D1 D2 D3 E1 E2 E3 F1 F2 F3 F4 F5 G1 G2 G3 H1 I1 I2"
+ALL_TESTS="A1 A2 A3 B1 B2 B3 B4 C1 C2 C3 C4 D1 D2 E1 E2 E3 F1 F2 F3 F4 F5 G1 G2 G3 H1 I1 I2"
 
 export prefix
 prefix_dir="$prefix.dir"
@@ -172,7 +172,7 @@ fi
 
 if [ "$seq_read" = "y" ]; then
   sequential="--sequential-read"
-  ALL_TESTS=`echo $ALL_TESTS | sed -r -e 's/(D3|F1|F2|F3|F4|F5)//g'`
+  ALL_TESTS=`echo $ALL_TESTS | sed -r -e 's/(F1|F2|F3|F4|F5)//g'`
   if [ "$tape_mark" != "y" ] ; then
     ALL_TESTS="none"
   fi

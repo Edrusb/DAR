@@ -440,7 +440,7 @@ fi
 #  D2 -    operation with differential backup using delta signature
 #
 if echo $* | grep "D2" > /dev/null ; then
-GO "D2-1" 0 $ROUTINE_DEBUG $DAR -N -c $diff_delta -R $src -A $full_delta -B $OPT_NOSEQ
+GO "D2-1" 0 $ROUTINE_DEBUG $DAR -N -c $diff_delta -R $src -A $full_delta -B $OPT_NOSEQ --delta sig --delta-sig-min-size 1
 GO "D2-2" 0 $ROUTINE_DEBUG check_hash $hash $diff_delta.*.dar
 GO "D2-3" 0 $ROUTINE_DEBUG $DAR -N -l $diff_delta -B $OPT
 GO "D2-4" 0 $ROUTINE_DEBUG $DAR -N -t $diff_delta -B $OPT
@@ -450,24 +450,6 @@ GO "D2-6" 0 $ROUTINE_DEBUG $DAR -N -x $full_delta -R $dst2 -B $OPT
 GO "D2-7" 0 $ROUTINE_DEBUG $DAR -N -x $diff_delta -R $dst2 -w -B $OPT
 GO "D2-8" 0 $ROUTINE_DEBUG my_diff $src $dst2
 rm -rf $dst2
-fi
-
-#
-# D3 -     operation with incremental backup using delta signature
-#
-
-if echo $* | grep "D3" > /dev/null ; then
-GO "D3-1" 0 $ROUTINE_DEBUG $DAR -N -c $diff_delta2 -R $src -A $catf_delta -B $OPT_NOSEQ --delta sig --delta-sig-min-size 1
-GO "D3-2" 0 $ROUTINE_DEBUG check_hash $hash $diff_delta2.*.dar
-GO "D3-3" 0 $ROUTINE_DEBUG $DAR -N -l $diff_delta2 -B $OPT
-GO "D3-4" 0 $ROUTINE_DEBUG $DAR -N -t $diff_delta2 -B $OPT
-GO "D3-5" 0 $ROUTINE_DEBUG $DAR -N -d $diff_delta2 -R $src -B $OPT
-mkdir $dst2
-GO "D3-6" 0 $ROUTINE_DEBUG $DAR -N -x $full -R $dst2 -B $OPT
-GO "D3-7" 0 $ROUTINE_DEBUG $DAR -N -x $diff_delta2 -R $dst2 -w -B $OPT
-GO "D3-8" 0 $ROUTINE_DEBUG my_diff $src $dst2
-rm -rf $dst2
-
 fi
 
 #
