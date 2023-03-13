@@ -300,9 +300,6 @@ namespace libdar
 	if(delta_sig_size.is_zero())
 	    return;
 
-	if(delta_sig_size.is_zero())
-	    throw SRC_BUG;
-
 	if(sig == nullptr) // we have to fetch the data
 	{
 	    crc *calculated = nullptr;
