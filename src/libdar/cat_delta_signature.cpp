@@ -54,7 +54,22 @@ namespace libdar
 
 	try
 	{
-	    patch_base_check = create_crc_from_file(*src);
+	    if(ver < archive_version(11,2))
+		patch_base_check = create_crc_from_file(*src);
+		// starting format 10.2 the patch base check
+		// has been moved before the delta patch,
+		// while this cat_delta_structure stays written
+		// after the delta patch and its CRC
+		// To patch_base_check is since then set
+		// calling dump_patch_base_crc()
+	    else
+	    {
+		if(patch_base_check != nullptr)
+		{
+		    delete patch_base_check;
+		    patch_base_check = nullptr;
+		}
+	    }
 	    delta_sig_size.read(*src);
 
 	    if(!delta_sig_size.is_zero())
@@ -122,9 +137,17 @@ namespace libdar
 
 	if(sequential_mode)
 	{
-	    if(!has_patch_base_crc())
-		throw SRC_BUG;
-	    patch_base_check->dump(f);
+		//if(!has_patch_base_crc())
+		// throw SRC_BUG;
+		// patch_base_check->dump(f);
+		///// since format 11.2 we do not save
+		///// patch_base_crc has been moved to cat_file
+		///// to be saved before the delta patch and
+		///// allow patching a file when reading a backup
+		///// in sequential mode
+		///// the field is still present in this class
+		///// for backward compatibility with older format
+
 	    delta_sig_size.dump(f);
 	}
 
@@ -166,9 +189,12 @@ namespace libdar
 
     void cat_delta_signature::dump_metadata(generic_file & f) const
     {
-	if(!has_patch_base_crc())
-	    throw SRC_BUG;
-	patch_base_check->dump(f);
+	    // if(!has_patch_base_crc())
+	    // throw SRC_BUG;
+	    // patch_base_check->dump(f);
+	    ///// patch_base_check has moved to cat_file
+	    ///// since format 11.2
+
 	delta_sig_size.dump(f);
 	if(!delta_sig_size.is_zero())
 	    delta_sig_offset.dump(f);
@@ -190,14 +216,7 @@ namespace libdar
 
     void cat_delta_signature::set_patch_base_crc(const crc & c)
     {
-	if(patch_base_check != nullptr)
-	{
-	    delete patch_base_check;
-	    patch_base_check = nullptr;
-	}
-	patch_base_check = c.clone();
-	if(patch_base_check == nullptr)
-	    throw Ememory("cat_delta_signature::set_crc");
+	throw SRC_BUG; // no more used since format 11.2
     }
 
     bool cat_delta_signature::get_patch_result_crc(const crc * & c) const
