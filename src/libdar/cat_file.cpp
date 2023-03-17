@@ -465,7 +465,7 @@ namespace libdar
                 (void)ptr->write(&tmp, sizeof(tmp));
 		if(get_saved_status() == saved_status::delta)
 		{
-		    if(patch_base_check == nullptr)
+		    if(!has_patch_base_crc())
 			throw SRC_BUG;
 		    patch_base_check->dump(*ptr);
 		}
@@ -951,6 +951,25 @@ namespace libdar
 	}
 	else
 	    return false;
+    }
+
+    bool cat_file::has_patch_base_crc() const
+    {
+	if(patch_base_check == nullptr
+	   && delta_sig != nullptr
+	   && delta_sig->has_patch_base_crc())
+	{
+	    const crc *tmp = nullptr;
+	    if(!delta_sig->get_patch_base_crc(tmp))
+		throw SRC_BUG; // was reported to have such field just above
+	    if(tmp == nullptr)
+		throw SRC_BUG;
+	    const_cast<cat_file *>(this)->patch_base_check = tmp->clone();
+	    if(patch_base_check == nullptr)
+		throw Ememory("cat_file::cat_file");
+	}
+
+	return patch_base_check != nullptr;
     }
 
     bool cat_file::get_patch_base_crc(const crc * & c) const

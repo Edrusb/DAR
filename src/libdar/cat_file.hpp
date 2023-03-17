@@ -163,7 +163,7 @@ namespace libdar
 
 
 	    /// returns whether the object has a base patch CRC (s_delta status objects)
-	bool has_patch_base_crc() const { return patch_base_check != nullptr; };
+	bool has_patch_base_crc() const;
 
 	    /// returns the CRC of the file to base the patch on, for s_delta objects
 	bool get_patch_base_crc(const crc * & c) const;
