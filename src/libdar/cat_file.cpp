@@ -67,6 +67,7 @@ namespace libdar
         furtive_read_mode = x_furtive_read_mode;
         file_data_status_read = 0;
         file_data_status_write = 0;
+	patch_base_check = nullptr;
 	delta_sig = nullptr;
 	delta_sig_read = false;
 	read_ver = macro_tools_supported_version;
@@ -119,6 +120,7 @@ namespace libdar
         furtive_read_mode = false; // no used in that "status" mode
         file_data_status_read = 0;
         file_data_status_write = 0; // may be changed later using set_sparse_file_detection_write()
+	patch_base_check = nullptr;
 	delta_sig = nullptr;
 	delta_sig_read = false;
 	read_ver = reading_ver;
@@ -161,15 +163,19 @@ namespace libdar
                                 file_data_status_read &= ~FILE_DATA_IS_DIRTY; // removing the flag DIRTY
                             }
 
-			    if((file_data_status_read & FILE_DATA_HAS_DELTA_SIG) != 0)
-				will_have_delta_signature_structure();
-			    file_data_status_read &= ~FILE_DATA_HAS_DELTA_SIG;
-
-                            file_data_status_write = file_data_status_read;
-
                             ptr->read(&tmp, sizeof(tmp));
                             algo_read = char2compression(tmp);
 			    algo_write = algo_read;
+
+			    if((file_data_status_read & FILE_DATA_HAS_DELTA_SIG) != 0)
+			    {
+				will_have_delta_signature_structure();
+				if(saved == saved_status::delta && reading_ver >= archive_version(11,2))
+				    patch_base_check = create_crc_from_file(*ptr);
+				file_data_status_read &= ~FILE_DATA_HAS_DELTA_SIG;
+			    }
+
+                            file_data_status_write = file_data_status_read;
                         }
                         else
                             if(storage_size->is_zero()) // in older archive storage_size was set to zero if data was not compressed
@@ -258,15 +264,21 @@ namespace libdar
                     char tmp;
 
                     ptr->read(&file_data_status_read, sizeof(file_data_status_read));
-		    if((file_data_status_read & FILE_DATA_HAS_DELTA_SIG) != 0)
-		    {
-			file_data_status_read &= ~FILE_DATA_HAS_DELTA_SIG;
-			will_have_delta_signature_structure();
-		    }
-                    file_data_status_write = file_data_status_read;
+
                     ptr->read(&tmp, sizeof(tmp));
                     algo_read = char2compression(tmp);
 		    algo_write = algo_read;
+
+		    if((file_data_status_read & FILE_DATA_HAS_DELTA_SIG) != 0)
+		    {
+			will_have_delta_signature_structure();
+			if(saved == saved_status::delta && reading_ver >= archive_version(11,2))
+			    patch_base_check = create_crc_from_file(*ptr);
+			file_data_status_read &= ~FILE_DATA_HAS_DELTA_SIG;
+		    }
+
+                    file_data_status_write = file_data_status_read;
+
                 }
 		else // not saved
 		{
@@ -329,6 +341,7 @@ namespace libdar
         furtive_read_mode = ref.furtive_read_mode;
         file_data_status_read = ref.file_data_status_read;
         file_data_status_write = ref.file_data_status_write;
+	patch_base_check = nullptr;
 	delta_sig = nullptr;
 	delta_sig_read = ref.delta_sig_read;
 	read_ver = ref.read_ver;
@@ -358,12 +371,20 @@ namespace libdar
             if(offset == nullptr || size == nullptr || storage_size == nullptr)
                 throw Ememory("cat_file::cat_file(cat_file)");
 
+	    if(ref.patch_base_check != nullptr)
+	    {
+		patch_base_check = ref.patch_base_check->clone();
+		if(patch_base_check == nullptr)
+		    throw Ememory("cat_file::cat_file(cat_file)");
+	    }
+
 	    if(ref.delta_sig != nullptr)
 	    {
 		delta_sig = new (nothrow) cat_delta_signature(*ref.delta_sig);
 		if(delta_sig == nullptr)
 		    throw Ememory("cat_file::cat_file(cat_file)");
 	    }
+
         }
         catch(...)
         {
@@ -410,6 +431,12 @@ namespace libdar
                 storage_size->dump(*ptr);
                 ptr->write(&flags, sizeof(flags));
                 ptr->write(&tmp, sizeof(tmp));
+		if(get_saved_status() == saved_status::delta)
+		{
+		    if(patch_base_check == nullptr)
+			throw SRC_BUG;
+		    patch_base_check->dump(*ptr);
+		}
             }
 	    else // since format 9 flag is present in any case to know whether object has delta signature
                 ptr->write(&flags, sizeof(flags));
@@ -436,6 +463,12 @@ namespace libdar
 
                 (void)ptr->write(&flags, sizeof(flags));
                 (void)ptr->write(&tmp, sizeof(tmp));
+		if(get_saved_status() == saved_status::delta)
+		{
+		    if(patch_base_check == nullptr)
+			throw SRC_BUG;
+		    patch_base_check->dump(*ptr);
+		}
             }
 	    else
 	    {
@@ -922,18 +955,13 @@ namespace libdar
 
     bool cat_file::get_patch_base_crc(const crc * & c) const
     {
-	if(delta_sig == nullptr)
-	    return false;
-	else
+	if(patch_base_check != nullptr)
 	{
-	    if(delta_sig->has_patch_base_crc())
-	    {
-		delta_sig->get_patch_base_crc(c);
-		return true;
-	    }
-	    else
-		return false;
+	    c = patch_base_check;
+	    return true;
 	}
+	else
+	    return false;
     }
 
     void cat_file::set_patch_base_crc(const crc & c)
@@ -941,7 +969,41 @@ namespace libdar
 	if(delta_sig == nullptr)
 	    throw SRC_BUG;
 
-	delta_sig->set_patch_base_crc(c);
+	clean_patch_base_crc();
+	patch_base_check = c.clone();
+
+	if(patch_base_check == nullptr)
+	    throw Ememory("cat_file::set_patch_base_crc");
+    }
+
+    bool cat_file::has_patch_result_crc() const
+    {
+	if(delta_sig != nullptr && delta_sig->is_pending_read())
+	{
+		// if read() has not yet been called (pending_read() returned true)
+		// at the time one asks whether a patch_result is
+		// available, it means the object is not
+		// yet fully read while already used,
+		// which is only the case in sequential-read
+		// where from the "true" value as first argument
+		// of delta_sig->read() below
+
+	    escape* esc = get_escape_layer();
+	    if(esc != nullptr)
+	    {
+		get_pile()->flush_read_above(esc);
+		if(esc->skip_to_next_mark(escape::seqt_delta_sig, false))
+		    delta_sig->read(true, read_ver);
+		else
+		    return false;
+		    // delta_sig was created, thus we may have hit
+		    // either a bug or a data corruption, letting the caller deciding
+	    }
+	    else
+		throw SRC_BUG; // we should not be in read_pending() and without escape layer
+	}
+
+	return delta_sig != nullptr && delta_sig->has_patch_result_crc();
     }
 
     bool cat_file::get_patch_result_crc(const crc * & c) const
@@ -1089,6 +1151,14 @@ namespace libdar
 		}
 
 		delta_sig->read(small, read_ver);
+		if(read_ver < archive_version(11,2))
+		{
+		    const crc *tmp;
+		    if(delta_sig->get_patch_base_crc(tmp))
+			const_cast<cat_file *>(this)->set_patch_base_crc(*tmp);
+		    else
+			const_cast<cat_file *>(this)->clean_patch_base_crc();
+		}
 		delta_sig_read = true;
 	    }
 	    catch(Egeneric & e)
@@ -1163,7 +1233,10 @@ namespace libdar
 	    if(get_saved_status() == saved_status::delta)
 		delta_sig->drop_sig();
 	    else
+	    {
 		clear_delta_signature_structure();
+		clean_patch_base_crc();
+	    }
 	}
     }
 
@@ -1174,6 +1247,7 @@ namespace libdar
 	    delete delta_sig;
 	    delta_sig = nullptr;
 	}
+	clean_patch_base_crc();
     }
 
     bool cat_file::same_data_as(const cat_file & other, bool check_data, const infinint & hourshift)
@@ -1435,6 +1509,15 @@ namespace libdar
 	}
     }
 
+    void cat_file::clean_patch_base_crc()
+    {
+	if(patch_base_check != nullptr)
+	{
+	    delete patch_base_check;
+	    patch_base_check = nullptr;
+	}
+    }
+
     void cat_file::detruit()
     {
         if(offset != nullptr)
@@ -1462,6 +1545,7 @@ namespace libdar
 	    delete delta_sig;
 	    delta_sig = nullptr;
 	}
+	clean_patch_base_crc();
     }
 
 

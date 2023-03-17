@@ -45,6 +45,7 @@ namespace libdar
 	    throw SRC_BUG;
 	if(zip == nullptr)
 	    throw SRC_BUG;
+	pending_read = true;
     }
 
     void cat_delta_signature::read(bool sequential_read, const archive_version & ver)
@@ -84,6 +85,7 @@ namespace libdar
 	    }
 
 	    patch_result_check = create_crc_from_file(*src);
+	    pending_read = false;
 	}
 	catch(...)
 	{
@@ -252,6 +254,7 @@ namespace libdar
 	src = nullptr;
 	zip = nullptr;
 	sig_block_len = 0;
+	pending_read = false;
     }
 
     void cat_delta_signature::copy_from(const cat_delta_signature & ref)
@@ -277,6 +280,7 @@ namespace libdar
 	    patch_result_check = nullptr;
 	src = ref.src;
 	zip = ref.zip;
+	pending_read = ref.pending_read;
     }
 
     void cat_delta_signature::move_from(cat_delta_signature && ref) noexcept
@@ -292,6 +296,7 @@ namespace libdar
 	swap(patch_result_check, ref.patch_result_check);
 	src = move(ref.src);
 	zip = move(ref.zip);
+	pending_read = move(ref.pending_read);
     }
 
     void cat_delta_signature::destroy() noexcept

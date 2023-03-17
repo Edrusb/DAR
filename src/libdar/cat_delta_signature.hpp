@@ -122,6 +122,9 @@ namespace libdar
 
 	    /////////// method for read mode ///////////
 
+	    /// tells whether the read() call has been invoked
+	bool is_pending_read() const { return pending_read; };
+
 	    /// read the metadata of the object from the generic_file given at construction time
 	    /// \note in sequential read mode, the data is also read at that time and loaded into memory,
 	    /// thing which is done transparently by obtain_sig() when in direct access mode
@@ -206,7 +209,8 @@ namespace libdar
 	crc *patch_result_check;    ///< associated CRC
 	generic_file *src;          ///< where to read data from
 	proto_compressor *zip;      ///< needed to disable compression when reading delta signature data from an archive
-	mutable U_I sig_block_len;  ///< block lenght used within delta signature
+	mutable U_I sig_block_len;  ///< block length used within delta signature
+	bool pending_read;          ///< when the object has been created for read but data not yet read from archive
 
 	void init() noexcept;
 	void copy_from(const cat_delta_signature & ref);
