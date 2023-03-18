@@ -1252,10 +1252,7 @@ namespace libdar
 	    if(get_saved_status() == saved_status::delta)
 		delta_sig->drop_sig();
 	    else
-	    {
 		clear_delta_signature_structure();
-		clean_patch_base_crc();
-	    }
 	}
     }
 
