@@ -117,16 +117,18 @@ namespace libdar
 	U_I min;
 	U_I incr;
 
-	while(read < bytes)
+	while(bytes > 0)
 	{
 	    min = bytes > buffer_size ? buffer_size : bytes;
-	    incr += ptr->read(buffer, min);
+	    incr = ptr->read(buffer, min);
 		// we used read, to let the object handle to exception
 		// contexts and if fixed continue the read_and_drop
 		// operation normally
 	    read += incr;
 	    if(incr < min) // reached eof
-		bytes = read; // we force the loop to end
+		bytes = 0; // we force the loop to end
+	    else
+		bytes -= incr;
 	}
 
 	return read;
