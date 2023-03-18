@@ -8,6 +8,8 @@ from 2.7.8 to 2.7.9
 - adding the misc/dar_static_builder_with_musl_voidlinux.bash script
   which automatically builds dar_static from source code under
   VoidLinux/musl
+- fixing bug concerning the restoration in sequential read mode of a
+  backup containing binary patches
 
 from 2.7.7 to 2.7.8
 - adapted code to workaround clang 10.0.1 bug under FreeBSD 12
