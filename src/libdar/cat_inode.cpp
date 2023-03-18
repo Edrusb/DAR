@@ -605,13 +605,13 @@ namespace libdar
 
 	    // FSA part
 
-	if(fsa_saved !=  fsa_saved_status::none)
+	if(fsa_saved != fsa_saved_status::none)
 	{
 	    if(fsa_families == nullptr)
 		throw SRC_BUG;
 	    fsa_families->dump(*ptr);
 	}
-	if(fsa_saved ==  fsa_saved_status::full)
+	if(fsa_saved == fsa_saved_status::full)
 	{
 	    if(fsa_size == nullptr)
 		throw SRC_BUG;
