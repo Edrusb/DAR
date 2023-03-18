@@ -1394,7 +1394,10 @@ namespace libdar
         if(of_fd == nullptr)
             throw Erange("sar::set_offset", gettext("file not open"));
         else
-            of_fd->skip(offset);
+	{
+            if(!of_fd->skip(offset))
+		throw Erange("sar::set_offset","Cannot seek to the requested position");
+	}
     }
 
     void sar::open_last_file(bool bytheend)
