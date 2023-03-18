@@ -10,6 +10,10 @@ from 2.7.8 to 2.7.9
   VoidLinux/musl
 - fixing bug concerning the restoration in sequential read mode of a
   backup containing binary patches
+- fixed bug in tuyau_global class that lead to seeking at a wrong
+  in sequential read mode and the unability to properly rely on a
+  isolated catalogue to read (test/extract/diff) an backup in sequential
+  read mode, leading dar to report CRC error.
 
 from 2.7.7 to 2.7.8
 - adapted code to workaround clang 10.0.1 bug under FreeBSD 12
