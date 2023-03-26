@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002-2022 Denis Corbin
+// Copyright (C) 2002-2023 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -605,13 +605,13 @@ namespace libdar
 
 	    // FSA part
 
-	if(fsa_saved !=  fsa_saved_status::none)
+	if(fsa_saved != fsa_saved_status::none)
 	{
 	    if(fsa_families == nullptr)
 		throw SRC_BUG;
 	    fsa_families->dump(*ptr);
 	}
-	if(fsa_saved ==  fsa_saved_status::full)
+	if(fsa_saved == fsa_saved_status::full)
 	{
 	    if(fsa_size == nullptr)
 		throw SRC_BUG;

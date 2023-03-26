@@ -13,6 +13,22 @@ from 2.7.x to 2.8.0
 - using early_memory_release from dar CLI when sequential-read mode is used
 - adding -qcrypto option
 
+from 2.7.8 to 2.7.9
+- added sanity check in elastic buffer code upon Sviat89@github
+  feedback.
+- fixed bug in block_compressor module found by sviat89 while reading
+  the code. Seen its context, it does not seem however to have much
+  chance to express and would lead dar/libdar to loop forever
+  consuming CPU.
+- adding the misc/dar_static_builder_with_musl_voidlinux.bash script
+  which automatically builds dar_static from source code under
+  VoidLinux/musl
+- fixing bug concerning the restoration in sequential read mode of a
+  backup containing binary patches
+- fixed bug in tuyau_global class that lead to seeking at a wrong
+  in sequential read mode and the unability to properly rely on a
+  isolated catalogue to read (test/extract/diff) an backup in sequential
+  read mode, leading dar to report CRC error.
 
 from 2.7.7 to 2.7.8
 - adapted code to workaround clang 10.0.1 bug under FreeBSD 12

@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002-2022 Denis Corbin
+// Copyright (C) 2002-2023 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -163,7 +163,7 @@ namespace libdar
 
 
 	    /// returns whether the object has a base patch CRC (s_delta status objects)
-	bool has_patch_base_crc() const { return delta_sig != nullptr && delta_sig->has_patch_base_crc(); };
+	bool has_patch_base_crc() const;
 
 	    /// returns the CRC of the file to base the patch on, for s_delta objects
 	bool get_patch_base_crc(const crc * & c) const;
@@ -174,7 +174,7 @@ namespace libdar
 
 
 	    /// returns whether the object has a CRC corresponding to data (for s_saved, s_delta, and when delta signature is present)
-	bool has_patch_result_crc() const { return delta_sig != nullptr && delta_sig->has_patch_result_crc(); };
+	bool has_patch_result_crc() const;
 
 	    /// returns the CRC the file will have once restored or patched (for s_saved, s_delta, and when delta signature is present)
 	bool get_patch_result_crc(const crc * & c) const;
@@ -255,6 +255,7 @@ namespace libdar
 	bool furtive_read_mode; ///< used only when status equals "from_path"
 	char file_data_status_read;  ///< defines the datastructure to use when reading the data
 	char file_data_status_write; ///< defines the datastructure to apply when writing down the data
+	crc *patch_base_check;       ///< when data contains a delta patch, moved from delta_sig since format 10.2
 	cat_delta_signature *delta_sig; ///< delta signature and associated CRC
 	mutable bool delta_sig_read; ///< whether delta sig has been read/initialized from filesystem
 	archive_version read_ver; ///< archive format used/to use
@@ -263,6 +264,9 @@ namespace libdar
 				  bool can_read_my_data,
 				  bool can_read_other_data,
 				  const infinint & hourshift) const;
+
+	void clean_patch_base_crc();
+
 	void detruit();
 
     };

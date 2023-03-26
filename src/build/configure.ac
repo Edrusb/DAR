@@ -1,6 +1,6 @@
 #######################################################################
 # dar - disk archive - a backup/restoration program
-# Copyright (C) 2002-2022 Denis Corbin
+# Copyright (C) 2002-2023 Denis Corbin
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -2057,11 +2057,11 @@ AS_IF(
 
 AC_ARG_ENABLE([libargon2-linking],
               AC_HELP_STRING(--disable-libargon2-linking, [avoid linking with libargon2 if available to prevent the argon2 hashing algorithm to be used]),
-              [explicit_argon2=yes],
-              [enable_argon2=yes])
+              [explicit_libargon2_linking=yes],
+              [enable_libargon2_linking=yes])
 
 AS_IF(
-              [ test "x$enable_argon2" != "xyes" ],
+              [ test "x$enable_libargon2_linking" != "xyes" ],
               [
                 AC_MSG_WARN([libargon2 support has been disabled by user])
                 local_argon2=no
@@ -2108,6 +2108,11 @@ AS_IF(
                                 [
                                     local_argon2=no
                                     AC_MSG_RESULT([not usable! See config.log for details])
+
+				    AS_IF( [ test "x$explicit_libargon2_linking" != "xno" ],
+				            [ AC_MSG_ERROR([libargon2 is missing to build libdar]) ]
+					 )
+
                                 ],
                                 [
                                    # if cross compiling

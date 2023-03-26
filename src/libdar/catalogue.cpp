@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002-2022 Denis Corbin
+// Copyright (C) 2002-2023 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -1067,7 +1067,7 @@ namespace libdar
 			// delta signature field found, we may have to either:
 			// - drop the global delta_signature structure
 			// - keep the global delta_signature structure but drop the delta_signature data
-			// - keep the global detla_signature structure and keep the delta_signature data, dumping it to the target archive
+			// - keep the global delta_signature structure and keep the delta_signature data, dumping it to the target archive
 		    if(!build  // we keep existing delta_signature as is
 		       ||
 		       (delta_mask.is_covered(juillet.get_string()) // or we have to build/transfer delta sig if they match size and mask criteria

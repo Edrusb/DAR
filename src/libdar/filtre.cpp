@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002-2022 Denis Corbin
+// Copyright (C) 2002-2023 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -3097,6 +3097,12 @@ namespace libdar
 
 			// need to store at least the base CRC and result CRC even if not delta signature is computed:
 		    fic->will_have_delta_signature_structure();
+
+		    const crc *tmp;
+		    if(ref_fic->get_crc(tmp))
+			fic->set_patch_base_crc(*tmp);
+		    else
+			throw SRC_BUG;
 		}
 	    }
 
@@ -4641,15 +4647,6 @@ namespace libdar
 			if(!sig)
 			    throw SRC_BUG;
 		    }
-
-		    if(ref_file->has_patch_base_crc())
-		    {
-			const crc *tmp;
-			ref_file->get_patch_base_crc(tmp);
-			e_file->set_patch_base_crc(*tmp);
-		    }
-		    else
-			throw SRC_BUG;
 
 		    if(ref_file->has_patch_result_crc())
 		    {

@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002-2022 Denis Corbin
+// Copyright (C) 2002-2023 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -91,9 +91,26 @@ namespace libdar
 	S_I step = (dir == elastic_forward ? +1 : -1);
 	unsigned char first_mark = (dir == elastic_forward ? get_low_mark(reading_ver) : get_high_mark(reading_ver));
 	unsigned char last_mark  = (dir == elastic_forward ? get_high_mark(reading_ver) : get_low_mark(reading_ver));
+	static const U_32 forbidden_size = ~((U_32)(0));
+
+	    // see note below
+	if(size >= forbidden_size)
+	    throw Erange("elastic::elastic", gettext("Buffer size too large to setup an elastic buffer"));
 
 	while(pos < size && buffer[pos] != SINGLE_MARK && buffer[pos] != first_mark)
 	    pos += step;
+	    // note: when going backward, the 'pos < size' condition stays pertinent
+	    // because 'pos' is an unsigned int and when decrementing by one a value of zero, it
+	    // loops to the higest integer supported by this unsigned int type, which is
+	    // greater (or equal) to 'size'. The out of bound condition is thus detected by the
+	    // 'pos < size' statement in both forward and backward directions
+	    //
+	    // in forward direction however, having 'size' equal to the max integer value supported
+	    // will not lead to detect this overhead, so we forbids size to be that max value.
+	    // In practice a such large elastic buffer (2^32 bytes wide) is never used in libdar
+	    // by default.
+	    //
+	    // Thanks to Sviat89@github for triggering this.
 
 	if(pos >= size)
 	    throw Erange("elastic::elastic", gettext("elastic buffer incoherent structure"));

@@ -1,6 +1,6 @@
 //*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002-2022 Denis Corbin
+// Copyright (C) 2002-2023 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -1394,7 +1394,10 @@ namespace libdar
         if(of_fd == nullptr)
             throw Erange("sar::set_offset", gettext("file not open"));
         else
-            of_fd->skip(offset);
+	{
+            if(!of_fd->skip(offset))
+		throw Erange("sar::set_offset","Cannot seek to the requested position");
+	}
     }
 
     void sar::open_last_file(bool bytheend)

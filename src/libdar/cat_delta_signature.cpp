@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002-2022 Denis Corbin
+// Copyright (C) 2002-2023 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -45,6 +45,7 @@ namespace libdar
 	    throw SRC_BUG;
 	if(zip == nullptr)
 	    throw SRC_BUG;
+	pending_read = true;
     }
 
     void cat_delta_signature::read(bool sequential_read, const archive_version & ver)
@@ -54,7 +55,22 @@ namespace libdar
 
 	try
 	{
-	    patch_base_check = create_crc_from_file(*src);
+	    if(ver < archive_version(11,2))
+		patch_base_check = create_crc_from_file(*src);
+		// starting format 10.2 the patch base check
+		// has been moved before the delta patch,
+		// while this cat_delta_structure stays written
+		// after the delta patch and its CRC
+		// To patch_base_check is since then set
+		// calling dump_patch_base_crc()
+	    else
+	    {
+		if(patch_base_check != nullptr)
+		{
+		    delete patch_base_check;
+		    patch_base_check = nullptr;
+		}
+	    }
 	    delta_sig_size.read(*src);
 
 	    if(!delta_sig_size.is_zero())
@@ -69,6 +85,7 @@ namespace libdar
 	    }
 
 	    patch_result_check = create_crc_from_file(*src);
+	    pending_read = false;
 	}
 	catch(...)
 	{
@@ -122,9 +139,17 @@ namespace libdar
 
 	if(sequential_mode)
 	{
-	    if(!has_patch_base_crc())
-		throw SRC_BUG;
-	    patch_base_check->dump(f);
+		//if(!has_patch_base_crc())
+		// throw SRC_BUG;
+		// patch_base_check->dump(f);
+		///// since format 11.2 we do not save
+		///// patch_base_crc has been moved to cat_file
+		///// to be saved before the delta patch and
+		///// allow patching a file when reading a backup
+		///// in sequential mode
+		///// the field is still present in this class
+		///// for backward compatibility with older format
+
 	    delta_sig_size.dump(f);
 	}
 
@@ -166,9 +191,12 @@ namespace libdar
 
     void cat_delta_signature::dump_metadata(generic_file & f) const
     {
-	if(!has_patch_base_crc())
-	    throw SRC_BUG;
-	patch_base_check->dump(f);
+	    // if(!has_patch_base_crc())
+	    // throw SRC_BUG;
+	    // patch_base_check->dump(f);
+	    ///// patch_base_check has moved to cat_file
+	    ///// since format 11.2
+
 	delta_sig_size.dump(f);
 	if(!delta_sig_size.is_zero())
 	    delta_sig_offset.dump(f);
@@ -190,14 +218,7 @@ namespace libdar
 
     void cat_delta_signature::set_patch_base_crc(const crc & c)
     {
-	if(patch_base_check != nullptr)
-	{
-	    delete patch_base_check;
-	    patch_base_check = nullptr;
-	}
-	patch_base_check = c.clone();
-	if(patch_base_check == nullptr)
-	    throw Ememory("cat_delta_signature::set_crc");
+	throw SRC_BUG; // no more used since format 11.2
     }
 
     bool cat_delta_signature::get_patch_result_crc(const crc * & c) const
@@ -233,6 +254,7 @@ namespace libdar
 	src = nullptr;
 	zip = nullptr;
 	sig_block_len = 0;
+	pending_read = false;
     }
 
     void cat_delta_signature::copy_from(const cat_delta_signature & ref)
@@ -258,6 +280,7 @@ namespace libdar
 	    patch_result_check = nullptr;
 	src = ref.src;
 	zip = ref.zip;
+	pending_read = ref.pending_read;
     }
 
     void cat_delta_signature::move_from(cat_delta_signature && ref) noexcept
@@ -273,6 +296,7 @@ namespace libdar
 	swap(patch_result_check, ref.patch_result_check);
 	src = move(ref.src);
 	zip = move(ref.zip);
+	pending_read = move(ref.pending_read);
     }
 
     void cat_delta_signature::destroy() noexcept
@@ -299,9 +323,6 @@ namespace libdar
 
 	if(delta_sig_size.is_zero())
 	    return;
-
-	if(delta_sig_size.is_zero())
-	    throw SRC_BUG;
 
 	if(sig == nullptr) // we have to fetch the data
 	{

@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002-2022 Denis Corbin
+// Copyright (C) 2002-2023 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -51,14 +51,14 @@ namespace libdar
 	// +------+------+-----------+--------------+----------+--------+
 	// | base | sig  | sig block |sig data      | data CRC | result |
 	// | CRC  | size | len (if   |(if size > 0) |    if    |  CRC   |
-	// |      |      | size > 0) |              | size > 0 |        |
+	// | (*)  |      | size > 0) |              | size > 0 |        |
 	// +------+------+-----------+--------------+----------+--------+
 	//
 	//    DIRECT MODE - in catalogue at end of archive (METADATA)
 	// +------+------+---------------+--------+
 	// | base | sig  | sig offset    | result |
 	// | CRC  | size | (if size > 0) |  CRC   |
-	// |      |      |               |        |
+	// | (*)  |      |               |        |
 	// +------+------+---------------+--------+
 	//
 	//    DIRECT MODE - in the core of the archive (DATA)
@@ -68,6 +68,8 @@ namespace libdar
 	// | size > 0) |               | size > 0 |
 	// +-----------+---------------+----------+
 	//
+	// (*) base_CRC has been moved to cat_file structure since format 11,2
+	//     in order to read this field before the delta patch in sequential read mode
 	//
 	// this structure is used for all cat_file inode that have
 	// either a delta signature or contain a delta patch (s_delta status)
@@ -91,7 +93,7 @@ namespace libdar
     class cat_delta_signature
     {
     public:
-	    /// constructor to read an object (using read() later on) from filesystem
+	    /// constructor to read an object (using read() later on) from filesystem/backup
 
 	    /// \param[in] f where to read the data from, used when calling read() later on. f must not
 	    /// be set to nullptr and the pointed to object must survive this cat_delta_signature object
@@ -100,7 +102,7 @@ namespace libdar
 	    /// in the catalogue at end of archive)
 	cat_delta_signature(generic_file *f, proto_compressor* c);
 
-	    /// constructor to write an object to filesytem (using dump_* methods later on)
+	    /// constructor to write an object to filesytem/backup (using dump_* methods later on)
 	cat_delta_signature() { init(); };
 
 	    /// copy constructor
@@ -119,6 +121,9 @@ namespace libdar
 	~cat_delta_signature() { destroy(); };
 
 	    /////////// method for read mode ///////////
+
+	    /// tells whether the read() call has been invoked
+	bool is_pending_read() const { return pending_read; };
 
 	    /// read the metadata of the object from the generic_file given at construction time
 	    /// \note in sequential read mode, the data is also read at that time and loaded into memory,
@@ -196,7 +201,7 @@ namespace libdar
 	void clear() { destroy(); init(); };
 
     private:
-	crc *patch_base_check;      ///< associated CRC for the file this signature has been computed on
+	crc *patch_base_check;      ///< associated CRC for the file this signature has been computed on, moved to cat_file since format 11.2, still need for older formats
 	infinint delta_sig_size;    ///< size of the data to setup "sig" (set to zero when reading in sequential mode, sig is then setup on-fly)
 	infinint delta_sig_offset;  ///< where to read sig_block_len followed by delta_sig_size bytes of data from which to setup "sig"
 	    ///\note delta_sig_offset is set to zero when read in sequential mode, sig is setup on-fly
@@ -204,12 +209,15 @@ namespace libdar
 	crc *patch_result_check;    ///< associated CRC
 	generic_file *src;          ///< where to read data from
 	proto_compressor *zip;      ///< needed to disable compression when reading delta signature data from an archive
-	mutable U_I sig_block_len;  ///< block lenght used within delta signature
+	mutable U_I sig_block_len;  ///< block length used within delta signature
+	bool pending_read;          ///< when the object has been created for read but data not yet read from archive
 
 	void init() noexcept;
 	void copy_from(const cat_delta_signature & ref);
 	void move_from(cat_delta_signature && ref) noexcept;
 	void destroy() noexcept;
+
+	    // reads sig_block_len + sig data
 	void fetch_data(const archive_version & ver) const;
     };
 
