@@ -17,12 +17,12 @@ jobs:
         sudo apt-get install make gcc g++ libtool intltool libattr1-dev libbz2-1.0 libbz2-dev libbz2-ocaml libbz2-ocaml-dev liblzo2-dev libgpgme-dev libargon2-dev
     - name: init
       run: misc/init
-    - name: configure
+    - name: configure --disable-upx
       run: ./configure --prefix=/usr
     - name: make
       run: make -j4
     - name: install
-      run: sudo make install
+      run: sudo make install-strip
     - name: include test
       run: |
         echo "#include <dar/libdar.hpp>" >/tmp/test-libdar.cpp
