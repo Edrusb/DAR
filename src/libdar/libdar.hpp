@@ -26,8 +26,7 @@
     /// - API module: contains all information for using libdar within your program
     /// - Private module: contains all libdar internal documentation, you do not have to read it in order use libdar
     /// - CMDLINE module: contains the documentation for command-line tools,
-    /// you might want to have a look for illustration of libdar usage.
-    /// - API5 module: contains API v5 symbols as found on release 2.4.x and 2.5.x
+    ///   you might want to have a look for illustration of libdar usage.
     /// .
     ///
 
@@ -55,11 +54,6 @@
     ///
     /// Understanding this is not necessary to use libdar through the API.
     /// This is libdar internal code documentation
-
-    /// \defgroup API5 API5
-    /// \brief APplication Interface backward compatibility for API version 5
-    ///
-    /// backward compatible namespace with dar/libdar releases 2.5.x and 2.4.x
 
     /// \file libdar.hpp
     /// \brief the main file of the libdar API definitions
