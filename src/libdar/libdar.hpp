@@ -104,9 +104,6 @@
     // to redirect to a shell_interaction user I/O object any type of user interaction
 #include "shell_interaction_emulator.hpp"
 
-    // to be able to properly cancel a running libdar thread
-#include "thread_cancellation.hpp"
-
     // for even more flexibility you can create your own class inherited from class user_interaction
     // (see user_interaction.hpp include file)
 
