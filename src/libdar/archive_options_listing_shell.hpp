@@ -43,7 +43,7 @@ namespace libdar
 	/// class holding optional shell specific parameters used to list the contents of an existing archive
 
 	/// \note this class is both used for historical reason and user convenience, but to simplify/clarity the API
-	/// the original archive_options_listing only retain the shell independant parameters
+	/// the original archive_options_listing only retain the shell independent parameters
     class archive_options_listing_shell: public archive_options_listing
     {
     public:
