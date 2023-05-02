@@ -21,8 +21,7 @@
 
     /// \file ea.hpp
     /// \brief contains a set of routines to manage EA values associated to a file
-    /// \ingroup Private
-    /// \note API included module due to dependencies
+    /// \ingroup API
 
 #ifndef EA_HPP
 #define EA_HPP
