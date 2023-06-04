@@ -1096,7 +1096,17 @@ namespace libdar
 	    }
 
 	    if(only_contains_an_isolated_catalogue())
+	    {
+		infinint first = sum.get_ref_first_slice_size();
+		infinint other = sum.get_ref_slice_size();
+
 		get_ui().printf(gettext("\nWARNING! This archive only contains the catalogue of another archive, it can only be used as reference for differential backup or as rescue in case of corruption of the original archive's content. You cannot restore any data from this archive alone\n"));
+		get_ui().printf("");
+		if(first != other)
+		    get_ui().printf(gettext("\tFirst slice size of the archive of reference: %i byte(s)"), &first);
+		get_ui().printf(gettext("\tSlice size of the archive of reference: %i byte(s)"), &other);
+		get_ui().printf("");
+	    }
 
 	    string in_place = sum.get_in_place();
 	    if(!in_place.empty())
@@ -1124,6 +1134,7 @@ namespace libdar
 	infinint last_slice_size;
 	infinint slice_number;
 	infinint archive_size;
+	slice_layout slyt;
 
 	path tmp(".");
 
@@ -1136,6 +1147,9 @@ namespace libdar
 
 	try
 	{
+	    if(!get_catalogue_slice_layout(slyt))
+		slyt.clear();
+
 	    if(get_sar_param(sub_slice_size, first_slice_size, last_slice_size, slice_number))
 	    {
 		if(slice_number == 1)
@@ -1173,6 +1187,8 @@ namespace libdar
 	ret.set_slice_size(sub_slice_size);
 	ret.set_first_slice_size(first_slice_size);
 	ret.set_last_slice_size(last_slice_size);
+	ret.set_ref_slice_size(slyt.other_size);
+	ret.set_ref_first_slice_size(slyt.first_size);
 	ret.set_slice_number(slice_number);
 	ret.set_archive_size(archive_size);
 
