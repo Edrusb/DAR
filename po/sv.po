@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: sv\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612&atid=511612\n"
-"POT-Creation-Date: 2023-03-26 15:48+0200\n"
+"POT-Creation-Date: 2023-06-04 18:33+0200\n"
 "PO-Revision-Date: 2012-04-15 11:28+0200\n"
 "Last-Translator: Peter Landgren <peter.talken@telia.com>\n"
 "Language-Team: Swedish <kde-i18n-doc@kde.org>\n"
@@ -4380,11 +4380,11 @@ msgstr ""
 "(detta kan ta  mycket tid och in vilket fall som helst kommer bara några "
 "filer, som mest, att återställas.)?"
 
-#: src/libdar/i_archive.cpp:577 src/libdar/i_archive.cpp:2030
+#: src/libdar/i_archive.cpp:577 src/libdar/i_archive.cpp:2046
 msgid "Compression_level must be between 1 and 9 included"
 msgstr "Kompressionsnivån måste ligga mellan 1 och 9, inklusive"
 
-#: src/libdar/i_archive.cpp:579 src/libdar/i_archive.cpp:2032
+#: src/libdar/i_archive.cpp:579 src/libdar/i_archive.cpp:2048
 msgid ""
 "\"first_file_size\" cannot be different from zero if \"file_size\" is equal "
 "to zero"
@@ -4392,7 +4392,7 @@ msgstr ""
 "\"första_filstorleken\" kan inte vara skild från noll om \"filstorlek\" är "
 "lika med noll"
 
-#: src/libdar/i_archive.cpp:581 src/libdar/i_archive.cpp:2034
+#: src/libdar/i_archive.cpp:581 src/libdar/i_archive.cpp:2050
 msgid "Crypto block size must be greater than 10 bytes"
 msgstr "Krypteringsblockstorlek måste vara större än 10 byte"
 
@@ -4439,7 +4439,7 @@ msgid ""
 "resulting archive before removing the damaged one"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:944 src/libdar/i_archive.cpp:1379
+#: src/libdar/i_archive.cpp:944 src/libdar/i_archive.cpp:1395
 msgid "This archive is not exploitable, check documentation for more"
 msgstr ""
 "Detta arkiv kan inte utnyttjas, kontrollera dokumentationen för mer "
@@ -4451,7 +4451,7 @@ msgid ""
 "disable this message by asking not to restore file ownership"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:967 src/libdar/i_archive.cpp:1398
+#: src/libdar/i_archive.cpp:967 src/libdar/i_archive.cpp:1414
 msgid ""
 "Cannot use in-place restoration as no in-place path is stored in the archive"
 msgstr ""
@@ -4527,7 +4527,7 @@ msgstr ""
 msgid "The global data compression ratio is: "
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1099
+#: src/libdar/i_archive.cpp:1103
 #, fuzzy, c-format
 msgid ""
 "\n"
@@ -4542,16 +4542,28 @@ msgstr ""
 "räddning vid förstört innehåll i originalarkivet. Du kan återställa alla "
 "data från detta arkiv ensamt\n"
 
-#: src/libdar/i_archive.cpp:1103
+#: src/libdar/i_archive.cpp:1106
+#, fuzzy, c-format
+#| msgid "Error while opening the archive of reference: "
+msgid "\tFirst slice size of the archive of reference: %i byte(s)"
+msgstr "Fel vid öppnande av referensarkivet: "
+
+#: src/libdar/i_archive.cpp:1107
+#, fuzzy, c-format
+#| msgid "Error while opening the archive of reference: "
+msgid "\tSlice size of the archive of reference: %i byte(s)"
+msgstr "Fel vid öppnande av referensarkivet: "
+
+#: src/libdar/i_archive.cpp:1113
 #, c-format
 msgid "in-place path: %S"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1105
+#: src/libdar/i_archive.cpp:1115
 msgid "no in-place path recorded"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1133 src/libdar/i_archive.cpp:1466
+#: src/libdar/i_archive.cpp:1144 src/libdar/i_archive.cpp:1482
 msgid ""
 "This archive is not exploitable, check the archive class usage in the API "
 "documentation"
@@ -4559,48 +4571,48 @@ msgstr ""
 "Detta arkiv kan inte utnyttjas, kontrollera, hur man använder arkivklassen, "
 "i API-dokumentationen"
 
-#: src/libdar/i_archive.cpp:1226 src/libdar/i_archive.cpp:1718
-#: src/libdar/i_archive.cpp:1751
+#: src/libdar/i_archive.cpp:1242 src/libdar/i_archive.cpp:1734
+#: src/libdar/i_archive.cpp:1767
 msgid ""
 "Fetching EA value while listing an archive is not possible in sequential "
 "read mode"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1232
+#: src/libdar/i_archive.cpp:1248
 msgid "slicing focused output is not available in sequential-read mode"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1240
+#: src/libdar/i_archive.cpp:1256
 #, c-format
 msgid ""
 "Using user provided modified slicing (first slice = %i bytes, other slices = "
 "%i bytes)"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1243
+#: src/libdar/i_archive.cpp:1259
 msgid ""
 "No slice layout of the archive of reference for the current isolated "
 "catalogue is available, cannot provide slicing information, aborting"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1316
+#: src/libdar/i_archive.cpp:1332
 #, c-format
 msgid "Exception caught from archive_listing_callback execution: %s"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1321
+#: src/libdar/i_archive.cpp:1337
 msgid "Exception caught from archive_listing_callback execution"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1350
+#: src/libdar/i_archive.cpp:1366
 msgid "Error while listing archive contents: "
 msgstr "Fel vid listning av arkivinnehåll: "
 
-#: src/libdar/i_archive.cpp:1436
+#: src/libdar/i_archive.cpp:1452
 msgid "Error while comparing archive with filesystem: "
 msgstr "Fel vid jämförelse mellan arkiv och filsystem: "
 
-#: src/libdar/i_archive.cpp:1478
+#: src/libdar/i_archive.cpp:1494
 msgid ""
 "WARNING! This is an isolated catalogue, no data or EA is present in this "
 "archive, only the catalogue structure can be checked"
@@ -4608,21 +4620,21 @@ msgstr ""
 "VARNING! Detta är en isolerad katalog, inga data eller EA finns i detta "
 "arkiv, endast katalogstrukturen kan kontrolleras"
 
-#: src/libdar/i_archive.cpp:1512
+#: src/libdar/i_archive.cpp:1528
 msgid "A problem occurred while reading this archive contents: "
 msgstr "Ett problem inträffade vid läsning av innehålet i detta arkiv: "
 
-#: src/libdar/i_archive.cpp:1527
+#: src/libdar/i_archive.cpp:1543
 msgid "Error while testing archive: "
 msgstr "Fel vid arkivtest: "
 
-#: src/libdar/i_archive.cpp:1576
+#: src/libdar/i_archive.cpp:1592
 msgid ""
 "Isolation with delta signature is not possible on a just created archive (on-"
 "fly isolation)"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:2037
+#: src/libdar/i_archive.cpp:2053
 msgid ""
 "nodump flag feature has not been activated at compilation time, it is thus "
 "not available"
@@ -4630,13 +4642,13 @@ msgstr ""
 "--nodump-funktionen har ej aktiverats vid kompileringstillfället, sålunda är "
 "den ej tillgängligt"
 
-#: src/libdar/i_archive.cpp:2064
+#: src/libdar/i_archive.cpp:2080
 msgid ""
 "Cannot sequentially read an archive of reference when delta signature or "
 "delta patch is requested"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:2100
+#: src/libdar/i_archive.cpp:2116
 #, c-format
 msgid ""
 "WARNING! The archive is located in the directory to backup, this may create "
@@ -4649,63 +4661,63 @@ msgstr ""
 "\"%S.*.%S\" till kommandoraden eller ändra platsen för arkivet. (se -h för "
 "hjälp) Vill du verkligen fortsätta?"
 
-#: src/libdar/i_archive.cpp:2290
+#: src/libdar/i_archive.cpp:2306
 msgid "Ready to start writing down the archive?"
 msgstr "Klart att börja skriva till arkivet?"
 
-#: src/libdar/i_archive.cpp:2338
+#: src/libdar/i_archive.cpp:2354
 msgid "Building the catalog object..."
 msgstr ""
 
-#: src/libdar/i_archive.cpp:2356
+#: src/libdar/i_archive.cpp:2372
 #, c-format
 msgid "Error while fetching information for %S: "
 msgstr "Fel vid hämtning av information för %S: "
 
-#: src/libdar/i_archive.cpp:2420
+#: src/libdar/i_archive.cpp:2436
 #, c-format
 msgid ""
 "Warning making a differential/incremental backup with a different root "
 "directory: %S <-> %S"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:2432
+#: src/libdar/i_archive.cpp:2448
 msgid "Processing files for backup..."
 msgstr ""
 
-#: src/libdar/i_archive.cpp:2512
+#: src/libdar/i_archive.cpp:2528
 #, fuzzy
 msgid "Processing files for merging..."
 msgstr "Kontrollerar filers datumordning..."
 
-#: src/libdar/i_archive.cpp:2554
+#: src/libdar/i_archive.cpp:2570
 #, fuzzy
 msgid "Processing files for fixing..."
 msgstr "Kontrollerar filers datumordning..."
 
-#: src/libdar/i_archive.cpp:2636
+#: src/libdar/i_archive.cpp:2652
 msgid ""
 "Adding reference to files that have been destroyed since reference backup..."
 msgstr ""
 "Lägger till hänvisning till filer, som har förstörts sedan "
 "referensbackuppen..."
 
-#: src/libdar/i_archive.cpp:2691
+#: src/libdar/i_archive.cpp:2707
 msgid "Error while saving data: "
 msgstr "Fel vid datasparande: "
 
-#: src/libdar/i_archive.cpp:2717
+#: src/libdar/i_archive.cpp:2733
 msgid "WARNING! Incorrect signature found for archive, continue anyway?"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:2760
+#: src/libdar/i_archive.cpp:2776
 msgid ""
 "Cannot get data name of the archive, this archive is not completely "
 "initialized"
 msgstr ""
 "Kan ej hämta datanamn för arkivet, detta arkiv är ej helt initialiserat"
 
-#: src/libdar/i_archive.cpp:2785
+#: src/libdar/i_archive.cpp:2801
 msgid ""
 "This archive contains an isolated catalogue, it cannot be used for this "
 "operation. It can only be used as reference for a incremental/differential "
@@ -4716,7 +4728,7 @@ msgstr ""
 "säkerhetskopiering eller som säkerhetskopiering av det ursprungliga arkivets "
 "katalog"
 
-#: src/libdar/i_archive.cpp:2792
+#: src/libdar/i_archive.cpp:2808
 msgid ""
 "LAX MODE: Archive seems to be only an isolated catalogue (no data in it), "
 "Can I assume data corruption occurred and consider the archive as being a "
@@ -4726,16 +4738,16 @@ msgstr ""
 "det). Kan det antagas att data förstörts och kan det arkivet betraktas som "
 "ett riktigt arkiv?"
 
-#: src/libdar/i_archive.cpp:2797
+#: src/libdar/i_archive.cpp:2813
 msgid "Error while fetching archive properties: "
 msgstr "Fel vid hämtning av arkivegenskaper: "
 
-#: src/libdar/i_archive.cpp:2822
+#: src/libdar/i_archive.cpp:2838
 #, fuzzy
 msgid "Sorry, file size is unknown at this step of the program."
 msgstr "Tyvärr, filstorleken är okänd vid detta stadium i programmet.\n"
 
-#: src/libdar/i_archive.cpp:2921
+#: src/libdar/i_archive.cpp:2937
 #, c-format
 msgid ""
 "libgcrypt version < %s. Ligcrypt used has a bug that leads md5 and sha1 hash "
