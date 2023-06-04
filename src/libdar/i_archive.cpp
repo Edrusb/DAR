@@ -1102,9 +1102,15 @@ namespace libdar
 
 		get_ui().printf(gettext("\nWARNING! This archive only contains the catalogue of another archive, it can only be used as reference for differential backup or as rescue in case of corruption of the original archive's content. You cannot restore any data from this archive alone\n"));
 		get_ui().printf("");
-		if(first != other)
-		    get_ui().printf(gettext("\tFirst slice size of the archive of reference: %i byte(s)"), &first);
-		get_ui().printf(gettext("\tSlice size of the archive of reference: %i byte(s)"), &other);
+		get_ui().printf("Archive of reference slicing:");
+		if(other.is_zero())
+		    get_ui().printf(gettext("\tUnknown or no slicing"));
+		else
+		{
+		    if(first != other && !first.is_zero())
+			get_ui().printf(gettext("\tFirst slice : %i byte(s)"), &first);
+		    get_ui().printf(gettext("\tOther slices: %i byte(s)"), &other);
+		}
 		get_ui().printf("");
 	    }
 
