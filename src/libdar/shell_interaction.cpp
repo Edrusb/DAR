@@ -1010,7 +1010,8 @@ namespace libdar
 	    ea_state = REMOVED;
 	    break;
 	case db_etat::et_absent:
-	    throw SRC_BUG; // state not used for EA
+	    ea_state = ABSENT;
+	    break;
 	case db_etat::et_patch:
 	    throw SRC_BUG;
 	case db_etat::et_patch_unusable:
