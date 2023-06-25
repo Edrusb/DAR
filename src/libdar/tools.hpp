@@ -631,21 +631,6 @@ namespace libdar
     extern std::string tools_wstring_to_string(const std::wstring & val);
 #endif
 
-	/// allocate a new dirent structure for use with readdir_r
-	///
-	/// \param[in] path_name is the path of to the directory (and its underlying filesystem)
-	/// where the resulting dirent will be used. Depending on fileystem, the size of the dirent
-	/// structure may vary it is necessary to know the directory where the corresponding files
-	/// resides
-	/// \param[out] max_name_length is the maximum filename length allocated in the returned structure
-	/// \return a pointer to the newly allocated dirent structure
-    struct dirent *tools_allocate_struct_dirent(const std::string & path_name, U_64 & max_name_length);
-
-	/// release a dirent structure as allocated by tools_allocate_struct_dirent
-	///
-	/// \param[in] ptr is the address of the structure to release
-    extern void tools_release_struct_dirent(struct dirent *ptr);
-
 	/// display the content of a secu_string, this function is only for trouble shooting!
     extern void tools_secu_string_show(user_interaction & dialog, const std::string & msg, const secu_string & key);
 

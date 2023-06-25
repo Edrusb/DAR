@@ -91,7 +91,7 @@ PYBIND11_MODULE(libdar, mod)
 
 	virtual std::string exceptionID() const override
 	{
-	    PYBIND11_OVERLOAD_PURE(
+	    PYBIND11_OVERRIDE_PURE(
 		std::string,       // return type
 		pyEgeneric_pub,    // parent class
 		exceptionID,       // name of the method in C++ (must match Python name)
@@ -498,7 +498,7 @@ PYBIND11_MODULE(libdar, mod)
 
 	virtual bool is_covered(const std::string & expression) const override
 	{
-	    PYBIND11_OVERLOAD_PURE(
+	    PYBIND11_OVERRIDE_PURE(
 		bool,
 		libdar::mask,
 		is_covered,
@@ -507,7 +507,7 @@ PYBIND11_MODULE(libdar, mod)
 
 	virtual bool is_covered(const libdar::path & chemin) const override
 	{
-	    PYBIND11_OVERLOAD(
+	    PYBIND11_OVERRIDE(
 		bool,
 		libdar::mask,
 		is_covered,
@@ -516,7 +516,7 @@ PYBIND11_MODULE(libdar, mod)
 
 	virtual std::string dump(const std::string & prefix) const override
 	{
-	    PYBIND11_OVERLOAD_PURE(
+	    PYBIND11_OVERRIDE_PURE(
 		std::string,
 		libdar::mask,
 		dump,
@@ -525,7 +525,7 @@ PYBIND11_MODULE(libdar, mod)
 
 	virtual libdar::mask *clone() const override
 	{
-	    PYBIND11_OVERLOAD_PURE(
+	    PYBIND11_OVERRIDE_PURE(
 		libdar::mask *,
 		libdar::mask,
 		clone, // trailing comma needed for portability
@@ -638,7 +638,7 @@ PYBIND11_MODULE(libdar, mod)
     public:
 	virtual bool evaluate(const libdar::cat_nomme & first, const libdar::cat_nomme & second) const override
 	{
-	    PYBIND11_OVERLOAD_PURE(bool,
+	    PYBIND11_OVERRIDE_PURE(bool,
 				   libdar::criterium,
 				   evaluate,
 				   first,
@@ -647,7 +647,7 @@ PYBIND11_MODULE(libdar, mod)
 
 	virtual criterium *clone() const override
 	{
-	    PYBIND11_OVERLOAD_PURE(libdar::criterium *,
+	    PYBIND11_OVERRIDE_PURE(libdar::criterium *,
 				   libdar::criterium,
 				   clone,); // trailing comma expected as this method has no argument
 	};
@@ -822,7 +822,7 @@ PYBIND11_MODULE(libdar, mod)
     public:
 	virtual void get_action(const libdar::cat_nomme & first, const libdar::cat_nomme & second, libdar::over_action_data & data, libdar::over_action_ea & ea) const override
 	{
-	    PYBIND11_OVERLOAD_PURE(void,
+	    PYBIND11_OVERRIDE_PURE(void,
 				   libdar::crit_action,
 				   get_action,
 				   first,
@@ -833,7 +833,7 @@ PYBIND11_MODULE(libdar, mod)
 
 	virtual libdar::crit_action *clone() const override
 	{
-	    PYBIND11_OVERLOAD_PURE(libdar::crit_action *,
+	    PYBIND11_OVERRIDE_PURE(libdar::crit_action *,
 				   libdar::crit_action,
 				   clone,); // training comma is expected as there is no argument to this method
 	};
@@ -923,7 +923,7 @@ PYBIND11_MODULE(libdar, mod)
     protected:
 	virtual void inherited_message(const std::string & message) override
 	{
-	    PYBIND11_OVERLOAD_PURE(
+	    PYBIND11_OVERRIDE_PURE(
 		void,
 		libdar::user_interaction,
 		inherited_message,
@@ -932,7 +932,7 @@ PYBIND11_MODULE(libdar, mod)
 
 	virtual bool inherited_pause(const std::string & message) override
 	{
-	    PYBIND11_OVERLOAD_PURE(
+	    PYBIND11_OVERRIDE_PURE(
 		bool,
 		libdar::user_interaction,
 		inherited_pause,
@@ -941,7 +941,7 @@ PYBIND11_MODULE(libdar, mod)
 
 	virtual std::string inherited_get_string(const std::string & message, bool echo) override
 	{
-	    PYBIND11_OVERLOAD_PURE(
+	    PYBIND11_OVERRIDE_PURE(
 		std::string,
 		libdar::user_interaction,
 		inherited_get_string,
@@ -951,7 +951,7 @@ PYBIND11_MODULE(libdar, mod)
 
 	virtual libdar::secu_string inherited_get_secu_string(const std::string & message, bool echo) override
 	{
-	    PYBIND11_OVERLOAD_PURE(
+	    PYBIND11_OVERRIDE_PURE(
 		libdar::secu_string,
 		libdar::user_interaction,
 		inherited_get_secu_string,
@@ -979,7 +979,7 @@ PYBIND11_MODULE(libdar, mod)
 
 	virtual void set_location(const libdar::path & chemin) override
 	{
-	    PYBIND11_OVERLOAD(
+	    PYBIND11_OVERRIDE(
 		void,
 		libdar::entrepot,
 		set_location,
@@ -988,7 +988,7 @@ PYBIND11_MODULE(libdar, mod)
 
 	virtual void set_root(const libdar::path & p_root) override
 	{
-	    PYBIND11_OVERLOAD(
+	    PYBIND11_OVERRIDE(
 		void,
 		libdar::entrepot,
 		set_root,
@@ -997,7 +997,7 @@ PYBIND11_MODULE(libdar, mod)
 
 	virtual libdar::path get_full_path() const override
 	{
-	    PYBIND11_OVERLOAD(
+	    PYBIND11_OVERRIDE(
 		libdar::path,
 		libdar::entrepot,
 		get_full_path,
@@ -1006,7 +1006,7 @@ PYBIND11_MODULE(libdar, mod)
 
 	virtual std::string get_url() const override
 	{
-	    PYBIND11_OVERLOAD_PURE(
+	    PYBIND11_OVERRIDE_PURE(
 		std::string,
 		libdar::entrepot,
 		get_url,);
@@ -1014,7 +1014,7 @@ PYBIND11_MODULE(libdar, mod)
 
 	virtual const libdar::path & get_location() const override
 	{
-	    PYBIND11_OVERLOAD(
+	    PYBIND11_OVERRIDE(
 		const libdar::path &,
 		libdar::entrepot,
 		get_location,
@@ -1023,7 +1023,7 @@ PYBIND11_MODULE(libdar, mod)
 
 	virtual const libdar::path & get_root() const override
 	{
-	    PYBIND11_OVERLOAD(
+	    PYBIND11_OVERRIDE(
 		const libdar::path &,
 		libdar::entrepot,
 		get_root,
@@ -1032,7 +1032,7 @@ PYBIND11_MODULE(libdar, mod)
 
 	virtual void read_dir_reset() const override
 	{
-	    PYBIND11_OVERLOAD_PURE(
+	    PYBIND11_OVERRIDE_PURE(
 		void,
 		libdar::entrepot,
 		read_dir_reset,
@@ -1041,7 +1041,7 @@ PYBIND11_MODULE(libdar, mod)
 
 	virtual bool read_dir_next(std::string & filename) const override
 	{
-	    PYBIND11_OVERLOAD_PURE(
+	    PYBIND11_OVERRIDE_PURE(
 		bool,
 		libdar::entrepot,
 		read_dir_next,
@@ -1050,7 +1050,7 @@ PYBIND11_MODULE(libdar, mod)
 
 	virtual entrepot *clone() const override
 	{
-	    PYBIND11_OVERLOAD_PURE(
+	    PYBIND11_OVERRIDE_PURE(
 		entrepot *,
 		libdar::entrepot,
 		clone,
@@ -1066,7 +1066,7 @@ PYBIND11_MODULE(libdar, mod)
 						       bool fail_if_exists,
 						       bool erase) const override
 	{
-	    PYBIND11_OVERLOAD_PURE(
+	    PYBIND11_OVERRIDE_PURE(
 		libdar::fichier_global *,
 		libdar::entrepot,
 		inherited_open,
@@ -1080,7 +1080,7 @@ PYBIND11_MODULE(libdar, mod)
 
 	virtual void inherited_unlink(const std::string & filename) const override
 	{
-	    PYBIND11_OVERLOAD_PURE(
+	    PYBIND11_OVERRIDE_PURE(
 		void,
 		libdar::entrepot,
 		inherited_unlink,
@@ -1089,7 +1089,7 @@ PYBIND11_MODULE(libdar, mod)
 
 	virtual void read_dir_flush() override
 	{
-	    PYBIND11_OVERLOAD_PURE(
+	    PYBIND11_OVERRIDE_PURE(
 		void,
 		libdar::entrepot,
 		read_dir_flush,

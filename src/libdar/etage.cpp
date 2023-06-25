@@ -91,189 +91,157 @@ using namespace std;
 
 namespace libdar
 {
-	// check if the given file is a tag tellig if the current directory is a cache directory
+        // check if the given file is a tag telling if the current directory is a cache directory
     static bool cache_directory_tagging_check(const char *cpath, const char *filename);
 
 
     etage::etage(user_interaction &ui,
-		 const char *dirname,
-		 const datetime & x_last_acc,
-		 const datetime & x_last_mod,
-		 bool cache_directory_tagging,
-		 bool furtive_read_mode)
+                 const char *dirname,
+                 const datetime & x_last_acc,
+                 const datetime & x_last_mod,
+                 bool cache_directory_tagging,
+                 bool furtive_read_mode)
     {
         struct dirent *ret;
-	DIR *tmp = nullptr;
+        DIR *tmp = nullptr;
 #if FURTIVE_READ_MODE_AVAILABLE
-	int fddir = -1;
+        int fddir = -1;
 
-	if(furtive_read_mode)
-	{
-	    fddir = ::open(dirname, O_RDONLY|O_BINARY|O_NOATIME);
+        if(furtive_read_mode)
+        {
+            fddir = ::open(dirname, O_RDONLY|O_BINARY|O_NOATIME);
 
-	    if(fddir < 0)
+            if(fddir < 0)
+            {
+                if(errno != EPERM)
+                    throw Erange("etage::etage",
+                                 string(gettext("Error opening directory in furtive read mode: ")) + dirname + " : " + tools_strerror_r(errno));
+                else // using back normal access mode
+                {
+                    string tmp = tools_strerror_r(errno);
+                    ui.message(tools_printf(gettext("Could not open directory %s in furtive read mode (%s), using normal mode"), dirname, tmp.c_str()));
+                }
+            }
+        }
+#endif
+        try
+        {
+#if FURTIVE_READ_MODE_AVAILABLE
+            if(furtive_read_mode && fddir >= 0)
+            {
+                tmp = fdopendir(fddir);
+                if(tmp == nullptr)
+                    close(fddir);
+                    // else, tmp != nullptr:
+                    // fddir is now under control of the system
+                    // we must not close it.
+            }
+            else
+                tmp = opendir(dirname);
+#else
+            tmp = opendir(dirname);
+#endif
+            bool is_cache_dir = false;
+
+            if(tmp == nullptr)
+                throw Erange("etage::etage" , string(gettext("Error opening directory: ")) + dirname + " : " + tools_strerror_r(errno));
+
+            fichier.clear();
+	    while(!is_cache_dir && (ret = readdir(tmp)) != nullptr)
 	    {
-		if(errno != EPERM)
-		    throw Erange("etage::etage",
-				 string(gettext("Error opening directory in furtive read mode: ")) + dirname + " : " + tools_strerror_r(errno));
-		else // using back normal access mode
+		if(strcmp(ret->d_name, ".") != 0 && strcmp(ret->d_name, "..") != 0)
 		{
-		    string tmp = tools_strerror_r(errno);
-		    ui.message(tools_printf(gettext("Could not open directory %s in furtive read mode (%s), using normal mode"), dirname, tmp.c_str()));
+		    if(cache_directory_tagging)
+			is_cache_dir = cache_directory_tagging_check(dirname, ret->d_name);
+		    fichier.push_back(string(ret->d_name));
 		}
 	    }
-	}
-#endif
-	try
-	{
-#if FURTIVE_READ_MODE_AVAILABLE
-	    if(furtive_read_mode && fddir >= 0)
-	    {
-		tmp = fdopendir(fddir);
-		if(tmp == nullptr)
-		    close(fddir);
-		    // else, tmp != nullptr:
-		    // fddir is now under control of the system
-		    // we must not close it.
-	    }
-	    else
-		tmp = opendir(dirname);
-#else
-	    tmp = opendir(dirname);
-#endif
-	    bool is_cache_dir = false;
+            closedir(tmp);
+            tmp = nullptr;
 
-	    if(tmp == nullptr)
-		throw Erange("etage::etage" , string(gettext("Error opening directory: ")) + dirname + " : " + tools_strerror_r(errno));
+            if(is_cache_dir)
+            {
+                fichier.clear();
+                ui.message(tools_printf(gettext("Detected Cache Directory Tagging Standard for %s, the contents of that directory will not be saved"), dirname));
+                    // drop all the contents of the directory because it follows the Cache Directory Tagging Standard
+            }
 
-	    fichier.clear();
-
-#if HAVE_READDIR_R && (CAN_USE_READDIR_R == 1)
-    	    U_64 max_alloc_filename;
-	    struct dirent *dbldrt = nullptr;
-
-	    ret = tools_allocate_struct_dirent(dirname, max_alloc_filename);
-	    if(ret == nullptr)
-		throw SRC_BUG;
-	    try
-	    {
-		while(!is_cache_dir && (readdir_r(tmp, ret, &dbldrt) == 0) && dbldrt != nullptr)
-		{
-		    ret->d_name[max_alloc_filename] = '\0'; // yes, one byte is allocated for the terminal zero
-		    if(strlen(ret->d_name) >= max_alloc_filename)
-		    {
-			ui.message(tools_printf(gettext("Filename provided by the operating system seems truncated in directory %s, storing filename as is: %s"), dirname, ret->d_name));
-			continue;
-		    }
-#else
-		while(!is_cache_dir && (ret = readdir(tmp)) != nullptr)
-#endif
-
-		    if(strcmp(ret->d_name, ".") != 0 && strcmp(ret->d_name, "..") != 0)
-		    {
-			if(cache_directory_tagging)
-			    is_cache_dir = cache_directory_tagging_check(dirname, ret->d_name);
-			fichier.push_back(string(ret->d_name));
-		    }
-
-#if HAVE_READDIR_R && (CAN_USE_READDIR_R == 1)
-		}
-	    }
-	    catch(...)
-	    {
-		if(ret != nullptr)
-		    tools_release_struct_dirent(ret);
-		throw;
-	    }
-	    tools_release_struct_dirent(ret);
-	    ret = nullptr;
-#endif
-	    closedir(tmp);
-	    tmp = nullptr;
-
-	    if(is_cache_dir)
-	    {
-		fichier.clear();
-		ui.message(tools_printf(gettext("Detected Cache Directory Tagging Standard for %s, the contents of that directory will not be saved"), dirname));
-		    // drop all the contents of the directory because it follows the Cache Directory Tagging Standard
-	    }
-
-	    last_mod = x_last_mod;
-	    last_acc = x_last_acc;
-	}
-	catch(...)
-	{
-	    if(tmp != nullptr)
-		closedir(tmp);
-	    throw;
-	}
+            last_mod = x_last_mod;
+            last_acc = x_last_acc;
+        }
+        catch(...)
+        {
+            if(tmp != nullptr)
+                closedir(tmp);
+            throw;
+        }
     }
 
     bool etage::read(string & ref)
     {
         if(fichier.empty())
             return false;
-	else
-	{
-	    ref = fichier.front();
-	    fichier.pop_front();
-	    return true;
-	}
+        else
+        {
+            ref = fichier.front();
+            fichier.pop_front();
+            return true;
+        }
     }
 
-	///////////////////////////////////////////
-	////////////// static functions ///////////
-	///////////////////////////////////////////
+        ///////////////////////////////////////////
+        ////////////// static functions ///////////
+        ///////////////////////////////////////////
 
 
     static bool cache_directory_tagging_check(const char *cpath, const char *filename)
     {
-	bool ret = false;
+        bool ret = false;
 
-	if(strcmp(CACHE_DIR_TAG_FILENAME, filename) != 0)
-	    ret = false;
-	else // we need to inspect the few first bytes of the file
-	{
-	    try
-	    {
-		path chem = path(cpath).append(filename);
-		fichier_local fic = fichier_local(chem.display(), false);
-		U_I len = strlen(CACHE_DIR_TAG_FILENAME_CONTENTS);
-		char *buffer = new (nothrow) char[len+1];
-		S_I lu;
+        if(strcmp(CACHE_DIR_TAG_FILENAME, filename) != 0)
+            ret = false;
+        else // we need to inspect the few first bytes of the file
+        {
+            try
+            {
+                path chem = path(cpath).append(filename);
+                fichier_local fic = fichier_local(chem.display(), false);
+                U_I len = strlen(CACHE_DIR_TAG_FILENAME_CONTENTS);
+                char *buffer = new (nothrow) char[len+1];
+                S_I lu;
 
-		if(buffer == nullptr)
-		    throw Ememory("etage:cache_directory_tagging_check");
-		try
-		{
-		    lu = fic.read(buffer, len);
-		    if(lu < 0 || (U_I)(lu) < len)
-			ret = false;
-		    else
-			ret = strncmp(buffer, CACHE_DIR_TAG_FILENAME_CONTENTS, len) == 0;
-		}
-		catch(...)
-		{
-		    delete [] buffer;
-		    throw;
-		}
-		delete [] buffer;
-	    }
-	    catch(Ememory & e)
-	    {
-		throw;
-	    }
-	    catch(Ebug & e)
-	    {
-		throw;
-	    }
-	    catch(...)
-	    {
-		ret = false;
-	    }
-	}
+                if(buffer == nullptr)
+                    throw Ememory("etage:cache_directory_tagging_check");
+                try
+                {
+                    lu = fic.read(buffer, len);
+                    if(lu < 0 || (U_I)(lu) < len)
+                        ret = false;
+                    else
+                        ret = strncmp(buffer, CACHE_DIR_TAG_FILENAME_CONTENTS, len) == 0;
+                }
+                catch(...)
+                {
+                    delete [] buffer;
+                    throw;
+                }
+                delete [] buffer;
+            }
+            catch(Ememory & e)
+            {
+                throw;
+            }
+            catch(Ebug & e)
+            {
+                throw;
+            }
+            catch(...)
+            {
+                ret = false;
+            }
+        }
 
-	return ret;
+        return ret;
     }
 
 } // end of namespace

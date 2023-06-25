@@ -2280,36 +2280,6 @@ namespace libdar
     }
 #endif
 
-    struct dirent *tools_allocate_struct_dirent(const std::string & path_name, U_64 & max_name_length)
-    {
-	struct dirent *ret;
-	S_64 name_max = pathconf(path_name.c_str(), _PC_NAME_MAX);
-	U_I len;
-
-	if(name_max == -1)
-	    name_max = NAME_MAX;
-	if(name_max < NAME_MAX)
-	    name_max = NAME_MAX;
-	len = offsetof(struct dirent, d_name) + name_max + 1;
-
-	ret = (struct dirent *) new (nothrow) char[len];
-	if(ret == nullptr)
-	    throw Ememory("tools_allocate_struc_dirent");
-	memset(ret, '\0', len);
-#ifdef _DIRENT_HAVE_D_RECLEN
-	ret->d_reclen = (len / sizeof(long))*sizeof(long);
-#endif
-	max_name_length = name_max;
-
-	return ret;
-    }
-
-    void tools_release_struct_dirent(struct dirent *ptr)
-    {
-	if(ptr != nullptr)
-	    delete [] ((char *)(ptr));
-    }
-
     void tools_secu_string_show(user_interaction & dialog, const string & msg, const secu_string & key)
     {
 	string res = msg + tools_printf(" (size=%d) [", key.get_size());

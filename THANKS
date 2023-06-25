@@ -1,3 +1,8 @@
+version 2.7.10
+--------------
+Thanks to John Goerzen for patch proposal (python binding), for
+his many feedbacks and his strong support for dar/libdar software.
+
 version 2.7.9
 -------------
 Thanks to Sviat89@github for feedback, thanks to Jim Avera for feedback

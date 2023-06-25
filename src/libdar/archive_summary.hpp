@@ -56,6 +56,8 @@ namespace libdar
 	const infinint & get_slice_size() const { return slice_size; };
 	const infinint & get_first_slice_size() const { return first_slice_size; };
 	const infinint & get_last_slice_size() const { return last_slice_size; };
+	const infinint & get_ref_slice_size() const { return ref_slice_size; };
+	const infinint & get_ref_first_slice_size() const { return ref_first_slice_size; };
 	const infinint & get_slice_number() const { return slice_number; };
 	const infinint & get_archive_size() const { return archive_size; };
 	const infinint & get_catalog_size() const { return catalog_size; };
@@ -77,6 +79,8 @@ namespace libdar
 	void set_slice_size(const infinint & arg) { slice_size = arg; };
 	void set_first_slice_size(const infinint & arg) { first_slice_size = arg; };
 	void set_last_slice_size(const infinint & arg) { last_slice_size = arg; };
+	void set_ref_slice_size(const infinint & arg) { ref_slice_size = arg; };
+	void set_ref_first_slice_size(const infinint & arg) { ref_first_slice_size = arg; };
 	void set_slice_number(const infinint & arg) { slice_number = arg; };
 	void set_archive_size(const infinint & arg) { archive_size = arg; };
 	void set_catalog_size(const infinint & arg) { catalog_size = arg; };
@@ -95,9 +99,11 @@ namespace libdar
 	void clear();
 
     private:
-	infinint slice_size;          ///< slice of the first slice or zero if not applicable
-	infinint first_slice_size;    ///< slice of the middle slices or zero if not applicable
+	infinint slice_size;          ///< slice of the middle slice or zero if not applicable
+	infinint first_slice_size;    ///< slice of the first slices or zero if not applicable
 	infinint last_slice_size;     ///< slice of the last slice or zero if not applicable
+	infinint ref_slice_size;      ///< slice of the slice of the archive of reference
+	infinint ref_first_slice_size;///< slice of the first slice of the archive of reference
 	infinint slice_number;        ///< number of slices composing the archive of zero if unknown
 	infinint archive_size;        ///< total size of the archive
 	infinint catalog_size;        ///< catalogue size if known, zero if not

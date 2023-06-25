@@ -629,7 +629,7 @@ fi
 #
 # I2 - FTP repository
 #
-if echo $* | grep "I1" > /dev/null ; then
+if echo $* | grep "I2" > /dev/null ; then
 GO "I2-1" 0 $ROUTINE_DEBUG $DAR -N -w -c $DAR_FTP_REPO/$prefix$full -R $src "-@" $prefix$catf_fly -B $OPT
 GO "I2-2" 0 $ROUTINE_DEBUG $DAR -N -l $DAR_FTP_REPO/$prefix$full -B $OPT
 GO "I2-3" 0 $ROUTINE_DEBUG $DAR -N -t $DAR_FTP_REPO/$prefix$full -B $OPT

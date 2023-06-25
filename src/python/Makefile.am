@@ -49,7 +49,7 @@ else
   TARGET=
 endif
 
-AM_LDFLAGS = -shared $(GPGME_LIBS) $(LIBCURL_LIBS) $(LIBTHREADAR_LIBS) ../libdar/.libs/$(MYLIB)
+AM_LDFLAGS = -shared -Wl,--no-as-needed $(GPGME_LIBS) $(LIBCURL_LIBS) $(LIBTHREADAR_LIBS) ../libdar/.libs/$(MYLIB)
 
 all-local: $(TARGET)
 

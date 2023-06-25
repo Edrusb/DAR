@@ -13,6 +13,15 @@ from 2.7.x to 2.8.0
 - using early_memory_release from dar CLI when sequential-read mode is used
 - adding -qcrypto option
 
+from 2.7.9 to 2.7.10
+- displaying the slicing information about the archive of reference
+  stored within a isolated catalogue when using -l and -q options
+- cleanup code from obsolete and unused readdir_r invocation
+- fixing display bug in dar_manager (shell_interaction class of libdar)
+- fixing python binding build system with the John Goerzen's proposal
+- replacing the deprecated PYBIND11_OVERLOAD_* by PYBIND11_OVERRIDE_*
+  equivalents
+
 from 2.7.8 to 2.7.9
 - added sanity check in elastic buffer code upon Sviat89@github
   feedback.
