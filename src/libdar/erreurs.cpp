@@ -50,7 +50,6 @@ namespace libdar
 	// subsequent action are read-only (once initialized is true).
 
     static void init();
-    static void inattendue();
     static void notcatched();
 
     const char *dar_gettext(const char *arg)
@@ -160,22 +159,8 @@ namespace libdar
 
     static void init()
     {
-        set_unexpected(inattendue);
         set_terminate(notcatched);
         initialized = true;
-    }
-
-    static void inattendue()
-    {
-        cerr << "###############################################" << endl;
-        cerr << gettext("#   UNEXPECTED EXCEPTION,                     #") << endl;
-        cerr << gettext("#                         E X I T I N G !     #") << endl;
-        cerr << "#                                             #" << endl;
-        cerr << "###############################################" << endl;
-        cerr << tools_printf(gettext(" THANKS TO REPORT THE PREVIOUS OUTPUT TO MAINTAINER\n GIVING A DESCRIPTION OF THE CIRCUMSTANCES.")) << endl;
-	cerr << tools_printf(gettext(" IF POSSIBLE TRY TO REPRODUCE THIS ERROR, A\n SCENARIO THAT CAN REPRODUCE IT WOULD HELP MUCH\n IN SOLVING THIS PROBLEM.                THANKS")) << endl;
-        exit(3); // this was exit code for bugs at the time this code was part of dar
-	    // now it is part of libdar, while exit code stay defined in typical command line code (dar_suite software)
     }
 
     static void notcatched()
