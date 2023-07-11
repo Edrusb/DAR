@@ -1,6 +1,7 @@
 from 2.7.10 to 2.7.11
 - removed set_unexpected() invocation (not useful for years in libdar
   and incompatible with C++17)
+- fixed generated dynamic libdar binary to include all its dependent libraries
 
 from 2.7.9 to 2.7.10
 - displaying the slicing information about the archive of reference

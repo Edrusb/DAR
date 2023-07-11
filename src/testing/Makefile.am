@@ -21,14 +21,14 @@
 
 if BUILD_MODE32
     MYLIB=libdar32
-    AM_CPPFLAGS=-DLIBDAR_MODE=32 -I'$(srcdir)/../dar_suite' -I'$(srcdir)/../libdar' -I../dar_suite -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF) $(GPGME_CFLAGS) $(LIBCURL_CFLAGS) $(LIBTHREADAR_CFLAGS)
+    AM_CPPFLAGS=-DLIBDAR_MODE=32 -I'$(srcdir)/../dar_suite' -I'$(srcdir)/../libdar' -I../dar_suite -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF)
 else
 if BUILD_MODE64
     MYLIB=libdar64
-    AM_CPPFLAGS=-DLIBDAR_MODE=64 -I'$(srcdir)/../dar_suite' -I'$(srcdir)/../libdar' -I../dar_suite -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF) $(GPGME_CFLAGS) $(LIBCURL_CFLAGS) $(LIBTHREADAR_CFLAGS)
+    AM_CPPFLAGS=-DLIBDAR_MODE=64 -I'$(srcdir)/../dar_suite' -I'$(srcdir)/../libdar' -I../dar_suite -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF)
 else
     MYLIB=libdar
-    AM_CPPFLAGS=-I'$(srcdir)/../dar_suite' -I'$(srcdir)/../libdar' -I../dar_suite -DDAR_LOCALEDIR=\"$(localedir)\"  -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF) $(GPGME_CFLAGS) $(LIBCURL_CFLAGS) $(LIBTHREADAR_CFLAGS)
+    AM_CPPFLAGS=-I'$(srcdir)/../dar_suite' -I'$(srcdir)/../libdar' -I../dar_suite -DDAR_LOCALEDIR=\"$(localedir)\"  -DDAR_SYS_DIR=\"$(system_path)\" $(CPP_PROF)
 endif
 endif
 
@@ -43,7 +43,7 @@ endif
 
 noinst_PROGRAMS = test_hide_file test_terminateur test_catalogue test_infinint test_tronc test_compressor test_mask test_tuyau test_deci test_path test_erreurs test_sar test_filesystem test_scrambler test_generic_file test_storage test_limitint test_libdar test_cache test_tronconneuse test_elastic test_blowfish test_mask_list test_escape test_hash_fichier moving_file hashsum test_crypto_asym test_range $(LIBTHREADAR_TEST_MODULES) test_rsync test_smart_pointer test_datetime test_entrepot_libcurl test_truncate test_mycurl_param_list
 
-LDADD = ../libdar/$(MYLIB).la $(LIBCURL_LIBS) $(GPGME_LIBS) $(LIBTHREADAR_LIBS) $(LTLIBINTL)
+LDADD = ../libdar/$(MYLIB).la $(LTLIBINTL)
 
 if DEBUG_STATIC
 AM_LDFLAGS = -all-static
