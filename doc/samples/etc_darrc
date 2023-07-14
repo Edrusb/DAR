@@ -58,6 +58,8 @@ compress-exclusion:
 -Z "*.mp4*"
 -Z "*.mpeg"
 -Z "*.mpg"
+-Z "*.mts"
+-Z "*.m2ts"
 -Z "*.oga"
 -Z "*.swf"
 -Z "*.vob"
@@ -121,6 +123,7 @@ compress-exclusion:
 -Z "*.wz"
 -Z "*.xz"
 -Z "*.zst"
+-Z "*.zstd"
 # These are zip files. Not all are compressed, but considering that they can
 # get quite large it is probably more prudent to leave this uncommented.
 -Z "*.pk3"
@@ -133,9 +136,12 @@ compress-exclusion:
 # Other, in alphabetical order.
 -Z "*.Po"
 -Z "*.aar"
+-Z "*.azw"
+-Z "*.azw3"
 -Z "*.bx"
 -Z "*.chm"
--Z "*.doc"
+-Z "*.djvu"
+-Z "*.docx"
 -Z "*.epub"
 -Z "*.f3d"
 -Z "*.gpg"
@@ -145,12 +151,16 @@ compress-exclusion:
 -Z "*.jin"
 -Z "*.ods"
 -Z "*.odt"
+-Z "*.odp"
+-Z "*.pdf"
+-Z "*.pptx"
 -Z "*.ser"
 -Z "*.svgz"
 -Z "*.swx"
 -Z "*.sxi"
 -Z "*.whl"
 -Z "*.wings"
+-Z "*.xlsx"
 
 # These are blender bake files. Compression on these is optional in blender.
 # Blender's compression algorithm is better at compressing these than xz or
