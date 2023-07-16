@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: DAR 2.7.0\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612&atid=511612\n"
-"POT-Creation-Date: 2023-06-25 15:17+0200\n"
-"PO-Revision-Date: 2023-06-25 15:19+0200\n"
+"POT-Creation-Date: 2023-07-16 20:27+0200\n"
+"PO-Revision-Date: 2023-07-16 20:31+0200\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
 "Language: fr\n"
@@ -5484,29 +5484,29 @@ msgstr ""
 msgid "Unknown escape sequence type"
 msgstr "Type de séquence d'échappement inconnue"
 
-#: src/libdar/erreurs.cpp:123
+#: src/libdar/erreurs.cpp:122
 #, c-format
 msgid "File %S line %d"
 msgstr "Fichier %S ligne %d"
 
-#: src/libdar/erreurs.cpp:123
+#: src/libdar/erreurs.cpp:122
 msgid "it seems to be a bug here"
 msgstr "Il semble qu'il y ait un bogue ici"
 
-#: src/libdar/erreurs.cpp:152
+#: src/libdar/erreurs.cpp:151
 #, c-format
 msgid "in file %S line %S"
 msgstr "dans le fichier %S ligne %S"
 
-#: src/libdar/erreurs.cpp:171
-msgid "#   UNEXPECTED EXCEPTION,                     #"
-msgstr "#   EXCEPTION NON ATTENDUE,                   #"
+#: src/libdar/erreurs.cpp:169
+msgid "#   NOT CAUGHT EXCEPTION,                     #"
+msgstr "#   EXCEPTION NON ATTRAPÉE,                   #"
 
-#: src/libdar/erreurs.cpp:172 src/libdar/erreurs.cpp:185
+#: src/libdar/erreurs.cpp:170
 msgid "#                         E X I T I N G !     #"
 msgstr "#                         A B A N D O N !     #"
 
-#: src/libdar/erreurs.cpp:175 src/libdar/erreurs.cpp:188
+#: src/libdar/erreurs.cpp:173
 msgid ""
 " THANKS TO REPORT THE PREVIOUS OUTPUT TO MAINTAINER\n"
 " GIVING A DESCRIPTION OF THE CIRCUMSTANCES."
@@ -5514,21 +5514,7 @@ msgstr ""
 " MERCI DE REPORTER L'AFFICHAGE PRÉCÉDENT AU MAINTENEUR\n"
 " EN DONNANT UNE DESCRIPTION DES CIRCONSTANCES."
 
-#: src/libdar/erreurs.cpp:176
-msgid ""
-" IF POSSIBLE TRY TO REPRODUCE THIS ERROR, A\n"
-" SCENARIO THAT CAN REPRODUCE IT WOULD HELP MUCH\n"
-" IN SOLVING THIS PROBLEM.                THANKS"
-msgstr ""
-" SI POSSIBLE ESSAYEZ DE REPRODUIRE L'ERREUR, UN\n"
-" SCÉNARIO QUI PERMET DE LA REPRODUIRE SERAIT UTILE\n"
-" POUR CORRIGER CE PROBLÈME.                 MERCI"
-
-#: src/libdar/erreurs.cpp:184
-msgid "#   NOT CAUGHT EXCEPTION,                     #"
-msgstr "#   EXCEPTION NON ATTRAPÉE,                   #"
-
-#: src/libdar/erreurs.cpp:189
+#: src/libdar/erreurs.cpp:174
 msgid ""
 " IF POSSIBLE TRY TO PRODUCE THIS ERROR, A\n"
 " SCENARIO THAT CAN REPRODUCE IT WOULD HELP MUCH\n"
@@ -8923,15 +8909,17 @@ msgid "FATAL error from operating system, aborting operation: "
 msgstr ""
 "Erreur FATALE provenant du système d'exploitation, abandon de l'opération : "
 
-#, fuzzy, c-format
-#~| msgid "Error while opening the archive of reference: "
-#~ msgid "\tFirst slice size of the archive of reference: %i byte(s)"
-#~ msgstr "Erreur lors de l'ouverture de l'archive de référence : "
+#~ msgid "#   UNEXPECTED EXCEPTION,                     #"
+#~ msgstr "#   EXCEPTION NON ATTENDUE,                   #"
 
-#, fuzzy, c-format
-#~| msgid "Error while opening the archive of reference: "
-#~ msgid "\tSlice size of the archive of reference: %i byte(s)"
-#~ msgstr "Erreur lors de l'ouverture de l'archive de référence : "
+#~ msgid ""
+#~ " IF POSSIBLE TRY TO REPRODUCE THIS ERROR, A\n"
+#~ " SCENARIO THAT CAN REPRODUCE IT WOULD HELP MUCH\n"
+#~ " IN SOLVING THIS PROBLEM.                THANKS"
+#~ msgstr ""
+#~ " SI POSSIBLE ESSAYEZ DE REPRODUIRE L'ERREUR, UN\n"
+#~ " SCÉNARIO QUI PERMET DE LA REPRODUIRE SERAIT UTILE\n"
+#~ " POUR CORRIGER CE PROBLÈME.                 MERCI"
 
 #, c-format
 #~ msgid ""

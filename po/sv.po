@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: sv\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612&atid=511612\n"
-"POT-Creation-Date: 2023-06-25 15:17+0200\n"
+"POT-Creation-Date: 2023-07-16 20:27+0200\n"
 "PO-Revision-Date: 2012-04-15 11:28+0200\n"
 "Last-Translator: Peter Landgren <peter.talken@telia.com>\n"
 "Language-Team: Swedish <kde-i18n-doc@kde.org>\n"
@@ -5296,29 +5296,29 @@ msgstr ""
 msgid "Unknown escape sequence type"
 msgstr "Okänd escape-sekvenstyp"
 
-#: src/libdar/erreurs.cpp:123
+#: src/libdar/erreurs.cpp:122
 #, c-format
 msgid "File %S line %d"
 msgstr "Fil %S rad %d"
 
-#: src/libdar/erreurs.cpp:123
+#: src/libdar/erreurs.cpp:122
 msgid "it seems to be a bug here"
 msgstr "det verkar vara en bugg här"
 
-#: src/libdar/erreurs.cpp:152
+#: src/libdar/erreurs.cpp:151
 #, c-format
 msgid "in file %S line %S"
 msgstr "i fil %S rad %S"
 
-#: src/libdar/erreurs.cpp:171
-msgid "#   UNEXPECTED EXCEPTION,                     #"
-msgstr "#   OVÄNTAT AVBROTT,                          #"
+#: src/libdar/erreurs.cpp:169
+msgid "#   NOT CAUGHT EXCEPTION,                     #"
+msgstr "#   ICKE FÅNGAT AVBROTT,                      #"
 
-#: src/libdar/erreurs.cpp:172 src/libdar/erreurs.cpp:185
+#: src/libdar/erreurs.cpp:170
 msgid "#                         E X I T I N G !     #"
 msgstr "#                       A V B B Y T E R !     #"
 
-#: src/libdar/erreurs.cpp:175 src/libdar/erreurs.cpp:188
+#: src/libdar/erreurs.cpp:173
 msgid ""
 " THANKS TO REPORT THE PREVIOUS OUTPUT TO MAINTAINER\n"
 " GIVING A DESCRIPTION OF THE CIRCUMSTANCES."
@@ -5326,21 +5326,7 @@ msgstr ""
 " TACKSAM FÖR RAPPORT OM FÖREGÅENDE UTMATNING TILL UNDERHÅLLAREN\n"
 " MED EN BESKRIVNING AV OMSTÄNDIGHETERNA."
 
-#: src/libdar/erreurs.cpp:176
-msgid ""
-" IF POSSIBLE TRY TO REPRODUCE THIS ERROR, A\n"
-" SCENARIO THAT CAN REPRODUCE IT WOULD HELP MUCH\n"
-" IN SOLVING THIS PROBLEM.                THANKS"
-msgstr ""
-" OM MÖJLIGT FÖRSÖK ATT ÅTERSKAPA DETTA FEL,\n"
-"ETT SCENARIO SOM KAN ÅTERSKAPA DET ÄR TILL STOR HJÄLP\n"
-" VID PROBLEMSLÖSNINGEN              TACK"
-
-#: src/libdar/erreurs.cpp:184
-msgid "#   NOT CAUGHT EXCEPTION,                     #"
-msgstr "#   ICKE FÅNGAT AVBROTT,                      #"
-
-#: src/libdar/erreurs.cpp:189
+#: src/libdar/erreurs.cpp:174
 msgid ""
 " IF POSSIBLE TRY TO PRODUCE THIS ERROR, A\n"
 " SCENARIO THAT CAN REPRODUCE IT WOULD HELP MUCH\n"
@@ -8630,6 +8616,18 @@ msgstr "EN INTE IMPLEMENTERAD FUNKTION har använts: "
 #, fuzzy
 msgid "FATAL error from operating system, aborting operation: "
 msgstr "FATALT fel, avbryter åtgärd"
+
+#~ msgid "#   UNEXPECTED EXCEPTION,                     #"
+#~ msgstr "#   OVÄNTAT AVBROTT,                          #"
+
+#~ msgid ""
+#~ " IF POSSIBLE TRY TO REPRODUCE THIS ERROR, A\n"
+#~ " SCENARIO THAT CAN REPRODUCE IT WOULD HELP MUCH\n"
+#~ " IN SOLVING THIS PROBLEM.                THANKS"
+#~ msgstr ""
+#~ " OM MÖJLIGT FÖRSÖK ATT ÅTERSKAPA DETTA FEL,\n"
+#~ "ETT SCENARIO SOM KAN ÅTERSKAPA DET ÄR TILL STOR HJÄLP\n"
+#~ " VID PROBLEMSLÖSNINGEN              TACK"
 
 #, fuzzy, c-format
 #~| msgid "Error while opening the archive of reference: "
