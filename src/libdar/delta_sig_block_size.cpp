@@ -44,11 +44,11 @@ namespace libdar
 {
     void delta_sig_block_size::reset()
     {
-	fs_function = fixed;
-	multiplier = RS_DEFAULT_BLOCK_LEN;
+	fs_function = square2;
+	multiplier = 1;
 	divisor = 1;
 	min_block_len = RS_DEFAULT_BLOCK_LEN;
-	max_block_len = 0;
+	max_block_len = 128*1024;
     }
 
     bool delta_sig_block_size::operator == (const delta_sig_block_size & ref) const

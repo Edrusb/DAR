@@ -1040,12 +1040,11 @@ square2
 returns the approximated value of the square root of the file size. Note that for better performance and as accuracy is not important here, this function is implemented as exp2(log2(filesize)/2) where exp2 and log2 are based on the integer left and right bit shift operations.
 .TP
 square3
-returns the approximated value of the cube root of filesize, implemented as exp2(log(filesize)/3)
+returns the approximated value of the cube root of filesize, implemented as exp2(log2(filesize)/3)
 .RE
-.br
-.br
+.PP
 .RS
-All numerical fields can receive multiplier suffix (k, M, ...) for more details about these suffixes, see -s option description. If not specified
+All numerical fields can receive multiplier suffix (k, M, ...) for more details about these suffixes, see -s option description. If not specified,
 .B
 "max"
 defaults to zero (no maximum value defined). If not specified
@@ -1055,7 +1054,13 @@ defaults to RS_DEFAULT_BLOCK_LEN (see below for details on this symbol). If not 
 .B
 "divisor"
 defaults to 1. Using "--delta sig" without additional fields is equivalent to using
-.B --delta sig:fixed:RS_DEFAULT_BLOCK_LEN
+.B
+--delta sig:fixed:RS_DEFAULT_BLOCK_LEN
+up to dar/libdar version 2.7.10. Starting release 2.7.11, the default is equivalent to use
+.B
+--delta sig:square2:1:1:RS_DEFAULT_BLOCK_LEN:128k
+,
+which is _almost_ what is used by rsync command line tool (rsync use rather 700 bytes as minimum block size),
 where "RS_DEFAULT_BLOCK_LEN" is taken from librsync and is today equal to 2048 bytes (which may well change in the future by the way if librsync maintainers decide to do so).
 .RE
 
