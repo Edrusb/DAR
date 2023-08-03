@@ -5,6 +5,8 @@ from 2.7.10 to 2.7.11
 - modified default block size for binary deltas, to be closer to what rsync
   uses (more details in man page).
 - Improve compression exclusions
+- adding support for ronna (10^27) and quetta (10^30) new SI prefixes, R
+  and Q respectively
 
 from 2.7.9 to 2.7.10
 - displaying the slicing information about the archive of reference
