@@ -4,9 +4,11 @@ from 2.7.10 to 2.7.11
 - fixed generated dynamic libdar binary to include all its dependent libraries
 - modified default block size for binary deltas, to be closer to what rsync
   uses (more details in man page).
-- Improve compression exclusions
+- Improved compression exclusions
 - adding support for ronna (10^27) and quetta (10^30) new SI prefixes, R
   and Q respectively
+- fixing bug in infinint class met when extending underlying storage by zero
+  bytes
 
 from 2.7.9 to 2.7.10
 - displaying the slicing information about the archive of reference

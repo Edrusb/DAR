@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: sv\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612&atid=511612\n"
-"POT-Creation-Date: 2023-07-16 20:27+0200\n"
+"POT-Creation-Date: 2023-08-03 20:34+0200\n"
 "PO-Revision-Date: 2012-04-15 11:28+0200\n"
 "Last-Translator: Peter Landgren <peter.talken@telia.com>\n"
 "Language-Team: Swedish <kde-i18n-doc@kde.org>\n"
@@ -1344,7 +1344,7 @@ msgstr "OK, behåller %S som basnamn"
 msgid "Auto detecting min-digits to be %i"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1568 src/libdar/tools.cpp:2112
+#: src/dar_suite/line_tools.cpp:1568 src/libdar/tools.cpp:2117
 msgid "Cannot get full path of current working directory: "
 msgstr "Kan ej få komplett sökväg till gällande arbetsmapp: "
 
@@ -2885,15 +2885,15 @@ msgstr ""
 msgid "The iterator is not indexing the object it has been defined for"
 msgstr "'Iteratorn' indexerar inte det objekt som den har definierats för"
 
-#: src/libdar/storage.cpp:779 src/libdar/storage.cpp:844
+#: src/libdar/storage.cpp:781 src/libdar/storage.cpp:846
 msgid "Iterator does not point to data"
 msgstr "'Iteratorn' pekar inte på data"
 
-#: src/libdar/storage.cpp:838
+#: src/libdar/storage.cpp:840
 msgid "Reference storage of the iterator is empty or non existent"
 msgstr "Referenslager hos iteratorn är tomt eller finns ej"
 
-#: src/libdar/storage.cpp:855
+#: src/libdar/storage.cpp:857
 msgid "The iterator position is not inside the storage of reference"
 msgstr "Iteratorns position är ej innanför referensens lagringsutrymme"
 
@@ -5044,16 +5044,16 @@ msgstr "Kan ej sätta senaste tillgångtid och senaste modifieringstid: "
 msgid "Cannot get size of %S: not a plain file"
 msgstr ""
 
-#: src/libdar/tools.cpp:1415
+#: src/libdar/tools.cpp:1420
 #, c-format
 msgid "Unknown suffix [%c] in string %S"
 msgstr "Okänt suffix [%c] i sträng %S"
 
-#: src/libdar/tools.cpp:1442
+#: src/libdar/tools.cpp:1447
 msgid "Unknown substitution string: %"
 msgstr "Okänd utbytessträng :%"
 
-#: src/libdar/tools.cpp:1449
+#: src/libdar/tools.cpp:1454
 #, fuzzy
 msgid ""
 "last char of user command-line to execute is '%', (use '%%' instead to avoid "
@@ -5062,122 +5062,122 @@ msgstr ""
 "sista tecknet i användarkommandoraden är '%', (använd '%%' i stället så "
 "undviks detta meddelande). Ignorera det och fortsätta ?"
 
-#: src/libdar/tools.cpp:1505
+#: src/libdar/tools.cpp:1510
 msgid "execve() failed. (process table is full ?)"
 msgstr "execve() misslyckades. (full processtabell ?)"
 
-#: src/libdar/tools.cpp:1507
+#: src/libdar/tools.cpp:1512
 msgid "system() call failed: "
 msgstr "system()-anrop misslyckades: "
 
-#: src/libdar/tools.cpp:1509
+#: src/libdar/tools.cpp:1514
 #, c-format
 msgid "execution of [ %S ] returned error code: %d"
 msgstr "utförande av [ %S ] resulterade i felkod: %d"
 
-#: src/libdar/tools.cpp:1516
+#: src/libdar/tools.cpp:1521
 msgid "Error during user command line execution: "
 msgstr "Fel vid utförande av användarkommandoradsexekvering: "
 
-#: src/libdar/tools.cpp:1516
+#: src/libdar/tools.cpp:1521
 msgid " . Retry command-line ?"
 msgstr " . Försöka med kommandoraden igen ?"
 
-#: src/libdar/tools.cpp:1521
+#: src/libdar/tools.cpp:1526
 msgid "Ignore previous error on user command line and continue ?"
 msgstr "Ignorera föregående fel från användarkommandorad och fortsätta ?"
 
-#: src/libdar/tools.cpp:1563
+#: src/libdar/tools.cpp:1568
 msgid "Fatal error on user command line: "
 msgstr "Ödesdigert fel i användarkommandorad: "
 
-#: src/libdar/tools.cpp:1645 src/libdar/tools.cpp:1651
+#: src/libdar/tools.cpp:1650 src/libdar/tools.cpp:1656
 #, fuzzy
 msgid "Badly formated octal number"
 msgstr "Dåligt formaterad databas"
 
-#: src/libdar/tools.cpp:1756
+#: src/libdar/tools.cpp:1761
 #, fuzzy
 msgid "Cannot get effective permission given a file descriptor: "
 msgstr "Kan ej återställe behörigheter för %s : %s"
 
-#: src/libdar/tools.cpp:1772
+#: src/libdar/tools.cpp:1777
 #, c-format
 msgid "Error while setting file permission: %s"
 msgstr "Fel vid tilldelning av en fils egenskaper:%s"
 
-#: src/libdar/tools.cpp:1793
+#: src/libdar/tools.cpp:1798
 #, fuzzy
 msgid "An empty string is not a valid user name"
 msgstr "En tom sträng är ej en giltig sökväg"
 
-#: src/libdar/tools.cpp:1831 src/libdar/tools.cpp:1853
+#: src/libdar/tools.cpp:1836 src/libdar/tools.cpp:1858
 #, fuzzy
 msgid "Unknown user"
 msgstr "Okänd användare: %S"
 
-#: src/libdar/tools.cpp:1833 src/libdar/tools.cpp:1855
+#: src/libdar/tools.cpp:1838 src/libdar/tools.cpp:1860
 #, fuzzy, c-format
 msgid "Error found while looking for UID of user %s: %S"
 msgstr "Fel vid anrop av fork() för att starta dar: "
 
-#: src/libdar/tools.cpp:1863 src/libdar/tools.cpp:1957
+#: src/libdar/tools.cpp:1868 src/libdar/tools.cpp:1962
 msgid ""
 "Cannot convert username to uid in statically linked binary, either directly "
 "provide the UID or run libdar from a dynamically linked executable"
 msgstr ""
 
-#: src/libdar/tools.cpp:1888
+#: src/libdar/tools.cpp:1893
 #, fuzzy
 msgid "An empty string is not a valid group name"
 msgstr "En tom sträng är ej en giltig sökväg"
 
-#: src/libdar/tools.cpp:1924 src/libdar/tools.cpp:1947
+#: src/libdar/tools.cpp:1929 src/libdar/tools.cpp:1952
 #, fuzzy
 msgid "Unknown group"
 msgstr "Okänd användare: %S"
 
-#: src/libdar/tools.cpp:1926
+#: src/libdar/tools.cpp:1931
 #, c-format
 msgid "Error found while looking fo GID of group %s: %S"
 msgstr ""
 
-#: src/libdar/tools.cpp:1949
+#: src/libdar/tools.cpp:1954
 #, fuzzy, c-format
 msgid "Error found while looking for GID of group %s: %S"
 msgstr "Fel vid anrop av fork() för att starta dar: "
 
-#: src/libdar/tools.cpp:1986
+#: src/libdar/tools.cpp:1991
 #, c-format
 msgid "Error while setting file user ownership: %s"
 msgstr "Fel vid inställning av ägare till fil: %s"
 
-#: src/libdar/tools.cpp:2145
+#: src/libdar/tools.cpp:2150
 #, fuzzy
 msgid "Worse"
 msgstr "[Värre]"
 
-#: src/libdar/tools.cpp:2165
+#: src/libdar/tools.cpp:2170
 #, c-format
 msgid "Error code %d to message conversion failed"
 msgstr ""
 
-#: src/libdar/tools.cpp:2220
+#: src/libdar/tools.cpp:2225
 #, fuzzy
 msgid "Invalid wide-char found in string: "
 msgstr "Ogiltigt tal i sträng: %S"
 
-#: src/libdar/tools.cpp:2249
+#: src/libdar/tools.cpp:2254
 #, fuzzy
 msgid "Invalid wide-char found in string:"
 msgstr "Ogiltigt tal i sträng: %S"
 
-#: src/libdar/tools.cpp:2303
+#: src/libdar/tools.cpp:2308
 #, fuzzy, c-format
 msgid "Error unlinking %S: %S"
 msgstr "Fel vid öppning av %s : "
 
-#: src/libdar/tools.cpp:2350
+#: src/libdar/tools.cpp:2355
 msgid ""
 "Cannot convert negative floating point value to unsigned (positive) integer"
 msgstr ""

@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: DAR 2.7.0\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612&atid=511612\n"
-"POT-Creation-Date: 2023-07-16 20:27+0200\n"
+"POT-Creation-Date: 2023-08-03 20:34+0200\n"
 "PO-Revision-Date: 2023-07-16 20:31+0200\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
@@ -1385,7 +1385,7 @@ msgid "Auto detecting min-digits to be %i"
 msgstr ""
 "Détection automatique de %i chiffre(s) minimum(s) pour les numéros de tranche"
 
-#: src/dar_suite/line_tools.cpp:1568 src/libdar/tools.cpp:2112
+#: src/dar_suite/line_tools.cpp:1568 src/libdar/tools.cpp:2117
 msgid "Cannot get full path of current working directory: "
 msgstr "Impossible d'obtenir le chemin complet du répertoire courant : "
 
@@ -2945,15 +2945,15 @@ msgstr ""
 msgid "The iterator is not indexing the object it has been defined for"
 msgstr "L'itérateur n'indexe pas l'objet pour lequel il a été défini"
 
-#: src/libdar/storage.cpp:779 src/libdar/storage.cpp:844
+#: src/libdar/storage.cpp:781 src/libdar/storage.cpp:846
 msgid "Iterator does not point to data"
 msgstr "L'itérateur ne pointe pas sur des données"
 
-#: src/libdar/storage.cpp:838
+#: src/libdar/storage.cpp:840
 msgid "Reference storage of the iterator is empty or non existent"
 msgstr "Le \"storage\" de référence de l'itérateur est vide ou non existant"
 
-#: src/libdar/storage.cpp:855
+#: src/libdar/storage.cpp:857
 msgid "The iterator position is not inside the storage of reference"
 msgstr ""
 "La position de l'itérateur n'est pas contenue dans le \"storage\" de "
@@ -5219,16 +5219,16 @@ msgstr "Impossible d'obtenir la date de dernière modification : %s"
 msgid "Cannot get size of %S: not a plain file"
 msgstr "Impossible de connaître la taill de %S: ce n'est pas un fichier plein"
 
-#: src/libdar/tools.cpp:1415
+#: src/libdar/tools.cpp:1420
 #, c-format
 msgid "Unknown suffix [%c] in string %S"
 msgstr "Suffixe inconnu [%c] dans la chaîne %S"
 
-#: src/libdar/tools.cpp:1442
+#: src/libdar/tools.cpp:1447
 msgid "Unknown substitution string: %"
 msgstr "Chaîne de substitution inconnue : %"
 
-#: src/libdar/tools.cpp:1449
+#: src/libdar/tools.cpp:1454
 msgid ""
 "last char of user command-line to execute is '%', (use '%%' instead to avoid "
 "this message)"
@@ -5236,67 +5236,67 @@ msgstr ""
 "Le dernier caractère de la ligne de commande utilisateur à exécuter est '%', "
 "(utiliser '%%' à la place pour éviter ce message)"
 
-#: src/libdar/tools.cpp:1505
+#: src/libdar/tools.cpp:1510
 msgid "execve() failed. (process table is full ?)"
 msgstr "execve() a échoué. (table de processus pleine ?)"
 
-#: src/libdar/tools.cpp:1507
+#: src/libdar/tools.cpp:1512
 msgid "system() call failed: "
 msgstr "system() a échoué : "
 
-#: src/libdar/tools.cpp:1509
+#: src/libdar/tools.cpp:1514
 #, c-format
 msgid "execution of [ %S ] returned error code: %d"
 msgstr "l'exécution de [ %S ] a retourné un code d'erreur : %d"
 
-#: src/libdar/tools.cpp:1516
+#: src/libdar/tools.cpp:1521
 msgid "Error during user command line execution: "
 msgstr "Erreur pendant l'exécution de la ligne de commande utilisateur : "
 
-#: src/libdar/tools.cpp:1516
+#: src/libdar/tools.cpp:1521
 msgid " . Retry command-line ?"
 msgstr " . Essayer à nouveau la ligne de commande ?"
 
-#: src/libdar/tools.cpp:1521
+#: src/libdar/tools.cpp:1526
 msgid "Ignore previous error on user command line and continue ?"
 msgstr ""
 "Ignorer l'erreur précédente concernant la ligne de commande utilisateur et "
 "continuer ?"
 
-#: src/libdar/tools.cpp:1563
+#: src/libdar/tools.cpp:1568
 msgid "Fatal error on user command line: "
 msgstr "Erreur fatale sur la ligne de commande utilisateur : "
 
-#: src/libdar/tools.cpp:1645 src/libdar/tools.cpp:1651
+#: src/libdar/tools.cpp:1650 src/libdar/tools.cpp:1656
 msgid "Badly formated octal number"
 msgstr "Nombre octal malformée"
 
-#: src/libdar/tools.cpp:1756
+#: src/libdar/tools.cpp:1761
 msgid "Cannot get effective permission given a file descriptor: "
 msgstr ""
 "Impossible d'obtenir les droits d'accès à partir d'un description de "
 "fichier : "
 
-#: src/libdar/tools.cpp:1772
+#: src/libdar/tools.cpp:1777
 #, c-format
 msgid "Error while setting file permission: %s"
 msgstr "Erreur lors de la configuration des droits d'accès : %s"
 
-#: src/libdar/tools.cpp:1793
+#: src/libdar/tools.cpp:1798
 msgid "An empty string is not a valid user name"
 msgstr "Une chaîne vide n'est pas un nom d'utilisateur valide"
 
-#: src/libdar/tools.cpp:1831 src/libdar/tools.cpp:1853
+#: src/libdar/tools.cpp:1836 src/libdar/tools.cpp:1858
 msgid "Unknown user"
 msgstr "Utilisateur inconnu"
 
-#: src/libdar/tools.cpp:1833 src/libdar/tools.cpp:1855
+#: src/libdar/tools.cpp:1838 src/libdar/tools.cpp:1860
 #, c-format
 msgid "Error found while looking for UID of user %s: %S"
 msgstr ""
 "Erreur rencontrée lors de la recherche de l'UID pour l'utilisateur %s: %S"
 
-#: src/libdar/tools.cpp:1863 src/libdar/tools.cpp:1957
+#: src/libdar/tools.cpp:1868 src/libdar/tools.cpp:1962
 msgid ""
 "Cannot convert username to uid in statically linked binary, either directly "
 "provide the UID or run libdar from a dynamically linked executable"
@@ -5305,52 +5305,52 @@ msgstr ""
 "executable lié statiquement. Fournir soit directement l'UID soit utiliser un "
 "exécutable lié dynamiquement"
 
-#: src/libdar/tools.cpp:1888
+#: src/libdar/tools.cpp:1893
 msgid "An empty string is not a valid group name"
 msgstr "Une chaîne vide n'est pas un nom de groupe valide"
 
-#: src/libdar/tools.cpp:1924 src/libdar/tools.cpp:1947
+#: src/libdar/tools.cpp:1929 src/libdar/tools.cpp:1952
 msgid "Unknown group"
 msgstr "Groupe inconnu"
 
-#: src/libdar/tools.cpp:1926
+#: src/libdar/tools.cpp:1931
 #, c-format
 msgid "Error found while looking fo GID of group %s: %S"
 msgstr "Erreur recontrée lors de la recherche de GID pour le groupe %s : %S"
 
-#: src/libdar/tools.cpp:1949
+#: src/libdar/tools.cpp:1954
 #, c-format
 msgid "Error found while looking for GID of group %s: %S"
 msgstr "Erreur recontrée lors de la recherche de GID pour le groupe %s : %S"
 
-#: src/libdar/tools.cpp:1986
+#: src/libdar/tools.cpp:1991
 #, c-format
 msgid "Error while setting file user ownership: %s"
 msgstr "Erreur lors de la changement de propriétaire : %s"
 
-#: src/libdar/tools.cpp:2145
+#: src/libdar/tools.cpp:2150
 msgid "Worse"
 msgstr "Pire "
 
-#: src/libdar/tools.cpp:2165
+#: src/libdar/tools.cpp:2170
 #, c-format
 msgid "Error code %d to message conversion failed"
 msgstr "Erreur lors de la conversion du code %d en message"
 
-#: src/libdar/tools.cpp:2220
+#: src/libdar/tools.cpp:2225
 msgid "Invalid wide-char found in string: "
 msgstr "Caractère large invalide dans la chaîne : "
 
-#: src/libdar/tools.cpp:2249
+#: src/libdar/tools.cpp:2254
 msgid "Invalid wide-char found in string:"
 msgstr "Caractère large invalide dans la chaîne : "
 
-#: src/libdar/tools.cpp:2303
+#: src/libdar/tools.cpp:2308
 #, c-format
 msgid "Error unlinking %S: %S"
 msgstr "Erreur lors de la suppression de %S : %S"
 
-#: src/libdar/tools.cpp:2350
+#: src/libdar/tools.cpp:2355
 msgid ""
 "Cannot convert negative floating point value to unsigned (positive) integer"
 msgstr ""
