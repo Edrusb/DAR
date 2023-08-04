@@ -908,14 +908,18 @@ namespace libdar
 					   && delta_signature
 					   && delta_mask.is_covered(juillet.get_string())
 					   && e_file->get_size() >= delta_sig_min_size)
+					{
 					    e_file->will_have_delta_signature_available();
-					    // during small inode dump for that file, the flag telling a delta_sig is present will be set
+						// during small inode dump for that file, the flag telling a delta_sig is present will be set
 
 
-					    // CALCULATING THE SIGNATURE BLOCK SIZE
+						// CALCULATING THE SIGNATURE BLOCK SIZE
 
-					if(e_file != nullptr)
-					    sig_bl = delta_sig_block_len.calculate(e_file->get_size());
+					    if(e_file != nullptr)
+						sig_bl = delta_sig_block_len.calculate(e_file->get_size());
+					    else
+						sig_bl = 0;
+					}
 					else
 					    sig_bl = 0;
 

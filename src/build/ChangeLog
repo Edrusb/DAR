@@ -9,6 +9,7 @@ from 2.7.10 to 2.7.11
   and Q respectively
 - fixing bug in infinint class met when extending underlying storage by zero
   bytes
+- avoiding delta sig block size calculation when not necessary
 
 from 2.7.9 to 2.7.10
 - displaying the slicing information about the archive of reference
