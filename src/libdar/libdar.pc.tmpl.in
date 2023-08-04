@@ -28,5 +28,5 @@ Name: libdar
 Description: Disk ARchive library
 Requires:
 Version: #LIBDAR_VERSION#
-Libs: -L${libdir} -ldar#LIBDAR_SUFFIX# @LIBS@ @GPGME_LIBS@ @LIBCURL_LIBS@ @LIBTHREADAR_LIBS@
-Cflags: -I${includedir} #LIBDAR_MODE# @GPGME_CFLAGS@ @LIBCURL_CFLAGS@ @LIBTHREADAR_CFLAGS@ #CXXSTDFLAGS#
+Libs: -L${libdir} -ldar#LIBDAR_SUFFIX# @LIBS@
+Cflags: -I${includedir} #LIBDAR_MODE# #CXXSTDFLAGS#

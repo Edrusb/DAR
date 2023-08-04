@@ -731,7 +731,7 @@
 	You probably know a bit the metric system, where a dimension is expressed by a base unit
 	(the <i>meter</i> for distance, the <i>liter</i> for volume, the <i>Joule</i> for energy,
 	the <i>Volt</i> for electrical potential, the <i>bar</i> for pressure, the <i>Watt</i> for
-	power, the <i>second</i> for time, etc.), and all declined using prefixes:
+	power, the <i>second</i> for time, etc.), and all eventually declined using prefixes:
       </p>
       <code class=block>
 	prefix (symbol) = ratio
@@ -746,6 +746,8 @@
 	atto (a) = 0.000,000,000,000,000,001
 	zepto (z) = 0.000,000,000,000,000,000,001
 	yocto (y) = 0.000,000,000,000,000,000,000,001
+	ronto (r) = 0.000,000,000,000,000,000,000,000,001
+	quecto (q) = 0.000,000,000,000,000,000,000,000,000,001
 	deca (da) = 10
 	hecto (h) = 100
 	kilo (k) = 1,000 (yes, this is a lower case letter, not an
@@ -757,12 +759,15 @@
 	exa (E) = 1,000,000,000,000,000,000
 	zetta (Z) = 1,000,000,000,000,000,000,000
 	yotta (Y) = 1,000,000,000,000,000,000,000,000
+	ronna (R) = 1,000,000,000,000,000,000,000,000,000
+	quetta (Q) = 1,000,000,000,000,000,000,000,000,000,000
       </code>
       <p>
 	Not all prefix have been introduced at the same time, the oldest
 	(c, d, m, da, h, k) exist since 1795, this explain the fact
-	they are all lowercase and are not all power of 1000. The other
-	are much more recent (1960, 1975, 1991 according to
+	they are all lowercase and are not all power of 1000. Mega and micro
+	have been added in 1873. The rest is much more recent
+	(1960, 1975, 1991, 2022 according to
 	<a href="https://en.wikipedia.org/wiki/Yotta-">Wikipedia</a>)
       </p>
       <p>
@@ -770,11 +775,11 @@
       </p>
       <ul>
 	<li>the unit follows the number</li>
-	<li>a space has to be used between the number of the unit</li>
+	<li>a space has to be inserted between the number and the unit</li>
       </ul>
       <p>
 	Thus instead of writing "4K hour" the correct writing is "4 kh" for
-	<i>four kilohour</i>.
+	<i>four kilohour</i>
       </p>
       <p>
 	This way two milliseconds (noted "2 ms") are 0.002 second,
@@ -831,12 +836,17 @@
       </p>
       <p>
 	<b>Anyway, back to dar and present time</b>, you have to possibility to
-	give the size in byte or using a single letter as suffix
-	(k, M, T, P, E, Z, Y, the base unit being implicitely
-	the byte) thus the possibility to
-	provide a size in kilo, mega, tera, peta, exa, zetta or yotta byte,
-	with the computer science definition of these terms (power of 1024) by
-	default.
+	use the SI unit prefixes (k, M, T, P, E, Z, Y, R, Q) as number suffixes,
+	like 10k for number 10,000 which, if convenient, is not correct regarding
+	SI system rules but so frequently used today, that my now old school teachers
+	would probably not complain too loudly ;^)
+      </p>
+      <p>
+	In this suffix notation the base unit is implicitely the byte, giving thus
+	the possibility to
+	provide sizes in kilo, mega, tera, peta, exa, zetta, yotta, ronna or quetta byte,
+	using by default the computer science definition of these terms: a power of 1024,
+	which today corresponds to the kiB, MiB... unit symbols.
       </p>
       <p>
 	These suffixes are for simplicity and to not have to compute how much
@@ -847,7 +857,7 @@
       <p>
 	Now, if you want 2 Megabytes slices in the sense of the metric system,
 	simply use "-s 2000000" but since version 2.2.0, you can alter the meaning
-	of all the suffixes used by dar, using the following
+	of all these suffixes  using the following
 	<code>--alter=SI-units</code> option.
 	(which can be shorten to <code>-aSI</code> or <code>-asi</code>):
       </p>
@@ -855,14 +865,14 @@
 	-aSI -s 2k
       </code>
       <p>
-	Yes, and to make things more confuse, marketing/sales arrived and made sellers count
+	Yes, and to make things more confused, marketing/sales arrived and made sellers count
 	gigabits a third way: I remember some time ago, I bought a hard disk which
-	was described as "2.1 GB", (OK, that's now long ago!), but in
-	fact it had only 2097152 bytes available. This is far from 2202009
-	bytes (= 2.1 GiB for computer science meaning), and a bit more than
+	was described as "2.1 GB", (OK, that's now long ago! ~ year 2000), but in
+	fact it had only 2097152 bytes available. This is much below 2202009
+	bytes (= 2.1 GiB for computer science meaning), while a bit more than
 	2,000,000 bytes (metric system). OK, if it had these 2202009 bytes
-	(computer science meaning of 2.1 GB), this hard disk would have been
-	sold under the label "2.5 GB"!? ... just kidding :-)
+	(computer science meaning of 2.1 GB), would this hard disk have been
+	sold under the label "2.3 GB"!? ... just kidding :-)
       </p>
       <p>
 	Note that to distinguish kilo, mega, tera and so on, new
@@ -877,6 +887,8 @@
 	Ei
 	Zi
 	Yi
+	Ri
+	Qi
       </code>
       <p>
 	For example, we have 1 kiB for 1 kilobytes (= 1024 bytes), and 1 kibit

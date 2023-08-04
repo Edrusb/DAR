@@ -1400,6 +1400,11 @@ namespace libdar
 	case 'Y':  // yottabyte
 	    factor = infinint(base).power((U_I)8);
 	    break;
+	case 'R':
+	    factor = infinint(base).power((U_I)9);
+	break;
+	case 'Q':
+	    factor = infinint(base).power((U_I)10);
 	case '0':
 	case '1':
 	case '2':

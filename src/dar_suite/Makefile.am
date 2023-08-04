@@ -52,14 +52,14 @@ endif
 
 if BUILD_MODE32
     MYLIB=libdar32
-    AM_CPPFLAGS=-DLIBDAR_MODE=32 -I'$(srcdir)/../libdar' -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(sysconfdir)\" $(CPP_PROF) $(GPGME_CFLAGS) $(LIBCURL_CFLAGS) $(LIBTHREADAR_CFLAGS)
+    AM_CPPFLAGS=-DLIBDAR_MODE=32 -I'$(srcdir)/../libdar' -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(sysconfdir)\" $(CPP_PROF)
 else
 if BUILD_MODE64
     MYLIB=libdar64
-    AM_CPPFLAGS=-DLIBDAR_MODE=64 -I'$(srcdir)/../libdar' -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(sysconfdir)\" $(CPP_PROF) $(GPGME_CFLAGS) $(LIBCURL_CFLAGS) $(LIBTHREADAR_CFLAGS)
+    AM_CPPFLAGS=-DLIBDAR_MODE=64 -I'$(srcdir)/../libdar' -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(sysconfdir)\" $(CPP_PROF)
 else
     MYLIB=libdar
-    AM_CPPFLAGS=-I'$(srcdir)/../libdar' -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(sysconfdir)\" $(CPP_PROF) $(GPGME_CFLAGS) $(LIBCURL_CFLAGS) $(LIBTHREADAR_CFLAGS)
+    AM_CPPFLAGS=-I'$(srcdir)/../libdar' -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(sysconfdir)\" $(CPP_PROF)
 endif
 endif
 
@@ -92,7 +92,7 @@ endif
 #
 
 bin_PROGRAMS = dar dar_xform dar_slave dar_manager dar_cp dar_split $(ALSO_BUILD)
-LDADD = ../libdar/$(MYLIB).la $(LIBCURL_LIBS) $(GPGME_LIBS) $(LIBTHREADAR_LIBS) $(LTLIBINTL)
+LDADD = ../libdar/$(MYLIB).la $(LTLIBINTL)
 if DEBUG_STATIC
 AM_LDFLAGS = -all-static $(LD_PROF)
 else

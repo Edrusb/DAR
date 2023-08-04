@@ -1,3 +1,8 @@
+version 2.7.11
+--------------
+Thanks to Ryan Schmidt for feedback. Thanks to John Goerzen for
+feedback, support and contribution with a git pull request.
+
 version 2.7.10
 --------------
 Thanks to John Goerzen for patch proposal (python binding), for

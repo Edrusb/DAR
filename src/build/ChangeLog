@@ -13,6 +13,19 @@ from 2.7.x to 2.8.0
 - using early_memory_release from dar CLI when sequential-read mode is used
 - adding -qcrypto option
 
+from 2.7.10 to 2.7.11
+- removed set_unexpected() invocation (not useful for years in libdar
+  and incompatible with C++17)
+- fixed generated dynamic libdar binary to include all its dependent libraries
+- modified default block size for binary deltas, to be closer to what rsync
+  uses (more details in man page).
+- Improved compression exclusions
+- adding support for ronna (10^27) and quetta (10^30) new SI prefixes, R
+  and Q respectively
+- fixing bug in infinint class met when extending underlying storage by zero
+  bytes
+- avoiding delta sig block size calculation when not necessary
+
 from 2.7.9 to 2.7.10
 - displaying the slicing information about the archive of reference
   stored within a isolated catalogue when using -l and -q options

@@ -47,9 +47,7 @@ AM_ICONV
 #
 # libraries:
 #   necessary library flags are stored in the "output variables" LIBS substituable shell variable and passed to Makefile.in
-#   as well as other like LIBTHREADAR_LIBS/CFLAGS and LIBCURL_LIBSS/CFLAGS due to the use of PKG_CHECK_MODULE macro
 #   that get substitued in Makefiles.in when the @LIBS@ form is met.
-#   In addition, the AM_PATH_GPGME defines he GPGME_CFLAGS and GPGME_LIBS output variable
 #
 
 # have a specific variable for pkgconfig, setting the default value:
@@ -1341,7 +1339,8 @@ AS_IF(         [test "x$enable_libcurl_linking" != "xyes"],
                ],
                [
                   PKG_CHECK_EXISTS(libcurl,
-                        [ PKG_CHECK_MODULES(LIBCURL, libcurl, [], [AC_MSG_ERROR([libcurl not found, but reported to exist !?!])])
+                        [
+			  PKG_CHECK_MODULES(LIBCURL, libcurl, [], [AC_MSG_ERROR([libcurl not found, but reported to exist !?!])])
                           AC_DEFINE(HAVE_LIBCURL, 1, [Libcurl library availability])
                         ],
                         [
@@ -1384,7 +1383,11 @@ AS_IF(         [test "x$enable_libcurl_linking" != "xyes"],
                  unset CPPFLAGS___cache
                  unset LIBS___cache
                  AS_IF( [ test "x$explicit_libcurl_linking" = "xyes" -a "$local_libcurl" != "yes" ],
-                        [ AC_MSG_ERROR([libcurl linking failed]) ]
+                        [ AC_MSG_ERROR([libcurl linking failed]) ],
+			[
+			  CPPFLAGS="$LIBCURL_CFLAGS $CPPFLAGS"
+                          LIBS="$LIBCURL_LIBS $LIBS"
+			]
                       )
                 ]
      )
@@ -1713,7 +1716,11 @@ AS_IF(          [ test "x$enable_gpgme_linking" != "xyes" ],
                  fi
 
                  AS_IF( [ test "x$explicit_gpgme_linking" = "xyes" -a "$local_gpgme" != "yes" ],
-                        [ AC_MSG_ERROR([gpgme linking failed]) ]
+                        [ AC_MSG_ERROR([gpgme linking failed]) ],
+			[
+			  CPPFLAGS="$GPGME_CFLAGS $CPPFLAGS"
+                          LIBS="$GPGME_LIBS $LIBS"
+			]
                       )
                 ]
      )
@@ -2007,7 +2014,12 @@ AS_IF(       [ test "x$enable_threadar" != "xyes" ],
               LIBS="$LIBS__cache"
               unset LIBS__cache
               AS_IF( [ test "x$explicit_threadar" = "xyes" -a "$local_threadar" != "yes" ],
-                     [ AC_MSG_ERROR([libthreadar linking failed]) ]
+                     [ AC_MSG_ERROR([libthreadar linking failed]) ],
+		     [
+		       CPPFLAGS="$LIBTHREADAR_CFLAGS $CPPFLAGS"
+		       CXXFLAGS="$LIBTHREADAR_CFLAGS $CXXFLAGS"
+		       LIBS="$LIBTHREADAR_LIBS $LIBS"
+		     ]
                    )
             ]
      )
@@ -2015,13 +2027,6 @@ AS_IF(       [ test "x$enable_threadar" != "xyes" ],
 AS_IF(
   [ test "$local_threadar" = "yes" ],
   [
-    CPPFLAGS__cache="$CPPFLAGS"
-    CPPFLAGS="$LIBTHREADAR_CFLAGS $CPPFLAGS"
-    CXXFLAGS__cache="$CXXFLAGS"
-    CXXFLAGS="$LIBTHREADAR_CFLAGS $CXXFLAGS"
-    LIBS__cache="$LIBS"
-    LIBS="$LIBTHREADAR_LIBS $LIBS"
-
     AC_RUN_IFELSE(
      [
        AC_LANG_PROGRAM( [[
@@ -2046,12 +2051,6 @@ AS_IF(
         local_threadar_barrier_mac=no
      ]
     )
-    CPPFLAGS="$CPPFLAGS__cache"
-    unset CPPFLAGS__cache
-    CXXFLAGS="$CXXFLAGS__cache"
-    unset CXXFLAGS__cache
-    LIBS="$LIBS__cache"
-    unset LIBS__cache
   ]
 )
 
@@ -2159,15 +2158,6 @@ AS_IF(
                 ]
      )
 
-
-CPPFLAGS__cache="$CPPFLAGS"
-CPPFLAGS="$CPPFLAGS $GPGME_CFLAGS $LIBCURL_CFLAGS $LIBTHREADAR_CFLAGS"
-CXXFLAGS__cache="$CXXFLAGS"
-CXXFLAGS="$CXXFLAGS"
-LDFLAGS__cache="$LDFLAGS"
-LDFLAGS="$LDFLAGS -static"
-LIBS__cache="$LIBS"
-LIBS="$LIBS $GPGME_LIBS $LIBCURL_LIBS $LIBTHREADAR_LIBS"
 AC_MSG_CHECKING([static linking])
 AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                                                 #if HAVE_STDIO_H
@@ -2327,14 +2317,6 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                         [ AC_MSG_ERROR([Cannot build dar-static on this system, check config.log]) ]
                       )
                ])
-CPPFLAGS="$CPPFLAGS__cache"
-unset CPPFLAGS__cache
-CXXFLAGS="$CXXFLAGS__cache"
-unset CXXFLAGS__cache
-LDFLAGS="$LDFLAGS__cache"
-unset LDFLAGS__cache
-LIBS="$LIBS__cache"
-unset LIBS__cache
 
 AC_ARG_ENABLE( [python-binding],
                AS_HELP_STRING(--disable-python-binding, [ignore python binding even if it is possible to build it]),

@@ -526,6 +526,8 @@ namespace libdar
         if(it.ref != this)
 	    throw Erange("storage::insert_bytes_at_iterator_cmn", gettext("The iterator is not indexing the object it has been defined for"));
 
+	if(size == 0)
+	    return; // nothing to insert
 
         if(it.cell != nullptr)
         {
