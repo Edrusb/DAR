@@ -236,6 +236,9 @@ namespace libdar
 	    /// compare just data not inode information EA nor FSA
 	bool same_data_as(const cat_file & other, bool check_data, const infinint & hourshift);
 
+	    /// expose the archive format the object of the backup this object comes from
+	const archive_version & get_archive_version() const { return read_ver; };
+
     protected:
         virtual void sub_compare(const cat_inode & other, bool isolated_mode) const override;
         virtual void inherited_dump(const pile_descriptor & pdesc, bool small) const override;
