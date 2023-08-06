@@ -3094,9 +3094,15 @@ namespace libdar
 			// need to store at least the base CRC and result CRC even if not delta signature is computed:
 		    fic->will_have_delta_signature_structure();
 
-		    const crc *tmp;
-		    if(ref_fic->get_crc(tmp))
+		    if(ref_fic->has_patch_result_crc())
+		    {
+			const crc *tmp = nullptr;
+
+			ref_fic->get_patch_result_crc(tmp);
+			if(tmp == nullptr)
+			    throw SRC_BUG;
 			fic->set_patch_base_crc(*tmp);
+		    }
 		    else
 			throw SRC_BUG;
 		}
@@ -3730,34 +3736,6 @@ namespace libdar
 					}
 					    // else delta diff without delta signature, storing en empty zero length signature
 					    // delta_sig stays equal to nullptr
-				    }
-
-				    if(!fic->has_patch_base_crc())
-				    {
-					const crc *tmp = nullptr;
-
-					switch(fic->get_saved_status())
-					{
-					case saved_status::saved:
-				 	    fic->get_crc(tmp);
-					    break;
-					case saved_status::fake:
-					    throw SRC_BUG;
-					case saved_status::not_saved:
-					    throw SRC_BUG;
-					case saved_status::delta:
-					    if(ref_fic->has_patch_result_crc())
-						ref_fic->get_patch_result_crc(tmp);
-					    else
-						throw SRC_BUG;
-					    break;
-					default:
-					    throw SRC_BUG;
-					}
-
-					if(tmp == nullptr)
-					    throw SRC_BUG;
-					fic->set_patch_base_crc(*tmp);
 				    }
 
 				    if(!fic->has_patch_result_crc())
