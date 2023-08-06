@@ -1,3 +1,10 @@
+from 2.7.11 to 2.7.12
+- fixed bug avoid restoration fo binary patch when it was based on another
+   binary patch. Added workaround to read archive format 11.2 (used for
+   releases 2.7.9 to 2.7.11). Archive format has been updated to 11.3 while
+   2.7.12 generated backup have the exact same format as from 11.2, this
+   trick is only used to activate the workaround for badly generated backups
+
 from 2.7.10 to 2.7.11
 - removed set_unexpected() invocation (not useful for years in libdar
   and incompatible with C++17)
