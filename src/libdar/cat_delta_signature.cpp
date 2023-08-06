@@ -142,8 +142,8 @@ namespace libdar
 		//if(!has_patch_base_crc())
 		// throw SRC_BUG;
 		// patch_base_check->dump(f);
-		///// since format 11.2 we do not save
-		///// patch_base_crc has been moved to cat_file
+		///// since format 11.2 we do not save patch_base_crc
+		///// has been moved to cat_file
 		///// to be saved before the delta patch and
 		///// allow patching a file when reading a backup
 		///// in sequential mode

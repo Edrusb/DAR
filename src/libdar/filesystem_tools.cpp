@@ -481,16 +481,16 @@ namespace libdar
     {
         infinint patch_crc_size = tools_file_size_to_crc_size(patcher.get_size());
         infinint base_crc_size = tools_file_size_to_crc_size(existing.get_size());
-        crc * calculated_patch_crc = nullptr;      //< calculated CRC of the read patch data
-        crc * calculated_base_crc = nullptr;       //< calculated CRC of the base file to be patched
-        const crc *expected_patch_crc = nullptr;   //< expected CRC of the patched data
-        const crc *expected_base_crc = nullptr;    //< expected CRC of the base file to be patched
-        const crc *expected_result_crc = nullptr;  //< expected CRC of the resulting patched file
+        crc * calculated_patch_crc = nullptr;      ///< calculated CRC of the read patch data
+        crc * calculated_base_crc = nullptr;       ///< calculated CRC of the base file to be patched
+        const crc *expected_patch_crc = nullptr;   ///< expected CRC of the patched data
+        const crc *expected_base_crc = nullptr;    ///< expected CRC of the base file to be patched
+        const crc *expected_result_crc = nullptr;  ///< expected CRC of the resulting patched file
         string temporary_pathname;
-        fichier_local *resulting = nullptr;
-        generic_file *current = nullptr;
-        generic_file *delta = nullptr;
-        generic_rsync *rdiffer = nullptr;
+        fichier_local *resulting = nullptr;        ///< used to temporarily saved to patch result
+        generic_file *current = nullptr;           ///< will hold the data from the cat_file "existing"
+        generic_file *delta = nullptr;             ///< will hold the data from the cat_file "patcher"
+        generic_rsync *rdiffer = nullptr;          ///< interface to rsync to apply the patch
         null_file black_hole = gf_write_only;
 
             // sanity checks
