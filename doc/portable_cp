@@ -9,7 +9,7 @@ TMP_SRC=dar_install_cp_test_src
 TMP_DST=dar_install_cp_test_dst
 
 if mkdir "$TMP_DST" && mkdir "$TMP_SRC" ; then
-  if cp -dR --preserve=mode $TMP_SRC $TMP_DST ; then
+  if cp -dR --preserve=mode $TMP_SRC $TMP_DST 1> /dev/null 2> /dev/null ; then
      rm -rf "$TMP_SRC" "$TMP_DST"
      exec cp -dR --preserve=mode "$1" "$2"
   else
