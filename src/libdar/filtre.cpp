@@ -1783,10 +1783,10 @@ namespace libdar
 	    }
 	    else
 	    {
-		    // allocating decr to "{T&R&~R&(A|!H)}[S*] P* ; {(e&~e&r&~r)|(!e&!~e)}[*s] *p"
+		    // allocating decr to "{E&R&~R&(A|!H)}[S*] P* ; {(e&~e&r&~r)|(!e&!~e)}[*s] *p"
 		    //
 		    // which means to record just data presence (S*) when:
-		    //   both entries are of the same type (T)
+		    //   both entries are of the same type and share the same inode data (E)
 		    //   and both have the same modification date (R&~R)
 		    //   and this is the first time we meet this hard linked inode, or this is not a hard linked inode (A|!H)
 		    // else data is taken as is (P*) from the "in place" archive
@@ -1808,7 +1808,7 @@ namespace libdar
 
 		    c_and.clear();
 		    c_or.clear();
-		    c_and.add_crit(crit_same_type());
+		    c_and.add_crit(crit_same_inode_data());
 		    c_and.add_crit(crit_in_place_data_more_recent());
 		    c_and.add_crit(crit_invert(crit_in_place_data_more_recent()));
 		    c_or.add_crit(crit_in_place_is_new_hardlinked_inode());
