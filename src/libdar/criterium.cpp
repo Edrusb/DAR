@@ -144,6 +144,90 @@ namespace libdar
 	    return false;
     }
 
+    bool crit_same_inode_data::evaluate(const cat_nomme &first, const cat_nomme &second) const
+    {
+	crit_same_type same_type;
+	crit_in_place_is_inode is_inode;
+
+
+	if(! same_type.evaluate(first, second))
+	    return false;
+
+	if(! is_inode.evaluate(first, second))
+	    return false;
+	else
+	{
+		/////
+		// inode level consideration
+
+	    const cat_inode* first_i = get_inode(&first);
+	    const cat_inode* second_i = get_inode(&second);
+
+	    if(first_i == nullptr || second_i == nullptr)
+		throw SRC_BUG; // show be both inodes
+
+	    if(first_i->get_uid() != second_i->get_uid())
+		return false;
+	    if(first_i->get_gid() != second_i->get_gid())
+		return false;
+	    if(first_i->get_perm() != second_i->get_perm())
+		return false;
+	    if(first_i->get_last_modif() != second_i->get_last_modif())
+		return false;
+
+		/////
+		// plain file specific considerations
+
+	    const cat_file* first_f = dynamic_cast<const cat_file*>(first_i);
+	    const cat_file* second_f = dynamic_cast<const cat_file*>(second_i);
+
+	    if(first_f != nullptr)
+	    {
+		if(second_f == nullptr)
+		    throw SRC_BUG; // they should be of the same type
+		if(first_f->get_size() != second_f->get_size())
+		    return false;
+	    }
+
+		/////
+		// devices specific considerations
+
+	    const cat_device* first_d = dynamic_cast<const cat_device*>(first_i);
+	    const cat_device* second_d = dynamic_cast<const cat_device*>(second_i);
+
+	    if(first_d != nullptr && first_d->get_saved_status() == saved_status::saved)
+	    {
+		if(second_d == nullptr)
+		    throw SRC_BUG; // they should be of the same type
+		if(second_d->get_saved_status() != saved_status::saved)
+		    return true;   // cannot compare any further
+		if(first_d->get_major() != second_d->get_major())
+		    return false;
+		if(first_d->get_minor() != second_d->get_minor())
+		    return false;
+	    }
+
+		/////
+		// symlink specific considerations
+
+	    const cat_lien* first_l = dynamic_cast<const cat_lien*>(first_i);
+	    const cat_lien* second_l = dynamic_cast<const cat_lien*>(second_i);
+
+	    if(first_l != nullptr && first_l->get_saved_status() == saved_status::saved)
+	    {
+		if(second_l == nullptr)
+		    throw SRC_BUG;
+		if(second_l->get_saved_status() != saved_status::saved)
+		    return true; // cannot comparer any further
+		if(first_l->get_target() != second_l->get_target())
+		    return false;
+	    }
+
+	    return true; // no difference was met so far
+	}
+    }
+
+
     bool crit_in_place_EA_present::evaluate(const cat_nomme &first, const cat_nomme &second) const
     {
 	const cat_inode *tmp = dynamic_cast<const cat_inode *>(&first);

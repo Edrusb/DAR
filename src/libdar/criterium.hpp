@@ -305,6 +305,32 @@ namespace libdar
 	virtual criterium *clone() const override { return new (std::nothrow) crit_in_place_has_delta_sig(*this); };
     };
 
+	/// returns true if both inputs are inode of the same type (file/pipe/device/...) and share inode information
+
+	/// inode information taken into account is
+	///. the permission,
+	///. ownership
+	///. modification date
+	///. file size (for plain files or hard linked files)
+	///. major and minor (for block and char devices)
+	///. target (for symlinks)
+	///
+	/// But no comparison is done on atime and mtime.
+
+    class crit_same_inode_data : public criterium
+    {
+    public:
+	crit_same_inode_data() = default;
+	crit_same_inode_data(const crit_same_inode_data & ref) = default;
+	crit_same_inode_data(crit_same_inode_data && ref) noexcept = default;
+	crit_same_inode_data & operator = (const crit_same_inode_data & ref) = default;
+	crit_same_inode_data & operator = (crit_same_inode_data && ref) noexcept = default;
+	~crit_same_inode_data() = default;
+
+	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override;
+	virtual criterium *clone() const override { return new (std::nothrow) crit_same_inode_data(*this); };
+    };
+
 
 	/// returns true if the first entry is first an inode, and has some EA (EA may be saved
 	/// or just recorded as existing).
