@@ -289,7 +289,7 @@ namespace libdar
     };
 
 
-    	/// return true if the entry has delta signatur
+        /// return true if the entry has delta signature
 
     class crit_in_place_has_delta_sig : public criterium
     {
