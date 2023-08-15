@@ -4,6 +4,9 @@ from 2.7.11 to 2.7.12
    releases 2.7.9 to 2.7.11). Archive format has been updated to 11.3 while
    2.7.12 generated backup have the exact same format as from 11.2, this
    trick is only used to activate the workaround for badly generated backups
+- adding new condition for overwriting policy (E letter), used to improve the
+   decremental backup when a file only change concerns its metadata (inode
+   information, like permission or ownership)
 
 from 2.7.10 to 2.7.11
 - removed set_unexpected() invocation (not useful for years in libdar
