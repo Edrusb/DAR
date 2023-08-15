@@ -26,7 +26,7 @@ if [ $# -ne 2 ] ; then
   exit 1
 fi
 
-SUB1=S"$2"B1
+SUB1=S"$2"B
 SUB2=S"$2"B2
 SUB3=S"$2"B3
 
