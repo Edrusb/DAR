@@ -43,7 +43,7 @@ endif
 mkdir "$build_dir"
 make clean distclean || echo "ignoring error, tree already clean"
 # setenv CXXFLAGS -O
-./configure --prefix=/ --bindir=/ --libdir=/ --datarootdir=/share --sysconfdir=/$dir_name/etc --disable-gpgme-linking $4 $5 $6 $7 $8 $9 ${10} ${11}
+./configure --prefix=/ --bindir=/ --libdir=/ --datarootdir=/share --sysconfdir=/$dir_name/etc --disable-gpgme-linking --disable-dar-static $4 $5 $6 $7 $8 $9 ${10} ${11}
 make $MAKE_OPT
 make DESTDIR="$build_dir" install-strip
 
