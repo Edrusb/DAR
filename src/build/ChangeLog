@@ -7,6 +7,7 @@ from 2.7.11 to 2.7.12
 - adding new condition for overwriting policy (E letter), used to improve the
    decremental backup when a file only change concerns its metadata (inode
    information, like permission or ownership)
+- fixing segmentation fault met when listing an archive content with -I option
 
 from 2.7.10 to 2.7.11
 - removed set_unexpected() invocation (not useful for years in libdar

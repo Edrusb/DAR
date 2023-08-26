@@ -1305,7 +1305,9 @@ namespace libdar
 		    juillet.enfile(e);
 
 		    if(options.get_subtree().is_covered(juillet.get_path())
-		       && (e_dir != nullptr || options.get_selection().is_covered(e_nom->get_name())))
+		       && (e_dir != nullptr
+			   || e_nom == nullptr
+			   || options.get_selection().is_covered(e_nom->get_name())))
 		    {
 			if(e_mir != nullptr)
 			    e_ino = e_mir->get_inode();
