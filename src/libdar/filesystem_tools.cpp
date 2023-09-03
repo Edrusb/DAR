@@ -481,17 +481,18 @@ namespace libdar
     {
         infinint patch_crc_size = tools_file_size_to_crc_size(patcher.get_size());
         infinint base_crc_size = tools_file_size_to_crc_size(existing.get_size());
-        crc * calculated_patch_crc = nullptr;      //< calculated CRC of the read patch data
-        crc * calculated_base_crc = nullptr;       //< calculated CRC of the base file to be patched
-        const crc *expected_patch_crc = nullptr;   //< expected CRC of the patched data
-        const crc *expected_base_crc = nullptr;    //< expected CRC of the base file to be patched
-        const crc *expected_result_crc = nullptr;  //< expected CRC of the resulting patched file
+        crc * calculated_patch_crc = nullptr;      ///< calculated CRC of the read patch data
+        crc * calculated_base_crc = nullptr;       ///< calculated CRC of the base file to be patched
+        const crc *expected_patch_crc = nullptr;   ///< expected CRC of the patched data
+        const crc *expected_base_crc = nullptr;    ///< expected CRC of the base file to be patched
+        const crc *expected_result_crc = nullptr;  ///< expected CRC of the resulting patched file
         string temporary_pathname;
-        fichier_local *resulting = nullptr;
-        generic_file *current = nullptr;
-        generic_file *delta = nullptr;
-        generic_rsync *rdiffer = nullptr;
+        fichier_local *resulting = nullptr;        ///< used to temporarily saved to patch result
+        generic_file *current = nullptr;           ///< will hold the data from the cat_file "existing"
+        generic_file *delta = nullptr;             ///< will hold the data from the cat_file "patcher"
+        generic_rsync *rdiffer = nullptr;          ///< interface to rsync to apply the patch
         null_file black_hole = gf_write_only;
+	bool disable_base_check = patcher.get_archive_version() == archive_version(11,2); ///< workaround bug in that format
 
             // sanity checks
 
@@ -529,18 +530,21 @@ namespace libdar
                     throw SRC_BUG;
                 else
                 {
-                        // calculating the crc of base file
+		    if(! disable_base_check)
+		    {
+			    // calculating the crc of base file
 
-                        // note: this file will be read with a mix of skip()
-                        // by the generic_rsync object below, thus is is not
-                        // possible to calculate its CRC at tha time, so we
-                        // do it now for that reason
-                    current->reset_crc(base_crc_size);
-                    current->copy_to(black_hole);
-                    calculated_base_crc = current->get_crc();
-                    if(calculated_base_crc == nullptr)
-                        throw SRC_BUG;
-                    current->skip(0);
+			    // note: this file will be read with a mix of skip()
+			    // by the generic_rsync object below, thus is is not
+			    // possible to calculate its CRC at tha time, so we
+			    // do it now for that reason
+			current->reset_crc(base_crc_size);
+			current->copy_to(black_hole);
+			calculated_base_crc = current->get_crc();
+			if(calculated_base_crc == nullptr)
+			    throw SRC_BUG;
+			current->skip(0);
+		    }
                 }
 
                     // obtaining patch
@@ -553,7 +557,7 @@ namespace libdar
 
 
                     // creating the patcher object (read-only object)
-                    // and checking the current data matches the expected_base_crc (done by generic_rsync)
+                    // and checking the current data matches the expected_base_crc
 
                 rdiffer = new (nothrow) generic_rsync(current,
                                                       delta);
@@ -578,7 +582,7 @@ namespace libdar
 
                     // comparing the expected base crc with the calculated one
 
-                if(*calculated_base_crc != *expected_base_crc)
+                if(!disable_base_check && *calculated_base_crc != *expected_base_crc)
                     throw Erange("filesystem.cpp::make_delta_patch", gettext("File the patch is about to be applied to is not the expected one, aborting the patch operation"));
 
 

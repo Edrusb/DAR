@@ -486,6 +486,9 @@ static const criterium * criterium_create_from_string(user_interaction &dialog, 
 	    case 'L':
 		ret = new (nothrow) crit_in_place_has_delta_sig();
 		break;
+	    case 'E':
+		ret = new (nothrow) crit_same_inode_data();
+		break;
 	    case 'e':
 		ret = new (nothrow) crit_in_place_EA_present();
 		break;

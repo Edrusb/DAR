@@ -93,3 +93,6 @@ chgrp root plain_file2.txt
 cp "$COMP_FILE" .
 # need an uncompressible file to test skip back upon poor compression
 cp "$UNCOMP_FILE" .
+
+# file used to test binary delta
+cp "$UNCOMP_FILE" for_binary_delta

@@ -449,6 +449,11 @@ mkdir $dst2
 GO "D2-6" 0 $ROUTINE_DEBUG $DAR -N -x $full_delta -R $dst2 -B $OPT
 GO "D2-7" 0 $ROUTINE_DEBUG $DAR -N -x $diff_delta -R $dst2 -w -B $OPT
 GO "D2-8" 0 $ROUTINE_DEBUG my_diff $src $dst2
+../modif_tree_again.sh "$src" "U"
+GO "D2-9" 0 $ROUTINE_DEBUG $DAR -N -c $diff_delta2 -R $src -A $diff_delta -B $OPT_NOSEQ --delta sig --delta-sig-min-size 1
+GO "D2-A" 0 $ROUTINE_DEBUG check_hash $hash $diff_delta2.*.dar
+GO "D2-B" 0 $ROUTINE_DEBUG $DAR -N -x $diff_delta2 -R $dst2 -w -B $OPT
+GO "D2-C" 0 $ROUTINE_DEBUG my_diff "$src" "$dst2"
 rm -rf $dst2
 fi
 
@@ -545,14 +550,14 @@ rm -rf $src $dst
 fi
 
 #
-# F4 - merging with delta signature aucun recalcul de signature
+# F4 - merging with delta signature - without signature recomputation
 #
 if echo $* | grep "F4" > /dev/null ; then
 GO "F4-1" 0 $ROUTINE_DEBUG $DAR -+ merge_delta -A full_delta -B $OPT --delta sig
 fi
 
 #
-# F5 - merging with delta signature + recalcul de signature
+# F5 - merging with delta signature - with signature recomputation
 #
 if echo $* | grep "F5" > /dev/null ; then
 rm $merge_delta*.*

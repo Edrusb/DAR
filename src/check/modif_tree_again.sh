@@ -22,8 +22,8 @@
 #######################################################################
 
 if [ $# -ne 2 ] ; then
-  echo "usage: $0 <dir> <discriminant>"
-  exit 1
+    echo "usage: $0 <dir> <discriminant>"
+    exit 1
 fi
 
 SUB1=S"$2"B1
@@ -33,18 +33,4 @@ SUB3=S"$2"B3
 cd "$1"
 
 cd "$SUB1"
-ln ../plain_file.txt new_hard_linked_inode.txt
-echo "new file alone" > plain2.txt
-echo "trigger binary patch" >> for_binary_delta
-cd ..
-
-cd "$SUB2"
-rm -f symlink.txt
-rm -f tube1
-cd ..
-
-rm -rf "$SUB3"
-
-cd "$SUB1"
-rm  blockdev
-chgrp sys plain_file2.txt
+echo "trigger binary patch again" >> for_binary_delta
