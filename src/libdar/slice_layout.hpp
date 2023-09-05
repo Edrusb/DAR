@@ -42,7 +42,7 @@ namespace libdar
     class slice_layout
     {
     public:
-	slice_layout() = default;
+	slice_layout() { older_sar_than_v8 = false; };
 	slice_layout(const slice_layout & ref) = default;
 	slice_layout(slice_layout && ref) noexcept = default;
 	slice_layout & operator = (const slice_layout & ref) = default;
