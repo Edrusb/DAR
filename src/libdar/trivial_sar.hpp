@@ -145,7 +145,7 @@ namespace libdar
 	std::string base;         ///< basename of the archive (used for string susbstitution in hook)
 	std::string ext;          ///< extension of the archive (used for string substitution in hook)
 	label of_data_name;       ///< archive's data name
-	bool old_sar;             ///< true if the read sar has an old header (format <= "07") or the to be written is must keep a version 07 format.
+	bool old_sar;             ///< true if the read sar has an old header (format <= "07") or the to be written must keep a version 07 format.
 	infinint min_digits;      ///< minimum number of digits in slice name
 	std::string hook_where;   ///< what value to use for %p substitution in hook
 	std::string base_url;     ///< what value to use for %u substitution in hook
