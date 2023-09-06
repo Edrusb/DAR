@@ -46,7 +46,7 @@ namespace libdar
     class user_interaction_blind : public user_interaction
     {
     public:
-	user_interaction_blind() = default;
+	user_interaction_blind() {};
 	user_interaction_blind(const user_interaction_blind & ref) = default;
 	user_interaction_blind(user_interaction_blind && ref) noexcept = default;
 	user_interaction_blind & operator = (const user_interaction_blind & ref) = default;

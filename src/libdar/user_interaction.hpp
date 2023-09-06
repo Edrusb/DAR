@@ -46,7 +46,7 @@ namespace libdar
     class user_interaction
     {
     public:
-	user_interaction() = default;
+	user_interaction() {};
 	user_interaction(const user_interaction & ref) = default;
 	user_interaction(user_interaction && ref) noexcept = default;
 	user_interaction & operator = (const user_interaction & ref) = default;
