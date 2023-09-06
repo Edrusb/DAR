@@ -48,7 +48,7 @@ namespace libdar
     public:
 	static constexpr U_I OLD_CRC_SIZE = 2;
 
-	crc() = default;
+	crc() {};
 	crc(const crc & ref) = default;
 	crc(crc && ref) noexcept = default;
 	crc & operator = (const crc & ref) = default;

@@ -40,7 +40,8 @@ namespace libdar
     class tlv_list
     {
     public:
-	tlv_list() = default;                     ///< builds an empty list
+	    /// builds an empty list
+	tlv_list() {};  // field "contents" is an object initialized by its default constructor
 	tlv_list(generic_file & f) { init(f); };  ///< builds a list from a file
 	tlv_list(const tlv_list & ref) = default;
 	tlv_list(tlv_list && ref) = default;

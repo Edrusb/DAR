@@ -46,7 +46,7 @@ namespace libdar
     class terminateur
     {
     public :
-	terminateur() = default;
+	terminateur() {}; // fields "pos" and "t_start" are objects initialized by their default constructor
 	terminateur(const terminateur & ref) = default;
 	terminateur(terminateur && ref) noexcept = default;
 	terminateur & operator = (const terminateur & ref) = default;

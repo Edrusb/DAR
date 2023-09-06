@@ -48,7 +48,7 @@ namespace libdar
     class database_archives
     {
     public:
-	database_archives() = default;
+	database_archives() {}; // fields "chemin" and "base" are objects and get initialized by the std::string default constructor
 	database_archives(const database_archives & ref) = default;
 	database_archives(database_archives && ref) noexcept = default;
 	database_archives & operator = (const database_archives & ref) = default;

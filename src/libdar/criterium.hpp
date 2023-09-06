@@ -51,7 +51,7 @@ namespace libdar
     class criterium
     {
     public:
-	criterium() = default;
+	criterium() {};
 	criterium(const criterium & ref) = default;
 	criterium(criterium && ref) noexcept = default;
 	criterium & operator = (const criterium & ref) = default;
@@ -86,7 +86,7 @@ namespace libdar
     class crit_in_place_is_inode : public criterium
     {
     public:
-	crit_in_place_is_inode() = default;
+	crit_in_place_is_inode() {};
 	crit_in_place_is_inode(const crit_in_place_is_inode & ref) = default;
 	crit_in_place_is_inode(crit_in_place_is_inode && ref) noexcept = default;
 	crit_in_place_is_inode & operator = (const crit_in_place_is_inode & ref) = default;
@@ -103,7 +103,7 @@ namespace libdar
     class crit_in_place_is_dir : public criterium
     {
     public:
-	crit_in_place_is_dir() = default;
+	crit_in_place_is_dir() {};
 	crit_in_place_is_dir(const crit_in_place_is_dir & ref) = default;
 	crit_in_place_is_dir(crit_in_place_is_dir && ref) noexcept = default;
 	crit_in_place_is_dir & operator = (const crit_in_place_is_dir & ref) = default;
@@ -120,7 +120,7 @@ namespace libdar
     class crit_in_place_is_file : public criterium
     {
     public:
-	crit_in_place_is_file() = default;
+	crit_in_place_is_file() {};
 	crit_in_place_is_file(const crit_in_place_is_file & ref) = default;
 	crit_in_place_is_file(crit_in_place_is_file && ref) noexcept = default;
 	crit_in_place_is_file & operator = (const crit_in_place_is_file & ref) = default;
@@ -138,7 +138,7 @@ namespace libdar
     class crit_in_place_is_hardlinked_inode : public criterium
     {
     public:
-	crit_in_place_is_hardlinked_inode() = default;
+	crit_in_place_is_hardlinked_inode() {};
 	crit_in_place_is_hardlinked_inode(const crit_in_place_is_hardlinked_inode & ref) = default;
 	crit_in_place_is_hardlinked_inode(crit_in_place_is_hardlinked_inode && ref) noexcept = default;
 	crit_in_place_is_hardlinked_inode & operator = (const crit_in_place_is_hardlinked_inode & ref) = default;
@@ -157,7 +157,7 @@ namespace libdar
     class crit_in_place_is_new_hardlinked_inode : public criterium
     {
     public:
-	crit_in_place_is_new_hardlinked_inode() = default;
+	crit_in_place_is_new_hardlinked_inode() {};
 	crit_in_place_is_new_hardlinked_inode(const crit_in_place_is_new_hardlinked_inode & ref) = default;
 	crit_in_place_is_new_hardlinked_inode(crit_in_place_is_new_hardlinked_inode && ref) noexcept = default;
 	crit_in_place_is_new_hardlinked_inode & operator = (const crit_in_place_is_new_hardlinked_inode & ref) = default;
@@ -223,7 +223,7 @@ namespace libdar
     class crit_in_place_data_bigger : public criterium
     {
     public:
-	crit_in_place_data_bigger() = default;
+	crit_in_place_data_bigger() {};
 	crit_in_place_data_bigger(const crit_in_place_data_bigger & ref) = default;
 	crit_in_place_data_bigger(crit_in_place_data_bigger && ref) noexcept = default;
 	crit_in_place_data_bigger & operator = (const crit_in_place_data_bigger & ref) = default;
@@ -244,7 +244,7 @@ namespace libdar
     class crit_in_place_data_saved : public criterium
     {
     public:
-	crit_in_place_data_saved() = default;
+	crit_in_place_data_saved() {};
 	crit_in_place_data_saved(const crit_in_place_data_saved & ref) = default;
 	crit_in_place_data_saved(crit_in_place_data_saved && ref) noexcept = default;
 	crit_in_place_data_saved & operator = (const crit_in_place_data_saved & ref) = default;
@@ -261,7 +261,7 @@ namespace libdar
     class crit_in_place_data_dirty : public criterium
     {
     public:
-	crit_in_place_data_dirty() = default;
+	crit_in_place_data_dirty() {};
 	crit_in_place_data_dirty(const crit_in_place_data_dirty & ref) = default;
 	crit_in_place_data_dirty(crit_in_place_data_dirty && ref) noexcept = default;
 	crit_in_place_data_dirty & operator = (const crit_in_place_data_dirty & ref) = default;
@@ -277,7 +277,7 @@ namespace libdar
     class crit_in_place_data_sparse : public criterium
     {
     public:
-	crit_in_place_data_sparse() = default;
+	crit_in_place_data_sparse() {};
 	crit_in_place_data_sparse(const crit_in_place_data_sparse & ref) = default;
 	crit_in_place_data_sparse(crit_in_place_data_sparse && ref) noexcept = default;
 	crit_in_place_data_sparse & operator = (const crit_in_place_data_sparse & ref) = default;
@@ -294,7 +294,7 @@ namespace libdar
     class crit_in_place_has_delta_sig : public criterium
     {
     public:
-	crit_in_place_has_delta_sig() = default;
+	crit_in_place_has_delta_sig() {};
 	crit_in_place_has_delta_sig(const crit_in_place_has_delta_sig & ref) = default;
 	crit_in_place_has_delta_sig(crit_in_place_has_delta_sig && ref) noexcept = default;
 	crit_in_place_has_delta_sig & operator = (const crit_in_place_has_delta_sig & ref) = default;
@@ -320,7 +320,7 @@ namespace libdar
     class crit_same_inode_data : public criterium
     {
     public:
-	crit_same_inode_data() = default;
+	crit_same_inode_data() {};
 	crit_same_inode_data(const crit_same_inode_data & ref) = default;
 	crit_same_inode_data(crit_same_inode_data && ref) noexcept = default;
 	crit_same_inode_data & operator = (const crit_same_inode_data & ref) = default;
@@ -338,7 +338,7 @@ namespace libdar
     class crit_in_place_EA_present : public criterium
     {
     public:
-	crit_in_place_EA_present() = default;
+	crit_in_place_EA_present() {};
 	crit_in_place_EA_present(const crit_in_place_EA_present & ref) = default;
 	crit_in_place_EA_present(crit_in_place_EA_present && ref) noexcept = default;
 	crit_in_place_EA_present & operator = (const crit_in_place_EA_present & ref) = default;
@@ -407,7 +407,7 @@ namespace libdar
     class crit_in_place_more_EA : public criterium
     {
     public:
-	crit_in_place_more_EA() = default;
+	crit_in_place_more_EA() {};
 	crit_in_place_more_EA(const crit_in_place_more_EA & ref) = default;
 	crit_in_place_more_EA(crit_in_place_more_EA && ref) noexcept = default;
 	crit_in_place_more_EA & operator = (const crit_in_place_more_EA & ref) = default;
@@ -427,7 +427,7 @@ namespace libdar
     class crit_in_place_EA_bigger : public crit_in_place_more_EA
     {
     public:
-	crit_in_place_EA_bigger() = default;
+	crit_in_place_EA_bigger() {};
 	crit_in_place_EA_bigger(const crit_in_place_EA_bigger & ref) = default;
 	crit_in_place_EA_bigger(crit_in_place_EA_bigger && ref) noexcept = default;
 	crit_in_place_EA_bigger & operator = (const crit_in_place_EA_bigger & ref) = default;
@@ -446,7 +446,7 @@ namespace libdar
     class crit_in_place_EA_saved : public criterium
     {
     public:
-	crit_in_place_EA_saved() = default;
+	crit_in_place_EA_saved() {};
 	crit_in_place_EA_saved(const crit_in_place_EA_saved & ref) = default;
 	crit_in_place_EA_saved(crit_in_place_EA_saved && ref) noexcept = default;
 	crit_in_place_EA_saved & operator = (const crit_in_place_EA_saved & ref) = default;
@@ -466,7 +466,7 @@ namespace libdar
     class crit_same_type : public criterium
     {
     public:
-	crit_same_type() = default;
+	crit_same_type() {};
 	crit_same_type(const crit_same_type & ref) = default;
 	crit_same_type(crit_same_type && ref) noexcept = default;
 	crit_same_type & operator = (const crit_same_type & ref) = default;

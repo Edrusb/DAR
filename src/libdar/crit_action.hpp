@@ -80,7 +80,7 @@ namespace libdar
     class crit_action
     {
     public:
-	crit_action() = default;
+	crit_action() {};
 	crit_action(const crit_action & ref) = default;
 	crit_action(crit_action && ref) noexcept = default;
 	crit_action & operator = (const crit_action & ref) = default;

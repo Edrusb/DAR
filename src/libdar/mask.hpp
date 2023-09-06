@@ -61,7 +61,7 @@ namespace libdar
     class mask
     {
     public :
-	mask() = default;
+	mask() {};
 	mask(const mask & ref) = default;
 	mask(mask && ref) noexcept = default;
 	mask & operator = (const mask & ref) = default;
@@ -278,7 +278,7 @@ namespace libdar
 	    /// \note at this stage the mask is not usable and will
 	    /// throw an exception until some mask are added to the *AND*
 	    /// thanks to the add_mask() method
-        et_mask() = default;
+        et_mask() {}; // field "lst" is an object and initialized by its default constructor
 
 	    /// copy constructor
         et_mask(const et_mask &m) : mask(m) { copy_from(m); };
@@ -359,7 +359,7 @@ namespace libdar
     class ou_mask : public et_mask
     {
     public:
-	ou_mask() = default;
+	ou_mask() {};
 	ou_mask(const ou_mask & ref) = default;
 	ou_mask(ou_mask && ref) noexcept = default;
 	ou_mask & operator = (const ou_mask & ref) = default;
