@@ -131,9 +131,14 @@ namespace libdar
     class mycurl_param_list
     {
     public:
-	mycurl_param_list() { reset_read(); }; // fields "element_list" and "cursor" are objects and get initialized by their default constructor
+#ifndef LIBCURL_AVAILABLE
 
-#if LIBCURL_AVAILABLE
+	    // libcurl not available, no field to initialize
+	mycurl_param_list() {};
+
+#else
+
+	mycurl_param_list() { reset_read(); }; // fields "element_list" and "cursor" are objects and get initialized by their default constructor
 
 	mycurl_param_list(const mycurl_param_list & ref) { copy_from(ref); };
 	mycurl_param_list(mycurl_param_list && ref) noexcept = default;
