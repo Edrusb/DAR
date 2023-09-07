@@ -13,6 +13,13 @@ from 2.7.x to 2.8.0
 - using early_memory_release from dar CLI when sequential-read mode is used
 - adding -qcrypto option
 
+from 2.7.12 to 2.7.13
+- fixing bug auto-reported in "slice_layout.cpp line 48" concerning isolated
+  catalogues when binary and triggered when dar/libdar has been compiled with
+  some version gcc (gcc >= 11) with optimizations set.
+- fixing the configure script to not fail if libargon2 is not present unless
+  explicitely asked by --enable-libargon2-linking
+
 from 2.7.11 to 2.7.12
 - fixed bug avoid restoration fo binary patch when it was based on another
    binary patch. Added workaround to read archive format 11.2 (used for

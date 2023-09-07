@@ -2107,11 +2107,6 @@ AS_IF(
                                 [
                                     local_argon2=no
                                     AC_MSG_RESULT([not usable! See config.log for details])
-
-				    AS_IF( [ test "x$explicit_libargon2_linking" != "xno" ],
-				            [ AC_MSG_ERROR([libargon2 is missing to build libdar]) ]
-					 )
-
                                 ],
                                 [
                                    # if cross compiling
@@ -2155,6 +2150,11 @@ AS_IF(
                                                    ])
                                 ]
                         )
+
+		AS_IF( [ test "x$explicit_libargon2_linking" = "xyes" -a $local_argon2 != "yes" ],
+		       [ AC_MSG_ERROR([libargon2 is missing to build libdar]) ]
+		)
+
                 ]
      )
 
