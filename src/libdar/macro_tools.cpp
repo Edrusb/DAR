@@ -1170,9 +1170,7 @@ namespace libdar
 	    gf_mode open_mode = gf_read_write; // by default first layer is read-write except in case of hashing or encryption
 		// read-write mode is used when skipping back due to file change, the escape layer needs to read the few
 		// bytes before the backward position to take care of tape marks
-	    slicing.other_size = file_size;
-	    slicing.first_size = first_file_size;
-
+	    slicing.clear(); // will eventually be set by sar if sar is used
 	    layers.clear();
 
 	    secu_string real_pass = pass;
