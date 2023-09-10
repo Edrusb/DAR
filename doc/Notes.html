@@ -456,6 +456,10 @@
 	    encrypted key (encrypted by mean of GPG asymetric algorithm,
             present only if flag says so)
 	  </li>
+	  <li>
+	    the slice layout of the backup of reference if the current archive
+	    is an isolated catalogue
+	  </li>
           <li>
 	    eventually, salt, iteration_count and hash algo for key
             derivation fonction (KDF) (used since version 2.6.0 when
@@ -480,6 +484,30 @@
           compression layer, escape layer (it is needed if mark have
           been inserted in the archive to un-escape data that could else
           be taken as an escape sequence mark) and encryption layer.
+	</p>
+
+	<h4>Slice Layout</h4>
+
+	<p>
+	  <b>slice_layout</b> is a class holding information about the first slice size, other file size as well as size of slice headers.
+	  It is used in <em>sar</em> class to store the slicing information read from the class <em>header</em> which for historical reason
+	  does not use the slice_layout class but read/write those fields as independent ones. Class <em>sar</em> thus relies on class <em>header</em>
+	  to read or write this information to/from an archive.
+	</p>
+	<p>
+	  This class is also used in class <em>header_version</em> which is used to read/write the archive header/trailer at the beginning and
+	  at the end of the backup. The use of the class <em>slice_layout</em> in that structure is only present for isolated catalogues and contains
+	  the slicing information of the archive of reference. The class <em>header_version</em> relies on the <em>slice_layout::read()</em>
+	  and <em>slice_layout::write()</em> methods to read and write those fields to/from an archive's trailer/header.
+	  Here, this information is needed for the <b>-Tslice</b> option to work when applied to an isolated catalogue.
+	</p>
+	<p>
+	  The isolation process leads the slicing information stored in <em>archive::i_archive::slices</em> once a backup has been read (normal isolation)
+	  or written (on-fly isolation) to be passed from <em>archive::i_archive::op_isolate()</em> to <em>macro_tools_create_layers()</em> which uses it
+	  to setup the <em>header_version</em> object to use in the isolated catalogue under construction. Once the layers are build by this routine,
+	  and the catalogue dropped to these layers, <em>op_isolate()</em> calls <em>macro_tools_close_layers()</em> with that generated <em>header_version</em>
+	  (containing the slice_layout of the current archive, which will be the reference for the isolated catalogue under construction),
+	  for it be written at end of isolated catalogue, in order to set the archive trailer structure.
 	</p>
 
 	<h4>The data</h4>
