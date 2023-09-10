@@ -412,7 +412,7 @@
 	<h4>version trailer</h4>
 	<p>
           the <b>version trailer</b> (which may still be called "version header" in
-          some part of the documentation because it was originallt located at
+          some part of the documentation because it was originally located at
           the beginning of the archive in previous archive format) is
           composed of:
 	</p>
@@ -502,12 +502,15 @@
 	  Here, this information is needed for the <b>-Tslice</b> option to work when applied to an isolated catalogue.
 	</p>
 	<p>
-	  The isolation process leads the slicing information stored in <em>archive::i_archive::slices</em> once a backup has been read (normal isolation)
-	  or written (on-fly isolation) to be passed from <em>archive::i_archive::op_isolate()</em> to <em>macro_tools_create_layers()</em> which uses it
-	  to setup the <em>header_version</em> object to use in the isolated catalogue under construction. Once the layers are build by this routine,
-	  and the catalogue dropped to these layers, <em>op_isolate()</em> calls <em>macro_tools_close_layers()</em> with that generated <em>header_version</em>
-	  (containing the slice_layout of the current archive, which will be the reference for the isolated catalogue under construction),
-	  for it be written at end of isolated catalogue, in order to set the archive trailer structure.
+	  <b>The isolation process:</b> At the end of archive creation, either read from filesystem (normal isolation) or just written to
+	  filesystem (on-fly isolation), the field <em>archive::i_archive::slices</em> holds the slice layout of the current archive. It has been
+	  read for the <em>sar</em> layer if the archive is sliced or is set to a default value if there is no <em>sar</em> layer and thus no slicing.
+	  The isolation process is defined in <em>archive::i_archive::op_isolate()</em>: it transmits the <em>slices</em> information to
+	  <em>macro_tools_create_layers()</em> which, in particular, uses it to setup the <em>header_version</em>. Once the layers are built
+	  by this routine, this <em>header_version</em> structure is written at the beginning of the archive (version header).
+	  After the catalogue has been written to these layers, <em>op_isolate()</em> calls <em>macro_tools_close_layers()</em> giving it
+	  this same generated <em>header_version</em> (containing the slice_layout of the current archive, which will be the reference for the isolated
+	  catalogue under construction), for it be written at the end of the archive (this is then the "version trailer").
 	</p>
 
 	<h4>The data</h4>
