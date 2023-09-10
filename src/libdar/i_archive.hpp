@@ -212,7 +212,7 @@ namespace libdar
 	bool lax_read_mode;      ///< whether the archive has been openned in lax mode (unused for creation/merging/isolation)
 	bool sequential_read;    ///< whether the archive is read in sequential mode
 	std::list<signator> gnupg_signed; ///< list of signature found in the archive (reading an existing archive)
-	slice_layout slices;     ///< slice layout, archive is not sliced <=> first_size or other_size fields is set to zero (in practice both are set to zero, but one being set is enought to determine the archive is not sliced)
+	slice_layout slices;     ///< slice layout, archive is not sliced <=> first_size or other_size fields are set to zero (in practice both are set to zero, but one being set is enought to determine the archive is not sliced)
 
 	void free_mem();
 	void check_gnupg_signed() const;
