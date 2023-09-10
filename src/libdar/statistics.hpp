@@ -82,7 +82,7 @@ namespace libdar
 	statistics(const statistics & ref) { copy_from(ref); };
 
 	    /// move constructor
-	statistics(statistics && ref) noexcept { init(false); move_from(std::move(ref)); };
+	statistics(statistics && ref) { init(false); move_from(std::move(ref)); };
 
 	    /// copy assignement
 	statistics & operator = (const statistics & ref) { detruit(); copy_from(ref); return *this; };

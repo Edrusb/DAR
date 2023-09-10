@@ -412,7 +412,7 @@
 	<h4>version trailer</h4>
 	<p>
           the <b>version trailer</b> (which may still be called "version header" in
-          some part of the documentation because it was originallt located at
+          some part of the documentation because it was originally located at
           the beginning of the archive in previous archive format) is
           composed of:
 	</p>
@@ -456,6 +456,10 @@
 	    encrypted key (encrypted by mean of GPG asymetric algorithm,
             present only if flag says so)
 	  </li>
+	  <li>
+	    the slice layout of the backup of reference if the current archive
+	    is an isolated catalogue
+	  </li>
           <li>
 	    eventually, salt, iteration_count and hash algo for key
             derivation fonction (KDF) (used since version 2.6.0 when
@@ -480,6 +484,33 @@
           compression layer, escape layer (it is needed if mark have
           been inserted in the archive to un-escape data that could else
           be taken as an escape sequence mark) and encryption layer.
+	</p>
+
+	<h4>Slice Layout</h4>
+
+	<p>
+	  <b>slice_layout</b> is a class holding information about the first slice size, other file size as well as size of slice headers.
+	  It is used in <em>sar</em> class to store the slicing information read from the class <em>header</em> which for historical reason
+	  does not use the slice_layout class but read/write those fields as independent ones. Class <em>sar</em> thus relies on class <em>header</em>
+	  to read or write this information to/from an archive.
+	</p>
+	<p>
+	  This class is also used in class <em>header_version</em> which is used to read/write the archive header/trailer at the beginning and
+	  at the end of the backup. The use of the class <em>slice_layout</em> in that structure is only present for isolated catalogues and contains
+	  the slicing information of the archive of reference. The class <em>header_version</em> relies on the <em>slice_layout::read()</em>
+	  and <em>slice_layout::write()</em> methods to read and write those fields to/from an archive's trailer/header.
+	  Here, this information is needed for the <b>-Tslice</b> option to work when applied to an isolated catalogue.
+	</p>
+	<p>
+	  <b>The isolation process:</b> At the end of archive creation, either read from filesystem (normal isolation) or just written to
+	  filesystem (on-fly isolation), the field <em>archive::i_archive::slices</em> holds the slice layout of the current archive. It has been
+	  read for the <em>sar</em> layer if the archive is sliced or is set to a default value if there is no <em>sar</em> layer and thus no slicing.
+	  The isolation process is defined in <em>archive::i_archive::op_isolate()</em>: it transmits the <em>slices</em> information to
+	  <em>macro_tools_create_layers()</em> which, in particular, uses it to setup the <em>header_version</em>. Once the layers are built
+	  by this routine, this <em>header_version</em> structure is written at the beginning of the archive (version header).
+	  After the catalogue has been written to these layers, <em>op_isolate()</em> calls <em>macro_tools_close_layers()</em> giving it
+	  this same generated <em>header_version</em> (containing the slice_layout of the current archive, which will be the reference for the isolated
+	  catalogue under construction), for it be written at the end of the archive (this is then the "version trailer").
 	</p>
 
 	<h4>The data</h4>
@@ -648,8 +679,18 @@
 	</p>
 
 	<p>
-	  To be complete, the previous sequence is preceeded by
-	  the data_name  as describe above and and the in_place path.
+	  To be complete, the previous sequence is preceeded by:
+	</p>
+	<ul>
+	  <li>
+	    the <b>data_name</b> as describe above,
+	  </li>
+	  <li>
+	    the <b>in-place path</b> which is the root path (-R option) used at backup time that can be used
+	    at restoration time by mean of -ap option in place of any -R option.
+	  </li>
+	</ul>
+	<p>
 	  This sequence is then followed by a CRC calculated on the whole
 	  catalogue dumped data:
 	</p>

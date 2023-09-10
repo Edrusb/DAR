@@ -53,7 +53,7 @@ namespace libdar
 	xz_module(xz_module && ref) noexcept = default;
 	xz_module & operator = (const xz_module & ref) { end_process(); setup(ref.level); return *this; };
 	xz_module & operator = (xz_module && ref) noexcept = default;
-	virtual ~xz_module() noexcept { end_process(); };
+	virtual ~xz_module() { end_process(); };
 
 	    // inherited from compress_module interface
 
