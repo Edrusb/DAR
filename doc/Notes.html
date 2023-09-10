@@ -648,8 +648,18 @@
 	</p>
 
 	<p>
-	  To be complete, the previous sequence is preceeded by
-	  the data_name  as describe above and and the in_place path.
+	  To be complete, the previous sequence is preceeded by:
+	</p>
+	<ul>
+	  <li>
+	    the <b>data_name</b> as describe above,
+	  </li>
+	  <li>
+	    the <b>in-place path</b> which is the root path (-R option) used at backup time that can be used
+	    at restoration time by mean of -ap option in place of any -R option.
+	  </li>
+	</ul>
+	<p>
 	  This sequence is then followed by a CRC calculated on the whole
 	  catalogue dumped data:
 	</p>
