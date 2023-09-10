@@ -126,7 +126,7 @@ namespace libdar
 					 bool sequential_read, ///< whether to use the escape sequence (if present) to get archive contents and proceed to sequential reading
 					 bool info_details,    ///< be or not verbose about the archive openning
 					 std::list<signator> & gnupg_signed, ///< list of existing signature found for that archive (valid or not)
-					 slice_layout & sl,    ///< slicing layout of the archive
+					 slice_layout & sl,    ///< slicing layout of the archive (read from sar header if present)
 					 U_I multi_threaded_crypto,  ///< number of worker thread to run for cryptography (1 -> tronconneuse object, more -> parallel_tronconneuse object)
 					 U_I multi_threaded_compress,  ///< number of worker threads to compress/decompress (need compression_block_size > 0)
 					 bool header_only      ///< if true, stop the process before openning the encryption layer

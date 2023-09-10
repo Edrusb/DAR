@@ -1768,9 +1768,9 @@ namespace libdar
 		    if(hasher == nullptr)
 			throw Ememory("macro_tools_close_layers");
 
-			// at this stage, hasher has been built and now owns and
-			// will destroy when no more needed both global_hash_to_sign
-			// and global_layers
+			// at this stage, hasher has been built and now manages
+			// both global_hash_to_sign and global_layers which will
+			// be destroyed with hasher, when it will no more be needed
 
 		}
 		catch(...)
