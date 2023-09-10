@@ -1594,7 +1594,7 @@ namespace libdar
 	    header_version isol_ver;
 	    label isol_data_name;
 	    label internal_name;
-	    slice_layout isol_slices;
+	    slice_layout isol_slices; // this field is not used here, but necessary to call macro_tools_create_layers()
 
 	    if(!exploitable && options.get_delta_signature())
 		throw Erange("archive::i_archive::op_isolate", gettext("Isolation with delta signature is not possible on a just created archive (on-fly isolation)"));

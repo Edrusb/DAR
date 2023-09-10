@@ -179,8 +179,8 @@ namespace libdar
 
 	/// \param[in]  dialog for user interaction
 	/// \param[out] layers the resulting stack of generic_file layers ready for use
-	/// \param[out] ver the archive "header" to be dropped at end of archive
-	/// \param[out] slicing slicing layout of the archive
+	/// \param[out] ver the archive "header/trailer" to be dropped at beginning and end of archive
+	/// \param[out] slicing slicing layout of the created archive (resulting from sar layers if present according to the provided first/file_size provided below)
 	/// \param[in]  ref_slicing if not nullptr the pointed to slicing_layout will be stored in the header/trailer version of the archive
 	/// \param[in]  sauv_path_t where to create the archive
 	/// \param[in]  filename archive base name
