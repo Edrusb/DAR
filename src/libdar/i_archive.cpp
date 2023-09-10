@@ -1241,19 +1241,17 @@ namespace libdar
         try
         {
 	    slice_layout used_layout;
-	    slice_layout *slice_ptr = nullptr;
 	    thread_cancellation thr;
 
 	    if(options.get_display_ea() && sequential_read)
 		throw Erange("archive::i_archive::get_children_of", gettext("Fetching EA value while listing an archive is not possible in sequential read mode"));
 
-	    if(options.get_slicing_location())
+	    if(options.get_slicing_location())  // -Tslice is asked
 	    {
 		if(!only_contains_an_isolated_catalogue()
 		   && sequential_read)
 		    throw Erange("archive::i_archive::op_listing", gettext("slicing focused output is not available in sequential-read mode"));
 
-		slice_ptr = & used_layout;
 		if(!get_catalogue_slice_layout(used_layout))
 		{
 		    if(options.get_user_slicing(used_layout.first_size, used_layout.other_size))
@@ -1321,7 +1319,7 @@ namespace libdar
 			   || (e_dir != nullptr && e_dir->get_recursive_has_changed()) // invoking callback for directory containing saved files
 			    )
 			{
-			    e->set_list_entry(slice_ptr,
+			    e->set_list_entry(&used_layout,
 					      options.get_display_ea(),
 					      ent);
 			    if(local_check_dirty_seq(get_cat().get_escape_layer()))
