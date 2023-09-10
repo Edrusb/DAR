@@ -165,7 +165,7 @@ namespace libdar
 	S_I (generic_file::*lecture)(char &a) = (dir == elastic_forward ? &generic_file::read_forward : &generic_file::read_back);
 	unsigned char first_mark = (dir == elastic_forward ? get_low_mark(reading_ver) : get_high_mark(reading_ver));
 	unsigned char last_mark  = (dir == elastic_forward ? get_high_mark(reading_ver) : get_low_mark(reading_ver));
-	unsigned char a;
+	unsigned char a = '\0'; // initialized just to avoid cppcheck complaining
 
 	while((f.*lecture)((char &)a) && a != SINGLE_MARK && a != first_mark)
 	    ++count;

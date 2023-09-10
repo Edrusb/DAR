@@ -51,7 +51,7 @@ namespace libdar
 	smart_node(const smart_node & ref) = delete;
 	smart_node(smart_node && ref) noexcept = delete;
 	smart_node & operator = (const smart_node & ref) = delete;
-	smart_node & operator = (smart_node && ref) noexcept = delete;
+	smart_node & operator = (smart_node && ref) = delete;
         ~smart_node() noexcept(false) { if(ptr != nullptr) delete ptr; if(!count_ref.is_zero()) throw SRC_BUG; };
 
 	void add_ref() { ++count_ref; };
@@ -131,7 +131,7 @@ namespace libdar
 	};
 
 	    /// move assignment operator
-	smart_pointer & operator = (smart_pointer && ref) noexcept
+	smart_pointer & operator = (smart_pointer && ref)
 	{
 	    if(ptr != ref.ptr)
 	    {

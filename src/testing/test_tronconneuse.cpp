@@ -197,6 +197,10 @@ void f2(const shared_ptr<user_interaction> & dialog)
 
     for(i = 0; i < taille && toto->read_back(buffer[i]) == 1; ++i)
 	cout << toto->get_position() << endl;
+	// note that cppcheck is wrong, 'i' is *strictly* less than 'taille'
+	// which value is 100 for the evaluation after && to be performed
+	// and buffer[i] to be accessed. There is thus no out of bounds
+	// access as i starts from zero and increases by one at each cycle.
 
     buffer[i] = '\0';
     cout << buffer << " | " << toto->get_position() << endl;
