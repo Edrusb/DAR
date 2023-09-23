@@ -26,7 +26,7 @@ CPPCHECKDIR=./cppcheckbuilddir
 
 cppcheck:
 	@if cppcheck --help > /dev/null ; then \
-	( mkdir -p $(CPPCHECKDIR) && cppcheck --force --file-filter="*.?pp" -isrc/testing -isrc/python ~/Dar-stable --cppcheck-build-dir=$(CPPCHECKDIR) ) || exit 1 ; \
+	( mkdir -p $(CPPCHECKDIR) && cppcheck --force --file-filter="*.?pp" -isrc/testing -isrc/python --cppcheck-build-dir=$(CPPCHECKDIR) `pwd` ) || exit 1 ; \
 	else \
 	echo "cppcheck not present, aborting" || exit 1 ; \
 	fi
