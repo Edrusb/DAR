@@ -1,3 +1,9 @@
+version 2.7.13
+--------------
+Thanks to Thomas, Andrea Vai, John Goerzen and Rolf Gebhardt for having
+reported investigated and helped to solve tricky bug in libdar. Thanks again
+to John Goerzen for continuous support to dar and libdar.
+
 version 2.7.12
 --------------
 Thanks to Minh Van Le for feedback and bugs report. Thanks to Ryan Schmidt

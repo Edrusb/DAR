@@ -15,10 +15,12 @@ from 2.7.x to 2.8.0
 
 from 2.7.12 to 2.7.13
 - fixing bug auto-reported in "slice_layout.cpp line 48" concerning isolated
-  catalogues when binary and triggered when dar/libdar has been compiled with
-  some version gcc (gcc >= 11) with optimizations set.
+  catalogs triggered when dar/libdar has been compiled with some version
+  gcc (gcc >= 11) with optimizations set.
 - fixing the configure script to not fail if libargon2 is not present unless
-  explicitely asked by --enable-libargon2-linking
+  explicitly asked by --enable-libargon2-linking
+- added support for cppcheck to reinforce code robustness and sanity
+- updating documentation about slice_layout structure and usage in libdar
 
 from 2.7.11 to 2.7.12
 - fixed bug avoid restoration fo binary patch when it was based on another

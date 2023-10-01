@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: DAR 2.7.0\n"
 "Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
 "group_id=65612&atid=511612\n"
-"POT-Creation-Date: 2023-09-03 14:37+0200\n"
+"POT-Creation-Date: 2023-10-01 11:25+0200\n"
 "PO-Revision-Date: 2023-07-16 20:31+0200\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
@@ -4519,11 +4519,11 @@ msgstr ""
 "en reste (ce qui peut prendre encore plus de temps et en tout état de cause, "
 "ne permettra au plus de récupérer que quelques fichiers) ?"
 
-#: src/libdar/i_archive.cpp:577 src/libdar/i_archive.cpp:2054
+#: src/libdar/i_archive.cpp:577 src/libdar/i_archive.cpp:2052
 msgid "Compression_level must be between 1 and 9 included"
 msgstr "\"Compression_level\" doit être compris entre 1 et 9 inclus"
 
-#: src/libdar/i_archive.cpp:579 src/libdar/i_archive.cpp:2056
+#: src/libdar/i_archive.cpp:579 src/libdar/i_archive.cpp:2054
 msgid ""
 "\"first_file_size\" cannot be different from zero if \"file_size\" is equal "
 "to zero"
@@ -4531,7 +4531,7 @@ msgstr ""
 "\"first_file_size\" ne peut être différent de zéro si \"file_size est égal à "
 "zéro"
 
-#: src/libdar/i_archive.cpp:581 src/libdar/i_archive.cpp:2058
+#: src/libdar/i_archive.cpp:581 src/libdar/i_archive.cpp:2056
 msgid "Crypto block size must be greater than 10 bytes"
 msgstr "La taille d'un bloc de chiffrement doit être supérieure à 10 octets"
 
@@ -4587,7 +4587,7 @@ msgstr ""
 "Réparation d'archive terminée. ATTENTION ! Il est fortement recommandé de "
 "tester l'archive resultante avant de supprimer celle qui est abîmée"
 
-#: src/libdar/i_archive.cpp:944 src/libdar/i_archive.cpp:1403
+#: src/libdar/i_archive.cpp:944 src/libdar/i_archive.cpp:1401
 msgid "This archive is not exploitable, check documentation for more"
 msgstr ""
 "Cette archive n'est pas exploitable, vérifier la documentation pour plus "
@@ -4602,7 +4602,7 @@ msgstr ""
 "faire. Vous pouvez supprimer ce message en demandant à ne pas restaurer ces "
 "propriétés"
 
-#: src/libdar/i_archive.cpp:967 src/libdar/i_archive.cpp:1422
+#: src/libdar/i_archive.cpp:967 src/libdar/i_archive.cpp:1420
 msgid ""
 "Cannot use in-place restoration as no in-place path is stored in the archive"
 msgstr ""
@@ -4721,7 +4721,7 @@ msgstr "chemin d'origine : %S"
 msgid "no in-place path recorded"
 msgstr "aucun chemin d'origine enregistré"
 
-#: src/libdar/i_archive.cpp:1150 src/libdar/i_archive.cpp:1490
+#: src/libdar/i_archive.cpp:1150 src/libdar/i_archive.cpp:1488
 msgid ""
 "This archive is not exploitable, check the archive class usage in the API "
 "documentation"
@@ -4729,8 +4729,8 @@ msgstr ""
 "Cette archive n'est pas exploitable, vérifier la documentation de l'API pour "
 "plus d'informations"
 
-#: src/libdar/i_archive.cpp:1248 src/libdar/i_archive.cpp:1742
-#: src/libdar/i_archive.cpp:1775
+#: src/libdar/i_archive.cpp:1247 src/libdar/i_archive.cpp:1740
+#: src/libdar/i_archive.cpp:1773
 msgid ""
 "Fetching EA value while listing an archive is not possible in sequential "
 "read mode"
@@ -4738,12 +4738,12 @@ msgstr ""
 "La récupération d'EA lors de la lecture d'une archive n'est pas possible en "
 "mode séquentiel"
 
-#: src/libdar/i_archive.cpp:1254
+#: src/libdar/i_archive.cpp:1253
 msgid "slicing focused output is not available in sequential-read mode"
 msgstr ""
 "L'affichage focalisé sur les tranches est impossible en lecture séquentielle"
 
-#: src/libdar/i_archive.cpp:1262
+#: src/libdar/i_archive.cpp:1260
 #, c-format
 msgid ""
 "Using user provided modified slicing (first slice = %i bytes, other slices = "
@@ -4752,7 +4752,7 @@ msgstr ""
 "Utilisation du découpage fourni par l'utilisateur (première tranche = %i "
 "octets, autres tranches = %i octets)"
 
-#: src/libdar/i_archive.cpp:1265
+#: src/libdar/i_archive.cpp:1263
 msgid ""
 "No slice layout of the archive of reference for the current isolated "
 "catalogue is available, cannot provide slicing information, aborting"
@@ -4761,25 +4761,25 @@ msgstr ""
 "l'archive dont a été isolé le présent catalogue. Impossible de localiser les "
 "fichiers au sein de l'archive, arrêt des opérations."
 
-#: src/libdar/i_archive.cpp:1340
+#: src/libdar/i_archive.cpp:1338
 #, c-format
 msgid "Exception caught from archive_listing_callback execution: %s"
 msgstr "Exception attrapée depuis l'execution de archive_listing_callback : %s"
 
-#: src/libdar/i_archive.cpp:1345
+#: src/libdar/i_archive.cpp:1343
 msgid "Exception caught from archive_listing_callback execution"
 msgstr "Exception attrapée depuis l'execution de archive_listing_callback"
 
-#: src/libdar/i_archive.cpp:1374
+#: src/libdar/i_archive.cpp:1372
 msgid "Error while listing archive contents: "
 msgstr "Erreur lors de l'affichage du contenu de l'archive : "
 
-#: src/libdar/i_archive.cpp:1460
+#: src/libdar/i_archive.cpp:1458
 msgid "Error while comparing archive with filesystem: "
 msgstr ""
 "Erreur pendant la comparaison de l'archive avec le système de fichiers : "
 
-#: src/libdar/i_archive.cpp:1502
+#: src/libdar/i_archive.cpp:1500
 msgid ""
 "WARNING! This is an isolated catalogue, no data or EA is present in this "
 "archive, only the catalogue structure can be checked"
@@ -4787,15 +4787,15 @@ msgstr ""
 "ATTENTION ! Ceci est un catalogue isolé, aucune donnée ou AE n'est présent "
 "dans cette archive, seule la structure du catalogue peut être validée"
 
-#: src/libdar/i_archive.cpp:1536
+#: src/libdar/i_archive.cpp:1534
 msgid "A problem occurred while reading this archive contents: "
 msgstr "Une erreur est survenue lors de la lecture du contenu de l'archive : "
 
-#: src/libdar/i_archive.cpp:1551
+#: src/libdar/i_archive.cpp:1549
 msgid "Error while testing archive: "
 msgstr "Erreur lors du test de l'archive : "
 
-#: src/libdar/i_archive.cpp:1600
+#: src/libdar/i_archive.cpp:1598
 msgid ""
 "Isolation with delta signature is not possible on a just created archive (on-"
 "fly isolation)"
@@ -4803,7 +4803,7 @@ msgstr ""
 "L'isolation avec signature delta est impossible en une seule opération "
 "(isolation à la volée)"
 
-#: src/libdar/i_archive.cpp:2061
+#: src/libdar/i_archive.cpp:2059
 msgid ""
 "nodump flag feature has not been activated at compilation time, it is thus "
 "not available"
@@ -4811,7 +4811,7 @@ msgstr ""
 "La fonctionnalité --nodump n'a pas été activée lors de la compilation, cette "
 "option n'est donc pas disponible"
 
-#: src/libdar/i_archive.cpp:2088
+#: src/libdar/i_archive.cpp:2086
 msgid ""
 "Cannot sequentially read an archive of reference when delta signature or "
 "delta patch is requested"
@@ -4819,7 +4819,7 @@ msgstr ""
 "Impossible de lire séquentiellement une archive de référence quand des "
 "signature delta ou des patch sont demandés"
 
-#: src/libdar/i_archive.cpp:2124
+#: src/libdar/i_archive.cpp:2122
 #, c-format
 msgid ""
 "WARNING! The archive is located in the directory to backup, this may create "
@@ -4833,20 +4833,20 @@ msgstr ""
 "commande ou bien il faut changer l'archive de place (voir l'option -h pour "
 "l'aide). Voulez-vous vraiment continuer ?"
 
-#: src/libdar/i_archive.cpp:2314
+#: src/libdar/i_archive.cpp:2312
 msgid "Ready to start writing down the archive?"
 msgstr "Prêt à commencer l'écriture de l'archive ?"
 
-#: src/libdar/i_archive.cpp:2362
+#: src/libdar/i_archive.cpp:2360
 msgid "Building the catalog object..."
 msgstr "Construction de l'objet catalogue ..."
 
-#: src/libdar/i_archive.cpp:2380
+#: src/libdar/i_archive.cpp:2378
 #, c-format
 msgid "Error while fetching information for %S: "
 msgstr "Erreur lors de la recherche d'informations pour %S : "
 
-#: src/libdar/i_archive.cpp:2444
+#: src/libdar/i_archive.cpp:2442
 #, c-format
 msgid ""
 "Warning making a differential/incremental backup with a different root "
@@ -4855,35 +4855,35 @@ msgstr ""
 "Attention création d'une archive différentielle/incrémentale avec un chemin "
 "racine (chemin d'origine) différent : %S <-> %S"
 
-#: src/libdar/i_archive.cpp:2456
+#: src/libdar/i_archive.cpp:2454
 msgid "Processing files for backup..."
 msgstr "Traitement des fichiers pour la sauvegarde ..."
 
-#: src/libdar/i_archive.cpp:2536
+#: src/libdar/i_archive.cpp:2534
 msgid "Processing files for merging..."
 msgstr "Traitement des fichier pour la fusion ..."
 
-#: src/libdar/i_archive.cpp:2578
+#: src/libdar/i_archive.cpp:2576
 msgid "Processing files for fixing..."
 msgstr "Traitement des fichier pour la réparation ..."
 
-#: src/libdar/i_archive.cpp:2660
+#: src/libdar/i_archive.cpp:2658
 msgid ""
 "Adding reference to files that have been destroyed since reference backup..."
 msgstr ""
 "Ajout des fichiers qui ont été détruits depuis la sauvegarde de référence ..."
 
-#: src/libdar/i_archive.cpp:2715
+#: src/libdar/i_archive.cpp:2713
 msgid "Error while saving data: "
 msgstr "Erreur lors de la sauvegarde des données : "
 
-#: src/libdar/i_archive.cpp:2741
+#: src/libdar/i_archive.cpp:2739
 msgid "WARNING! Incorrect signature found for archive, continue anyway?"
 msgstr ""
 "ATTENTION ! Signature incorrecte trouvée pour l'archive, on continue malgré "
 "tout ?"
 
-#: src/libdar/i_archive.cpp:2784
+#: src/libdar/i_archive.cpp:2782
 msgid ""
 "Cannot get data name of the archive, this archive is not completely "
 "initialized"
@@ -4891,7 +4891,7 @@ msgstr ""
 "Impossible d'obtenir le nom de données de cette archive ; cette archive "
 "n'est pas complètement initialisée"
 
-#: src/libdar/i_archive.cpp:2809
+#: src/libdar/i_archive.cpp:2807
 msgid ""
 "This archive contains an isolated catalogue, it cannot be used for this "
 "operation. It can only be used as reference for a incremental/differential "
@@ -4902,7 +4902,7 @@ msgstr ""
 "sauvegarde incrémentale/décrémentale ou comme secours du catalogue de "
 "l'archive d'origine"
 
-#: src/libdar/i_archive.cpp:2816
+#: src/libdar/i_archive.cpp:2814
 msgid ""
 "LAX MODE: Archive seems to be only an isolated catalogue (no data in it), "
 "Can I assume data corruption occurred and consider the archive as being a "
@@ -4912,15 +4912,15 @@ msgstr ""
 "présente), Doit-on considérer qu'il s'agit plutôt d'une corruption et peut-"
 "on considérer que l'archive est une vraie archive ?"
 
-#: src/libdar/i_archive.cpp:2821
+#: src/libdar/i_archive.cpp:2819
 msgid "Error while fetching archive properties: "
 msgstr "Erreur lors de la recherche des propriétés de l'archive : "
 
-#: src/libdar/i_archive.cpp:2846
+#: src/libdar/i_archive.cpp:2844
 msgid "Sorry, file size is unknown at this step of the program."
 msgstr "Désolé, la taille du fichier est inconnue à cette étape du programme"
 
-#: src/libdar/i_archive.cpp:2945
+#: src/libdar/i_archive.cpp:2943
 #, c-format
 msgid ""
 "libgcrypt version < %s. Ligcrypt used has a bug that leads md5 and sha1 hash "
@@ -5724,7 +5724,7 @@ msgstr ""
 "passe sur le point d'être fourni peut être écrit sur disque en clair "
 "(fichier d'échange). Vous avez été prévenu !"
 
-#: src/libdar/macro_tools.cpp:656 src/libdar/macro_tools.cpp:1423
+#: src/libdar/macro_tools.cpp:656 src/libdar/macro_tools.cpp:1421
 #, c-format
 msgid "Archive %S requires a password: "
 msgstr "L'archive %S nécessite un mot de passe : "
@@ -5752,13 +5752,13 @@ msgid "Opening cyphering layer..."
 msgstr "Ouverture d'une couche de chiffrement ..."
 
 #: src/libdar/macro_tools.cpp:721 src/libdar/macro_tools.cpp:751
-#: src/libdar/macro_tools.cpp:1501
+#: src/libdar/macro_tools.cpp:1499
 #, c-format
 msgid "multi-threaded cyphering layer open, with %d worker thread(s)"
 msgstr "Couche de chiffrement multi-thread ouverte avec %d fil(s)"
 
 #: src/libdar/macro_tools.cpp:724 src/libdar/macro_tools.cpp:754
-#: src/libdar/macro_tools.cpp:1503
+#: src/libdar/macro_tools.cpp:1501
 msgid ""
 "libthreadar is required at compilation time in order to use more than one "
 "thread for cryptography"
@@ -5767,7 +5767,7 @@ msgstr ""
 "thread pour le chiffrement"
 
 #: src/libdar/macro_tools.cpp:734 src/libdar/macro_tools.cpp:764
-#: src/libdar/macro_tools.cpp:1513
+#: src/libdar/macro_tools.cpp:1511
 msgid "single-threaded cyphering layer open"
 msgstr "Couche de chiffrement mono-thread ouverte"
 
@@ -5857,7 +5857,7 @@ msgstr "Ouverture de la couche de compression sequentielle (mono thread)"
 msgid "block compression layer open with %d worker thread(s)"
 msgstr "Ouverture de la couche de compression par blocs avec %d tache(s)"
 
-#: src/libdar/macro_tools.cpp:927 src/libdar/macro_tools.cpp:1676
+#: src/libdar/macro_tools.cpp:927 src/libdar/macro_tools.cpp:1674
 msgid "All layers have been created successfully"
 msgstr "Toutes les couches d'abstraction ont été crées avec succès"
 
@@ -5984,7 +5984,7 @@ msgstr ""
 msgid "LAX MODE: Failed to read the catalogue"
 msgstr "MODE RELAX : Échec de lecture du catalogue"
 
-#: src/libdar/macro_tools.cpp:1196
+#: src/libdar/macro_tools.cpp:1194
 msgid ""
 "Creating low layer: Writing archive into a black hole object (equivalent to /"
 "dev/null)..."
@@ -5992,19 +5992,19 @@ msgstr ""
 "Création de la couche de base : Ecriture de l'archive dans un trou noir "
 "(équivalent à /dev/null) ..."
 
-#: src/libdar/macro_tools.cpp:1205
+#: src/libdar/macro_tools.cpp:1203
 msgid "Creating low layer: Writing archive into standard output object..."
 msgstr ""
 "Création de la couche de base : Ecriture de l'archive vers la sortie "
 "standard ..."
 
-#: src/libdar/macro_tools.cpp:1218
+#: src/libdar/macro_tools.cpp:1216
 msgid "Creating low layer: Writing archive into a plain file object..."
 msgstr ""
 "Création de la couche de base : Ecriture de l'archive dans un fichier "
 "normal ..."
 
-#: src/libdar/macro_tools.cpp:1239
+#: src/libdar/macro_tools.cpp:1237
 msgid ""
 "Creating low layer: Writing archive into a sar object (Segmentation and "
 "Reassembly) for slicing..."
@@ -6012,13 +6012,13 @@ msgstr ""
 "Création de la couche de base : Ecriture de l'archive vers un objet sar "
 "(Segmentation and Reassemblement) pour le découpage en tranches ..."
 
-#: src/libdar/macro_tools.cpp:1278
+#: src/libdar/macro_tools.cpp:1276
 msgid "Adding cache layer over pipe to provide limited skippability..."
 msgstr ""
 "Ajout d'une couche de cache au-dessus du tube pour fournir une capacité de "
 "déplacement limitée"
 
-#: src/libdar/macro_tools.cpp:1299
+#: src/libdar/macro_tools.cpp:1297
 msgid ""
 "WARNING: support for secure memory was not available at compilation time, in "
 "case of heavy memory load, this may lead the password/passphrase provided to "
@@ -6029,13 +6029,13 @@ msgstr ""
 "de passe peuvent être écrit sur disque en clair (fichier d'échange). Vous "
 "avez été prévenus !"
 
-#: src/libdar/macro_tools.cpp:1314
+#: src/libdar/macro_tools.cpp:1312
 msgid "Generating random key for symmetric encryption..."
 msgstr ""
 "Génération d'une clef de chiffrement aléatoire pour le chiffrement "
 "symmétrique ..."
 
-#: src/libdar/macro_tools.cpp:1322
+#: src/libdar/macro_tools.cpp:1320
 msgid ""
 "Scrambling is a very weak encryption algorithm, this is a non-sens to use "
 "with asymmetric encryption"
@@ -6043,7 +6043,7 @@ msgstr ""
 "Le chiffrement \"scramble\" est très faible. C'est un non-sens de l'utiliser "
 "avec le chiffrement asymétrique"
 
-#: src/libdar/macro_tools.cpp:1362
+#: src/libdar/macro_tools.cpp:1360
 #, c-format
 msgid ""
 "For your information, this is the iteration %d for which the randomly "
@@ -6054,18 +6054,18 @@ msgstr ""
 "générée est considérée comme faible par libgcrypt. La rechercher d'une "
 "nouvelle clef aléatoire continue ... patience"
 
-#: src/libdar/macro_tools.cpp:1366
+#: src/libdar/macro_tools.cpp:1364
 #, c-format
 msgid ""
 "... A strong randomly generated key could be found after %d iteration(s)"
 msgstr ""
 "Une clef forte générée aléatoirement a pu être trouvée après %d iteration(s)"
 
-#: src/libdar/macro_tools.cpp:1373
+#: src/libdar/macro_tools.cpp:1371
 msgid "Key generated"
 msgstr "Clef générée"
 
-#: src/libdar/macro_tools.cpp:1385
+#: src/libdar/macro_tools.cpp:1383
 msgid ""
 "WARNING: When signing an archive with more than one recipient, there is a "
 "theorical risk that a recipient forges a slightly modified version of the "
@@ -6079,107 +6079,107 @@ msgstr ""
 "context de signer l'archive générée sans dar en appelant par exemple \"gpg --"
 "detach-sign\""
 
-#: src/libdar/macro_tools.cpp:1424
+#: src/libdar/macro_tools.cpp:1422
 msgid "Please confirm your password: "
 msgstr "Merci de confirmer le mot de passe : "
 
-#: src/libdar/macro_tools.cpp:1428
+#: src/libdar/macro_tools.cpp:1426
 msgid "The two passwords are not identical. Aborting"
 msgstr "Les deux mots de passes ne sont pas identiques. Abandon"
 
-#: src/libdar/macro_tools.cpp:1448
+#: src/libdar/macro_tools.cpp:1446
 msgid "Adding a new layer on top: scrambler object..."
 msgstr "Ajout d'une nouvelle couche : Chiffrement faible ..."
 
-#: src/libdar/macro_tools.cpp:1460
+#: src/libdar/macro_tools.cpp:1458
 msgid "Adding a new layer on top: Strong encryption object..."
 msgstr "Ajout d'une nouvelle couche : Chiffrement fort ..."
 
-#: src/libdar/macro_tools.cpp:1529
+#: src/libdar/macro_tools.cpp:1527
 msgid "Adding a new layer on top: Caching layer for better performances..."
 msgstr ""
 "Ajout d'une nouvelle couche : Cache pour de meilleures performances ..."
 
-#: src/libdar/macro_tools.cpp:1600
+#: src/libdar/macro_tools.cpp:1598
 msgid "Writing down the archive header..."
 msgstr "Ecriture de l'en-tête de l'archive ..."
 
-#: src/libdar/macro_tools.cpp:1623
+#: src/libdar/macro_tools.cpp:1621
 msgid "Writing down the initial elastic buffer through the encryption layer..."
 msgstr "Ecriture du tampon élastique initial via la couche de chiffrement ..."
 
-#: src/libdar/macro_tools.cpp:1634
+#: src/libdar/macro_tools.cpp:1632
 msgid "Adding a new layer on top: Escape layer to allow sequential reading..."
 msgstr ""
 "Ajout d'une nouvelle couche : Couche d'échappement pour permettre la lecture "
 "séquentielle ..."
 
-#: src/libdar/macro_tools.cpp:1649
+#: src/libdar/macro_tools.cpp:1647
 msgid "Adding a new layer on top: compression..."
 msgstr "Ajout d'une nouvelle couche : Compression ..."
 
-#: src/libdar/macro_tools.cpp:1654
+#: src/libdar/macro_tools.cpp:1652
 msgid "Adding a streamed compression layer"
 msgstr "Ajout d'un couche de compression sequentielle"
 
-#: src/libdar/macro_tools.cpp:1664
+#: src/libdar/macro_tools.cpp:1662
 #, c-format
 msgid "Adding block compression layer, with %d worker thread(s)"
 msgstr "Ajout d'une couche de compression par block utilisant %d thread(s)"
 
-#: src/libdar/macro_tools.cpp:1690
+#: src/libdar/macro_tools.cpp:1688
 msgid "Error creating archive layers: "
 msgstr "Erreur pendant la création des couches pour l'archive : "
 
-#: src/libdar/macro_tools.cpp:1796
+#: src/libdar/macro_tools.cpp:1794
 msgid "Writing down archive contents..."
 msgstr "Ecriture du contenu de l'archive ..."
 
-#: src/libdar/macro_tools.cpp:1820
+#: src/libdar/macro_tools.cpp:1818
 msgid "Calculating the signature of the catalogue hash..."
 msgstr "Calcul de la signature du hashage du catalogue ..."
 
-#: src/libdar/macro_tools.cpp:1836
+#: src/libdar/macro_tools.cpp:1834
 msgid "Writing down the signed hash of the catalogue..."
 msgstr "Ecriture de la signature du catalogue..."
 
-#: src/libdar/macro_tools.cpp:1886
+#: src/libdar/macro_tools.cpp:1884
 msgid "Closing the compression layer..."
 msgstr "Fermeture de la couche de compression ..."
 
-#: src/libdar/macro_tools.cpp:1898
+#: src/libdar/macro_tools.cpp:1896
 msgid "Closing the escape layer..."
 msgstr "Fermeture de la couche d'échappement..."
 
-#: src/libdar/macro_tools.cpp:1910
+#: src/libdar/macro_tools.cpp:1908
 msgid "Writing down the first archive terminator..."
 msgstr "Ecriture du premier terminateur d'archive..."
 
-#: src/libdar/macro_tools.cpp:1916
+#: src/libdar/macro_tools.cpp:1914
 msgid "writing down the final elastic buffer through the encryption layer..."
 msgstr "Ecriture du tampon élastique terminal via la couche de chiffrement ..."
 
-#: src/libdar/macro_tools.cpp:1955
+#: src/libdar/macro_tools.cpp:1953
 msgid "Closing the encryption layer..."
 msgstr "Fermeture de la couche de chiffrement ..."
 
-#: src/libdar/macro_tools.cpp:1977
+#: src/libdar/macro_tools.cpp:1975
 msgid "Writing down archive trailer..."
 msgstr "Ecriture de la fin d'archive ..."
 
-#: src/libdar/macro_tools.cpp:1982
+#: src/libdar/macro_tools.cpp:1980
 msgid "Writing down the second archive terminator..."
 msgstr "Ecriture du second terminateur d'archive ..."
 
-#: src/libdar/macro_tools.cpp:1993
+#: src/libdar/macro_tools.cpp:1991
 msgid "Closing archive low layer..."
 msgstr "Fermeture de la couche de base ..."
 
-#: src/libdar/macro_tools.cpp:2010
+#: src/libdar/macro_tools.cpp:2008
 msgid "Archive is closed."
 msgstr "L'archive est fermée."
 
-#: src/libdar/macro_tools.cpp:2197 src/libdar/macro_tools.cpp:2235
+#: src/libdar/macro_tools.cpp:2195 src/libdar/macro_tools.cpp:2233
 msgid ""
 "libthreadar is required at compilation time in order to use more than one "
 "thread for block compression"
@@ -6187,7 +6187,7 @@ msgstr ""
 "libthreadar est nécessaire lors de la compilation afin de pouvoir utiliser "
 "plus d'une file d'exécution pour la compression par bloc"
 
-#: src/libdar/macro_tools.cpp:2258
+#: src/libdar/macro_tools.cpp:2256
 msgid ""
 "The format version of the archive is too high for that software version, try "
 "reading anyway?"
@@ -7053,64 +7053,64 @@ msgstr "entrée supprimée"
 msgid "door inode"
 msgstr "inode Porte"
 
-#: src/libdar/mycurl_easyhandle_node.cpp:150
+#: src/libdar/mycurl_easyhandle_node.cpp:152
 #, c-format
 msgid "Error met while setting string option %d on libcurl handle: %s"
 msgstr ""
 "Erreur lors du paramétrage de l'option %d de type string pour le handle "
 "libcurl : %s"
 
-#: src/libdar/mycurl_easyhandle_node.cpp:160
+#: src/libdar/mycurl_easyhandle_node.cpp:162
 #, c-format
 msgid "Error met while setting secu_string option %d on libcurl handle: %s"
 msgstr ""
 "Erreur lors du paramétrage de l'option %d de type secu_string pour le handle "
 "libcurl : %s"
 
-#: src/libdar/mycurl_easyhandle_node.cpp:170
+#: src/libdar/mycurl_easyhandle_node.cpp:172
 #, c-format
 msgid "Error met while setting pointer option %d on libcurl handle: %s"
 msgstr ""
 "Erreur lors du paramétrage de l'option %d de type pointer pour le handle "
 "libcurl : %s"
 
-#: src/libdar/mycurl_easyhandle_node.cpp:180
+#: src/libdar/mycurl_easyhandle_node.cpp:182
 #, c-format
 msgid "Error met while setting long option %d on libcurl handle: %s"
 msgstr ""
 "Erreur lors du paramétrage de l'option %d de type long pour le handle "
 "libcurl : %s"
 
-#: src/libdar/mycurl_easyhandle_node.cpp:190
+#: src/libdar/mycurl_easyhandle_node.cpp:192
 #, c-format
 msgid "Error met while setting curl_slist option %d on libcurl handle: %s"
 msgstr ""
 "Erreur lors du paramétrage de l'option %d de type curl_slist pour le handle "
 "libcurl : %s"
 
-#: src/libdar/mycurl_easyhandle_node.cpp:200
+#: src/libdar/mycurl_easyhandle_node.cpp:202
 #, c-format
 msgid "Error met while setting curl_off_t option %d on libcurl handle: %s"
 msgstr ""
 "Erruer lors du paramétrage de l'option %d de type curl_off_t pour le handle "
 "libcurl : %s"
 
-#: src/libdar/mycurl_easyhandle_node.cpp:231
+#: src/libdar/mycurl_easyhandle_node.cpp:233
 msgid "Error met while creating a libcurl handle"
 msgstr "Erreur lors de la cration d'un objet libcurl"
 
-#: src/libdar/mycurl_easyhandle_node.cpp:329
-#: src/libdar/mycurl_easyhandle_node.cpp:335
+#: src/libdar/mycurl_easyhandle_node.cpp:331
+#: src/libdar/mycurl_easyhandle_node.cpp:337
 #, c-format
 msgid "%S: %s, aborting"
 msgstr "%S : %s, abandon"
 
-#: src/libdar/mycurl_easyhandle_node.cpp:350
+#: src/libdar/mycurl_easyhandle_node.cpp:352
 #, c-format
 msgid "%S: %s, retrying in %d seconds"
 msgstr "%S : %s, nouvelle tentative dans %d secondes"
 
-#: src/libdar/mycurl_easyhandle_node.cpp:357
+#: src/libdar/mycurl_easyhandle_node.cpp:359
 #, c-format
 msgid "%S: %s, do we retry network operation?"
 msgstr "%S : %s, retente-t-on l'opération réseau ?"

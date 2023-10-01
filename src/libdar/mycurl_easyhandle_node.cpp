@@ -70,6 +70,7 @@ namespace libdar
 
     mycurl_easyhandle_node & mycurl_easyhandle_node::operator = (const mycurl_easyhandle_node & ref)
     {
+	    // handle is kept as is
 	wanted = ref.current;
 	(void) wanted.update_with(ref.wanted);
 	return *this;
@@ -77,6 +78,7 @@ namespace libdar
 
     mycurl_easyhandle_node & mycurl_easyhandle_node::operator = (mycurl_easyhandle_node && ref) noexcept
     {
+	    // this->handle is kept as is
 	wanted = std::move(ref.current);
 	(void) wanted.update_with(ref.wanted);
 	return *this;
