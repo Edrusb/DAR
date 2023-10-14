@@ -22,7 +22,7 @@
     /// \file entrepot_local.hpp
     /// \brief defines the implementation for local filesystem entrepot
     /// The entrepot_local correspond to the local filesystems.
-    /// \ingroup Private
+    /// \ingroup API
 
 #ifndef ENTREPOT_LOCAL_HPP
 #define ENTREPOT_LOCAL_HPP
@@ -47,6 +47,12 @@ namespace libdar
     class entrepot_local : public entrepot
     {
     public:
+
+	    /// constructor
+
+	    /// \param[in] user defines the default user ownership of files created by the entrepot::open() method
+	    /// \param[in] group defines the default group ownership of files created by the entrepot::open() method
+	    /// \param[in] x_furtive_mode whether to ask the operating system to make furtive read access (no mtime/atime/ctime modification)
 	entrepot_local(const std::string & user, const std::string & group, bool x_furtive_mode);
 	entrepot_local(const entrepot_local & ref): entrepot(ref) { copy_from(ref); };
 	entrepot_local(entrepot_local && ref) noexcept: entrepot(std::move(ref)) { nullifyptr(); move_from(std::move(ref)); };
