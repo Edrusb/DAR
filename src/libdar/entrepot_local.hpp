@@ -21,14 +21,7 @@
 
     /// \file entrepot_local.hpp
     /// \brief defines the implementation for local filesystem entrepot
-    /// The entrepot_local is the only implementation of an entrepot class present
-    /// in libdar. It correspond to local filesystems. The reason of existence of the
-    /// entrepot stuff is to allow external application like webdar to drop/read slices over
-    /// the network using FTP protocol for example. External applications only have to define
-    /// Their own implementation of the entrepot interface and file-like objects they
-    /// generates (inherited from class fichier_global), libdar uses them throught the
-    /// generic interface. This avoids having network related stuff inside libdar, which
-    /// for security reason and functions/roles separation would not be a good idea
+    /// The entrepot_local correspond to the local filesystems.
     /// \ingroup Private
 
 #ifndef ENTREPOT_LOCAL_HPP
