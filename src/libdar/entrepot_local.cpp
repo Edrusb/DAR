@@ -93,15 +93,14 @@ namespace libdar
 	    throw SRC_BUG;
 	if(contents == nullptr)
 	    return false;
-	if(contents->fichier.empty())
+	if(!contents->read(filename))
 	{
 	    delete contents;
 	    me->contents = nullptr;
 	    return false;
 	}
-	filename = contents->fichier.front();
-	me->contents->fichier.pop_front();
-	return true;
+	else
+ 	    return true;
     }
 
     fichier_global *entrepot_local::inherited_open(const shared_ptr<user_interaction> & dialog,

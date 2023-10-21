@@ -251,7 +251,7 @@ namespace libdar
                     string tmp;
 
 		    if(!alter_atime && !furtive_read_mode)
-			tools_noexcept_make_date(current_dir->display(), false, inner.last_acc, inner.last_mod, inner.last_mod);
+			tools_noexcept_make_date(current_dir->display(), false, inner.get_last_acc(), inner.get_last_mod(), inner.get_last_mod());
                     pile.pop_back();
                     if(pile.empty())
                         return false; // end of filesystem
@@ -369,7 +369,7 @@ namespace libdar
         else
         {
 	    if(!alter_atime && !furtive_read_mode)
-		tools_noexcept_make_date(current_dir->display(), false, pile.back().last_acc, pile.back().last_mod, pile.back().last_mod);
+		tools_noexcept_make_date(current_dir->display(), false, pile.back().get_last_acc(), pile.back().get_last_mod(), pile.back().get_last_mod());
             pile.pop_back();
         }
 

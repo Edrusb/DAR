@@ -41,13 +41,14 @@ namespace libdar
 
 	/// the etage structure keep trace of directory contents
 
-	/// it relies on the [fd]opendir() system call family than
-	/// cannot be used recursively. Thus each etage structure
-	/// contains the contents of a directory, and can then be stored beside
-	/// other etage structures corresponding to subdirectories
+	/// it relies on the [fd]opendir() system call family that
+	/// cannot be used recursively. Thus each etage structure is used
+	/// to cache the contents of a directory, and can then be stored
+	/// beside other etage structures corresponding to subdirectories
 
-    struct etage
+    class etage
     {
+    public:
 	etage() { fichier.clear(); last_mod = datetime(0); last_acc = datetime(0); }; // required to fake an empty dir when one is impossible to open
         etage(user_interaction & ui,
 	      const char *dirname,
@@ -62,10 +63,14 @@ namespace libdar
 	~etage() = default;
 
         bool read(std::string & ref);
+	bool is_empty() const { return fichier.empty(); };
+	datetime get_last_mod() const { return last_mod; };
+	datetime get_last_acc() const { return last_acc; };
 
+    private:
         std::deque<std::string> fichier; ///< holds the list of entry in the directory
-        datetime last_mod;              ///< the last_lod of the directory itself
-	datetime last_acc;              ///< the last_acc of the directory itself
+        datetime last_mod;               ///< the last_lod of the directory itself
+	datetime last_acc;               ///< the last_acc of the directory itself
     };
 
 	/// @}
