@@ -127,7 +127,18 @@ namespace libdar
 
 	    /// routines to read existing files in the current directory (see set_location() / set_root() methods)
 	virtual void read_dir_reset() const = 0;
+
+	    /// read the next filename of the current directory
+
+	    /// \param[out] filename name of the next entry in the directory, (valid only if this method returned true)
+	    /// \returns false if no more filename could be fould
 	virtual bool read_dir_next(std::string & filename) const = 0;
+
+	    /// alternative to the previous method, should be implemented also
+
+	    /// \param[out] filename name of the next entry in the directory, (valid only if this method returned true)
+	    /// \param[out] isdir true if filename is a directory (valid only if this method returned true)
+	virtual bool read_dir_next(std::string & filename, bool & isdir) const = 0;
 
 	void unlink(const std::string & filename) const { inherited_unlink(filename); }; //< done this way for homogeneity with open/inherited_open
 

@@ -87,13 +87,19 @@ namespace libdar
 
     bool entrepot_local::read_dir_next(string & filename) const
     {
+	bool isdir;
+	return read_dir_next(filename, isdir);
+    }
+
+    bool entrepot_local::read_dir_next(std::string & filename, bool & isdir) const
+    {
 	entrepot_local *me = const_cast<entrepot_local *>(this);
 
 	if(me == nullptr)
 	    throw SRC_BUG;
 	if(contents == nullptr)
 	    return false;
-	if(!contents->read(filename))
+	if(!contents->read(filename, isdir))
 	{
 	    delete contents;
 	    me->contents = nullptr;

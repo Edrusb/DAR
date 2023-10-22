@@ -193,6 +193,29 @@ namespace libdar
 #endif
     }
 
+    bool entrepot_libcurl::read_dir_next(std::string & filename, bool & isdir) const
+    {
+#if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
+	bool ret;
+
+	NLS_SWAP_IN;
+        try
+        {
+	    ret = pimpl->read_dir_next(filename, isdir);
+        }
+        catch(...)
+        {
+            NLS_SWAP_OUT;
+            throw;
+        }
+        NLS_SWAP_OUT;
+
+	return ret;
+#else
+	throw Efeature("libcurl library");
+#endif
+    }
+
     fichier_global *entrepot_libcurl::inherited_open(const shared_ptr<user_interaction> & dialog,
 						     const string & filename,
 						     gf_mode mode,

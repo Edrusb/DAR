@@ -153,7 +153,7 @@ namespace libdar
 		{
 		    if(cache_directory_tagging)
 			is_cache_dir = cache_directory_tagging_check(dirname, ret->d_name);
-		    fichier.push_back(string(ret->d_name));
+		    fichier.push_back(cell(string(ret->d_name), ret->d_type == DT_DIR));
 		}
 	    }
             closedir(tmp);
@@ -177,13 +177,14 @@ namespace libdar
         }
     }
 
-    bool etage::read(string & ref)
+    bool etage::read(string & ref, bool & isdir)
     {
         if(fichier.empty())
             return false;
         else
         {
-            ref = fichier.front();
+            ref = fichier.front().name;
+	    isdir = fichier.front().isdir;
             fichier.pop_front();
             return true;
         }

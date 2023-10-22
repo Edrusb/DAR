@@ -62,15 +62,23 @@ namespace libdar
 	etage & operator = (etage && ref) noexcept = default;
 	~etage() = default;
 
-        bool read(std::string & ref);
+        bool read(std::string & ref, bool & isdir);
 	bool is_empty() const { return fichier.empty(); };
 	datetime get_last_mod() const { return last_mod; };
 	datetime get_last_acc() const { return last_acc; };
 
     private:
-        std::deque<std::string> fichier; ///< holds the list of entry in the directory
-        datetime last_mod;               ///< the last_lod of the directory itself
-	datetime last_acc;               ///< the last_acc of the directory itself
+	struct cell
+	{
+	    std::string name;
+	    bool isdir;
+	    cell(const std::string & filename,
+		 bool is_dir): name(filename), isdir(is_dir) {};
+	};
+
+        std::deque<cell> fichier;     ///< holds the list of entry in the directory
+        datetime last_mod;            ///< the last_lod of the directory itself
+	datetime last_acc;            ///< the last_acc of the directory itself
     };
 
 	/// @}

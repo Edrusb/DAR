@@ -84,6 +84,7 @@ namespace libdar
 	virtual std::string get_url() const override { return base_URL + get_full_path().display_without_root(); };
 	virtual void read_dir_reset() const override;
 	virtual bool read_dir_next(std::string & filename) const override;
+	virtual bool read_dir_next(std::string & filename, bool & isdir) const override { throw Efeature("entrepot entry isdir"); };
 	virtual entrepot *clone() const override { return new (std::nothrow) i_entrepot_libcurl(*this); };
 
     protected:
