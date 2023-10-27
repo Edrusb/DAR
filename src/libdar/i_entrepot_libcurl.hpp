@@ -105,9 +105,9 @@ namespace libdar
     private:
 	mycurl_protocol x_proto;
 	std::string base_URL; ///< URL of the repository with only minimum path (login/password is given outside the URL)
-	mycurl_easyhandle_sharing easyh;
-	std::deque<std::string> current_dir;
-	std::string reading_dir_tmp;
+	mutable mycurl_easyhandle_sharing easyh;
+	mutable std::map<std::string, bool> current_dir; ///< map current directory entries to their property of being themselves a directory
+	mutable std::string reading_dir_tmp;             ///< used by callback to split received byte flow, line per line
 	U_I wait_delay;
 	bool verbosity;
 

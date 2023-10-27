@@ -167,18 +167,14 @@ namespace libdar
     {
 	fichier_global *ret = nullptr;
 	cache_global *rw = nullptr;
-	i_entrepot_libcurl *me = const_cast<i_entrepot_libcurl *>(this);
 	gf_mode hidden_mode = mode;
-
-	if(me == nullptr)
-	    throw SRC_BUG;
 
 	if(fail_if_exists)
 	{
 	    string tmp;
 
-	    me->read_dir_reset();
-	    while(me->read_dir_next(tmp))
+	    read_dir_reset();
+	    while(read_dir_next(tmp))
 		if(tmp == filename)
 		    throw Esystem("i_entrepot_libcurl::inherited_open", "File exists on remote repository" , Esystem::io_exist);
 	}
@@ -196,7 +192,7 @@ namespace libdar
 	    fichier_libcurl *ret_libcurl = new (nothrow) fichier_libcurl(dialog,
 									 chemin,
 									 x_proto,
-									 me->easyh.alloc_instance(),
+									 easyh.alloc_instance(),
 									 hidden_mode,
 									 wait_delay,
 									 force_permission,
@@ -261,12 +257,8 @@ namespace libdar
 	mycurl_slist headers;
 	shared_ptr<mycurl_easyhandle_node> node;
 	string order;
-	i_entrepot_libcurl *me = const_cast<i_entrepot_libcurl *>(this);
 
-	if(me == nullptr)
-	    throw SRC_BUG;
-
-	node = me->easyh.alloc_instance();
+	node = easyh.alloc_instance();
 	if(!node)
 	    throw SRC_BUG;
 
@@ -421,7 +413,10 @@ namespace libdar
 		switch(*ptr)
 		{
 		case '\n':
-		    me->current_dir.push_back(me->reading_dir_tmp);
+		    if(me->withdirinfo)
+			me->update_current_dir_with_line(me->reading_dir_tmp);
+		    else
+			me->current_dir[me->reading_dir_tmp] = false; // for now assumed to be non directory entry
 		    me->reading_dir_tmp.clear();
 		    break;
 		case '\r':
