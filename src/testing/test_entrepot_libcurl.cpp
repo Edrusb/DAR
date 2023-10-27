@@ -136,6 +136,15 @@ void f1(int argc, char *argv[])
 			      "",
 			      "",
 			      3);
+
+    string entry;
+    bool isdir;
+    ui->printf("Directory content");
+    reposito.read_dir_reset_dirinfo();
+    while(reposito.read_dir_next_dirinfo(entry, isdir))
+	ui->printf("%s | %s", isdir? "DIR" : "xxx", entry.c_str());
+
+
     fichier_local readme("/etc/fstab");
     fichier_local *writetome = new fichier_local(ui,
 						 "/tmp/test.tmp",
@@ -151,6 +160,7 @@ void f1(int argc, char *argv[])
 						     false,
 						     true,
 						     false);
+
     try
     {
 	string tmp;

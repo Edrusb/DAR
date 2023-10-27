@@ -62,9 +62,12 @@ namespace libdar
 
 	virtual std::string get_url() const override { return std::string("file://") + get_full_path().display(); };
 
-	virtual void read_dir_reset() const override;
+	    /// \note dir_details does not matter for this implementation, both read_dir_next() can be
+	    /// used anytime.
+	virtual void read_dir_reset() const override { read_dir_reset_dirinfo(); };
 	virtual bool read_dir_next(std::string & filename) const override;
-	virtual bool read_dir_next(std::string & filename, bool & isdir) const override;
+	virtual void read_dir_reset_dirinfo() const override;
+	virtual bool read_dir_next_dirinfo(std::string & filename, bool & isdir) const override;
 
 	virtual entrepot *clone() const override { return new (std::nothrow) entrepot_local(*this); };
 

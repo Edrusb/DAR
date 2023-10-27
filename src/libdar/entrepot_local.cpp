@@ -71,7 +71,7 @@ namespace libdar
 	return *this;
     }
 
-    void entrepot_local::read_dir_reset() const
+    void entrepot_local::read_dir_reset_dirinfo() const
     {
 	entrepot_local *me = const_cast<entrepot_local *>(this);
 	user_interaction_blind aveugle;
@@ -88,10 +88,10 @@ namespace libdar
     bool entrepot_local::read_dir_next(string & filename) const
     {
 	bool isdir;
-	return read_dir_next(filename, isdir);
+	return read_dir_next_dirinfo(filename, isdir);
     }
 
-    bool entrepot_local::read_dir_next(std::string & filename, bool & isdir) const
+    bool entrepot_local::read_dir_next_dirinfo(std::string & filename, bool & isdir) const
     {
 	entrepot_local *me = const_cast<entrepot_local *>(this);
 

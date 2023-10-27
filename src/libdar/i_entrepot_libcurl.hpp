@@ -39,6 +39,7 @@ extern "C"
 
 #include <string>
 #include <deque>
+#include <map>
 #include "entrepot_libcurl.hpp"
 #include "secu_string.hpp"
 #include "mem_ui.hpp"
@@ -82,9 +83,10 @@ namespace libdar
 	    /// \note this is expected to have a double slash after the host:port
 	    /// like ftp://www.some.where:8021//tmp/sub/dir
 	virtual std::string get_url() const override { return base_URL + get_full_path().display_without_root(); };
-	virtual void read_dir_reset() const override;
+	virtual void read_dir_reset() const override { set_current_dir(false); };
 	virtual bool read_dir_next(std::string & filename) const override;
-	virtual bool read_dir_next(std::string & filename, bool & isdir) const override { throw Efeature("entrepot entry isdir"); };
+	virtual void read_dir_reset_dirinfo() const override { set_current_dir(true); };
+	virtual bool read_dir_next_dirinfo(std::string & filename, bool & isdir) const override;
 	virtual entrepot *clone() const override { return new (std::nothrow) i_entrepot_libcurl(*this); };
 
     protected:
@@ -108,8 +110,11 @@ namespace libdar
 	mutable mycurl_easyhandle_sharing easyh;
 	mutable std::map<std::string, bool> current_dir; ///< map current directory entries to their property of being themselves a directory
 	mutable std::string reading_dir_tmp;             ///< used by callback to split received byte flow, line per line
+	mutable std::deque<std::string> temporary_list;  ///< used only when looking for dir/nodir property
+	mutable std::map<std::string, bool>::const_iterator cur_dir_cursor; ///< next entry to be read from current_dir
 	U_I wait_delay;
 	bool verbosity;
+	mutable bool withdirinfo; ///< used by callback function while reading directory content, to know whether to expect only a filename per line or whole entry information
 
 	std::string get_libcurl_URL() const;
 	void set_libcurl_authentication(user_interaction & dialog,         ///< for user interaction
@@ -121,7 +126,11 @@ namespace libdar
 					const std::string & sftp_prv_keyfile,  ///< where to fetch the private key (sftp only)
 					const std::string & sftp_known_hosts   ///< where to fetch the .known_hosts file (sftp only)
 	    );
-	void detruit();
+
+	void fill_temporary_list() const;
+	void update_current_dir_with_line(const std::string & line) const;
+	void set_current_dir(bool details) const;
+
 
 	static std::string mycurl_protocol2string(mycurl_protocol proto);
 	static std::string build_url_from(mycurl_protocol proto, const std::string & host, const std::string & port);

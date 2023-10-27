@@ -82,7 +82,8 @@ namespace libdar
 	virtual const path & get_root() const override;
 	virtual void read_dir_reset() const override;
 	virtual bool read_dir_next(std::string & filename) const override;
-	virtual bool read_dir_next(std::string & filename, bool & isdir) const override;
+	virtual void read_dir_reset_dirinfo() const override;
+	virtual bool read_dir_next_dirinfo(std::string & filename, bool & isdir) const override;
 	virtual entrepot *clone() const override { return new (std::nothrow) entrepot_libcurl(*this); };
 
     protected:

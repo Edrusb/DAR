@@ -193,7 +193,26 @@ namespace libdar
 #endif
     }
 
-    bool entrepot_libcurl::read_dir_next(std::string & filename, bool & isdir) const
+    void entrepot_libcurl::read_dir_reset_dirinfo() const
+    {
+#if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
+	NLS_SWAP_IN;
+        try
+        {
+	    pimpl->read_dir_reset_dirinfo();
+        }
+        catch(...)
+        {
+            NLS_SWAP_OUT;
+            throw;
+        }
+        NLS_SWAP_OUT;
+#else
+	throw Efeature("libcurl library");
+#endif
+    }
+
+    bool entrepot_libcurl::read_dir_next_dirinfo(std::string & filename, bool & isdir) const
     {
 #if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
 	bool ret;
@@ -201,7 +220,7 @@ namespace libdar
 	NLS_SWAP_IN;
         try
         {
-	    ret = pimpl->read_dir_next(filename, isdir);
+	    ret = pimpl->read_dir_next_dirinfo(filename, isdir);
         }
         catch(...)
         {

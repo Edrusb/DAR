@@ -126,19 +126,37 @@ namespace libdar
 			     bool provide_a_plain_file = true) const;
 
 	    /// routines to read existing files in the current directory (see set_location() / set_root() methods)
+
+	    /// \param[in] dir_details, if set to true, use read_dir_next() with the isdir argument, else
+	    /// use the read_dir_next() with a single argument. By default and for backward compatibility
+	    /// dir_details is set to false.
 	virtual void read_dir_reset() const = 0;
 
 	    /// read the next filename of the current directory
 
 	    /// \param[out] filename name of the next entry in the directory, (valid only if this method returned true)
 	    /// \returns false if no more filename could be fould
+	    /// \note either use read_dir_reset() followed by read_dir_next() calls, or call
+	    /// read_dir_reset_dirinfo() followed by read_dir_next_dirinfo() calls
 	virtual bool read_dir_next(std::string & filename) const = 0;
 
-	    /// alternative to the previous method, should be implemented also
+
+	    /// routines to read existing files with dir information
+
+	    /// to be used before calling read_dir_next_dirinfo().
+	    /// \note after calling read_dir_reset_dirinfo() calling read_dir_next() gives undefined result,
+	    /// you first need to call read_dir_reset() or continue using read_dir_next_dirinfo()
+	virtual void read_dir_reset_dirinfo() const = 0;
+
+
+	    /// alternative to the method read_dir_next, should be implemented also
 
 	    /// \param[out] filename name of the next entry in the directory, (valid only if this method returned true)
 	    /// \param[out] isdir true if filename is a directory (valid only if this method returned true)
-	virtual bool read_dir_next(std::string & filename, bool & isdir) const = 0;
+	    /// \note a call to rea_dir_reset_dirinfo() should be done before the first call to this method
+	    /// \note either use read_dir_reset() followed by read_dir_next() calls, or call
+	    /// read_dir_reset_dirinfo() followed by read_dir_next_dirinfo() calls
+	virtual bool read_dir_next_dirinfo(std::string & filename, bool & isdir) const = 0;
 
 	void unlink(const std::string & filename) const { inherited_unlink(filename); }; //< done this way for homogeneity with open/inherited_open
 

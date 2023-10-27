@@ -51,12 +51,14 @@ namespace libdar
 							     bool verbose): mem_ui(dialog),
 									    x_proto(proto),
 									    base_URL(build_url_from(proto, host, port)),
-									    wait_delay(waiting_time)
+									    wait_delay(waiting_time),
+									    verbosity(verbose),
+									    withdirinfo(false)
     {
-	verbosity = verbose;
-
 	current_dir.clear();
 	reading_dir_tmp.clear();
+	temporary_list.clear();
+	cur_dir_cursor = current_dir.begin();
 
 	    // initializing the fields from parent class entrepot
 
@@ -94,65 +96,21 @@ namespace libdar
 	}
     }
 
-    void entrepot_libcurl::i_entrepot_libcurl::read_dir_reset() const
-    {
-	long listonly;
-	i_entrepot_libcurl *me = const_cast<i_entrepot_libcurl *>(this);
-	shared_ptr<mycurl_easyhandle_node> node;
-
-	if(me == nullptr)
-	    throw SRC_BUG;
-
-	node = me->easyh.alloc_instance();
-	if(!node)
-	    throw SRC_BUG;
-
-	if(verbosity)
-	    get_ui().printf("Asking libcurl to read directory content at %s", get_libcurl_URL().c_str());
-
-	me->current_dir.clear();
-	me->reading_dir_tmp = "";
-
-	switch(x_proto)
-	{
-	case proto_ftp:
-	case proto_sftp:
-	    listonly = 1;
-	    node->setopt(CURLOPT_URL, get_libcurl_URL());
-	    node->setopt(CURLOPT_DIRLISTONLY, listonly);
-	    node->setopt(CURLOPT_WRITEFUNCTION, (void*)get_ftp_listing_callback);
-	    node->setopt(CURLOPT_WRITEDATA, (void*)(this));
-	    node->apply(get_pointer(), wait_delay);
-		// libcurl will invoke our callback function 'get_ftp_listing_callback'
-		// passed above as argument, which one will fill the directory content
-		// in the std::deque current_dir. The reading_dir_tmp is the current
-		// or the latest entry name of the directory that was under the process of
-		// being spelled...
-
-	    if(!reading_dir_tmp.empty())
-	    {
-		me->current_dir.push_back(reading_dir_tmp);
-		me->reading_dir_tmp.clear();
-	    }
-	    break;
-	default:
-	    throw SRC_BUG;
-	}
-    }
-
     bool entrepot_libcurl::i_entrepot_libcurl::read_dir_next(string & filename) const
     {
-	i_entrepot_libcurl *me = const_cast<i_entrepot_libcurl *>(this);
+	bool isdir;
+	return read_dir_next_dirinfo(filename, isdir);
+    }
 
-	if(me == nullptr)
-	    throw SRC_BUG;
-
-	if(current_dir.empty())
+    bool entrepot_libcurl::i_entrepot_libcurl::read_dir_next_dirinfo(std::string & filename, bool & isdir) const
+    {
+	if(cur_dir_cursor == current_dir.end())
 	    return false;
 	else
 	{
-	    filename = current_dir.front();
-	    me->current_dir.pop_front();
+	    filename = cur_dir_cursor->first;
+	    isdir = cur_dir_cursor->second;
+	    ++cur_dir_cursor;
 	    return true;
 	}
     }
@@ -287,6 +245,7 @@ namespace libdar
     void entrepot_libcurl::i_entrepot_libcurl::read_dir_flush()
     {
 	current_dir.clear();
+	cur_dir_cursor = current_dir.end();
     }
 
     string entrepot_libcurl::i_entrepot_libcurl::get_libcurl_URL() const
@@ -364,6 +323,207 @@ namespace libdar
 	    easyh.setopt_global(CURLOPT_USERPWD, auth);
 	}
 
+    }
+
+    void entrepot_libcurl::i_entrepot_libcurl::fill_temporary_list() const
+    {
+	std::map<string, bool>::iterator it = current_dir.begin();
+
+	temporary_list.clear();
+	while(it != current_dir.end())
+	{
+	    temporary_list.push_back(it->first);
+	    ++it;
+	}
+    }
+
+    void entrepot_libcurl::i_entrepot_libcurl::update_current_dir_with_line(const string & line) const
+    {
+	    /// we expect the provided line to contain the following fields, separated by spaces:
+	    ///. drwxrwxrwx
+	    ///. <num hard links>
+	    ///. <uid/username>
+	    ///. <gid/username>
+	    ///. <filesize>
+	    ///. <date and time>
+	    ///. <filename>
+	    /// The most complicated part is to isolate the date from the rest, as it may depends on the local
+	    /// and as space can also be present in both <date and time> and <filename>
+
+	    /// It seemed more reliable to first get a temporary list of filename and then run a second time
+	    /// the directory listing but with full listing information. In that second time for each line received,
+	    /// search for a match at the end of line from the temporary list:
+	    /// - each time, retain all filenames that match the end of the line
+	    /// - retain the one having the longuest match
+	    /// - and update its information whether it is a directory or not lookiing at the first char of the line.
+	    /// - remove the matched entry from the temporary list of existing files and wait for the next line
+
+	    /// it is this assumed that both temporary_list and current_dir are filled with the directory content
+	    /// but the current_dir<>is_dir has still to be determined.
+
+	    ///////////////////////////
+	    // looking for longuest filename match found at end of 'line' from content of temporary_list
+	    //
+
+	    // we will record the best_match using max_len and best_entry:
+	unsigned int max_len = 0;
+	deque<string>::iterator best_entry = temporary_list.end();
+
+	    // let's search!
+
+	for(deque<string>::iterator filename_ptr = temporary_list.begin();
+	    filename_ptr != temporary_list.end();
+	    ++filename_ptr)
+	{
+		// for each filename of the temporary_list
+		// we look whether it can be found entirely at end of line
+
+	    if(line.size() > filename_ptr->size())
+	    {
+		unsigned int matched_len = 0; // will hold how much characters of filename are found at end of line
+
+		    // reading backward char by char:
+
+		string::const_reverse_iterator line_it = line.rbegin();
+		string::reverse_iterator file_it = filename_ptr->rbegin();
+
+		while(line_it != line.rend()
+		      &&
+		      file_it != filename_ptr->rend()
+		      &&
+		      *line_it == *file_it)
+		{
+		    ++matched_len;
+		    ++line_it;
+		    ++file_it;
+		}
+
+		    // matched_len is now calculated
+
+
+		if(file_it == filename_ptr->rend())
+		{
+
+			// we found the full filename at end of line
+
+		    if(max_len < matched_len)
+		    {
+			max_len = matched_len;
+			best_entry = filename_ptr;
+		    }
+		    else if(max_len == matched_len)
+		    {
+			if(best_entry == temporary_list.end())
+			    throw SRC_BUG;
+			if(*best_entry == *filename_ptr)
+			    throw Erange("i_entrepot_libcurl::update_current_dir_with_line", tools_printf("duplicated entry %s in directory", filename_ptr->c_str()));
+			else
+			    throw SRC_BUG;
+		    }
+			// else we already found a better match
+		}
+		    // else this is not a full match, ignoring this filename
+	    }
+		// else filename is too long to hold on the line with the extra attributes we expect to find
+	}
+
+	    ///////////////////////////
+	    // udating current_dir
+	    //
+	    // now we have max_len and best_entry set
+	    // we update the current_dir with directory nature information
+
+	if(max_len > 0)
+	{
+		// we have found a match
+
+	    if(best_entry == temporary_list.end())
+		throw SRC_BUG; // incoherence between max_len and best_entry
+
+		// looking for best_entry in current_dir and updating its value
+
+	    map<string, bool>::iterator found = current_dir.find(*best_entry);
+	    if(found == current_dir.end())
+		throw SRC_BUG; // entry found in temporary_list but not in current_dir??? what was temporary_list filled with then???
+
+	    if(line.size() == 0)
+		throw SRC_BUG;
+
+		// now updating value associated with best_entry
+	    found->second = (line[0] == 'd'); // directory if the line starts with a 'd'
+
+		// we now remove the best_entry from temporary_list to speed up future search
+
+	    temporary_list.erase(best_entry);
+	}
+	    // else no entry found in current_dir/temporary_list
+	    // probably a entry that has just been added to the current directory
+    }
+
+    void entrepot_libcurl::i_entrepot_libcurl::set_current_dir(bool details) const
+    {
+	shared_ptr<mycurl_easyhandle_node> node;
+
+	    // when details are needed, we run a first time without dir_detyails
+	    // to fill the current_dir list. Then we update temporary_list and run
+	    // a second time to fill the dir information
+	if(details)
+	{
+	    set_current_dir(false); // we call ourselves!
+	    fill_temporary_list();
+	    withdirinfo = true;
+	}
+	else
+	{
+	    withdirinfo = false;
+	    current_dir.clear();
+	}
+
+	node = easyh.alloc_instance();
+	if(!node)
+	    throw SRC_BUG;
+
+	if(verbosity)
+	    get_ui().printf("Asking libcurl to read directory content at %s", get_libcurl_URL().c_str());
+
+	reading_dir_tmp = "";
+
+	switch(x_proto)
+	{
+	case proto_ftp:
+	case proto_sftp:
+	    node->setopt(CURLOPT_URL, get_libcurl_URL());
+	    if(!details)
+	    {
+		long listonly = 1;
+		node->setopt(CURLOPT_DIRLISTONLY, listonly);
+	    }
+	    else
+	    {
+		long listonly = 0;
+		node->setopt(CURLOPT_DIRLISTONLY, listonly);
+	    }
+	    node->setopt(CURLOPT_WRITEFUNCTION, (void*)get_ftp_listing_callback);
+	    node->setopt(CURLOPT_WRITEDATA, (void*)(this));
+	    node->apply(get_pointer(), wait_delay);
+		// libcurl will invoke our callback function 'get_ftp_listing_callback'
+		// passed above as argument, which one will fill the directory content
+		// in the std::map current_dir. The reading_dir_tmp is the current
+		// or the latest entry name of the directory that was under the process of
+		// being spelled...
+
+	    if(!reading_dir_tmp.empty())
+	    {
+		if(!details)
+		    current_dir[reading_dir_tmp] = false; // for now we assume it is not a directory
+		reading_dir_tmp.clear();
+	    }
+	    break;
+	default:
+	    throw SRC_BUG;
+	}
+
+	cur_dir_cursor = current_dir.begin();
     }
 
     string entrepot_libcurl::i_entrepot_libcurl::mycurl_protocol2string(mycurl_protocol proto)
@@ -448,6 +608,8 @@ namespace libdar
 
 	return *ptr != nullptr;
     }
+
+
 
 #endif
 
