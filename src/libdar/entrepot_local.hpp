@@ -69,7 +69,7 @@ namespace libdar
 	virtual void read_dir_reset_dirinfo() const override;
 	virtual bool read_dir_next_dirinfo(std::string & filename, bool & isdir) const override;
 
-	virtual void create_dir(const std::string & dirname, U_I permission) override { throw Efeature("entrepot::create_dir"); };
+	virtual void create_dir(const std::string & dirname, U_I permission) override;
 
 	virtual entrepot *clone() const override { return new (std::nothrow) entrepot_local(*this); };
 

@@ -52,6 +52,7 @@ void get_args(int argc,
 	      string & chemin,
 	      string & port);
 
+void f2(int argc, char *argv[]);
 void f1(int argc, char *argv[]);
 
 int main(int argc, char *argv[])
@@ -62,6 +63,7 @@ int main(int argc, char *argv[])
     {
 	get_version(maj, med, min);
 	f1(argc, argv);
+	f2(argc, argv);
     }
     catch(Egeneric & e)
     {
@@ -360,4 +362,19 @@ void f1(int argc, char *argv[])
 	delete writetome;
     if(writetomepart != nullptr)
 	delete writetomepart;
+}
+
+void f2(int argc, char* argv[])
+{
+    shared_ptr<user_interaction> ui(new shell_interaction(cout, cerr, true));
+
+    entrepot_local repo("", "", false);
+    repo.set_location(path("/tmp"));
+    string pwd = repo.get_full_path().display();
+
+    cout << pwd << endl;
+    cout << repo.get_url() << endl;
+
+    repo.create_dir("COUCOU", 0750);
+    repo.set_location(repo.get_full_path() + string("COUCOU"));
 }

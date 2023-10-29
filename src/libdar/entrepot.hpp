@@ -92,7 +92,7 @@ namespace libdar
 	    /// full path of current directory + anything necessary to provide URL formated information
 	virtual std::string get_url() const = 0;
 
-	    /// set default ownership for files to be created thanks to the open() methods
+	    /// set default ownership for files to be created thanks to the open() or create_dir() methods
 	void set_user_ownership(const std::string & x_user) { user = x_user; };
 	void set_group_ownership(const std::string & x_group) { group = x_group; };
 

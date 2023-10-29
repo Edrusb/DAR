@@ -36,6 +36,23 @@ extern "C"
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
+
+#if HAVE_SYS_STAT_H
+#include <sys/stat.h>
+#endif
+
+#if HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+
+#if HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+
+#if HAVE_ERRNO_H
+#include <errno.h>
+#endif
+
 } // end extern "C"
 
 #include "entrepot_local.hpp"
@@ -108,6 +125,63 @@ namespace libdar
 	else
  	    return true;
     }
+
+    void entrepot_local::create_dir(const std::string & dirname, U_I permission)
+    {
+	static const char* create_msg = "Error creating directory: ";
+	static const char* owner_msg = "Error setting directory ownership: ";
+
+	string chemin = (get_full_path() + dirname).display();
+
+	int ret = mkdir(chemin.c_str(), permission);
+
+	if(ret != 0)
+	{
+	    switch(errno)
+	    {
+	    case EEXIST:
+		throw Esystem("entrepot_local::create_dir", gettext(create_msg) + tools_strerror_r(errno), Esystem::io_exist);
+	    case ENOENT:
+	    case ENOTDIR:
+		throw Esystem("entrepot_local::create_dir", gettext(create_msg) + tools_strerror_r(errno), Esystem::io_absent);
+	    case EACCES:
+	    case EPERM:
+	    case EFAULT:
+		throw Esystem("entrepot_local::create_dir", gettext(create_msg) + tools_strerror_r(errno), Esystem::io_access);
+	    case EROFS:
+		throw Esystem("entrepot_local::create_dir", gettext(create_msg) + tools_strerror_r(errno), Esystem::io_ro_fs);
+	    case ENOMEM:
+		throw Ememory("entrepot_local::create_dir");
+	    default:
+		throw Erange("entrepot_local::create_dir", gettext(create_msg) + tools_strerror_r(errno));
+	    }
+	}
+
+	uid_t uid = -1;
+	uid_t gid = -1;
+
+	if(get_user_ownership() != "")
+	    uid =tools_ownership2uid(get_user_ownership());
+	if(get_group_ownership() != "")
+	    gid = tools_ownership2gid(get_group_ownership());
+
+	if(uid != (uid_t)(-1) || gid != (gid_t)(-1))
+	{
+	    ret = chown(chemin.c_str(), uid, gid);
+
+	    if(ret != 0)
+	    {
+		switch(errno)
+		{
+		case ENOMEM:
+		    throw Ememory("entrepot_local::create_dir");
+		default:
+		    throw Erange("entrepot_local::create_dir", gettext(owner_msg) + tools_strerror_r(errno));
+		}
+	    }
+	}
+    }
+
 
     fichier_global *entrepot_local::inherited_open(const shared_ptr<user_interaction> & dialog,
 						   const std::string & filename,
