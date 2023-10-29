@@ -158,6 +158,16 @@ namespace libdar
 	    /// read_dir_reset_dirinfo() followed by read_dir_next_dirinfo() calls
 	virtual bool read_dir_next_dirinfo(std::string & filename, bool & isdir) const = 0;
 
+	    /// create a new directory in the current directory
+
+	    /// \param[in] dirname is the name of the subdirectory to create
+	    /// \param[in] permission is the usual POSIX user/group/other permission bits to set to the directory to create
+	    /// \note the operation fails if an entry of that name already exists
+	    /// \note the implementation should set the user and group ownership according to the
+	    /// argument provided to set_user_ownership() and set_group_ownership(), if this feature
+	    /// is supported in the underlying implementation
+	virtual void create_dir(const std::string & dirname, U_I permission) = 0;
+
 	void unlink(const std::string & filename) const { inherited_unlink(filename); }; //< done this way for homogeneity with open/inherited_open
 
 	    /// generate a clone of "this"

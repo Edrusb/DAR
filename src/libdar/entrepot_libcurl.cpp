@@ -235,6 +235,27 @@ namespace libdar
 #endif
     }
 
+
+    void entrepot_libcurl::create_dir(const std::string & dirname, U_I permission)
+    {
+#if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
+
+	NLS_SWAP_IN;
+        try
+        {
+	    pimpl->create_dir(dirname, permission);
+        }
+        catch(...)
+        {
+            NLS_SWAP_OUT;
+            throw;
+        }
+        NLS_SWAP_OUT;
+#else
+	throw Efeature("libcurl library");
+#endif
+    }
+
     fichier_global *entrepot_libcurl::inherited_open(const shared_ptr<user_interaction> & dialog,
 						     const string & filename,
 						     gf_mode mode,
