@@ -168,7 +168,8 @@ namespace libdar
 	    /// is supported in the underlying implementation
 	virtual void create_dir(const std::string & dirname, U_I permission) = 0;
 
-	void unlink(const std::string & filename) const { inherited_unlink(filename); }; //< done this way for homogeneity with open/inherited_open
+	    /// remove the target file from the entrepot
+	void unlink(const std::string & filename) const { inherited_unlink(filename); }; ///< done this way for homogeneity with open/inherited_open
 
 	    /// generate a clone of "this"
 
