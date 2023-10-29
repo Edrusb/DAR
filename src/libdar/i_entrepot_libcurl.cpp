@@ -115,7 +115,65 @@ namespace libdar
 	}
     }
 
-    fichier_global *entrepot_libcurl::i_entrepot_libcurl::inherited_open(const shared_ptr<user_interaction> & dialog,
+    void entrepot_libcurl::i_entrepot_libcurl::create_dir(const std::string & dirname, U_I permission)
+    {
+	path cwd = get_full_path();
+	string order;
+	mycurl_slist headers;
+
+	shared_ptr<mycurl_easyhandle_node> node = easyh.alloc_instance();
+	if(!node)
+	    throw SRC_BUG;
+
+	if(verbosity)
+	    get_ui().printf("Creating directory %s", dirname.c_str());
+
+	try
+	{
+	    switch(x_proto)
+	    {
+	    case proto_ftp:
+		set_location((cwd + dirname));
+		try
+		{
+		    node->setopt(CURLOPT_NEW_DIRECTORY_PERMS, long(permission));
+		    node->setopt(CURLOPT_FTP_CREATE_MISSING_DIRS, long(CURLFTP_CREATE_DIR_RETRY));
+		    node->setopt(CURLOPT_URL, get_libcurl_URL());
+		    node->setopt(CURLOPT_NOBODY, long(1));
+		    node->apply(get_pointer(), wait_delay);
+		}
+		catch(...)
+		{
+		    set_location(cwd);
+		    throw;
+		}
+		set_location(cwd);
+		break;
+	    case proto_sftp:
+		node->setopt(CURLOPT_NEW_DIRECTORY_PERMS, long(permission));
+		order = "mkdir " + dirname;
+		headers.append(order);
+		node->setopt(CURLOPT_QUOTE, headers);
+		node->setopt(CURLOPT_URL, get_libcurl_URL());
+		node->setopt(CURLOPT_NOBODY, long(1));
+		node->apply(get_pointer(), wait_delay);
+		break;
+	    default:
+		throw SRC_BUG;
+	    }
+	}
+	catch(Ebug & e)
+	{
+	    throw;
+	}
+	catch(Egeneric & e)
+	{
+	    e.prepend_message(tools_printf(gettext("Error met while creating directory %s : "), dirname.c_str()));
+	    throw;
+	}
+    }
+
+    fichier_global* entrepot_libcurl::i_entrepot_libcurl::inherited_open(const shared_ptr<user_interaction> & dialog,
 						       const string & filename,
 						       gf_mode mode,
 						       bool force_permission,

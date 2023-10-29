@@ -177,6 +177,8 @@ namespace libdar
 	  { CURLOPT_VERBOSE, type_long },
 	  { CURLOPT_WRITEDATA, type_pointer },
 	  { CURLOPT_WRITEFUNCTION, type_pointer },
+	  { CURLOPT_NEW_DIRECTORY_PERMS, type_long },
+	  { CURLOPT_FTP_CREATE_MISSING_DIRS, type_long },
 	      // eolist is needed to flag the end of list, option type does not matter
 	  { CURLOPT_APPEND, eolist }
 	};

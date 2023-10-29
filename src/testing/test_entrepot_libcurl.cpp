@@ -52,8 +52,9 @@ void get_args(int argc,
 	      string & chemin,
 	      string & port);
 
-void f2(int argc, char *argv[]);
 void f1(int argc, char *argv[]);
+void f2(int argc, char *argv[]);
+void f3(int argc, char *argv[]);
 
 int main(int argc, char *argv[])
 {
@@ -62,8 +63,9 @@ int main(int argc, char *argv[])
     try
     {
 	get_version(maj, med, min);
-	f1(argc, argv);
-	f2(argc, argv);
+	    // f1(argc, argv);
+	    // f2(argc, argv);
+	f3(argc, argv);
     }
     catch(Egeneric & e)
     {
@@ -370,6 +372,47 @@ void f2(int argc, char* argv[])
 
     entrepot_local repo("", "", false);
     repo.set_location(path("/tmp"));
+    string pwd = repo.get_full_path().display();
+
+    cout << pwd << endl;
+    cout << repo.get_url() << endl;
+
+    repo.create_dir("COUCOU", 0750);
+    repo.set_location(repo.get_full_path() + string("COUCOU"));
+}
+
+void f3(int argc, char* argv[])
+{
+    mycurl_protocol proto;
+    string login;
+    secu_string pass;
+    string host;
+    string port;
+    string chemin;
+    get_args(argc,
+	     argv,
+	     proto,
+	     login,
+	     pass,
+	     host,
+	     chemin,
+	     port);
+
+    shared_ptr<user_interaction> ui(new shell_interaction(cout, cerr, true));
+    entrepot_libcurl repo(ui,
+			  proto,
+			  login,
+			  pass,
+			  host,
+			  port,
+			  false,
+			  "",
+			  "",
+			  "",
+			  3);
+
+    repo.set_location(path("/home/dar-check"));
+
     string pwd = repo.get_full_path().display();
 
     cout << pwd << endl;
