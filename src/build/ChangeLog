@@ -12,6 +12,10 @@ from 2.7.x to 2.8.0
   another operation (like in-fly isolation done by dar)
 - using early_memory_release from dar CLI when sequential-read mode is used
 - adding -qcrypto option
+- extended entrepot classes (entrepot_local and entrepot_libcurl) to provide
+  directory/non-directory info while listing a directory content
+- extended entrepot classes to be able to create a subdirectory upon user
+  request.
 
 from 2.7.12 to 2.7.13
 - fixing bug auto-reported in "slice_layout.cpp line 48" concerning isolated
