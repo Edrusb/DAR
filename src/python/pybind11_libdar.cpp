@@ -1048,6 +1048,35 @@ PYBIND11_MODULE(libdar, mod)
 		filename);
 	};
 
+	virtual void read_dir_reset_dirinfo() const override
+	{
+	    PYBIND11_OVERRIDE_PURE(
+		void,
+		libdar::entrepot,
+		read_dir_reset_dirinfo,
+		);
+	};
+
+	virtual bool read_dir_next_dirinfo(std::string & filename, bool & isdir) const override
+	{
+	    PYBIND11_OVERRIDE_PURE(
+		bool,
+		libdar::entrepot,
+		read_dir_next,
+		filename,
+		isdir);
+	};
+
+	virtual void create_dir(const std::string & dirname, libdar::U_I permission) override
+	{
+	    PYBIND11_OVERRIDE_PURE(
+		void,
+		libdar::entrepot,
+		create_dir,
+		dirname,
+		permission);
+	}
+
 	virtual entrepot *clone() const override
 	{
 	    PYBIND11_OVERRIDE_PURE(
@@ -1105,6 +1134,9 @@ PYBIND11_MODULE(libdar, mod)
 	.def("get_url", &libdar::entrepot_local::get_url)
 	.def("read_dir_reset", &libdar::entrepot_local::read_dir_reset)
     	.def("read_dir_next", &libdar::entrepot_local::read_dir_next)
+	.def("read_dir_reset_dirinfo", &libdar::entrepot_local::read_dir_reset_dirinfo)
+	.def("read_dir_next_dirinfo", &libdar::entrepot_local::read_dir_next_dirinfo)
+	.def("create_dir", &libdar::entrepot_local::create_dir)
 	.def("clone", &libdar::entrepot_local::clone)
 	.def("set_location", &libdar::entrepot_local::set_location)
 	.def("set_root", &libdar::entrepot_local::set_root)
@@ -1132,6 +1164,9 @@ PYBIND11_MODULE(libdar, mod)
 	.def("get_url", &libdar::entrepot_libcurl::get_url)
 	.def("read_dir_reset", &libdar::entrepot_libcurl::read_dir_reset)
     	.def("read_dir_next", &libdar::entrepot_libcurl::read_dir_next)
+	.def("read_dir_reset_dirinfo", &libdar::entrepot_libcurl::read_dir_reset_dirinfo)
+	.def("read_dir_next_dirinfo", &libdar::entrepot_libcurl::read_dir_next_dirinfo)
+	.def("create_dir", &libdar::entrepot_libcurl::create_dir)
 	.def("clone", &libdar::entrepot_libcurl::clone)
 	.def("set_location", &libdar::entrepot_libcurl::set_location)
 	.def("set_root", &libdar::entrepot_libcurl::set_root)
