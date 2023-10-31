@@ -508,7 +508,12 @@ namespace libdar
 		throw SRC_BUG;
 
 		// now updating value associated with best_entry
-	    found->second = (line[0] == 'd'); // directory if the line starts with a 'd'
+		// directory if the line starts with a 'd'
+		// symlink if the line starts with an 'l', this may be a directory... maybe not,
+		// chdir on symlink pointing to nondir inode will fail, but at least this stay an
+		// option, which would not be the case if we assume all symlinks not to point to
+		// directories: chdir to them would then be forbidden by entrepot_libcurl...
+	    found->second = (line[0] == 'd' || line[0] == 'l');
 
 		// we now remove the best_entry from temporary_list to speed up future search
 

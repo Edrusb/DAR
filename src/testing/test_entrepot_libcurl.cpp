@@ -143,6 +143,8 @@ void f1(int argc, char *argv[])
 
     string entry;
     bool isdir;
+    if(chemin != "")
+	reposito.set_location(chemin);
     ui->printf("Directory content");
     reposito.read_dir_reset_dirinfo();
     while(reposito.read_dir_next_dirinfo(entry, isdir))

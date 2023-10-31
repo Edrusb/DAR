@@ -130,9 +130,9 @@ namespace libdar
 					const std::string & sftp_known_hosts   ///< where to fetch the .known_hosts file (sftp only)
 	    );
 
-	void fill_temporary_list() const;
-	void update_current_dir_with_line(const std::string & line) const;
-	void set_current_dir(bool details) const;
+	void fill_temporary_list() const;   ///< extract list files and subdir from current_dir to temporary_list std::deque
+	void update_current_dir_with_line(const std::string & line) const; ///< run from callback to fill current_dir with a detailed line from the 'dir/ls' output
+	void set_current_dir(bool details) const;  ///< fill current_dir with the content of the directory pointed to by get_location()
 
 
 	static std::string mycurl_protocol2string(mycurl_protocol proto);
