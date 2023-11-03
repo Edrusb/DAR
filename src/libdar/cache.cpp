@@ -69,6 +69,8 @@ namespace libdar
 	    throw Erange("cache::cache", gettext("wrong value given as initial_size argument while initializing cache"));
 
 	ref = & hidden;
+	if(ref == nullptr)
+	    throw SRC_BUG;
 	buffer = nullptr;
 	alloc_buffer(x_size);
 	next = 0;
@@ -645,6 +647,7 @@ namespace libdar
 	buffer = nullptr;
 	size = 0;
 	half = 0;
+	ref = nullptr; // we don't own and thus don't have to delete this object
     }
 
     void cache::shift_by_half()

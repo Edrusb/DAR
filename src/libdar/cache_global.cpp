@@ -36,6 +36,9 @@ namespace libdar
 			 x_ptr == nullptr ? throw SRC_BUG : x_ptr->get_mode())
     {
 	ptr = x_ptr;
+	if(ptr == nullptr)
+	    throw SRC_BUG;
+
 	buffer = new (nothrow) cache(*ptr,
 				     shift_mode,
 				     size);
