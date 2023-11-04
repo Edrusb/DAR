@@ -240,12 +240,12 @@ namespace libdar
 	    defaults_initialized = true;
 	    string arg_string("");
 	    secu_string arg_secu_string;
-	    void *arg_ptr = nullptr;
+	    void* arg_ptr = nullptr;
 	    long arg_long = 0;
 	    mycurl_slist arg_mycurl_slist;
 	    curl_off_t arg_curl_off_t = 0;
 
-	    const opt_asso *cursor = association;
+	    const opt_asso* cursor = association;
 
 	    while(cursor->cast != eolist)
 	    {
