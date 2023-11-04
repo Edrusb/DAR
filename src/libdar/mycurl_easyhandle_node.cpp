@@ -258,10 +258,35 @@ namespace libdar
 		    defaults.add(cursor->opt, arg_secu_string);
 		    break;
 		case type_pointer:
-		    defaults.add(cursor->opt, arg_ptr);
+		    switch(cursor->opt)
+		    {
+		    case CURLOPT_READFUNCTION:
+			defaults.add(cursor->opt, (void*)(fread)); // libcurl internal callback
+			break;
+		    case CURLOPT_WRITEFUNCTION:
+			defaults.add(cursor->opt, (void*)(fwrite)); // libcurl internal callback
+		    default:
+			defaults.add(cursor->opt, arg_ptr);
+		    }
 		    break;
 		case type_long:
-		    defaults.add(cursor->opt, arg_long);
+		    switch(cursor->opt)
+		    {
+		    case CURLOPT_NETRC:
+			defaults.add(cursor->opt, long(CURL_NETRC_IGNORED));
+			break;
+		    case CURLOPT_SSH_AUTH_TYPES:
+			defaults.add(cursor->opt, long(CURLSSH_AUTH_ANY));
+			break;
+		    case CURLOPT_NEW_DIRECTORY_PERMS:
+			defaults.add(cursor->opt, long(0755));
+			break;
+		    case CURLOPT_FTP_CREATE_MISSING_DIRS:
+			defaults.add(cursor->opt, long(CURLFTP_CREATE_DIR_NONE));
+			break;
+		    default:
+			defaults.add(cursor->opt, arg_long);
+		    }
 		    break;
 		case type_mycurl_slist:
 		    defaults.add(cursor->opt, arg_mycurl_slist);
