@@ -205,16 +205,15 @@ namespace libdar
 
 	try
 	{
-	    fichier_libcurl *ret_libcurl = new (nothrow) fichier_libcurl(dialog,
-									 chemin,
-									 x_proto,
-									 easyh.alloc_instance(),
-									 hidden_mode,
-									 wait_delay,
-									 force_permission,
-									 permission,
-									 erase);
-	    ret = ret_libcurl;
+	    ret = new (nothrow) fichier_libcurl(dialog,
+						chemin,
+						x_proto,
+						easyh.alloc_instance(),
+						hidden_mode,
+						wait_delay,
+						force_permission,
+						permission,
+						erase);
 
 	    if(ret == nullptr)
 		throw Ememory("entrepot_libcurl::i_entrepot_libcurl::inherited_open");
