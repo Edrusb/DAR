@@ -90,7 +90,7 @@ namespace libdar
 	fichier_libcurl & operator = (fichier_libcurl && ref) = delete;
 
 	    /// destructor
-	~fichier_libcurl() noexcept { kill(); join(); detruit(); };
+	~fichier_libcurl() noexcept;
 
 	    /// change the permission of the file
 	virtual void change_permission(U_I perm) override;
@@ -173,7 +173,6 @@ namespace libdar
 	void set_range(const infinint & begin, const infinint & range_size); ///< set range in easyhandle
 	void unset_range();  ///< unset range in easyhandle
 	void switch_to_metadata(bool mode);///< set to true to get or set file's metadata, false to read/write file's data
-	void detruit();     ///< get ready for object destruction
 	void run_thread();  ///< run subthread with the previously defined parameters
 	void stop_thread(); ///< ask subthread to stop and wait for its end
 	void relaunch_thread(const infinint & block_size); ///< re-run the subthread if not running

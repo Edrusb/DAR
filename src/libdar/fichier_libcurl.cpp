@@ -93,10 +93,30 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    detruit();
-	    throw;
+	    try
+	    {
+		terminate();
+	    }
+	    catch(...)
+	    {
+		    // ignore any subsequent exception raised by terminate()
+	    }
+	    throw; // propagating the first exception
 	}
     }
+
+    fichier_libcurl::~fichier_libcurl() noexcept
+    {
+	try
+	{
+	    terminate();
+	}
+	catch(...)
+	{
+		// nothing to propagate (noexcept/destructor)
+	}
+    }
+
 
     void fichier_libcurl::change_permission(U_I perm)
     {
@@ -624,18 +644,6 @@ namespace libdar
 	    }
 	}
 	metadatamode = mode;
-    }
-
-    void fichier_libcurl::detruit()
-    {
-	try
-	{
-	    terminate();
-	}
-	catch(...)
-	{
-		// ignore all errors
-	}
     }
 
     void fichier_libcurl::run_thread()
