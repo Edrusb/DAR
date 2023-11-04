@@ -224,10 +224,14 @@ namespace libdar
 		rw = new (nothrow) cache_global(dialog, ret, true);
 		if(rw != nullptr)
 		{
-		    ret = nullptr; // the former object pointed to by ret is now managed by rw
+			// the former object pointed to by ret is now managed by rw
+		    ret = nullptr;
+			// the next call my throw an exception, having ret set to nullptr
+			// avoid deleting the object pointed to by ret, in that context.
 		    rw->change_to_read_write();
-		    ret = rw;      // only now because if change_to_read_write() generate an exception
-			// we must not delete twice the same object that would be pointed to once by ret and once again by rw
+			// OK, we can now have ret pointing to the cache_global object to
+			// be returned.
+		    ret = rw;
 		    rw = nullptr;
 		}
 		else
@@ -237,7 +241,8 @@ namespace libdar
 		rw = new (nothrow) cache_global(dialog, ret, false);
 		if(rw != nullptr)
 		{
-		    ret = rw;  // the former object pointed to by ret is now managed by rw
+			// the former object pointed to by ret is now managed by rw
+		    ret = rw;
 		    rw = nullptr;
 		}
 		break;
@@ -247,6 +252,7 @@ namespace libdar
 		rw = new (nothrow) cache_global(dialog, ret, false, 1000);
 		if(rw != nullptr)
 		{
+			// the former object pointed to by ret is now managed by rw
 		    ret = rw;
 		    rw = nullptr;
 		}
