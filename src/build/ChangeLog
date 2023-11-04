@@ -16,6 +16,9 @@ from 2.7.x to 2.8.0
   directory/non-directory info while listing a directory content
 - extended entrepot classes to be able to create a subdirectory upon user
   request.
+- added implementation of fichier_libcurl::sync_write and using it at object
+  destruction for sanity (libdar call make use of terminate() first, so
+  this does solve any problem).
 
 from 2.7.12 to 2.7.13
 - fixing bug auto-reported in "slice_layout.cpp line 48" concerning isolated
