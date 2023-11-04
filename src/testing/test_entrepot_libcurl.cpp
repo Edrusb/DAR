@@ -63,8 +63,8 @@ int main(int argc, char *argv[])
     try
     {
 	get_version(maj, med, min);
-	    // f1(argc, argv);
-	    // f2(argc, argv);
+	f1(argc, argv);
+	f2(argc, argv);
 	f3(argc, argv);
     }
     catch(Egeneric & e)
