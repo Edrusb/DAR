@@ -50,6 +50,7 @@ namespace libdar
 				     bool erase): fichier_global(dialog, m),
 						  end_data_mode(false),
 						  sub_is_dying(false),
+						  sync_write_asked(false),
 						  ehandle(handle),
 						  metadatamode(false),
 						  current_offset(0),
@@ -262,9 +263,33 @@ namespace libdar
 
     void fichier_libcurl::inherited_sync_write()
     {
-	    // nothing to do because there is no data in transit
-	    // except in interthread but it cannot be flushed faster
-	    // than the normal multi-thread process does
+	char* ptr = nullptr;
+	unsigned int size;
+
+	    // we must return only once all interthread data have been consumed by the subthread
+
+	switch(get_mode())
+	{
+	case gf_write_only:
+
+	    sync_write_asked = true;
+
+	    if(is_running() && ! sub_is_dying)
+	    {
+		interthread.get_block_to_feed(ptr, size);
+		interthread.feed(ptr, 0); // this triggers sync_write when sync_write_asked is set
+		synchronize.wait();
+	    }
+	    else
+		sync_write_asked = false;
+	    break;
+	case gf_read_only:
+	    throw SRC_BUG;
+	case gf_read_write:
+	    throw SRC_BUG;
+	default:
+	    throw SRC_BUG;
+	}
     }
 
     void fichier_libcurl::inherited_flush_read()
@@ -278,6 +303,7 @@ namespace libdar
 	switch(get_mode())
 	{
 	case gf_write_only:
+	    inherited_sync_write();
 	    switch_to_metadata(true);
 	    break;
 	case gf_read_only:
@@ -766,11 +792,29 @@ namespace libdar
 	fichier_libcurl *me = (fichier_libcurl *)(userp);
 	char *ptr;
 	unsigned int ptr_size;
+	bool just_synced = false;
 
 	if(me == nullptr)
 	    throw SRC_BUG;
 
-	me->interthread.fetch(ptr, ptr_size);
+	do
+	{
+	    just_synced = false;
+	    me->interthread.fetch(ptr, ptr_size);
+
+		// note: if ptr_size is zero
+		// libcurl will assume EOF and stop
+		// the transfer process.
+
+	    if(me->sync_write_asked && ptr_size == 0)
+	    {
+		me->sync_write_asked = false;
+		me->interthread.fetch_recycle(ptr);
+		me->synchronize.wait();
+		just_synced = true;
+	    }
+	}
+	while(just_synced);
 
 	if(ptr_size <= room)
 	{

@@ -154,6 +154,7 @@ namespace libdar
 
 	bool end_data_mode;               ///< true if subthread has been requested to end
 	bool sub_is_dying;                ///< is set by subthread when about to end
+	bool sync_write_asked;            ///< ask subthread to use 'synchronize' tell all data has been written
 	std::shared_ptr<mycurl_easyhandle_node> ehandle; ///< easy handle (wrapped in C++ object) that we modify when necessary
 	bool metadatamode;                ///< wether we are acting on metadata rather than file's data
 	infinint current_offset;          ///< current offset we are reading / writing at
@@ -166,7 +167,7 @@ namespace libdar
 	infinint subthread_net_offset;    ///< updated by sub thread in network block mode to give amount of bytes pushed to interthread
 	infinint subthread_cur_offset;    ///< subthread copy of current_offset
 	libthreadar::fast_tampon<char> interthread; ///< data channel for reading or writing with subthread
-	libthreadar::barrier synchronize; ///< used to be sure subthread has been launched
+	libthreadar::barrier synchronize; ///< used to be sure subthread has been launched // also used for sync_write
 	mycurl_protocol x_proto;          ///< used to workaround some libcurl strange behavoir for some protocols
 
 	void set_range(const infinint & begin, const infinint & range_size); ///< set range in easyhandle
