@@ -160,7 +160,7 @@ namespace libdar
 
 	    /// create a new directory in the current directory
 
-	    /// \param[in] dirname is the name of the subdirectory to create
+	    /// \param[in] dirname is the name of the subdirectory to create (not its path!) It is created in as sub-directory of the directory given to set_location()
 	    /// \param[in] permission is the usual POSIX user/group/other permission bits to set to the directory to create
 	    /// \note the operation fails if an entry of that name already exists
 	    /// \note the implementation should set the user and group ownership according to the
