@@ -161,7 +161,7 @@ namespace libdar
 			if(val != 0)
 			    ui.message(tools_printf(gettext("Cannot determine whether %s is a directory or not, assuming it is not a directory"), ret->d_name));
 
-			bool isdir = (info.st_mode & S_IFMT) == S_IFDIR;
+			bool isdir = (info.st_mode & S_IFMT) == S_IFDIR || (info.st_mode & S_IFMT) == S_IFLNK;
 			fichier.push_back(cell(string(ret->d_name), isdir));
 		    }
 		    else
