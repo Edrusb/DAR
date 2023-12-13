@@ -424,7 +424,7 @@ namespace libdar
 	bool by_the_end = ! sequential_read;
 
 	if(! sequential_read && has_external_cat)
-	    by_the_end = false; // avoiding loading the last slice as we have from the catalogue from somewhere else
+	    by_the_end = false; // avoiding loading the last slice as we have the catalogue from the isolated catalogue
 
 	if(!dialog)
 	    throw SRC_BUG; // dialog points to nothing
