@@ -176,7 +176,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 	    if(ptr != nullptr)
 		ptr->change_non_interactive_output(cout);
 	}
-            // standart output can be used to send non interactive
+            // standard output can now be used to send non interactive
             // messages
 
 	try
