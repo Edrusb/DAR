@@ -172,6 +172,7 @@ struct line_param
     delta_sig_block_size delta_sig_len; ///< block len to used for delta signature computation
     bool unix_sockets;            ///< whether to restore unix-sockets
     bool in_place;                ///< in-place restoration of comparison
+    bool force_first_slice;       ///< whether to read the first instead of the last slice when a isolated catalogue is given in complement
 
 	// constructor for line_param
     line_param()
