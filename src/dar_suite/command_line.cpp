@@ -337,6 +337,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
     p.unix_sockets = false;
     p.in_place = false;
     p.never_resave_uncompr = false;
+    p.force_first_slice = false;
 
     if(!dialog)
 	throw SRC_BUG;
@@ -634,6 +635,10 @@ bool get_args(shared_ptr<user_interaction> & dialog,
 	    if(!p.use_sequential_marks)
 		throw Erange("get_args", gettext("--alter=tape-marks is impossible with -y option"));
 	}
+
+	if(p.force_first_slice &&
+	   (p.ref_filename == nullptr || (p.op != diff && p.op != extract && p.op != test)))
+	    throw Erange("get_args", gettext("-aforce-first-slice is only valid while reading an archive with the help of an isolated catalog"));
 
             //////////////////////
             // generating masks
@@ -1663,6 +1668,8 @@ static bool get_args_recursive(recursive_param & rec,
 		    p.never_resave_uncompr = true;
 		else if(strcasecmp("vc", optarg) == 0 || strcasecmp("verbose-libcurl", optarg) == 0)
 		    p.remote_verbose = true;
+		else if(strcasecmp("force-first-slice", optarg) == 0 || strcasecmp("ffs", optarg) == 0)
+		    p.force_first_slice = true;
 		else
                     throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext("Unknown argument given to -a : %s"), optarg));
                 break;

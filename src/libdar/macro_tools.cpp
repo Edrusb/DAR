@@ -410,7 +410,8 @@ namespace libdar
 				  U_I multi_threaded_crypto,
 				  U_I multi_threaded_compress,
 				  bool header_only,
-				  bool silent)
+				  bool silent,
+				  bool force_read_first_slice)
     {
 	secu_string real_pass = pass;
 	generic_file *tmp = nullptr;
@@ -422,6 +423,10 @@ namespace libdar
 	bool libcurl_repo = false;
 #endif
 	string salt;
+	bool by_the_end = ! sequential_read;
+
+	if(! sequential_read && has_external_cat && force_read_first_slice)
+	    by_the_end = false; // avoiding loading the last slice as we have the catalogue from the isolated catalogue
 
 	if(!dialog)
 	    throw SRC_BUG; // dialog points to nothing
@@ -464,7 +469,7 @@ namespace libdar
 							lax);
 		    }
 		}
-		else
+		else // basename is "-" but not in sequential_read mode (zapette)
 		{
 		    tuyau *in = nullptr;
 		    tuyau *out = nullptr;
@@ -481,11 +486,8 @@ namespace libdar
 			    delete out;
 			    out = nullptr;
 			}
-			else
-			{
+			else // memory allocation succeeded
 			    in = out = nullptr; // now managed by the zapette
-			    tmp->skip_to_eof(); // not sequential reading mode we must skip at eof
-			}
 		    }
 		    catch(...)
 		    {
@@ -506,7 +508,7 @@ namespace libdar
 						  basename,
 						  extension,
 						  where,
-						  !sequential_read, // not openned by the end in sequential read mode
+						  by_the_end, // not openned by the end in sequential read mode
 						  min_digits,
 						  sequential_read,
 						  lax,
@@ -532,18 +534,21 @@ namespace libdar
 	    stack.find_first_from_top(tmp_ctxt);
 	    if(tmp_ctxt == nullptr)
 		throw SRC_BUG;
+	    else
+		if(tmp_ctxt->is_an_old_start_end_archive())
+		    by_the_end = false; // old archive format have only a header, no trailer
+
 	    second_terminateur_offset = 0;
 
 	    if(info_details)
 	    {
-		if(sequential_read || (tmp_ctxt != nullptr && tmp_ctxt->is_an_old_start_end_archive()))
+		if(! by_the_end)
 		    dialog->message(gettext("Reading the archive header..."));
 		else
 		    dialog->message(gettext("Reading the archive trailer..."));
 	    }
 
-	    if(sequential_read
-	       || tmp_ctxt->is_an_old_start_end_archive()
+	    if(!by_the_end
 	       || stack.get_position().is_zero()) //< sar layer failed openning the last slice and fallen back openning the first slice
 		stack.skip(0);
 	    else
@@ -565,7 +570,7 @@ namespace libdar
 
 	    ver.read(stack, *dialog, lax);
 
-	    if(second_terminateur_offset.is_zero() && !sequential_read && ver.get_edition() > 7)
+	    if(second_terminateur_offset.is_zero() && by_the_end && ver.get_edition() > 7)
 		if(!has_external_cat)
 		{
 		    if(!lax)

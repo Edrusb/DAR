@@ -131,6 +131,7 @@ namespace libdar
 					 U_I multi_threaded_compress,  ///< number of worker threads to compress/decompress (need compression_block_size > 0)
 					 bool header_only,     ///< if true, stop the process before openning the encryption layer
 					 bool silent           ///< do not display some informational messages of low importance
+					 bool force_read_first_slice   ///< except when using sequential read, libdar fetches slicing information from the last slice, setting this to true lead fetching this from the first slice. historically, historical behavior is "false". This only applies when using external catalogue (has_external_cat == true)
 	);
         // all allocated objects (ret1, ret2, scram), must be deleted when no more needed by the caller of this routine
 

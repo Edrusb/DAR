@@ -133,7 +133,10 @@ namespace libdar
 	x_ignore_signature_check_failure = false;
 	x_multi_threaded_crypto = 1;
 	x_multi_threaded_compress = 1;
+	x_header_only = false;
 	x_silent = false;
+	x_early_memory_release = false;
+	x_force_first_slice = false;
 
 	    //
 	external_cat = false;
@@ -147,8 +150,6 @@ namespace libdar
 	x_ref_entrepot = shared_ptr<entrepot>(new (nothrow) entrepot_local("", "", false)); // never using furtive_mode to read slices
 	if(!x_ref_entrepot)
 	    throw Ememory("archive_options_read::clear");
-	x_header_only = false;
-	x_early_memory_release = false;
     }
 
     void archive_options_read::set_default_crypto_size()
@@ -219,7 +220,10 @@ namespace libdar
 	x_ignore_signature_check_failure = ref.x_ignore_signature_check_failure;
 	x_multi_threaded_crypto = ref.x_multi_threaded_crypto;
 	x_multi_threaded_compress = ref.x_multi_threaded_compress;
+	x_header_only = ref.x_header_only;
 	x_silent = ref.x_silent;
+	x_early_memory_release = ref.x_early_memory_release;
+	x_force_first_slice = ref.x_force_first_slice;
 
 	    //
 
@@ -234,8 +238,6 @@ namespace libdar
 	if(!ref.x_ref_entrepot)
 	    throw SRC_BUG;
 	x_ref_entrepot = ref.x_ref_entrepot;
-	x_header_only = ref.x_header_only;
-	x_early_memory_release = ref.x_early_memory_release;
     }
 
     void archive_options_read::move_from(archive_options_read && ref) noexcept
@@ -254,7 +256,12 @@ namespace libdar
 	x_ignore_signature_check_failure = move(ref.x_ignore_signature_check_failure);
 	x_multi_threaded_crypto = move(ref.x_multi_threaded_crypto);
 	x_multi_threaded_compress = move(ref.x_multi_threaded_compress);
+	x_header_only = move(ref.x_header_only);
 	x_silent = move(ref.x_silent);
+	x_early_memory_release = move(ref.x_early_memory_release);
+	x_force_first_slice = move(ref.x_force_first_slice);
+
+	    //
 
 	external_cat = move(ref.external_cat);
 	x_ref_chem = move(ref.x_ref_chem);
@@ -265,8 +272,6 @@ namespace libdar
 	x_ref_execute = move(ref.x_ref_execute);
 	x_ref_slice_min_digits = move(ref.x_ref_slice_min_digits);
 	x_ref_entrepot = move(ref.x_ref_entrepot);
-	x_header_only = move(ref.x_header_only);
-	x_early_memory_release = move(ref.x_early_memory_release);
     }
 
 

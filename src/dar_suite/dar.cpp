@@ -176,7 +176,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 	    if(ptr != nullptr)
 		ptr->change_non_interactive_output(cout);
 	}
-            // standart output can be used to send non interactive
+            // standard output can now be used to send non interactive
             // messages
 
 	try
@@ -866,6 +866,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    if(ref_repo)
 			read_options.set_ref_entrepot(ref_repo);
 		    read_options.set_silent(param.quiet_crypto);
+		    read_options.set_force_first_slice(param.force_first_slice);
 		}
 
 		arch.reset(new (nothrow) archive(dialog,
@@ -981,6 +982,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    read_options.set_ref_slice_min_digits(param.ref_num_digits);
 		    if(ref_repo)
 			read_options.set_ref_entrepot(ref_repo);
+		    read_options.set_force_first_slice(param.force_first_slice);
 		}
 		arch.reset(new (nothrow) archive(dialog,
 						 *param.sauv_root,
@@ -1070,6 +1072,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    read_options.set_ref_slice_min_digits(param.ref_num_digits);
 		    if(ref_repo)
 			read_options.set_ref_entrepot(ref_repo);
+		    read_options.set_force_first_slice(param.force_first_slice);
 		}
 		arch.reset(new (nothrow) archive(dialog,
 						 *param.sauv_root,
