@@ -169,6 +169,12 @@ namespace libdar
 	    /// how much thread libdar will use for compression (need libthreadar too and compression_block_size > 0)
 	void set_multi_threaded_compress(U_I num) { x_multi_threaded_compress = num; };
 
+	    /// whether we only read the archive header and exit
+	void set_header_only(bool val) { x_header_only = val; };
+
+	    /// whether to ask the first slice in place of the last slice when reading an archive with the help of an isolated catalogue
+	void set_force_first_slice(bool val) { x_force_first_slice = val; };
+
 
 	    //////// what follows concerne the use of an external catalogue instead of the archive's internal one
 
@@ -207,10 +213,6 @@ namespace libdar
 	    /// defines the protocol to use to retrieve slices of the reference archive (where the external catalogue resides)
 	void set_ref_entrepot(const std::shared_ptr<entrepot> & entr) { if(!entr) throw Erange("archive_options_read::set_ref_entrepot", "null entrepot pointer given in argument"); x_ref_entrepot = entr; };
 
-	    /// whether we only read the archive header and exit
-	void set_header_only(bool val) { x_header_only = val; };
-
-
 
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods (mainly used inside libdar, but kept public and part of the API in the case it is needed)
@@ -230,6 +232,8 @@ namespace libdar
 	bool get_ignore_signature_check_failure() const { return x_ignore_signature_check_failure; };
 	U_I get_multi_threaded_crypto() const { return x_multi_threaded_crypto; };
 	U_I get_multi_threaded_compress() const { return x_multi_threaded_compress; };
+	bool get_header_only() const { return x_header_only; };
+	bool get_force_first_slice() const { return x_force_first_slice; };
 
 	    // All methods that follow concern the archive where to fetch the (isolated) catalogue from
 	bool is_external_catalogue_set() const { return external_cat; };
@@ -241,8 +245,6 @@ namespace libdar
 	const std::string & get_ref_execute() const { return x_ref_execute; };
 	infinint get_ref_slice_min_digits() const { return x_ref_slice_min_digits; };
 	const std::shared_ptr<entrepot> & get_ref_entrepot() const { return x_ref_entrepot; };
-	bool get_header_only() const { return x_header_only; };
-
 
     private:
 	crypto_algo x_crypto;
@@ -259,7 +261,8 @@ namespace libdar
 	bool x_ignore_signature_check_failure;
 	U_I x_multi_threaded_crypto;
 	U_I x_multi_threaded_compress;
-
+	bool x_header_only;
+	bool x_force_first_slice;
 
 	    // external catalogue relative fields
 	bool external_cat;
@@ -271,7 +274,6 @@ namespace libdar
 	std::string x_ref_execute;
 	infinint x_ref_slice_min_digits;
 	std::shared_ptr<entrepot> x_ref_entrepot;
-	bool x_header_only;
 
 	void copy_from(const archive_options_read & ref);
 	void move_from(archive_options_read && ref) noexcept;
