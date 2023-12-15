@@ -131,7 +131,8 @@ namespace libdar
 					 slices,
 					 options.get_multi_threaded_crypto(),
 					 options.get_multi_threaded_compress(),
-					 options.get_header_only());
+					 options.get_header_only(),
+					 options.get_force_first_slice());
 
 		if(options.get_header_only())
 		{
@@ -188,6 +189,7 @@ namespace libdar
 						     ignored,
 						     options.get_multi_threaded_crypto(),
 						     options.get_multi_threaded_compress(),
+						     false,
 						     false);
 				// we do not comparing the signatories of the archive of reference with the current archive
 				// for example the isolated catalogue might be unencrypted and thus not signed

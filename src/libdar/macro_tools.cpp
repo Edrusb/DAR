@@ -409,7 +409,8 @@ namespace libdar
 				  slice_layout & sl,
 				  U_I multi_threaded_crypto,
 				  U_I multi_threaded_compress,
-				  bool header_only)
+				  bool header_only,
+				  bool force_read_first_slice)
     {
 	secu_string real_pass = pass;
 	generic_file *tmp = nullptr;
@@ -423,7 +424,7 @@ namespace libdar
 	string salt;
 	bool by_the_end = ! sequential_read;
 
-	if(! sequential_read && has_external_cat)
+	if(! sequential_read && has_external_cat && force_read_first_slice)
 	    by_the_end = false; // avoiding loading the last slice as we have the catalogue from the isolated catalogue
 
 	if(!dialog)
