@@ -21,6 +21,8 @@ a * alteration of operation		--alter	  argument:
 							    e[rase_ea]
 							    f[ixed-date]
 							    file-auth[entication]
+							    first-slice
+							    force-first-slice | ffs
 							    g[lob]
 							    h[oles-recheck]
 							    header

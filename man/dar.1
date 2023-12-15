@@ -1188,6 +1188,9 @@ Do not restore unix-sockets. By default saved unix sockets are recreated at rest
 .TP 20
 -ap, --alter=place
 Since version 2.7.1 libdar stores the filesystem root path (given -R option) used when creating a backup, this is the known as the 'in-place' path. At restoration time by default, dar uses the provided -R option or if not specified uses the current directory as root directory for the restoration operation. Using -ap option lead dar to read the in-place path from the backup and restore the data using this path instead. This option is thus exclusive with -R option and may lead dar to report an error if the archive has not stored any in-place path (older archive format or backup resulting of the merging of two backups having different in-place path).
+.TP 20
+-affs, --alter=force-first-slice
+This option only applies when restoring a backup with the help of an isolated catalogue. In that context dar still needs to read the archive format from the backup to restore. In direct access mode, this information is always fetched from the beginning of the archive, but in direct access mode it may be fetched reading the end of the last slice (default behavior) or reading the beginning of the first slice (when -affs is set). The objective is to avoid fetching the last slice when using very large backups. One can define a first slice (see -S option) of for example 1 kB while other slices (-s option) can be specified arbitrarily large. With the help of an isolated catalogue based on this archive and the first (small) slice, reading some data from this large backup then only needs the few (big) slices where the data is located, not more.
 .PP
 .B TESTING AND DIFFERENCE SPECIFIC OPTIONS (to use with -t or -d)
 .PP
@@ -1201,6 +1204,9 @@ is also available as described just above for restoration options.
 No other specific option, but all general options are available except for example -w which is useless, as testing and comparing only read data. -A option is available as described in GENERAL OPTIONS to backup of internal catalogue of the archive (assuming you have a previously isolated catalogue available).
 .PP
 Doing a difference in sequential read mode is possible but hard linked inodes can only be compared to the filesystem the first time they are met, next hard links to this same inode cannot obtain the corresponding data because skipping backward in sequential read mode is forbidden. In that situation, the hard links are reported as skipped, meaning that data comparison could not be performed.
+.TP 20
+-affs, --alter=force-first-slice
+this option also applies to testing and difference operations (see details above).
 .PP
 .B LISTING OPTIONS (to use with -l)
 .PP
