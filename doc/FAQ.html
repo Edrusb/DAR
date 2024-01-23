@@ -88,6 +88,7 @@
 	<a href="#sftppubkey">I have sftp pubkey authentication working with ssh/sftp, how to have dar using too this public key authentication for sftp?</a><br/>
 	<a href="#full-from-diff">I have a diff/incremental backup and I want to convert it to a full backup, how to do that?</a><br/>
 	<a href="#tapes">How to use dar with tapes (like LTO tapes)?</a><br/>
+	<a href="#Smallfiles">Why dar does not compress small files toghether for better compression ratio?</a><br/>
       </div>
     </div>
 
@@ -3515,6 +3516,127 @@
 	any other command than <code>dar</code>, in particular, yes, you can use it with <code>tar</code>
 	if you don't want to rely on the additional features and resiliency <code>dar</code> provides.
       </p>
-    </div>
-  </body>
+
+      <a name="Smallfiles"><b>Why dar does not compress small files together for better compression ratio?</b></a><br/>
+
+      <p>
+	Since around year 2010, this is a question/suggestion/remark/revew that haunted the dar-support mailing-list and
+	new feature requests, resurrecting from time to time: Why <em>dar</em> does not compress small files together in dar
+	archive for better compression, like <em>tar</em> does? (its grand and venerable brother).
+      </p>
+      <p>
+	First point to note: <em>tar</em> does not compress at all. This is gzip, bzip2, xz or other similar programs that
+	take as unstructured input what tar outputs, in order to produce an unstructured compressed data stream redirected
+	into a file.
+      </p>
+      <p>
+	It would be tempting to answer: "You can do the same with dar!", but there are better things to do, read below.
+      </p>
+      <p>
+	But before let's remind dar's design and objectives:
+      </p>
+      <ul>
+	<li>compression is done per file</li>
+	<li>a given file's data can be accessed directly</li>
+      </ul>
+      <p>
+	Doing so, has several advantages:
+      </p>
+      <ul>
+	<li>
+	  In a given backup/archive, you can avoid compressing some file, while compressing others (gain of time and space, as compressing
+	  already compressed file usually leads to waste storage space).
+	</li>
+	<li>
+	  You can quickly restore a particular file, even from a several petabytes archive/backup, no need to read
+	  (disk IO) and decompress (CPU cycles) all the data present before that file in the archive.
+	</li>
+	<li>
+	  Your backups are more robust: if even just one byte data corruption occurred at some place in one of your
+	  backup, it will concern only one file, but you will be able to restore all other files, even those located
+	  after that corruption. At the
+	  opposite, with tar's compression manner, you would lose all data following the data corruption...
+	</li>
+      </ul>
+      <p>
+	<em>dar</em> is doing that way, because tar's way was not addressing some major concerns in the backup
+	area. Yes, this has the drawback to degrade the compression ratio, but this is a design choice.
+      </p>
+      <p>
+	Now, looking for the best of both approaches, some
+	proposed to gather small files together and compress them together. This would not only break all the three
+	advantages exposed above, but also break another feature which is the order in which files are stored: Dar
+	does not inspect twice the same directory at backup time nor at restoration time. Doing so avoids
+	saving the full path of each directory and file (and at two places: in-line metadata and in the catalog).
+	This also leads to better performances as it better leverage disk cache for metadata (directory content). OK,
+	one could say that today with SSD and NVMe this is negligible, but one would ignore that direct RAM access
+	from cache, is still much faster than any NVMe disk access.
+      </p>
+      <p>
+	So, if you can't afford keeping small files uncompressed (see dar's --mincompr, -X and -I options
+	for example), or if compressing them with dar versus what tar does makes a so big difference that it worth
+	considering to compress them together, you have three options:
+      </p>
+      <ol>
+	<li>
+	  <p>
+	    <b>use tar in dar</b>
+	  </p>
+	  <ul>
+	    <li>
+	      make a tar archive of the many small files you have, just a tar file, without compression.
+	      Note: you can automate this when entering some particular directory trees of your choices by mean of -< -> and -=
+		options, and remove those temporary tar file when dar exit those directories at backup time.
+		You would also have to exclude those files used to build the tar file you created dynamically (see
+		-g/-P/-X/-I/-[/-] options).
+	    </li>
+	    <li>
+	      Then let dar perform the backup, compressing those tar files with other files, if they satisfy the
+	      --mincompr size, or any other filtering of you choice (see -Z and -Y options). Doing so
+	      can let you leverage parallel compression and reduced execution time, brought by dar, something you cannot have with
+	      tar alone.
+	    </li>
+	    <li>
+	      Of course, you benefit also of all other dar's features (slicing, ciphering, slice hashing in fly, isolated
+	      catalogues, differential/incremental/decremental backups... and even delta binary!)
+	    </li>
+	  </ul>
+	  <p>
+	    But yes, you will lose dar's three advantages seen above, but just for those small files you have gathered in a tar in dar file,
+	    not for the rest of what's under backup.
+	  </p>
+	</li>
+	<li>
+	  <p>
+	    <b>use tar alone</b>
+	  </p>
+	  <p>
+	    If dar does not match your need and/or if you do not need to leverage any of
+	    the three dar's advantages seen above, tar is probably a better choice for you.
+	    That's a pity, but there is not one tool that matches all needs...
+	  </p>
+	</li>
+	<li>
+	  <p>
+	    <b>describe with details a new implementation/enhancement</b>
+	  </p>
+	  <p>
+	    The proposal should take into account dar's design objectives (robustness to data
+	    corruption, efficient directory seeking, fast access to any file's data) in a way
+	    or another.
+	  </p>
+	  <p>
+	    But please, do not make an imprecised proposal, that assumes it will just "magically" work: I only like magic
+	    when I go to a magic show ;)
+	  </p>
+	  <p>
+	    Thanks to detail both backup and restoration processes. Often times, pulling out the missing details one
+	    after the other, results in something unfeasible or with unexpected complexity and/or much less
+	    gain than expected. Also look at the <a href="Notes.html#archive_structure">Dar Archive Structure</a> to
+	    see how it could fit or if not, what part should be redesigned and how.
+	  </p>
+	  </p>
+	</li>
+      </ol>
+    </div> </body>
 </html>
