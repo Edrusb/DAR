@@ -6,9 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: DAR 2.7.0\n"
-"Report-Msgid-Bugs-To: http://sourceforge.net/tracker/?"
-"group_id=65612&atid=511612\n"
-"POT-Creation-Date: 2023-10-01 11:25+0200\n"
+"Report-Msgid-Bugs-To: https://github.com/Edrusb/DAR/issues\n"
+"POT-Creation-Date: 2024-03-23 11:12+0100\n"
 "PO-Revision-Date: 2023-07-16 20:31+0200\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
@@ -7053,64 +7052,64 @@ msgstr "entrée supprimée"
 msgid "door inode"
 msgstr "inode Porte"
 
-#: src/libdar/mycurl_easyhandle_node.cpp:152
+#: src/libdar/mycurl_easyhandle_node.cpp:154
 #, c-format
 msgid "Error met while setting string option %d on libcurl handle: %s"
 msgstr ""
 "Erreur lors du paramétrage de l'option %d de type string pour le handle "
 "libcurl : %s"
 
-#: src/libdar/mycurl_easyhandle_node.cpp:162
+#: src/libdar/mycurl_easyhandle_node.cpp:164
 #, c-format
 msgid "Error met while setting secu_string option %d on libcurl handle: %s"
 msgstr ""
 "Erreur lors du paramétrage de l'option %d de type secu_string pour le handle "
 "libcurl : %s"
 
-#: src/libdar/mycurl_easyhandle_node.cpp:172
+#: src/libdar/mycurl_easyhandle_node.cpp:174
 #, c-format
 msgid "Error met while setting pointer option %d on libcurl handle: %s"
 msgstr ""
 "Erreur lors du paramétrage de l'option %d de type pointer pour le handle "
 "libcurl : %s"
 
-#: src/libdar/mycurl_easyhandle_node.cpp:182
+#: src/libdar/mycurl_easyhandle_node.cpp:184
 #, c-format
 msgid "Error met while setting long option %d on libcurl handle: %s"
 msgstr ""
 "Erreur lors du paramétrage de l'option %d de type long pour le handle "
 "libcurl : %s"
 
-#: src/libdar/mycurl_easyhandle_node.cpp:192
+#: src/libdar/mycurl_easyhandle_node.cpp:194
 #, c-format
 msgid "Error met while setting curl_slist option %d on libcurl handle: %s"
 msgstr ""
 "Erreur lors du paramétrage de l'option %d de type curl_slist pour le handle "
 "libcurl : %s"
 
-#: src/libdar/mycurl_easyhandle_node.cpp:202
+#: src/libdar/mycurl_easyhandle_node.cpp:204
 #, c-format
 msgid "Error met while setting curl_off_t option %d on libcurl handle: %s"
 msgstr ""
 "Erruer lors du paramétrage de l'option %d de type curl_off_t pour le handle "
 "libcurl : %s"
 
-#: src/libdar/mycurl_easyhandle_node.cpp:233
+#: src/libdar/mycurl_easyhandle_node.cpp:238
 msgid "Error met while creating a libcurl handle"
 msgstr "Erreur lors de la cration d'un objet libcurl"
 
-#: src/libdar/mycurl_easyhandle_node.cpp:331
-#: src/libdar/mycurl_easyhandle_node.cpp:337
+#: src/libdar/mycurl_easyhandle_node.cpp:336
+#: src/libdar/mycurl_easyhandle_node.cpp:342
 #, c-format
 msgid "%S: %s, aborting"
 msgstr "%S : %s, abandon"
 
-#: src/libdar/mycurl_easyhandle_node.cpp:352
+#: src/libdar/mycurl_easyhandle_node.cpp:357
 #, c-format
 msgid "%S: %s, retrying in %d seconds"
 msgstr "%S : %s, nouvelle tentative dans %d secondes"
 
-#: src/libdar/mycurl_easyhandle_node.cpp:359
+#: src/libdar/mycurl_easyhandle_node.cpp:364
 #, c-format
 msgid "%S: %s, do we retry network operation?"
 msgstr "%S : %s, retente-t-on l'opération réseau ?"
@@ -8626,16 +8625,16 @@ msgstr "Erreur lors de la cration du fichier de hashage : "
 msgid "unknown hash algorithm corresponding to char `%c'"
 msgstr "le caractère '%c' ne correspond à aucun algorithme de hashage connu"
 
-#: src/libdar/fichier_libcurl.cpp:206
+#: src/libdar/fichier_libcurl.cpp:207
 msgid "libcurl does not allow skipping in write mode"
 msgstr "libcurl interdit le changement de position en mode écriture"
 
-#: src/libdar/fichier_libcurl.cpp:260
+#: src/libdar/fichier_libcurl.cpp:261
 msgid ""
 "libcurl does not allow truncating at a given position while uploading files"
 msgstr "libcurl interdit de tronquer un fichier lors de son téléversement"
 
-#: src/libdar/fichier_libcurl.cpp:556
+#: src/libdar/fichier_libcurl.cpp:582
 msgid ""
 "Integer too large for libcurl, cannot skip at the requested offset in the "
 "remote repository"
