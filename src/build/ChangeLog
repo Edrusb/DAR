@@ -1,3 +1,7 @@
+from 2.7.14 to 2.7.15
+- updating libdar about CURLINFO_CONTENT_LENGTH_DOWNLOAD symbol which is
+  reported as deprecated by recent libcurl libraries.
+
 from 2.7.13 to 2.7.14
 - adding safe guard in fichier_libcurl destructor to verify all data have
   been passed to libcurl *and* libcurl has completed the writing operation
