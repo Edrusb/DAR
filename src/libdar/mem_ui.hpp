@@ -96,6 +96,9 @@ namespace libdar
 	    /// get access to the shared_ptr pointing to the user_interaction
 	std::shared_ptr<user_interaction> get_pointer() const { return ui; };
 
+	    /// change the user_interaction object
+	void change_ui(const std::shared_ptr<user_interaction> & new_dialog) { if(!new_dialog) throw SRC_BUG; ui = new_dialog; };
+
     private:
 	std::shared_ptr<user_interaction> ui;
     };
