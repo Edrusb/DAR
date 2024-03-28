@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002-2023 Denis Corbin
+// Copyright (C) 2002-2024 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -174,6 +174,7 @@ struct line_param
     bool unix_sockets;            ///< whether to restore unix-sockets
     bool in_place;                ///< in-place restoration or comparison
     bool never_resave_uncompr;    ///< never resave uncompressed when compression ratio is bad
+    bool force_first_slice;       ///< whether to read the first instead of the last slice when a isolated catalogue is given in complement
 
 	// constructor for line_param
     line_param()

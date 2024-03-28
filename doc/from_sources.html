@@ -81,6 +81,10 @@
 	    the <i>make</i> program (tested with
 	    <a href="http://www.gnu.org/software/make/">gnu make</a>)
 	  </li>
+	  <li>
+	    <a href="http://pkgconf.org/">pkg-config</a> to help detecting and configuring proper
+	    CFLAGS/CXXFLAGS and LDFLAGS for optional libraries dar may relies on (see below)
+	  </li>
 	</ol>
 
 	<p>
@@ -90,11 +94,11 @@
 
 	<ul>
 	  <li>
-	    <a href="http://www.gzip.org/zlib/">libz library</a>
+	    <a href="http://zlib.net/">libz library</a>
 	    for gzip compression support
 	  </li>
 	  <li>
-	    <a href="http://sources.redhat.com/bzip2/">libbzip2 library</a> for bzip2
+	    <a href="https://sourceware.org/bzip2/">libbzip2 library</a> for bzip2
 	    compression support
 	  </li>
 	  <li>
@@ -366,6 +370,14 @@
 	  </tr>
 	  <tr>
 	    <th>
+	      pkg-config tool
+	    </th>
+	    <td>
+	      pkg-config
+	    </td>
+	  </tr>
+	  <tr>
+	    <th>
 	      libz library
 	    </th>
 	    <td>
@@ -473,7 +485,7 @@
 	      libthreadar library
 	    </th>
 	    <td>
-	      libthreadar has to be installed manually
+	      libthreadar-dev
 	    </td>
 	  </tr>
 	  <tr>

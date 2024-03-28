@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002-2023 Denis Corbin
+// Copyright (C) 2002-2024 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -132,7 +132,8 @@ namespace libdar
 					 options.get_multi_threaded_crypto(),
 					 options.get_multi_threaded_compress(),
 					 options.get_header_only(),
-					 options.get_silent());
+					 options.get_silent(),
+					 options.get_force_first_slice());
 
 		if(options.get_header_only())
 		{
@@ -190,7 +191,8 @@ namespace libdar
 						     options.get_multi_threaded_crypto(),
 						     options.get_multi_threaded_compress(),
 						     false,
-						     options.get_silent());
+						     options.get_silent(),
+						     false);
 				// we do not comparing the signatories of the archive of reference with the current archive
 				// for example the isolated catalogue might be unencrypted and thus not signed
 

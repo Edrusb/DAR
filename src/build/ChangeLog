@@ -19,11 +19,18 @@ from 2.7.x to 2.8.0
 - added implementation of fichier_libcurl::sync_write and using it at object
   destruction for sanity (libdar call make use of terminate() first, so
   this does solve any problem).
+- adding option -affs option to drive dar to read the first slice rather
+  than the last slice to fetch archive format when reading an archive with
+  the help of an external catalog in direct access mode.
 
 from 2.7.13 to 2.7.14
 - adding safe guard in fichier_libcurl destructor to verify all data have
   been passed to libcurl *and* libcurl has completed the writing operation
   before destroying a fichier_libcurl object.
+- adding support for thread cancellation when interacting with libcurl
+- updating man page
+- fixing some error in the code documentation
+- updated FAQ
 
 from 2.7.12 to 2.7.13
 - fixing bug auto-reported in "slice_layout.cpp line 48" concerning isolated

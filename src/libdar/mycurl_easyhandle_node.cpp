@@ -1,6 +1,6 @@
 //*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002-2023 Denis Corbin
+// Copyright (C) 2002-2024 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -25,6 +25,7 @@
 #include "erreurs.hpp"
 #include "tools.hpp"
 #include "secu_string.hpp"
+#include "thread_cancellation.hpp"
 
 using namespace std;
 
@@ -138,6 +139,7 @@ namespace libdar
 	const long* t_long = nullptr;
 	const mycurl_slist* t_mycurl_slist = nullptr;
 	const curl_off_t* t_curl_off_t = nullptr;
+	thread_cancellation th;
 
 	while(it != changed.end())
 	{
@@ -217,10 +219,13 @@ namespace libdar
 	{
 	    err = curl_easy_perform(handle);
 	    if(!end_anyway)
+	    {
 		fichier_libcurl_check_wait_or_throw(dialog,
 						    err,
 						    wait_seconds,
 						    "Error met while performing action on libcurl handle");
+		th.check_self_cancellation();
+	    }
 	}
 	while(err != CURLE_OK && !end_anyway);
     }
