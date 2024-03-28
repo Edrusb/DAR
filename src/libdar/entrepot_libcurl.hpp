@@ -49,13 +49,13 @@ namespace libdar
     class entrepot_libcurl : public entrepot
     {
     public:
-	entrepot_libcurl(const std::shared_ptr<user_interaction> & dialog,         ///< for user interaction
-			 mycurl_protocol proto,             ///< network protocol to use
+	entrepot_libcurl(const std::shared_ptr<user_interaction> & dialog, ///< for user interaction
+			 mycurl_protocol proto,                  ///< network protocol to use
 			 const std::string & login,              ///< user login on remote host
-			 const secu_string & password,      ///< user password on remote host (empty for file auth or user interaction)
+			 const secu_string & password,           ///< user password on remote host (empty for file auth or user interaction)
 			 const std::string & host,               ///< the remote server to connect to
 			 const std::string & port,               ///< TCP/UDP port to connec to (empty string for default)
-			 bool auth_from_file,               ///< whether to check $HOME/.netrc for password
+			 bool auth_from_file,                    ///< whether to check $HOME/.netrc for password
 			 const std::string & sftp_pub_keyfile,   ///< where to fetch the public key (sftp only)
 			 const std::string & sftp_prv_keyfile,   ///< where to fetch the private key (sftp only)
 			 const std::string & sftp_known_hosts,   ///< location of the known_hosts file (empty string to disable this security check)
@@ -80,6 +80,7 @@ namespace libdar
 	virtual std::string get_url() const override;
 	virtual const path & get_location() const override;
 	virtual const path & get_root() const override;
+	virtual void change_user_interaction(const std::shared_ptr<user_interaction> & new_dialog) override;
 	virtual void read_dir_reset() const override;
 	virtual bool read_dir_next(std::string & filename) const override;
 	virtual void read_dir_reset_dirinfo() const override;

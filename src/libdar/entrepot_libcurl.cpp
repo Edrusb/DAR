@@ -151,6 +151,26 @@ namespace libdar
     }
 
 
+    void entrepot_libcurl::change_user_interaction(const shared_ptr<user_interaction> & new_dialog)
+    {
+#if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
+	NLS_SWAP_IN;
+        try
+        {
+	    pimpl->change_user_interaction(new_dialog);
+        }
+        catch(...)
+        {
+            NLS_SWAP_OUT;
+            throw;
+        }
+        NLS_SWAP_OUT;
+#else
+	throw Efeature("libcurl library");
+#endif
+    }
+
+
     void entrepot_libcurl::read_dir_reset() const
     {
 #if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )

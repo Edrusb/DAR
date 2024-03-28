@@ -532,7 +532,7 @@ namespace libdar
     {
 	shared_ptr<mycurl_easyhandle_node> node;
 
-	    // when details are needed, we run a first time without dir_detyails
+	    // when details are needed, we run a first time without dir_details
 	    // to fill the current_dir list. Then we update temporary_list and run
 	    // a second time to fill the dir information
 	if(details)

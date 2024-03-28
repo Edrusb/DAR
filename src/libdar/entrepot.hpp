@@ -125,6 +125,11 @@ namespace libdar
 			     hash_algo algo,
 			     bool provide_a_plain_file = true) const;
 
+	    /// change user_interaction if the implementation recorded it (at construction time for example)
+
+	    /// \note method open() just above uses the specified user_interaction provided as its first argument
+	virtual void change_user_interaction(const std::shared_ptr<user_interaction> & new_dialog) {};
+
 	    /// routines to read existing files in the current directory (see set_location() / set_root() methods)
 
 	    /// \param[in] dir_details, if set to true, use read_dir_next() with the isdir argument, else
