@@ -84,6 +84,7 @@ namespace libdar
 	    /// like ftp://www.some.where:8021//tmp/sub/dir
 	virtual std::string get_url() const override { return base_URL + get_full_path().display_without_root(); };
 	virtual void change_user_interaction(const std::shared_ptr<user_interaction> & new_dialog) override { change_ui(new_dialog); };
+	virtual std::shared_ptr<user_interaction> get_current_user_interaction() const { return get_pointer(); };
 	virtual void read_dir_reset() const override { set_current_dir(false); };
 	virtual bool read_dir_next(std::string & filename) const override;
 	virtual void read_dir_reset_dirinfo() const override { set_current_dir(true); };

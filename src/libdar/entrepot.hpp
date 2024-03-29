@@ -130,6 +130,9 @@ namespace libdar
 	    /// \note method open() just above uses the specified user_interaction provided as its first argument
 	virtual void change_user_interaction(const std::shared_ptr<user_interaction> & new_dialog) {};
 
+	    /// get the current user_interaction if the implementation reocrded it at construction time (may be nullptr if not)
+	virtual std::shared_ptr<user_interaction> get_current_user_interaction() const { return std::shared_ptr<user_interaction>(); };
+
 	    /// routines to read existing files in the current directory (see set_location() / set_root() methods)
 
 	    /// \param[in] dir_details, if set to true, use read_dir_next() with the isdir argument, else

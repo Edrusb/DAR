@@ -81,6 +81,7 @@ namespace libdar
 	virtual const path & get_location() const override;
 	virtual const path & get_root() const override;
 	virtual void change_user_interaction(const std::shared_ptr<user_interaction> & new_dialog) override;
+	virtual std::shared_ptr<user_interaction> get_current_user_interaction() const override;
 	virtual void read_dir_reset() const override;
 	virtual bool read_dir_next(std::string & filename) const override;
 	virtual void read_dir_reset_dirinfo() const override;
