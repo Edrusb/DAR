@@ -453,7 +453,13 @@ namespace libdar
 		if(val == nullptr) // ctime() failed
 		    ret = tools_int2str(pas) + " " + datetime::unit_symbol(datetime::tu_second);
 		else
+		{
 		    ret = val;
+		    ret = string(ret.begin(), ret.end() - 1); // -1 to remove the ending '\n';
+		    if(tu != datetime::tu_second)
+			ret += string(" + ") + tools_int2str(frac) + " " + datetime::unit_symbol(tu);
+		}
+
 #if HAVE_CTIME_R
 	    }
 	    catch(...)
@@ -462,10 +468,6 @@ namespace libdar
 		throw;
 	    }
 	    delete [] str;
-#else
-	    ret = string(ret.begin(), ret.end() - 1); // -1 to remove the ending '\n';
-	    if(tu != datetime::tu_second)
-		ret += string(" +  ") + string(frac) + datetime::unit_symbol(tu);
 #endif
 	}
 
