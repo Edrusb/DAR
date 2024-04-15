@@ -86,6 +86,9 @@ namespace libdar
 	    /// method works as expected.
 	void warning_with_more(U_I num) { at_once = num; count = 0; };
 
+	    /// display detailed datetime (including second fractions if present)
+	void set_fully_detailed_datetime(bool mode) { full_datetime = mode; };
+
 	    /// display an archive content
 	void archive_show_contents(const archive & ref, const archive_options_listing_shell & options);
 
@@ -132,6 +135,7 @@ namespace libdar
 	bool archive_listing_display_ea;     ///< to be used by listing_callbacks
 	range all_slices;                    ///< all the slices covered by the slicing listing operation
 	std::string marge;                   ///< used for the tree and XML listing operation
+	bool full_datetime;                  ///< show full datetime information (do not round to the second)
 
 	void set_term_mod(mode m);
 	void my_message(const std::string & mesg);

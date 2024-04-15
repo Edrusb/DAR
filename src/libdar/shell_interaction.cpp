@@ -119,6 +119,7 @@ namespace libdar
 	    beep = false;
 	    at_once = 0;
 	    count = 0;
+	    full_datetime = false;
 
 		// looking for an input terminal
 		//
@@ -1026,7 +1027,7 @@ namespace libdar
 	    data_date = NO_DATE;
 	}
 	else
-	    data_date = tools_display_date(data);
+	    data_date = tools_display_date(data, dialog->full_datetime);
 
 	if(!has_ea_date)
 	{
@@ -1034,7 +1035,7 @@ namespace libdar
 	    ea_date = NO_DATE;
 	}
 	else
-	    ea_date = tools_display_date(ea);
+	    ea_date = tools_display_date(ea, dialog->full_datetime);
 
 	dialog->printf(" \t%u\t%S  %S  %S  %S", num, &data_date, &data_state, &ea_date, &ea_state);
     }
