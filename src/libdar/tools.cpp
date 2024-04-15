@@ -426,29 +426,32 @@ namespace libdar
         return string(expected_size - s.size(), ' ') + s;
     }
 
-    string tools_display_date(const datetime & date)
+    string tools_display_date(const datetime & date, bool fully_detailed)
     {
         time_t pas = 0;
         time_t frac = 0;
 	string ret;
+	datetime::time_unit tu = fully_detailed ? date.get_unit() : datetime::tu_second;
 
-        if(!date.get_value(pas, frac, datetime::tu_second)) // conversion to system type failed. Using a replacement string
-            return deci(date.get_second_value()).human();
-        else
+        if(!date.get_value(pas, frac, tu)) // conversion to system type failed. Using a replacement string
+	    return deci(date.get_second_value()).human() + " " + datetime::unit_symbol(datetime::tu_second);
+	else
         {
+	    static const U_I str_size = 50; //< minimum required is 26 bytes for ctime_r
 	    char *val = nullptr;
 #if HAVE_CTIME_R
-	    char *str = new (nothrow) char [50]; //< minimum required is 26 bytes
+	    char *str = new (nothrow) char [str_size];
 	    if(str == nullptr)
 		throw Ememory("tools_display_date");
 	    try
 	    {
 		val = ctime_r(&pas, str);
+		str[str_size - 1] = '\0'; // does not hurt anyway
 #else
 		val = ctime(&pas);
 #endif
 		if(val == nullptr) // ctime() failed
-		    ret = tools_int2str(pas);
+		    ret = tools_int2str(pas) + " " + datetime::unit_symbol(datetime::tu_second);
 		else
 		    ret = val;
 #if HAVE_CTIME_R
@@ -460,11 +463,13 @@ namespace libdar
 	    }
 	    delete [] str;
 #else
-	ret = val;
+	    ret = string(ret.begin(), ret.end() - 1); // -1 to remove the ending '\n';
+	    if(tu != datetime::tu_second)
+		ret += string(" +  ") + string(frac) + datetime::unit_symbol(tu);
 #endif
 	}
 
-	return string(ret.begin(), ret.end() - 1); // -1 to remove the ending '\n'
+	return ret;
     }
 
     char *tools_str2charptr(const string &x)

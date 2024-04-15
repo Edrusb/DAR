@@ -155,8 +155,9 @@ namespace libdar
 	/// convert a date in second to its human readable representation
 
 	/// \param[in] date the date in second
+	/// \param[in] fully_detailed if set to true, does not round the date a the second boundary but add the second fraction stored in the provided datetime
 	/// \return the human representation corresponding to the argument
-    extern std::string tools_display_date(const datetime & date);
+    extern std::string tools_display_date(const datetime & date, bool fully_detailed = false);
 
         /// convert a string to a char *
 
