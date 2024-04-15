@@ -193,6 +193,28 @@ namespace libdar
 	return size;
     }
 
+    string datetime::unit_symbol(time_unit tu)
+    {
+	string ret;
+
+	switch(tu)
+	{
+	case tu_nanosecond:
+	    ret = "ns";
+	    break;
+	case tu_microsecond:
+	    ret = gettext("us"); // should be the mu greek letter, but as there is no ASCII char for that, this will be addressed in the translated messaged
+	    break;
+	case tu_second:
+	    ret = "s";
+	    break;
+	default:
+	    throw SRC_BUG;
+	}
+
+	return ret;
+    }
+
     void datetime::reduce_to_largest_unit() const
     {
 	infinint newval, reste;

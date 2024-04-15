@@ -139,6 +139,9 @@ namespace libdar
 	    /// set to null (zero)
 	void nullify() { val = 0; uni = tu_second ; };
 
+	    /// return the SI symbol of the time unit (s, ms, us (should be mu greek letter), ns)
+	static std::string unit_symbol(time_unit tu);
+
     private:
 	    // the date must not be stored as a single integer
 	    // to avoid reducing the possible addressable dates
