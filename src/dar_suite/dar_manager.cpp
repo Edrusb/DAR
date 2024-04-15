@@ -70,7 +70,7 @@ using namespace libdar;
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
 #define MISSING_ARG "Missing argument to -%c"
 #define INVALID_ARG "Invalid argument given to -%c (requires integer)"
-#define OPT_STRING "C:B:A:lD:b:p:od:ru:f:shVm:vQjw:ie:c@:N;:ka:9:z:"
+#define OPT_STRING "C:B:A:lD:b:p:od:ru:f:shVm:vQjw:ie:c@:N;:ka:9:z:x"
 
 enum operation { none_op, create, add, listing, del, chbase, where, options, dar, restore, used, files, stats, moving, interactive, check, batch };
 
@@ -91,6 +91,7 @@ static bool command_line(shell_interaction & dialog,
 			 compression & algozip,
 			 U_I & compression_level,
 			 bool & change_compression,
+			 bool & detailed_dates,
 			 bool recursive); // true if called from op_batch
 static void show_usage(shell_interaction & dialog, const char *command);
 static void show_version(shell_interaction & dialog, const char *command);
@@ -116,7 +117,11 @@ static void op_restore(shared_ptr<user_interaction> & dialog,
 		       bool ignore_dar_options_in_base,
 		       bool even_when_removed);
 static void op_used(shell_interaction & dialog, const database *dat, S_I num, bool info_details);
-static void op_files(shell_interaction & dialog, const database *dat, const string & arg, bool info_details);
+static void op_files(shell_interaction & dialog,
+		     const database *dat,
+		     const string & arg,
+		     bool info_details,
+		     bool detailed_dates);
 static void op_stats(shell_interaction & dialog, const database *dat, bool info_details);
 static void op_move(shared_ptr<user_interaction> & dialog, database *dat, S_I src, archive_num dst, bool info_details);
 static void op_interactive(shared_ptr<user_interaction> & dialog, database *dat, string base);
@@ -156,7 +161,8 @@ static void action(shared_ptr<user_interaction> & dialog,
 		   bool info_details,
 		   bool early_release,
 		   bool ignore_database_options,
-		   bool even_when_removed);
+		   bool even_when_removed,
+		   bool detailed_dates);
 static void signed_int_to_archive_num(S_I input, archive_num &num, bool & positive);
 
 
@@ -192,6 +198,7 @@ S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * const ar
     compression algozip;
     U_I compression_level;
     bool change_compression;
+    bool detailed_dates;
     shell_interaction *shelli = dynamic_cast<shell_interaction *>(dialog.get());
 
     if(!dialog)
@@ -218,6 +225,7 @@ S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * const ar
 		     algozip,
 		     compression_level,
 		     change_compression,
+		     detailed_dates,
 		     false))
 	return EXIT_SYNTAX;
 
@@ -273,7 +281,7 @@ S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * const ar
 	{
 	    try
 	    {
-		action(dialog, op, dat, arg, num, rest, num2, date, base, info_details, true, ignore_dat_options, even_when_removed);
+		action(dialog, op, dat, arg, num, rest, num2, date, base, info_details, true, ignore_dat_options, even_when_removed, detailed_dates);
 		finalize(dialog, op, dat, base, info_details, change_compression, algozip, compression_level);
 	    }
 	    catch(Edata & e)
@@ -312,6 +320,7 @@ static bool command_line(shell_interaction & dialog,
 			 compression & algozip,
 			 U_I & compression_level,
 			 bool & change_compression,
+			 bool & detailed_dates,
 			 bool recursive)
 {
     S_I lu, min;
@@ -332,6 +341,7 @@ static bool command_line(shell_interaction & dialog,
     algozip = compression::gzip;
     compression_level = 9;
     change_compression = false;
+    detailed_dates = false;
     string extra = "";
 
     try
@@ -541,6 +551,9 @@ static bool command_line(shell_interaction & dialog,
 						      compression_level,
 						      compr_bs); // we ignore this in dar_manager
 		    change_compression = true;
+		    break;
+		case 'x':
+		    detailed_dates = true;
 		    break;
 		case ':':
 		    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(optopt)));
@@ -871,7 +884,11 @@ static void op_used(shell_interaction & dialog, const database *dat, S_I num, bo
     dialog.database_show_files(*dat, rnum, opt);
 }
 
-static void op_files(shell_interaction & dialog, const database *dat, const string & arg, bool info_details)
+static void op_files(shell_interaction & dialog,
+		     const database *dat,
+		     const string & arg,
+		     bool info_details,
+		     bool detailed_dates)
 {
     thread_cancellation thr;
 
@@ -879,6 +896,7 @@ static void op_files(shell_interaction & dialog, const database *dat, const stri
 	throw SRC_BUG;
 
     thr.check_self_cancellation();
+    dialog.set_fully_detailed_datetime(detailed_dates);
     dialog.database_show_version(*dat, arg);
 }
 
@@ -1362,6 +1380,7 @@ static void op_batch(shared_ptr<user_interaction> & dialog, database *dat, const
     compression algozip; // not used here neither but at the level of the function that called op_batch
     U_I compression_level; // not used here neither but at the level of the function that called op_batch
     bool change_compression; // not used here neither but at the level of the function that called op_batch
+    bool detailed_dates;
     shell_interaction *shelli = dynamic_cast<shell_interaction *>(dialog.get());
 
     if(shelli == nullptr)
@@ -1422,6 +1441,7 @@ static void op_batch(shared_ptr<user_interaction> & dialog, database *dat, const
 			     algozip,
 			     compression_level,
 			     change_compression,
+			     detailed_dates,
 			     true))
 		throw Erange("op_batch", tools_printf(gettext("Syntax error in batch file: %S"), &line));
 
@@ -1431,7 +1451,7 @@ static void op_batch(shared_ptr<user_interaction> & dialog, database *dat, const
 	    if(sub_op == interactive)
 		throw Erange("op_batch", gettext("Syntax error in batch file: -i option not allowed"));
 
-	    action(dialog, sub_op, dat, arg, num, rest, num2, date, faked_base, sub_info_details, false, ignore_dat_options, even_when_removed);
+	    action(dialog, sub_op, dat, arg, num, rest, num2, date, faked_base, sub_info_details, false, ignore_dat_options, even_when_removed, detailed_dates);
 	}
 	while(tmp == '\n');
     }
@@ -1517,7 +1537,8 @@ static void action(shared_ptr<user_interaction> & dialog,
 		   bool info_details,
 		   bool early_release,
 		   bool ignore_database_options,
-		   bool even_when_removed)
+		   bool even_when_removed,
+		   bool detailed_dates)
 {
     shell_interaction *shelli = dynamic_cast<shell_interaction *>(dialog.get());
 
@@ -1558,7 +1579,7 @@ static void action(shared_ptr<user_interaction> & dialog,
 	op_used(*shelli, dat, num, info_details);
 	break;
     case files:
-	op_files(*shelli, dat, arg, info_details);
+	op_files(*shelli, dat, arg, info_details, detailed_dates);
 	break;
     case stats:
 	op_stats(*shelli, dat, info_details);
