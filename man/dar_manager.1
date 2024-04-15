@@ -65,11 +65,6 @@ use a keyboard interactive text menu to do operations on the given database. So 
 -A, --add [<path>/]<basename> [ [<path>/]<archive_basename>]
 add an archive to the database. An isolated catalogue can also be used only if it has been produced by dar version 1.2.0 or above. Why ? Because, an isolated catalogue produced by older version will always tell that no files are saved in the archive of reference, in that case the solution is to provide the archive itself as argument. An optional second argument is the basename of the archive if it is different from the first argument (need for extraction of files). For example you could have an isolated catalogue in first argument and the basename of the original archive (where is stored the data) as second argument. By default,
 .TP 20
--9, --min-digits <num>
-the slice number zeroed padding to use to get the slices filename (for more details see dar man page at this same option)
-.B dar_manager
-will look for an archive of reference in the command line used to create each archive, but in some cases, it may be necessary to specify the archive name (for example if you've changed its name).
-.TP 20
 -l, --list
 displays the information about the archives compiled in the database. In particular, a number is given to each archive, which is required to some other option to design a particular archive within the database. Nothing avoids you to feed the database with several archive of the same basename ! You will just have to guess which one is asked under this name. :-)
 .TP 20
@@ -97,6 +92,39 @@ Set the path to dar. If no argument is given, dar is expected to be located in t
 will restore all (an only) the given files or directories, in their latest recorded status, or before the date give thanks to the -e option. If a directory is given all subfiles and subdirectories are restored recursively in it. You can filter out some files from this recursion thanks to dar usual filtering option (see dar man page) you can provide beside -r using the -e option (see below). Dar_manager lead dar to remove any file, if a file is stored as having been removed at date requested for restoration, it is simply not restored. Thus if you restore in an empty directory you will get all the files and directories you provided to dar_manager in the state they have at the date you asked. File that did not existed at that time will not be restored. However you can restore over an existing installation, dar will then warn you before overwriting files (see -w and -n options for dar) but will still not remove files that were recorded removed from a previous archive of reference.
 Note that files listed after -r option, must never have an absolute path. They will be restored under the directory specified with -R option of dar (passed to dar using -o or -e options), or by default, under the current directory.
 .TP 20
+-u, --used <number>
+list the files that the given archive owns as last version available. Thus when no file is listed, the given archive is no more useful in database, and can be removed safely (-D option). If <number> is zero, all available file are listed, the status provided for each file present in the database is the most recent status. A negative number is allowed for this option (see -D option for details).
+.TP 20
+-f, --file <file>
+displays in which archive the given file is saved, and what are the modification date (mtime) and change date (ctime).
+.TP 20
+-s, --stats
+show the number of most recent files by archive. This helps to determine which archive can be safely removed from the database.
+.TP 20
+-m, --move <number> <number>
+changes the order of archives in the database. The first number is the number of the archive to move, while the second is the place where it must be shifted to.
+
+Archive order is important: An old archive must have a smaller index than a recent archive. If you add archive to a database in the order they have been created all should be fine. Else if a file has a more recent version in an archive which index is smaller, a warning will be issued (unless -ai option is used). This can occur if by mistake you added an archive to the database in the wrong order (old archive added after a recent one), in that case simply using the -m option will let you fix this mistake. If instead the problem is relative to a single file (or a small set of file), you should wonder why this file has its modification date altered in a way that it pretends to be older than its really is. Checking for the signs of a rootkit may be a good idea.
+.TP 20
+-c, --check
+check the database consistency, in particular the date ordering is verified and warning are issued for each file having more recent version located in an archive with a smaller index inside the database. -ai option makes -c option useless.
+.TP 20
+-@, --batch <filename>
+allows you to do several operations on a given database. All operations are defined in the provided <filename> and refer to the same database as defined by the -B switch on command line. This batch file, must thus not contain neither -B, -C, -i or -ai option (-ai are global to the batch operation). The batch file expected layout is one command per line, thus several arguments (like -l -v for example) may take place on a given line of the file (-v can be found both on command line for verbose output about the batch operation steps, as well as inside the batch file for verbose output of a particular batched command). Arguments are separated by spaces or tabs, other characters are passed as-is. In consequence, you should only need to use quotes (using " or ') if you intend to use an argument containing space. Last, comments may be placed on any line beginning by a hash character (#).
+.TP 20
+-h, --help
+display help usage
+.TP 20
+-V, --version
+display software version
+
+.SH OPTIONS
+.TP 20
+-9, --min-digits <num>
+the slice number zeroed padding to use to get the slices filename (for more details see dar man page at this same option)
+.B dar_manager
+will look for an archive of reference in the command line used to create each archive, but in some cases, it may be necessary to specify the archive name (for example if you've changed its name).
+.TP 20
 -w, --when <date>
 alters the -r option behavior: still restores the files in the most recent version available but only before the given date (versions of more recent dates are ignored). The <date> must respect the following format [ [ [year/]month/]day-]hour:minute[:second]. For example "22:10" for 10 PM past 10 or the current day,  "7-22:10" for 10 PM past 10 the 7th of the current month, "3/07-22:10" for the 7th of march at 22:10 of the current year, "2002/03/31-14:00:00" the date of the first dar's release ;-). The given date must be in the past, of course, and is compared to the "last modification" date of the saved files and not to the date at which archives have been done. Thus if a file has been changed long ago but saved in a recent (full) archive, it will be elected for restoration even for dates older than the creation of the archive. In the other way, a file saved long time ago with a mtime that was set to a date in the future will not be elected for restoration when giving the date at which was done the archive.
 .PP
@@ -119,34 +147,14 @@ dar_manager -B database.dmd -o -w -v -p -b -r -H 1
 .RE
 .RE
 .TP 20
--u, --used <number>
-list the files that the given archive owns as last version available. Thus when no file is listed, the given archive is no more useful in database, and can be removed safely (-D option). If <number> is zero, all available file are listed, the status provided for each file present in the database is the most recent status. A negative number is allowed for this option (see -D option for details).
-.TP 20
--f, --file <file>
-displays in which archive the given file is saved, and what are the modification date (mtime) and change date (ctime).
-.TP 20
--s, --stats
-show the number of most recent files by archive. This helps to determine which archive can be safely removed from the database.
-.TP 20
--m, --move <number> <number>
-changes the order of archives in the database. The first number is the number of the archive to move, while the second is the place where it must be shifted to.
-
-Archive order is important: An old archive must have a smaller index than a recent archive. If you add archive to a database in the order they have been created all should be fine. Else if a file has a more recent version in an archive which index is smaller, a warning will be issued (unless -ai option is used). This can occur if by mistake you added an archive to the database in the wrong order (old archive added after a recent one), in that case simply using the -m option will let you fix this mistake. If instead the problem is relative to a single file (or a small set of file), you should wonder why this file has its modification date altered in a way that it pretends to be older than its really is. Checking for the signs of a rootkit may be a good idea.
-.TP 20
--c, --check
-check the database consistency, in particular the date ordering is verified and warning are issued for each file having more recent version located in an archive with a smaller index inside the database. -ai option makes -c option useless.
-.TP 20
 -N, --ignore-options-in-base
-Do not use the options stored in database when calling dar for restoration. This option is only useful while restoring files from dar_manager, either directly (-r option) or using a batch file (-@ option, see below).
+Do not use the options stored in database when calling dar for restoration. This option is only useful while restoring files from dar_manager, either directly (-r option) or using a batch file (-@ option).
 .TP 20
 -k, --ignore-when-removed
 By default, dar_manager does not ask dar to restore file that have been removed at the requested date (or in the latest state available). This is useful for example to restore a directory in the state it has at a given date (only files that existed at that time are restored). However when you want to restore a file that has been destroyed by accident, you need to use -k option so you don't have to determine at which date that file existed to be be able to ask dar_manager to restore that file in the state it had before that date. In other words, -k option gives a behavior of dar_manager backward compatible with dar_manager released beside version 2.3.x of dar.
 .TP 20
 -ai, --alter=ignore-order
 avoid dar_manager to issue a warning for each file not following a chronological order of modification date when the archive number in the database is growing.
-.TP 20
--@, --batch <filename>
-allows you to do several operations on a given database. All operations are defined in the provided <filename> and refer to the same database as defined by the -B switch on command line. This batch file, must thus not contain neither -B, -C, -i or -ai option (-ai are global to the batch operation). The batch file expected layout is one command per line, thus several arguments (like -l -v for example) may take place on a given line of the file (-v can be found both on command line for verbose output about the batch operation steps, as well as inside the batch file for verbose output of a particular batched command). Arguments are separated by spaces or tabs, other characters are passed as-is. In consequence, you should only need to use quotes (using " or ') if you intend to use an argument containing space. Last, comments may be placed on any line beginning by a hash character (#).
 .TP 20
 -z, --compression <algo>[:<level>]
 Available creating or modifying a database content (-C, -A, -D, -m, -i, -L options), this option let you set the compression algorithm and eventually the compression level to use when the database is wrote to file. By default gzip:9 is use, but you can use "none" for no compression, "bzip2", "xz" and "lzo" and other compression algorithms (see -z option in dar's man page for an up to date list of available algorithms). Note: this option is only needed if you want to *change* the compression algorithm or level. Once defined, either at database creation time using -C option, or modified afterward, the compression scheme is stored in the database header and used for writing down database back to file.
@@ -156,12 +164,6 @@ Do not display any message on stderr when not launched from a terminal (for exam
 .TP 20
 -v, --verbose
 displays additional information about what it is doing.
-.TP 20
--h, --help
-display help usage
-.TP 20
--V, --version
-display software version
 
 .SH EXIT CODES
 .B dar_manager
