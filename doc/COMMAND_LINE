@@ -23,6 +23,7 @@ a * alteration of operation		--alter	  argument:
 							    file-auth[entication]
 							    first-slice
 							    force-first-slice | ffs
+							    fully-detailed-dates | fdd
 							    g[lob]
 							    h[oles-recheck]
 							    header
