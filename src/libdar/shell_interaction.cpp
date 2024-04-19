@@ -631,6 +631,7 @@ namespace libdar
 	else
 	{
 	    string nom = entry.get_name();
+	    entry.set_fully_detailed_dates(me->get_fully_detailed_datetime());
 
 	    if(entry.is_removed_entry())
 	    {
@@ -685,6 +686,8 @@ namespace libdar
 
 	if(entry.is_eod())
 	    return;
+
+	entry.set_fully_detailed_dates(me->get_fully_detailed_datetime());
 
 	if(entry.is_removed_entry())
 	{
@@ -745,6 +748,8 @@ namespace libdar
 	{
 	    string name = tools_output2xml(entry.get_name());
 	    unsigned char sig = entry.get_type();
+
+	    entry.set_fully_detailed_dates(me->get_fully_detailed_datetime());
 
 	    if(entry.is_removed_entry())
 	    {

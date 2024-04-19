@@ -89,6 +89,9 @@ namespace libdar
 	    /// display detailed datetime (including second fractions if present)
 	void set_fully_detailed_datetime(bool mode) { full_datetime = mode; };
 
+	    /// obtain the current value for displaying subsecond part of datetime
+	bool get_fully_detailed_datetime() const { return full_datetime; };
+
 	    /// display an archive content
 	void archive_show_contents(const archive & ref, const archive_options_listing_shell & options);
 
