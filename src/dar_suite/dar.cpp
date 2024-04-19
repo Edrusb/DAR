@@ -122,7 +122,10 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 	shell_interaction *ptr = dynamic_cast<shell_interaction *>(dialog.get());
 
 	if(ptr != nullptr)
+	{
 	    ptr->set_beep(param.beep);
+	    ptr->set_fully_detailed_datetime(param.fully_detailed_dates);
+	}
 
 	if(param.display_masks)
 	{
