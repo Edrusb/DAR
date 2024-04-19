@@ -1614,14 +1614,14 @@ namespace libdar
     const mask & archive_options_listing::get_selection() const
     {
 	if(x_selection == nullptr)
-	    throw Erange("archive_option_listing", dar_gettext("No mask available"));
+	    throw Erange("archive_options_listing", dar_gettext("No mask available"));
 	return *x_selection;
     }
 
     const mask & archive_options_listing::get_subtree() const
     {
 	if(x_subtree == nullptr)
-	    throw Erange("archive_option_listing", dar_gettext("No mask available"));
+	    throw Erange("archive_options_listing", dar_gettext("No mask available"));
 	return *x_subtree;
     }
 
