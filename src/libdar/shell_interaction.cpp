@@ -749,7 +749,8 @@ namespace libdar
 	    string name = tools_output2xml(entry.get_name());
 	    unsigned char sig = entry.get_type();
 
-	    entry.set_fully_detailed_dates(me->get_fully_detailed_datetime());
+		// entry.set_fully_detailed_dates(me->get_fully_detailed_datetime());
+		// for now xml output does not show subsecond value of dates
 
 	    if(entry.is_removed_entry())
 	    {
