@@ -175,6 +175,7 @@ struct line_param
     bool in_place;                ///< in-place restoration or comparison
     bool never_resave_uncompr;    ///< never resave uncompressed when compression ratio is bad
     bool force_first_slice;       ///< whether to read the first instead of the last slice when a isolated catalogue is given in complement
+    bool fully_detailed_dates;    ///< whether to show subsecond value of dates
 
 	// constructor for line_param
     line_param()

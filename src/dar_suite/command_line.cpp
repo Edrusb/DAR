@@ -338,6 +338,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
     p.in_place = false;
     p.never_resave_uncompr = false;
     p.force_first_slice = false;
+    p.fully_detailed_dates = false;
 
     if(!dialog)
 	throw SRC_BUG;
@@ -639,6 +640,9 @@ bool get_args(shared_ptr<user_interaction> & dialog,
 	if(p.force_first_slice &&
 	   (p.ref_filename == nullptr || (p.op != diff && p.op != extract && p.op != test)))
 	    throw Erange("get_args", gettext("-aforce-first-slice is only valid while reading an archive with the help of an isolated catalog"));
+	if(p.fully_detailed_dates && p.op != listing)
+	    dialog->message(gettext("-afdd option is useless while listing (-l option), ignoring"));
+
 
             //////////////////////
             // generating masks
@@ -1670,6 +1674,8 @@ static bool get_args_recursive(recursive_param & rec,
 		    p.remote_verbose = true;
 		else if(strcasecmp("force-first-slice", optarg) == 0 || strcasecmp("ffs", optarg) == 0)
 		    p.force_first_slice = true;
+		else if(strcasecmp("fully-detailed-dates", optarg) == 0 || strcasecmp("fdd", optarg) == 0)
+		    p.fully_detailed_dates = true;
 		else
                     throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext("Unknown argument given to -a : %s"), optarg));
                 break;
