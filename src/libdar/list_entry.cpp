@@ -124,26 +124,26 @@ namespace libdar
 
     string list_entry::get_last_access() const
     {
-	return last_access.is_null() ? "" : tools_display_date(last_access);
+	return last_access.is_null() ? "" : tools_display_date(last_access, full_date);
     }
 
     string list_entry::get_last_modif() const
     {
 	if(!is_removed_entry())
-	    return last_modif.is_null() ? "" : tools_display_date(last_modif);
+	    return last_modif.is_null() ? "" : tools_display_date(last_modif, full_date);
 	else
 	    return "";
     }
 
     string list_entry::get_last_change() const
     {
-	return last_change.is_null() ? "" : tools_display_date(last_change);
+	return last_change.is_null() ? "" : tools_display_date(last_change, full_date);
     }
 
     string list_entry::get_removal_date() const
     {
 	if(is_removed_entry())
-	    return last_modif.is_null() ? "Unknown date" : tools_display_date(last_modif);
+	    return last_modif.is_null() ? "Unknown date" : tools_display_date(last_modif, full_date);
 	else
 	    return "";
     }
@@ -324,6 +324,7 @@ namespace libdar
 	uid = 0;
 	gid = 0;
 	perm = 0;
+	full_date = false;
 	last_access.nullify();
 	last_modif.nullify();
 	data_status = saved_status::saved;

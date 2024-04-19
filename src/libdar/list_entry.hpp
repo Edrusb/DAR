@@ -108,6 +108,10 @@ namespace libdar
 	std::string get_uid(bool try_resolving_name = false) const;
 	std::string get_gid(bool try_resolving_name = false) const;
 	std::string get_perm() const;
+
+	    /// \note this is a const method because it only changes
+	    /// the display not the value of dates
+	void set_fully_detailed_dates(bool mode) const { full_date = mode; };
 	std::string get_last_access() const;
 	std::string get_last_modif() const;
 	std::string get_last_change() const;
@@ -275,6 +279,7 @@ namespace libdar
 	infinint uid;
 	infinint gid;
 	U_16 perm;
+	mutable bool full_date;
 	datetime last_access;
 	datetime last_modif;     ///< also used to store removal_date for removed entries
 	saved_status data_status;
