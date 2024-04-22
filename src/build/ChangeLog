@@ -23,6 +23,9 @@ from 2.7.x to 2.8.0
   than the last slice to fetch archive format when reading an archive with
   the help of an external catalog in direct access mode.
 - adding -x option to dar_manager (displaying subsecond date informations)
+- adding option -afdd to dar and dar_manager to show the subsecond part of
+  dates while listing a backup content (dar) or a database file information
+  (dar_manager).
 
 from 2.7.13 to 2.7.14
 - adding safe guard in fichier_libcurl destructor to verify all data have
