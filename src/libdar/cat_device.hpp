@@ -62,7 +62,7 @@ namespace libdar
 	cat_device(const cat_device & ref) = default;
 	cat_device(cat_device && ref) noexcept = default;
 	cat_device & operator = (const cat_device & ref) = default;
-	cat_device & operator = (cat_device && ref) noexcept = default;
+	cat_device & operator = (cat_device && ref) = default;
 	~cat_device() = default;
 
 	virtual bool operator == (const cat_entree & ref) const override;

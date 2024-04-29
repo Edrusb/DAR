@@ -54,7 +54,7 @@ namespace libdar
 	cat_ignored_dir(const cat_ignored_dir & ref) = default;
 	cat_ignored_dir(cat_ignored_dir && ref) noexcept = default;
 	cat_ignored_dir & operator = (const cat_ignored_dir & ref) = default;
-	cat_ignored_dir & operator = (cat_ignored_dir && ref) noexcept = default;
+	cat_ignored_dir & operator = (cat_ignored_dir && ref) = default;
 	~cat_ignored_dir() = default;
 
 	bool operator == (const cat_entree & ref) const override;

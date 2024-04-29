@@ -63,7 +63,7 @@ namespace libdar
 	cat_prise(const cat_prise & ref) = default;
 	cat_prise(cat_prise && ref) noexcept = default;
 	cat_prise & operator = (const cat_prise & ref) = default;
-	cat_prise & operator = (cat_prise && ref) noexcept = default;
+	cat_prise & operator = (cat_prise && ref) = default;
 	~cat_prise() = default;
 
 
