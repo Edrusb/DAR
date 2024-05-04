@@ -151,26 +151,14 @@ namespace libdar
 	    {
 		if(strcmp(ret->d_name, ".") != 0 && strcmp(ret->d_name, "..") != 0)
 		{
+			// only considering children of the current directory (ignoring '.' and '..')
+
 		    if(cache_directory_tagging)
 			is_cache_dir = cache_directory_tagging_check(dirname, ret->d_name);
-		    if(ret->d_type == DT_LNK || ret->d_type == DT_UNKNOWN) // we have to check whether the symlink points to a directory or to something else
-		    {
-			struct stat info;
-			int val = stat(ret->d_name, &info);
-			bool isdir = true;
-
-			if(val != 0)
-			{
-			    ui.message(tools_printf(gettext("Cannot determine whether %s is a directory or not, assuming it is not a directory"), ret->d_name));
-				// isdir is set to  true; at least it gives the user the possibility to try open this as if it was a directory, eventually the system will report an error
-			}
-			else
-			    isdir = (info.st_mode & S_IFMT) == S_IFDIR || (info.st_mode & S_IFMT) == S_IFLNK;
-
-			fichier.push_back(cell(string(ret->d_name), isdir));
-		    }
-		    else
-			fichier.push_back(cell(string(ret->d_name), ret->d_type == DT_DIR));
+		    fichier.push_back(cell(string(ret->d_name),
+					   (ret->d_type == DT_DIR
+					    || ret->d_type == DT_LNK
+					    || ret->d_type == DT_UNKNOWN)));
 		}
 	    }
             closedir(tmp);
