@@ -245,7 +245,7 @@ namespace libdar
 			const std::shared_ptr<heap<crypto_segment> > & xtas,
 			U_I num_workers);
 
-	~zip_below_write() { kill(); join(); };
+	~zip_below_write() { cancel(); join(); };
 
 
 	    /// consulted by the main thread, set to true by the zip_below_write thread
@@ -294,7 +294,7 @@ namespace libdar
 		       const std::shared_ptr<heap<crypto_segment> > & xtas,
 		       U_I num_workers);
 
-	~zip_below_read() { kill(); join(); };
+	~zip_below_read() { cancel(); join(); };
 
 	    /// this will trigger the sending of N eof_die blocks and thread termination
 	void do_stop() { should_i_stop = true; };
@@ -337,7 +337,7 @@ namespace libdar
 		   std::unique_ptr<compress_module> && ptr,
 		   bool compress);
 
-	~zip_worker() { kill(); join(); };
+	~zip_worker() { cancel(); join(); };
 
     protected:
 	virtual void inherited_run() override;

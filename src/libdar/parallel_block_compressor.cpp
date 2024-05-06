@@ -637,6 +637,10 @@ namespace libdar
 	{
 	    work();
 	}
+	catch(cancel_except &)
+	{
+	    throw;
+	}
 	catch(...)
 	{
 	    error = true;
@@ -648,6 +652,10 @@ namespace libdar
 	    try
 	    {
 		work();
+	    }
+	    catch(cancel_except &)
+	    {
+		throw;
 	    }
 	    catch(...)
 	    {
@@ -662,6 +670,7 @@ namespace libdar
     {
 	do
 	{
+	    cancellation_checkpoint();
 	    if(data.empty())
 	    {
 		if(!flags.empty())
@@ -793,6 +802,8 @@ namespace libdar
 
 	do
 	{
+	    cancellation_checkpoint();
+
 		// reading compressed block's header
 
 	    if(!should_i_stop)
@@ -906,6 +917,10 @@ namespace libdar
 	{
 	    work();
 	}
+	catch(cancel_except &)
+	{
+	    throw;
+	}
 	catch(...)
 	{
 	    error = true;
@@ -925,6 +940,10 @@ namespace libdar
 					static_cast<signed int>(compressor_block_flags::worker_error));
 		work();
 	    }
+	    catch(cancel_except &)
+	    {
+		throw;
+	    }
 	    catch(...)
 	    {
 		    // do nothing
@@ -941,6 +960,8 @@ namespace libdar
 
 	do
 	{
+	    cancellation_checkpoint();
+
 	    if(!transit)
 		transit = reader->worker_get_one(transit_slot, flag);
 

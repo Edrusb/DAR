@@ -335,7 +335,7 @@ namespace libdar
             trailing_clear_data(nullptr)
         { flag = tronco_flags::normal; };
 
-        ~read_below() { if(ptr) tas->put(move(ptr)); kill(); join(); };
+        ~read_below() { if(ptr) tas->put(move(ptr)); cancel(); join(); };
 
             /// let the caller give a callback function that given a generic_file with mixed cyphered and clear data, is able
             /// to return the offset of the first clear byte located *after* all the cyphered data, this
@@ -454,7 +454,7 @@ namespace libdar
 	    error_block(0)
 	{ if(encrypted == nullptr) throw SRC_BUG; };
 
-	~write_below() { kill(); join(); };
+	~write_below() { cancel(); join(); };
 
 	bool exception_pending() const { return error; };
 	const infinint & get_error_block() const { return error_block; };
@@ -501,7 +501,7 @@ namespace libdar
 	    abort(status::fine)
 	{ if(!reader || !writer || !waiting || !crypto) throw SRC_BUG; };
 
-	virtual ~crypto_worker() { kill(); join(); };
+	virtual ~crypto_worker() { cancel(); join(); };
 
     protected:
 	virtual void inherited_run() override;

@@ -1347,13 +1347,13 @@ namespace libdar
 
 	do
 	{
+	    cancellation_checkpoint();
 	    switch(flag)
 	    {
 
 		    // flag can be modifed anytime by the main thread, we must not assume
 		    // its value in a give case to be equal to the what the switch directive
 		    // pointed to
-
 	    case tronco_flags::die:
 		if(reof) // eof collided with a received order, continuing the eof process
 		    flag = tronco_flags::eof;
@@ -1537,6 +1537,8 @@ namespace libdar
 
 	do
 	{
+	    cancellation_checkpoint();
+
 	    if(ones.empty())
 	    {
 		if(!flags.empty())
@@ -1638,6 +1640,8 @@ namespace libdar
 
 	do
 	{
+	    cancellation_checkpoint();
+
 	    ptr = reader->worker_get_one(slot, flag);
 
 	    switch(static_cast<tronco_flags>(flag))

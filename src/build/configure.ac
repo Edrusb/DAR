@@ -1903,8 +1903,8 @@ AS_IF(       [ test "x$enable_threadar" != "xyes" ],
                               )
                AC_MSG_CHECKING([for libthreadar operationability])
                exp_maj_version_threadar=1
-               min_med_version_threadar=3
-               min_min_version_threadar=1
+               min_med_version_threadar=5
+               min_min_version_threadar=0
                AC_DEFINE_UNQUOTED(EXPECTED_MAJ_VERSION_THREADAR, "$exp_maj_version_threadar", [libthreadar expected major version])
                AC_DEFINE_UNQUOTED(MIN_MED_VERSION_THREADAR, "$min_med_version_threadar", [libthreadar minimal medium version])
                AC_DEFINE_UNQUOTED(MIN_MIN_VERSION_THREADAR, "$min_min_version_threadar", [libthreadar minimal minor version])
