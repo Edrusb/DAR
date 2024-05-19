@@ -171,12 +171,12 @@ namespace libdar
         {
             etage fils = etage(ui, s, datetime(0), datetime(0), false, false); // we don't care the access and modification time because directory will be destroyed
             string tmp;
-	    bool isdir;
+	    inode_type tp;
 
                 // first we destroy directory's children
-            while(fils.read(tmp, isdir))
+            while(fils.read(tmp, tp))
 	    {
-		if(isdir)
+		if(tp == inode_type::isdir)
 		    filesystem_tools_supprime(ui, (path(ref).append(tmp)).display());
 		else
 		    tools_unlink((path(ref).append(tmp)).display());

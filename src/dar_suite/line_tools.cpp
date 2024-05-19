@@ -1538,13 +1538,13 @@ void line_tools_check_min_digits(user_interaction & dialog, const path & loc, co
 {
     bool found = false;
     string cur;
-    bool isdir;
+    inode_type tp;
 
     etage contents(dialog, loc.display().c_str(), datetime(0), datetime(0), false, false);
 
     regular_mask slice = regular_mask(base + "\\.0+[1-9][0-9]*\\." + extension + "$", true);
 
-    while(!found && contents.read(cur, isdir))
+    while(!found && contents.read(cur, tp))
     {
 	found = slice.is_covered(cur);
 	if(found)
@@ -2027,7 +2027,7 @@ static bool is_a_slice_available(user_interaction & ui, const string & base, con
     try
     {
 	string rest;
-	bool isdir;
+	inode_type tp;
 
 	line_tools_split_path_basename(base.c_str(), chem, rest);
 
@@ -2036,8 +2036,8 @@ static bool is_a_slice_available(user_interaction & ui, const string & base, con
 	    etage contents = etage(ui, chem->display().c_str(), datetime(0), datetime(0), false, false);  // we don't care the dates here so we set them to zero
 	    regular_mask slice = regular_mask(rest + "\\.[0-9]+\\."+ extension, true);
 
-	    while(!ret && contents.read(rest, isdir))
-		ret = isdir ? false : slice.is_covered(rest);
+	    while(!ret && contents.read(rest, tp))
+		ret = (tp == inode_type::isdir) ? false : slice.is_covered(rest);
 	}
 	catch(Erange & e)
 	{

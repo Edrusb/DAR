@@ -142,13 +142,13 @@ void f1(int argc, char *argv[])
 			      3);
 
     string entry;
-    bool isdir;
+    inode_type tp;
     if(chemin != "")
 	reposito.set_location(chemin);
     ui->printf("Directory content");
     reposito.read_dir_reset_dirinfo();
-    while(reposito.read_dir_next_dirinfo(entry, isdir))
-	ui->printf("%s | %s", isdir? "DIR" : "xxx", entry.c_str());
+    while(reposito.read_dir_next_dirinfo(entry, tp))
+	ui->printf("%s | %s", tp == inode_type::isdir ? "DIR" : "xxx", entry.c_str());
 
 
     fichier_local readme("/etc/fstab");

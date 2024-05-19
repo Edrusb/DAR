@@ -98,18 +98,18 @@ namespace libdar
 
     bool entrepot_libcurl::i_entrepot_libcurl::read_dir_next(string & filename) const
     {
-	bool isdir;
-	return read_dir_next_dirinfo(filename, isdir);
+	inode_type tp;
+	return read_dir_next_dirinfo(filename, tp);
     }
 
-    bool entrepot_libcurl::i_entrepot_libcurl::read_dir_next_dirinfo(std::string & filename, bool & isdir) const
+    bool entrepot_libcurl::i_entrepot_libcurl::read_dir_next_dirinfo(std::string & filename, inode_type & tp) const
     {
 	if(cur_dir_cursor == current_dir.end())
 	    return false;
 	else
 	{
 	    filename = cur_dir_cursor->first;
-	    isdir = cur_dir_cursor->second;
+	    tp = cur_dir_cursor->second;
 	    ++cur_dir_cursor;
 	    return true;
 	}
@@ -390,7 +390,7 @@ namespace libdar
 
     void entrepot_libcurl::i_entrepot_libcurl::fill_temporary_list() const
     {
-	std::map<string, bool>::iterator it = current_dir.begin();
+	std::map<string, inode_type>::iterator it = current_dir.begin();
 
 	temporary_list.clear();
 	while(it != current_dir.end())
@@ -505,7 +505,7 @@ namespace libdar
 
 		// looking for best_entry in current_dir and updating its value
 
-	    map<string, bool>::iterator found = current_dir.find(*best_entry);
+	    map<string, inode_type>::iterator found = current_dir.find(*best_entry);
 	    if(found == current_dir.end())
 		throw SRC_BUG; // entry found in temporary_list but not in current_dir??? what was temporary_list filled with then???
 
@@ -518,7 +518,7 @@ namespace libdar
 		// chdir on symlink pointing to nondir inode will fail, but at least this stay an
 		// option, which would not be the case if we assume all symlinks not to point to
 		// directories: chdir to them would then be forbidden by entrepot_libcurl...
-	    found->second = (line[0] == 'd' || line[0] == 'l');
+	    found->second = (line[0] == 'd' || line[0] == 'l') ? inode_type::isdir : inode_type::nondir;
 
 		// we now remove the best_entry from temporary_list to speed up future search
 
@@ -583,7 +583,7 @@ namespace libdar
 	    if(!reading_dir_tmp.empty())
 	    {
 		if(!details)
-		    current_dir[reading_dir_tmp] = false; // for now we assume it is not a directory
+		    current_dir[reading_dir_tmp] = inode_type::unknown;
 		reading_dir_tmp.clear();
 	    }
 	    break;
@@ -644,7 +644,7 @@ namespace libdar
 		    if(me->withdirinfo)
 			me->update_current_dir_with_line(me->reading_dir_tmp);
 		    else
-			me->current_dir[me->reading_dir_tmp] = false; // for now assumed to be non directory entry
+			me->current_dir[me->reading_dir_tmp] = inode_type::unknown;
 		    me->reading_dir_tmp.clear();
 		    break;
 		case '\r':

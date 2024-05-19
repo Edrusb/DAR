@@ -254,7 +254,7 @@ namespace libdar
 #endif
     }
 
-    bool entrepot_libcurl::read_dir_next_dirinfo(std::string & filename, bool & isdir) const
+    bool entrepot_libcurl::read_dir_next_dirinfo(std::string & filename, inode_type & tp) const
     {
 #if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
 	bool ret;
@@ -262,7 +262,7 @@ namespace libdar
 	NLS_SWAP_IN;
         try
         {
-	    ret = pimpl->read_dir_next_dirinfo(filename, isdir);
+	    ret = pimpl->read_dir_next_dirinfo(filename, tp);
         }
         catch(...)
         {

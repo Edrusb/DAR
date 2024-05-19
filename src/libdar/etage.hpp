@@ -32,6 +32,7 @@
 #include <string>
 #include "datetime.hpp"
 #include "user_interaction.hpp"
+#include "entrepot_aux.hpp"
 
 namespace libdar
 {
@@ -62,18 +63,20 @@ namespace libdar
 	etage & operator = (etage && ref) noexcept = default;
 	~etage() = default;
 
-        bool read(std::string & ref, bool & isdir);
+        bool read(std::string & ref, inode_type & tp);
 	bool is_empty() const { return fichier.empty(); };
 	datetime get_last_mod() const { return last_mod; };
 	datetime get_last_acc() const { return last_acc; };
 
     private:
+
 	struct cell
 	{
 	    std::string name;
-	    bool isdir;
+	    inode_type type;
+
 	    cell(const std::string & filename,
-		 bool is_dir): name(filename), isdir(is_dir) {};
+		 inode_type tp): name(filename), type(tp) {};
 	};
 
         std::deque<cell> fichier;     ///< holds the list of entry in the directory

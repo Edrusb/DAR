@@ -41,6 +41,7 @@
 #include "path.hpp"
 #include "archive_aux.hpp"
 #include "gf_mode.hpp"
+#include "entrepot_aux.hpp"
 
 namespace libdar
 {
@@ -160,11 +161,11 @@ namespace libdar
 	    /// alternative to the method read_dir_next, should be implemented also
 
 	    /// \param[out] filename name of the next entry in the directory, (valid only if this method returned true)
-	    /// \param[out] isdir true if filename is a directory (valid only if this method returned true)
-	    /// \note a call to rea_dir_reset_dirinfo() should be done before the first call to this method
+	    /// \param[out] tp gives the nature of the entry
+	    /// \note a call to read_dir_reset_dirinfo() should be done before the first call to this method
 	    /// \note either use read_dir_reset() followed by read_dir_next() calls, or call
 	    /// read_dir_reset_dirinfo() followed by read_dir_next_dirinfo() calls
-	virtual bool read_dir_next_dirinfo(std::string & filename, bool & isdir) const = 0;
+	virtual bool read_dir_next_dirinfo(std::string & filename, inode_type & tp) const = 0;
 
 	    /// create a new directory in the current directory
 

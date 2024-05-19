@@ -245,9 +245,9 @@ namespace libdar
             {
                 etage & inner = pile.back();
                 string name;
-		bool isdir;
+		inode_type tp;
 
-                if(!inner.read(name, isdir))
+                if(!inner.read(name, tp))
                 {
                     string tmp;
 

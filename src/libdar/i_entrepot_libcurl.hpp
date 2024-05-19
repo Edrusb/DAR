@@ -88,7 +88,7 @@ namespace libdar
 	virtual void read_dir_reset() const override { set_current_dir(false); };
 	virtual bool read_dir_next(std::string & filename) const override;
 	virtual void read_dir_reset_dirinfo() const override { set_current_dir(true); };
-	virtual bool read_dir_next_dirinfo(std::string & filename, bool & isdir) const override;
+	virtual bool read_dir_next_dirinfo(std::string & filename, inode_type &tp) const override;
 
 	virtual void create_dir(const std::string & dirname, U_I permission) override;
 
@@ -113,10 +113,10 @@ namespace libdar
 	mycurl_protocol x_proto;
 	std::string base_URL; ///< URL of the repository with only minimum path (login/password is given outside the URL)
 	mutable mycurl_easyhandle_sharing easyh;
-	mutable std::map<std::string, bool> current_dir; ///< map current directory entries to their property of being themselves a directory
-	mutable std::string reading_dir_tmp;             ///< used by callback to split received byte flow, line per line
-	mutable std::deque<std::string> temporary_list;  ///< used only when looking for dir/nodir property
-	mutable std::map<std::string, bool>::const_iterator cur_dir_cursor; ///< next entry to be read from current_dir
+	mutable std::map<std::string, inode_type> current_dir; ///< map current directory entries to their property of being themselves a directory
+	mutable std::string reading_dir_tmp;                   ///< used by callback to split received byte flow, line per line
+	mutable std::deque<std::string> temporary_list;        ///< used only when looking for dir/nodir property
+	mutable std::map<std::string, inode_type>::const_iterator cur_dir_cursor; ///< next entry to be read from current_dir
 	U_I wait_delay;
 	bool verbosity;
 	mutable bool withdirinfo; ///< used by callback function while reading directory content, to know whether to expect only a filename per line or whole entry information

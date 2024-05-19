@@ -972,6 +972,11 @@ PYBIND11_MODULE(libdar, mod)
 	// entrepot_* classes
 	//
 
+    pybind11::enum_<libdar::inode_type>(mod, "inode_type")
+	.value("nondir", libdar::inode_type::nondir)
+	.value("isdir", libdar::inode_type::isdir)
+	.value("unknown", libdar::inode_type::unknown);
+
     class py_entrepot : public libdar::entrepot
     {
     public:
@@ -1057,14 +1062,14 @@ PYBIND11_MODULE(libdar, mod)
 		);
 	};
 
-	virtual bool read_dir_next_dirinfo(std::string & filename, bool & isdir) const override
+	virtual bool read_dir_next_dirinfo(std::string & filename, libdar::inode_type & tp) const override
 	{
 	    PYBIND11_OVERRIDE_PURE(
 		bool,
 		libdar::entrepot,
 		read_dir_next,
 		filename,
-		isdir);
+		tp);
 	};
 
 	virtual void create_dir(const std::string & dirname, libdar::U_I permission) override
