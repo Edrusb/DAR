@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: DAR 2.7.0\n"
 "Report-Msgid-Bugs-To: https://github.com/Edrusb/DAR/issues\n"
-"POT-Creation-Date: 2024-03-23 11:12+0100\n"
+"POT-Creation-Date: 2024-06-11 17:58+0200\n"
 "PO-Revision-Date: 2023-07-16 20:31+0200\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
@@ -8075,7 +8075,7 @@ msgstr "%S n'est pas un chemin valide : %S"
 msgid "Cannot add an absolute path"
 msgstr "Impossible d'ajouter un chemin absolu"
 
-#: src/libdar/path.cpp:357
+#: src/libdar/path.cpp:358
 msgid "Empty string as subdirectory does not make a valid path"
 msgstr ""
 "Une chaîne vide en tant que sous-répertoire ne donne pas un chemin valide"
