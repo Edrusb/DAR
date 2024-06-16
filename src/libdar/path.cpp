@@ -185,7 +185,7 @@ namespace libdar
         else
             if(!dirs.empty())
             {
-                relative = false;
+                relative = true;
                 arg = "/";
                 return true;
             }
