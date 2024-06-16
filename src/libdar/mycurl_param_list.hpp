@@ -125,8 +125,8 @@ namespace libdar
     };
 
 
-	/// This class holds an etherogenous list, more precisely an map that associate a CURLoption value
-	/// to a value of a random type.
+	/// This class holds an etherogenous list, more precisely a map that associates CURLoption option
+	/// to a value of a random type corresponding to each CURLoption option.
 
     class mycurl_param_list
     {
