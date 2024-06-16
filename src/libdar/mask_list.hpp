@@ -59,8 +59,8 @@ namespace libdar
             /// filename to select for the operation
             /// \param[in] case_sensit whether comparison is case sensitive or not
             /// \param[in] prefix add this prefix to relative paths of the list. The
-	    /// prefix should be either absolute, or "<ROOT>" (in case of operations
-	    /// on an existing archive)
+	    /// prefix should be either absolute, or path::FAKE_ROOT (if the operation
+	    /// does not involve an fs_root - testing, listing, merging operations for example)
 	    /// \param[in] include whether the mask_list is used for file inclusion or file exclusion
 	    /// \param[in] eol_list list of string that mean the end of a line
 	    /// providing an empty list as is the default value, means the list { "\n" ,  "\n\r" }

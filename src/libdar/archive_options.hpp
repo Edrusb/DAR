@@ -325,7 +325,15 @@ namespace libdar
 	    /// defines the filenames to only save (except directory) as those that match the given mask
 	void set_selection(const mask & selection);
 
-	    /// defines the directory and files to consider (this mask will be applied to the absolute path of files being proceeded)
+	    /// defines the directories and files to consider
+
+	    /// \note WARNING: this mask will be applied to the absolute path of files being proceeded.
+	    /// We speak here about the root of the filesystem under which the fs_root directory contains
+	    /// the files to backup. This is independent from the fs_root argument of class archive
+	    /// constructor which objective is to reduce the perimeter of the backup. The subtree filters
+	    /// do not compare only to the path inside the fs_root directory but to the full path,
+	    /// including the fs_root directory. In other words, if the subtree mask do not accept
+	    /// anything under fs_root path, the resulting backup will be empty.
 	void set_subtree(const mask & subtree);
 
 	    /// defines whether overwritting is allowed or not
@@ -1014,7 +1022,17 @@ namespace libdar
 	    /// defines the filenames to only save (except directory) as those that match the given mask
 	void set_selection(const mask & selection);
 
-	    /// defines the directory and files to consider (this mask will be applied to the absolute path of files being proceeded)
+	    /// defines the directories and files to consider
+
+	    /// \note WARNING: The filter mechanism used here is common to all operations and works
+	    /// by comparing full paths, while in the other hand, paths stored in the libdar archive are
+	    /// all relative to what was provided as fs_root at backup time. To have this filter mecanism
+	    /// working in the context of merging, where no fs_root can be provided to transform relative
+	    /// paths to absolute paths, libdar will emulate an fs_root with the pseudo root value of the
+	    /// path::FAKE_ROOT field. This is invisible form the libdar API user except when relying on
+	    /// mask_list objects, which cannot thus receive full path as those would not be prepended
+	    /// by path::FAKE_ROOT as fs_root value, because fs_root prefixing is only performed for relative
+	    /// paths.
 	void set_subtree(const mask & subtree);
 
 	    /// defines whether overwritting is allowed or not
@@ -1330,7 +1348,17 @@ namespace libdar
 	    /// defines the filenames to only save (except directory) as those that match the given mask
 	void set_selection(const mask & selection);
 
-	    /// defines the directory and files to consider (this mask will be applied to the absolute path of files being proceeded)
+	    /// defines the directories and files to consider
+
+	    /// \note WARNING: The filter mechanism used here is common to all operations and works
+	    /// by comparing full paths, while in the other hand, paths stored in the libdar archive are
+	    /// all relative paths to what was provided as fs_root at backup time. To have this filter mecanism
+	    /// working in the context of restoration, libdar prepends the relative path found in the libdar
+	    /// archive with  the fs_root argument given to archive::op_extract.
+	    /// In consequence the provided filter here, for extraction operation should be build taking into
+	    /// account that files to restore will be seen as subdirectories of this provided "fs_root" where
+	    /// the data will be restored. In other words, if the subtree mask do not accept anything under
+	    /// fs_root path, the resulting backup will be empty.
 	void set_subtree(const mask & subtree);
 
 	    /// defines whether a warning shall be issued before overwriting
@@ -1487,9 +1515,17 @@ namespace libdar
 	    /// \note this mask does not reject directory (it does not apply to it)
 	void set_selection(const mask & selection);
 
-	    /// mask applied to the full path, only those matching it will be listed
+	    /// defines the directories and files to consider
 
-	    /// \note a directory excluded by it implies all its content to be excluded (pruned)
+	    /// \note WARNING: The filter mechanism used here is common to all operations and works
+	    /// by comparing full paths, while in the other hand, paths stored in the libdar archive are
+	    /// all relative to what was provided as fs_root at backup time. To have this filter mecanism
+	    /// working in the context of listing, where no fs_root can be provided to transform relative
+	    /// paths to absolute paths, libdar will emulate an fs_root with the pseudo root value of the
+	    /// path::FAKE_ROOT field. This is invisible form the libdar API user except when relying on
+	    /// mask_list objects, which cannot thus receive full path as those would not be prepended
+	    /// by path::FAKE_ROOT as fs_root value, because fs_root prefixing is only performed for relative
+	    /// paths.
 	void set_subtree(const mask & subtree);
 
 	    /// whether to only show entries that have their data fully saved
@@ -1561,7 +1597,17 @@ namespace libdar
 	    /// list of filenames to consider (directory not concerned by this fiter)
 	void set_selection(const mask & selection);
 
-	    /// defines the directory and files to consider (this mask will be applied to the absolute path of files being proceeded)
+	    /// defines the directories and files to consider
+
+	    /// \note WARNING: The filter mechanism used here is common to all operations and works
+	    /// by comparing full paths, while in the other hand, paths stored in the libdar archive are
+	    /// all relative paths to what was provided as fs_root at backup time. To have this filter mecanism
+	    /// working in the context of restoration, libdar prepends the relative path found in the libdar
+	    /// archive with the fs_root argument given to archive::op_diff method.
+	    /// In consequence the provided filter here, for comparison operation should be build taking into
+	    /// account that files to compare will be seen as subdirectories of this provided "fs_root" the
+	    /// the archive will be compared to. In other words, if the subtree mask do not accept anything under
+	    /// the provided fs_root path, no file will be compared to what is on the filesystem.
 	void set_subtree(const mask & subtree);
 
 	    /// whether the user needs detailed output of the operation
@@ -1681,7 +1727,17 @@ namespace libdar
 	    /// list of filenames to consider (directory not concerned by this fiter)
 	void set_selection(const mask & selection);
 
-	    /// defines the directory and files to consider (this mask will be applied to the absolute path of files being proceeded)
+	    /// defines the directories and files to consider
+
+	    /// \note WARNING: The filter mechanism used here is common to all operations and works
+	    /// by comparing full paths, while in the other hand, paths stored in the libdar archive are
+	    /// all relative to what was provided as fs_root at backup time. To have this filter mecanism
+	    /// working in the context of testing, where no fs_root can be provided to transform relative
+	    /// paths to absolute paths, libdar will emulate an fs_root with the pseudo root value of the
+	    /// path::FAKE_ROOT field. This is invisible form the libdar API user except when relying on
+	    /// mask_list objects, which cannot thus receive full path as those would not be prepended
+	    /// by path::FAKE_ROOT as fs_root value, because fs_root prefixing is only performed for relative
+	    /// paths.
 	void set_subtree(const mask & subtree);
 
 	    /// whether the user needs detailed output of the operation

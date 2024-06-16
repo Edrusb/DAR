@@ -71,7 +71,7 @@ namespace libdar
         cat_inode(const cat_inode & ref);
 	cat_inode(cat_inode && ref) noexcept: cat_nomme(std::move(ref)) { nullifyptr(); move_from(std::move(ref)); };
 	cat_inode & operator = (const cat_inode & ref);
-	cat_inode & operator = (cat_inode && ref) noexcept { cat_nomme::operator = (std::move(ref)); move_from(std::move(ref)); return *this; };
+	cat_inode & operator = (cat_inode && ref) { cat_nomme::operator = (std::move(ref)); move_from(std::move(ref)); return *this; };
         ~cat_inode() noexcept(false);
 
         const infinint & get_uid() const { return uid; };

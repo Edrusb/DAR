@@ -49,7 +49,7 @@ namespace libdar
 	cat_eod(const cat_eod & ref) = default;
 	cat_eod(cat_eod && ref) noexcept = default;
 	cat_eod & operator = (const cat_eod & ref) = default;
-	cat_eod & operator = (cat_eod && ref) noexcept = default;
+	cat_eod & operator = (cat_eod && ref) = default;
 	~cat_eod() = default;
 
         cat_eod(const smart_pointer<pile_descriptor> & pdesc, bool small): cat_entree(pdesc, small, saved_status::saved) {};

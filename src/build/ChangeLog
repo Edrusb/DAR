@@ -27,6 +27,13 @@ from 2.7.x to 2.8.0
   dates while listing a backup content (dar) or a database file information
   (dar_manager).
 
+from 2.7.14 to 2.7.15
+- updating libdar about CURLINFO_CONTENT_LENGTH_DOWNLOAD symbol which is
+  reported as deprecated by recent libcurl libraries.
+- fixed compilation problem under MacOS Mojave
+- fixed bug that lead the warning about a backup operation about to save
+  the backup itslef, to not show
+
 from 2.7.13 to 2.7.14
 - adding safe guard in fichier_libcurl destructor to verify all data have
   been passed to libcurl *and* libcurl has completed the writing operation

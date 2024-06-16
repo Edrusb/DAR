@@ -54,7 +54,7 @@ namespace libdar
 	cat_detruit(const cat_detruit & ref) = default;
 	cat_detruit(cat_detruit && ref) noexcept = default;
 	cat_detruit & operator = (const cat_detruit & ref) = default;
-	cat_detruit & operator = (cat_detruit && ref) noexcept = default;
+	cat_detruit & operator = (cat_detruit && ref) = default;
 	~cat_detruit() = default;
 
 	virtual bool operator == (const cat_entree & ref) const override;

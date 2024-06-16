@@ -49,7 +49,7 @@ namespace libdar
 	cat_nomme(const cat_nomme & ref) = default;
 	cat_nomme(cat_nomme && ref) noexcept = default;
 	cat_nomme & operator = (const cat_nomme & ref) = default;
-	cat_nomme & operator = (cat_nomme && ref) noexcept = default;
+	cat_nomme & operator = (cat_nomme && ref) = default;
 	virtual ~cat_nomme() = default;
 
 	virtual bool operator == (const cat_entree & ref) const override;

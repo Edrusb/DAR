@@ -79,7 +79,7 @@ namespace libdar
 	return *this;
     }
 
-    cat_directory & cat_directory::operator = (cat_directory && ref) noexcept
+    cat_directory & cat_directory::operator = (cat_directory && ref)
     {
 	    // this assigns the inode part of the object
  	    // we don't modify the existing subfiles or subdirectories nor we copy them from the reference cat_directory

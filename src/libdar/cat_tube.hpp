@@ -62,7 +62,7 @@ namespace libdar
 	cat_tube(const cat_tube & ref) = default;
 	cat_tube(cat_tube && ref) noexcept = default;
 	cat_tube & operator = (const cat_tube & ref) = default;
-	cat_tube & operator = (cat_tube && ref) noexcept = default;
+	cat_tube & operator = (cat_tube && ref) = default;
 	~cat_tube() = default;
 
 	virtual bool operator == (const cat_entree & ref) const override;

@@ -101,7 +101,7 @@ namespace libdar
 	cat_entree & operator = (const cat_entree & ref) = default;
 
 	    // move assignment operator
-	cat_entree & operator = (cat_entree && ref) noexcept = default;
+	cat_entree & operator = (cat_entree && ref) = default;
 
 	    /// destructor
         virtual ~cat_entree() noexcept(false) {};

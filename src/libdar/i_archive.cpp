@@ -2141,7 +2141,7 @@ namespace libdar
 
 		// checking for exclusion due to different filesystem
 
-	    if(same_fs.is_covered(sauv_path_abs))
+	    if(! same_fs.is_covered(sauv_path_abs))
 		cov = false;
 
 	    if(snapshot)     // if we do a snapshot we dont create an archive this no risk to save ourselves
