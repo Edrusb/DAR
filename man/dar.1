@@ -377,7 +377,7 @@ since version 2.2.0 two modes of interpretation of these options exist. The norm
 .RS
 .TP 5
 the normal method is the default and is the one that has been presented above:
-A directory is elected for operation if no -P or -] option excludes it. If at least one -g or -[ option is given one command line, one -g or -[ option must cover it, else it is not elected for operation. If a directory is not selected, no recursion is done in it (the directory is pruned). For non directories files, the same is true (P, -g, -[ and -] do apply) and a second test must also be satisfied: no -X option must exclude the filename, and if at least one -I option is given, one must match the given filename (using or not wildcards).
+A directory is elected for operation if no -P or -] option excludes it. If at least one -g or -[ option is given on command line, one -g or -[ option must cover it, else it is not elected for operation. If a directory is not selected, no recursion is done in it (the directory is pruned). For non directories files, the same is true (P, -g, -[ and -] do apply) and a second test must also be satisfied: no -X option must exclude the filename, and if at least one -I option is given, one must match the given filename (using or not wildcards).
 .TP 5
 the ordered method (when -am option is given on command-line):
 The ordered method takes care of the order of presence between -X and -I in one hand and of -P, -g, -[ and -] in the other hand (note that it has also the same action concerning EA selection when using -u and -U options, but that's no more file selection). In the ordered method the last argument take precedence over all the previous ones, let's take an example:
