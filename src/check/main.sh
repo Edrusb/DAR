@@ -267,6 +267,8 @@ listing:
 testing:
 
 diffing:
+--fsa-scope none
+# because of birth date change when comparing with restored data
 
 EOF
 
