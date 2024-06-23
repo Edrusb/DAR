@@ -325,9 +325,9 @@ namespace libdar
 		if(!found)
 		{
 		    if(signatories)
-			get_ui().printf(gettext("No valid signing key could be find for %S"), &(recipients_email[i]));
+			get_ui().printf(gettext("No valid signing key could be found for %S"), &(recipients_email[i]));
 		    else
-			get_ui().printf(gettext("No valid encryption key could be find for %S"), &(recipients_email[i]));
+			get_ui().printf(gettext("No valid encryption key could be found for %S"), &(recipients_email[i]));
 		    get_ui().pause("Do you want to continue without this recipient?");
 		    ++offset;
 		}
