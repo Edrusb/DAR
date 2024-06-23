@@ -1,3 +1,24 @@
+#######################################################################
+# dar - disk archive - a backup/restoration program
+# Copyright (C) 2002-2024 Denis Corbin
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+#
+# to contact the author, see the AUTHOR file
+#######################################################################
+
 SUBDIRS = samples mini-howto man
 dist_noinst_DATA = COMMAND_LINE Doxyfile portable_cp Benchmark_tools/README Benchmark_tools/always_change Benchmark_tools/bitflip Benchmark_tools/build_test_tree.bash Benchmark_tools/hide_change Benchmark_tools/historization_feature restoration_dependencies.txt
 dist_pkgdata_DATA = README Features.html Limitations.html Notes.html Tutorial.html Good_Backup_Practice.html FAQ.html api_tutorial.html dar_doc.jpg dar_s_doc.jpg index.html dar-catalog.dtd authentification.html dar_key.txt old_dar_key1.txt old_dar_key2.txt from_sources.html presentation.html usage_notes.html python/libdar_test.py style.css restoration-with-dar.html benchmark.html benchmark_logs.html index_dar.html index_internal.html index_libdar.html

@@ -60,7 +60,7 @@ namespace libdar
        	cat_lien(const cat_lien & ref) = default;
 	cat_lien(cat_lien && ref) noexcept = default;
 	cat_lien & operator = (const cat_lien & ref) = default;
-	cat_lien & operator = (cat_lien && ref) noexcept = default;
+	cat_lien & operator = (cat_lien && ref) = default;
 	~cat_lien() = default;
 
 

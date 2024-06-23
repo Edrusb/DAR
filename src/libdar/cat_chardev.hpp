@@ -66,7 +66,7 @@ namespace libdar
 	cat_chardev(const cat_chardev & ref) = default;
 	cat_chardev(cat_chardev && ref) noexcept = default;
 	cat_chardev & operator = (const cat_chardev & ref) = default;
-	cat_chardev & operator = (cat_chardev && ref) noexcept = default;
+	cat_chardev & operator = (cat_chardev && ref) = default;
 	~cat_chardev() = default;
 
 

@@ -380,7 +380,7 @@ namespace libdar
 	    return a;
     }
 
-    const char datetime::time_unit_to_char(time_unit a)
+    char datetime::time_unit_to_char(time_unit a)
     {
 	switch(a)
 	{

@@ -75,7 +75,7 @@ namespace libdar
 	cat_mirage(const cat_mirage & ref) : cat_nomme (ref) { dup_on(ref.star_ref); };
 	cat_mirage(cat_mirage && ref) noexcept: cat_nomme(std::move(ref)) { try { dup_on(ref.star_ref); } catch(...) {}; };
 	cat_mirage & operator = (const cat_mirage & ref);
-	cat_mirage & operator = (cat_mirage && ref) noexcept;
+	cat_mirage & operator = (cat_mirage && ref);
 	~cat_mirage() { star_ref->drop_ref(this); };
 
 	virtual bool operator == (const cat_entree & ref) const override;

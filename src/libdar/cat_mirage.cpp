@@ -247,7 +247,7 @@ namespace libdar
         return *this;
     }
 
-    cat_mirage & cat_mirage::operator = (cat_mirage && ref) noexcept
+    cat_mirage & cat_mirage::operator = (cat_mirage && ref)
     {
 	    // moving the cat_nomme part of these objects
 	cat_nomme::operator = (move(ref));

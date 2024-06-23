@@ -50,7 +50,7 @@ namespace libdar
 	cat_ignored(const cat_ignored & ref) = default;
 	cat_ignored(cat_ignored && ref) noexcept = default;
 	cat_ignored & operator = (const cat_ignored & ref) = default;
-	cat_ignored & operator = (cat_ignored && ref) noexcept = default;
+	cat_ignored & operator = (cat_ignored && ref) = default;
 	~cat_ignored() = default;
 
 	virtual bool operator == (const cat_entree & ref) const override;

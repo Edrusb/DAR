@@ -156,12 +156,6 @@ namespace libdar
 		{
 		    gcry_error_t err;
 
-			// libgcypt built-in memory guard must be called before gcry_check_version
-
-		    err = gcry_control(GCRYCTL_ENABLE_M_GUARD);
-		    if(err != GPG_ERR_NO_ERROR)
-			throw Erange("libdar_init",tools_printf(gettext("Error while activating libgcrypt's memory guard: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
-
 			// no multi-thread support activated for gcrypt
 			// this must be done from the application as stated
 			// by the libgcrypt documentation
