@@ -7,6 +7,7 @@ from 2.7.14 to 2.7.15
 - removing obsolete call to gcry_control(GCRYCTL_ENABLE_M_GUARD) while
   initializing libgcrypt. This lead to libgcrypt initialization to fail
   with libgcrypt 1.11 and more recent versions.
+- fixed display bug about present but unsaved FSA status while listing
 
 from 2.7.13 to 2.7.14
 - adding safe guard in fichier_libcurl destructor to verify all data have
