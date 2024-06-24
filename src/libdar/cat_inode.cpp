@@ -492,6 +492,9 @@ namespace libdar
 	    {
 		if(scope.size() > 0)
 		    throw Erange("cat_inode::compare", gettext("No Filesystem Specific Attribute to compare with"));
+
+		    // this is not perfect, the "other" could have no FSA due to the non empty scope excluding only
+		    // the valid FSAs. A more specific comparison would worth it...
 	    }
 	    break;
 	case fsa_saved_status::partial:
@@ -502,7 +505,13 @@ namespace libdar
                     throw Erange("cat_inode::compare", gettext("inode last change date (ctime) greater, FSA might be different"));
 	    }
 	    else
-		throw Erange("cat_inode::compare", gettext("Filesystem Specific Attribute are missing"));
+	    {
+		if(scope.size() > 0)
+		    throw Erange("cat_inode::compare", gettext("Filesystem Specific Attribute are missing"));
+
+		    // this is not perfect, the "other" could have no FSA due to the non empty scope excluding only
+		    // the valid FSAs. A more specific comparison would worth it...
+	    }
 	    break;
 	case fsa_saved_status::none:
 	    break; // nothing to check
