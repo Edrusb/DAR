@@ -266,13 +266,13 @@ namespace libdar
 		switch(fsa_flag)
 		{
 		case INODE_FLAG_FSA_NONE:
-		    fsa_saved =  fsa_saved_status::none;
+		    fsa_saved = fsa_saved_status::none;
 		    break;
 		case INODE_FLAG_FSA_PART:
-		    fsa_saved =  fsa_saved_status::partial;
+		    fsa_saved = fsa_saved_status::partial;
 		    break;
 		case INODE_FLAG_FSA_FULL:
-		    fsa_saved =  fsa_saved_status::full;
+		    fsa_saved = fsa_saved_status::full;
 		    break;
 		default:
 		    throw Erange("cat_inode::cat_inode", gettext("badly structured inode: unknown inode flag for FSA"));
