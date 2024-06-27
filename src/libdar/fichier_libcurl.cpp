@@ -161,7 +161,7 @@ namespace libdar
 	    }
 	    catch(Egeneric & e)
 	    {
-		e.prepend_message("Error while reading file size on a remote repository");
+		e.prepend_message("Error while reading file size on a remote repository: ");
 		throw;
 	    }
 	}
