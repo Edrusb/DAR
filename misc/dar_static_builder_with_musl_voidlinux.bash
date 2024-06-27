@@ -33,8 +33,8 @@ LIBSSH2_VERSION=1.10.0
 # define whether to use libssh or libssh2
 # note that both libraries do support ssh version 2 protocol,
 # libssh even supports more recent ciphers than libssh2
-# LIBSSH=1
-LIBSSH=2
+LIBSSH=1
+# LIBSSH=2
 
 
 # wget options need for gnutls website that does not provide all chain of trust in its certificate
