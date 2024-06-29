@@ -369,14 +369,19 @@ namespace libdar
 		}
 	    }
 	    ent.set_fsa_status(tmp_inode->fsa_get_saved_status());
-	    if(tmp_inode->fsa_get_saved_status() == fsa_saved_status::full)
+	    if(tmp_inode->fsa_get_saved_status() == fsa_saved_status::full
+	       || tmp_inode->fsa_get_saved_status() == fsa_saved_status::partial)
 	    {
-		infinint tmp;
-
-		if(tmp_inode->fsa_get_offset(tmp))
-		    ent.set_archive_offset_for_FSA(tmp);
-		ent.set_storage_size_for_FSA(tmp_inode->fsa_get_size());
 		ent.set_fsa_scope(tmp_inode->fsa_get_families());
+
+		if(tmp_inode->fsa_get_saved_status() == fsa_saved_status::full)
+		{
+		    infinint tmp;
+
+		    if(tmp_inode->fsa_get_offset(tmp))
+			ent.set_archive_offset_for_FSA(tmp);
+		    ent.set_storage_size_for_FSA(tmp_inode->fsa_get_size());
+		}
 	    }
 	}
 
