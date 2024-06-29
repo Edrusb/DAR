@@ -51,6 +51,7 @@ namespace libdar
 						  end_data_mode(false),
 						  sub_is_dying(false),
 						  sync_write_asked(false),
+						  weof(false),
 						  ehandle(handle),
 						  metadatamode(false),
 						  current_offset(0),
@@ -181,7 +182,7 @@ namespace libdar
 	    }
 	    catch(Egeneric & e)
 	    {
-		e.prepend_message("Error while reading file size on a remote repository");
+		e.prepend_message("Error while reading file size on a remote repository: ");
 		throw;
 	    }
 	}
@@ -526,6 +527,7 @@ namespace libdar
     void fichier_libcurl::initialize_subthread()
     {
 	sub_is_dying = false;
+	weof = false;
 	synchronize.wait(); // release calling thread as we, as child thread, do now exist
     }
 
@@ -805,10 +807,30 @@ namespace libdar
 	if(me == nullptr)
 	    throw SRC_BUG;
 
+	bool fetch_block = !me->weof || me->sync_write_asked;
+	    // with libcurl 7.74.0 and below, returning zero
+	    // bytes was properly addressed by libcurl as an EOF
+	    // and no more call to read_data_callback was "performed".
+	    // But with libcurl 7.88.1 read_data_callback() was called
+	    // again at least once after that, which lead fichier_libcurl
+	    // main thread hanging forever for curl_perform to end
+	    // because read_data_callback() was pending to receive
+	    // data from interthread pipe. To avoid that having the ending
+	    // of the subthread involving external software (libcurl) which
+	    // somehow changed without notice nor documentation change, we
+	    // add the weof boolean variable to avoid fetching from interthread
+	    // in that context.
+
 	do
 	{
 	    just_synced = false;
-	    me->interthread.fetch(ptr, ptr_size);
+	    if(fetch_block)
+		me->interthread.fetch(ptr, ptr_size);
+	    else // emulate an the fetching of a zero length block
+	    {
+		ptr_size = 0;
+		ptr = bufptr; // we will copy 0 bytes from bufptr to bufptr
+	    }
 
 		// note: if ptr_size is zero
 		// libcurl will assume EOF and stop
@@ -817,7 +839,8 @@ namespace libdar
 	    if(me->sync_write_asked && ptr_size == 0)
 	    {
 		me->sync_write_asked = false;
-		me->interthread.fetch_recycle(ptr);
+		if(fetch_block)
+		    me->interthread.fetch_recycle(ptr);
 		me->synchronize.wait();
 		just_synced = true;
 	    }
@@ -827,7 +850,8 @@ namespace libdar
 	if(ptr_size <= room)
 	{
 	    memcpy(bufptr, ptr, ptr_size);
-	    me->interthread.fetch_recycle(ptr);
+	    if(fetch_block)
+		me->interthread.fetch_recycle(ptr);
 	    ret = ptr_size;
 	}
 	else
@@ -835,9 +859,13 @@ namespace libdar
 	    memcpy(bufptr, ptr, room);
 	    ptr_size -= room;
 	    memmove(ptr, ptr + room, ptr_size);
-	    me->interthread.fetch_push_back(ptr, ptr_size);
+	    if(fetch_block)
+		me->interthread.fetch_push_back(ptr, ptr_size);
 	    ret = room;
 	}
+
+	if(fetch_block && ptr_size == 0 && !(me->sync_write_asked))
+	    me->weof = true;
 
 	return ret;
     }

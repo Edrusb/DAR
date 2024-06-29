@@ -242,8 +242,8 @@ namespace libdar
 	if(me.size() >= you.size())
 	    if(strncmp(me.c_str(), you.c_str(), you.size()) == 0)
 		if(me.size() > you.size())
-		    return you.size() > 1 && me[you.size()] == '/'
-			|| you.size() == 1 && you[0] == '/';
+		    return (you.size() > 1 && me[you.size()] == '/')
+			|| (you.size() == 1 && you[0] == '/');
 		else  // thus, me.size() == you.size(), thus I'm a subdir of myself
 		    return true;
 	    else // path differs in the common length part, cannot be a subdir of "you"

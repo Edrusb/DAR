@@ -266,13 +266,13 @@ namespace libdar
 		switch(fsa_flag)
 		{
 		case INODE_FLAG_FSA_NONE:
-		    fsa_saved =  fsa_saved_status::none;
+		    fsa_saved = fsa_saved_status::none;
 		    break;
 		case INODE_FLAG_FSA_PART:
-		    fsa_saved =  fsa_saved_status::partial;
+		    fsa_saved = fsa_saved_status::partial;
 		    break;
 		case INODE_FLAG_FSA_FULL:
-		    fsa_saved =  fsa_saved_status::full;
+		    fsa_saved = fsa_saved_status::full;
 		    break;
 		default:
 		    throw Erange("cat_inode::cat_inode", gettext("badly structured inode: unknown inode flag for FSA"));
@@ -492,6 +492,9 @@ namespace libdar
 	    {
 		if(scope.size() > 0)
 		    throw Erange("cat_inode::compare", gettext("No Filesystem Specific Attribute to compare with"));
+
+		    // this is not perfect, the "other" could have no FSA due to the non empty scope excluding only
+		    // the valid FSAs. A more specific comparison would worth it...
 	    }
 	    break;
 	case fsa_saved_status::partial:
@@ -502,7 +505,13 @@ namespace libdar
                     throw Erange("cat_inode::compare", gettext("inode last change date (ctime) greater, FSA might be different"));
 	    }
 	    else
-		throw Erange("cat_inode::compare", gettext("Filesystem Specific Attribute are missing"));
+	    {
+		if(scope.size() > 0)
+		    throw Erange("cat_inode::compare", gettext("Filesystem Specific Attribute are missing"));
+
+		    // this is not perfect, the "other" could have no FSA due to the non empty scope excluding only
+		    // the valid FSAs. A more specific comparison would worth it...
+	    }
 	    break;
 	case fsa_saved_status::none:
 	    break; // nothing to check

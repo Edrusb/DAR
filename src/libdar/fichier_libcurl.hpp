@@ -155,6 +155,7 @@ namespace libdar
 	bool end_data_mode;               ///< true if subthread has been requested to end
 	bool sub_is_dying;                ///< is set by subthread when about to end
 	bool sync_write_asked;            ///< ask subthread to use 'synchronize' tell all data has been written
+	bool weof;                        ///< whether write EOF has been signaled to libcurl
 	std::shared_ptr<mycurl_easyhandle_node> ehandle; ///< easy handle (wrapped in C++ object) that we modify when necessary
 	bool metadatamode;                ///< wether we are acting on metadata rather than file's data
 	infinint current_offset;          ///< current offset we are reading / writing at

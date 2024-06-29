@@ -32,10 +32,14 @@ from 2.7.14 to 2.7.15
   reported as deprecated by recent libcurl libraries.
 - fixed compilation problem under MacOS Mojave
 - fixed bug that lead the warning about a backup operation about to save
-  the backup itslef, to not show
+  itself, to not show
 - removing obsolete call to gcry_control(GCRYCTL_ENABLE_M_GUARD) while
-  initializing libgcrypt. This lead to libgcrypt initialization to fail
+  initializing libgcrypt. This led to libgcrypt initialization to fail
   with libgcrypt 1.11 and more recent versions.
+- fixed listing but about "present but unsaved" FSA status
+- fixed dead-lock condition in libdar when used with libcurl > 0.74.0 at
+  the end of closing sftp session (undocumented changed behavior in
+  libcurl).
 
 from 2.7.13 to 2.7.14
 - adding safe guard in fichier_libcurl destructor to verify all data have
