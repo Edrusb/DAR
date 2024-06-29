@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: DAR 2.7.0\n"
 "Report-Msgid-Bugs-To: https://github.com/Edrusb/DAR/issues\n"
-"POT-Creation-Date: 2024-06-11 17:58+0200\n"
-"PO-Revision-Date: 2023-07-16 20:31+0200\n"
+"POT-Creation-Date: 2024-06-29 17:30+0200\n"
+"PO-Revision-Date: 2024-06-29 17:31+0200\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
 "Language: fr\n"
@@ -3018,12 +3018,12 @@ msgstr "Echec de paramétrage d'un contexte GPGME avec le protocole OpenPGP : "
 
 #: src/libdar/crypto_asym.cpp:328
 #, c-format
-msgid "No valid signing key could be find for %S"
+msgid "No valid signing key could be found for %S"
 msgstr "Aucune clef de signature valide n'a pu être trouvée pour %S"
 
 #: src/libdar/crypto_asym.cpp:330
 #, c-format
-msgid "No valid encryption key could be find for %S"
+msgid "No valid encryption key could be found for %S"
 msgstr "Aucune clef de chiffrement valide n'a pu être trouvée pour %S"
 
 #: src/libdar/crypto_asym.cpp:341
@@ -6894,21 +6894,21 @@ msgstr "attributs spécifiques au système de fichier différents"
 msgid "No Filesystem Specific Attribute to compare with"
 msgstr "Aucun attribut spécifique au système de fichier avec lequel comparer"
 
-#: src/libdar/cat_inode.cpp:502
+#: src/libdar/cat_inode.cpp:505
 msgid "inode last change date (ctime) greater, FSA might be different"
 msgstr ""
 "date de dernier changement de l'inode (ctime) plus récent, les FSA peuvent "
 "être différents"
 
-#: src/libdar/cat_inode.cpp:505
+#: src/libdar/cat_inode.cpp:510
 msgid "Filesystem Specific Attribute are missing"
 msgstr "Les attributs spécifiques au système de fichier (FSA) font défaut"
 
-#: src/libdar/cat_inode.cpp:792
+#: src/libdar/cat_inode.cpp:801
 msgid "CRC error detected while reading EA"
 msgstr "Erreur de CRC détectée lors de la lecture des AE"
 
-#: src/libdar/cat_inode.cpp:936
+#: src/libdar/cat_inode.cpp:945
 msgid ""
 "Error while reading CRC for EA from the archive: No escape mark found for "
 "that file"
@@ -6916,11 +6916,11 @@ msgstr ""
 "Erreur lors de la lecture du CRC pour des AE à partir de l'archive : Aucune "
 "séquence d'échappement trouvé pour ce fichier"
 
-#: src/libdar/cat_inode.cpp:1163
+#: src/libdar/cat_inode.cpp:1172
 msgid "CRC error detected while reading FSA"
 msgstr "Erreur de CRC détectée lors de la lecture des FSA"
 
-#: src/libdar/cat_inode.cpp:1287
+#: src/libdar/cat_inode.cpp:1296
 msgid ""
 "Error while reading CRC for FSA from the archive: No escape mark found for "
 "that file"
@@ -7012,43 +7012,43 @@ msgstr "Erreur de CRC sur l'entrée %S"
 msgid "Entry information CRC failure"
 msgstr "Erreur de CRC sur l'information d'une entrée dans la table de contenu"
 
-#: src/libdar/cat_entree.cpp:468
+#: src/libdar/cat_entree.cpp:473
 msgid "directory"
 msgstr "répertoire"
 
-#: src/libdar/cat_entree.cpp:472
+#: src/libdar/cat_entree.cpp:477
 msgid "hard linked inode"
 msgstr "inode liée en dur"
 
-#: src/libdar/cat_entree.cpp:474
+#: src/libdar/cat_entree.cpp:479
 msgid "plain file"
 msgstr "fichier plein"
 
-#: src/libdar/cat_entree.cpp:476
+#: src/libdar/cat_entree.cpp:481
 msgid "soft link"
 msgstr "lien symbolique"
 
-#: src/libdar/cat_entree.cpp:478
+#: src/libdar/cat_entree.cpp:483
 msgid "char device"
 msgstr "fichier spécial caractère"
 
-#: src/libdar/cat_entree.cpp:480
+#: src/libdar/cat_entree.cpp:485
 msgid "block device"
 msgstr "fichier spécial bloc"
 
-#: src/libdar/cat_entree.cpp:482
+#: src/libdar/cat_entree.cpp:487
 msgid "named pipe"
 msgstr "tube nommé"
 
-#: src/libdar/cat_entree.cpp:484
+#: src/libdar/cat_entree.cpp:489
 msgid "unix socket"
 msgstr "prise unix"
 
-#: src/libdar/cat_entree.cpp:486
+#: src/libdar/cat_entree.cpp:491
 msgid "deleted entry"
 msgstr "entrée supprimée"
 
-#: src/libdar/cat_entree.cpp:488
+#: src/libdar/cat_entree.cpp:493
 msgid "door inode"
 msgstr "inode Porte"
 
@@ -8006,47 +8006,42 @@ msgstr "Numéro d'archive invalide : %d"
 msgid "Initialization problem for liblzo2 library"
 msgstr "Problème d'initialisation pour la bibliothèque liblzo2"
 
-#: src/libdar/get_version.cpp:163
-#, c-format
-msgid "Error while activating libgcrypt's memory guard: %s/%s"
-msgstr "Erreur lors de l'activation du garde de mémoire de libgcrypt : %s/%s"
-
-#: src/libdar/get_version.cpp:170 src/libdar/get_version.cpp:188
+#: src/libdar/get_version.cpp:164 src/libdar/get_version.cpp:182
 #, c-format
 msgid "Too old version for libgcrypt, minimum required version is %s"
 msgstr ""
 "Version trop ancienne pour libgcrypt, la version minimale requise est %s"
 
-#: src/libdar/get_version.cpp:179
+#: src/libdar/get_version.cpp:173
 #, c-format
 msgid "Error while telling libgcrypt that initialization is finished: %s/%s"
 msgstr ""
 "Erreur lors de la communication à libgcrypt que l'initialisation est "
 "terminée : %s/%s"
 
-#: src/libdar/get_version.cpp:184
+#: src/libdar/get_version.cpp:178
 msgid "libgcrypt not initialized and libdar not allowed to do so"
 msgstr ""
 "libgcrypt n'a pas été initialisée et libdar n'est pas autorisé à le faire"
 
-#: src/libdar/get_version.cpp:199
+#: src/libdar/get_version.cpp:193
 #, c-format
 msgid "GPGME version requirement is not satisfied, requires version > %s"
 msgstr ""
 "prérequis insatisfait pour GPGME, une version supérieure à %s est nécessaire"
 
-#: src/libdar/get_version.cpp:203
+#: src/libdar/get_version.cpp:197
 #, c-format
 msgid "GPGME engine not available: %s"
 msgstr "le moteur GPGME n'est pas disponible: %s"
 
-#: src/libdar/get_version.cpp:213 src/libdar/get_version.cpp:217
-#: src/libdar/get_version.cpp:219
+#: src/libdar/get_version.cpp:207 src/libdar/get_version.cpp:211
+#: src/libdar/get_version.cpp:213
 #, c-format
 msgid "libcurl initialization failed: %s"
 msgstr "Echec d'initialisation de libcurl : %s"
 
-#: src/libdar/get_version.cpp:238
+#: src/libdar/get_version.cpp:232
 #, c-format
 msgid ""
 "libthreader version %d.%d.%d is too old, need version %s.%s.%s or more recent"
@@ -8625,16 +8620,16 @@ msgstr "Erreur lors de la cration du fichier de hashage : "
 msgid "unknown hash algorithm corresponding to char `%c'"
 msgstr "le caractère '%c' ne correspond à aucun algorithme de hashage connu"
 
-#: src/libdar/fichier_libcurl.cpp:207
+#: src/libdar/fichier_libcurl.cpp:208
 msgid "libcurl does not allow skipping in write mode"
 msgstr "libcurl interdit le changement de position en mode écriture"
 
-#: src/libdar/fichier_libcurl.cpp:261
+#: src/libdar/fichier_libcurl.cpp:262
 msgid ""
 "libcurl does not allow truncating at a given position while uploading files"
 msgstr "libcurl interdit de tronquer un fichier lors de son téléversement"
 
-#: src/libdar/fichier_libcurl.cpp:582
+#: src/libdar/fichier_libcurl.cpp:584
 msgid ""
 "Integer too large for libcurl, cannot skip at the requested offset in the "
 "remote repository"
@@ -8907,6 +8902,11 @@ msgstr "une FONCTIONNALITÉ NON ENCORE IMPLÉMENTÉE a été sollicitée :"
 msgid "FATAL error from operating system, aborting operation: "
 msgstr ""
 "Erreur FATALE provenant du système d'exploitation, abandon de l'opération : "
+
+#, c-format
+#~ msgid "Error while activating libgcrypt's memory guard: %s/%s"
+#~ msgstr ""
+#~ "Erreur lors de l'activation du garde de mémoire de libgcrypt : %s/%s"
 
 #~ msgid "#   UNEXPECTED EXCEPTION,                     #"
 #~ msgstr "#   EXCEPTION NON ATTENDUE,                   #"

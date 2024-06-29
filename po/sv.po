@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sv\n"
 "Report-Msgid-Bugs-To: https://github.com/Edrusb/DAR/issues\n"
-"POT-Creation-Date: 2024-06-11 17:58+0200\n"
+"POT-Creation-Date: 2024-06-29 17:30+0200\n"
 "PO-Revision-Date: 2012-04-15 11:28+0200\n"
 "Last-Translator: Peter Landgren <peter.talken@telia.com>\n"
 "Language-Team: Swedish <kde-i18n-doc@kde.org>\n"
@@ -2957,12 +2957,12 @@ msgstr ""
 
 #: src/libdar/crypto_asym.cpp:328
 #, c-format
-msgid "No valid signing key could be find for %S"
+msgid "No valid signing key could be found for %S"
 msgstr ""
 
 #: src/libdar/crypto_asym.cpp:330
 #, c-format
-msgid "No valid encryption key could be find for %S"
+msgid "No valid encryption key could be found for %S"
 msgstr ""
 
 #: src/libdar/crypto_asym.cpp:341
@@ -6672,20 +6672,20 @@ msgstr "andra Utvidgade Attribut"
 msgid "No Filesystem Specific Attribute to compare with"
 msgstr "inga Utvidgade Attribut att jämföra me "
 
-#: src/libdar/cat_inode.cpp:502
+#: src/libdar/cat_inode.cpp:505
 #, fuzzy
 msgid "inode last change date (ctime) greater, FSA might be different"
 msgstr "inods senaste ändringsdatum (ctime) är större, EA kan vara annat"
 
-#: src/libdar/cat_inode.cpp:505
+#: src/libdar/cat_inode.cpp:510
 msgid "Filesystem Specific Attribute are missing"
 msgstr ""
 
-#: src/libdar/cat_inode.cpp:792
+#: src/libdar/cat_inode.cpp:801
 msgid "CRC error detected while reading EA"
 msgstr "CRC-fel upptäckt vid läsning av EA"
 
-#: src/libdar/cat_inode.cpp:936
+#: src/libdar/cat_inode.cpp:945
 msgid ""
 "Error while reading CRC for EA from the archive: No escape mark found for "
 "that file"
@@ -6693,12 +6693,12 @@ msgstr ""
 "Fel vid läsning CRC för EA från arkiv: Inget escape-märke funnet för denna "
 "fil"
 
-#: src/libdar/cat_inode.cpp:1163
+#: src/libdar/cat_inode.cpp:1172
 #, fuzzy
 msgid "CRC error detected while reading FSA"
 msgstr "CRC-fel upptäckt vid läsning av EA"
 
-#: src/libdar/cat_inode.cpp:1287
+#: src/libdar/cat_inode.cpp:1296
 #, fuzzy
 msgid ""
 "Error while reading CRC for FSA from the archive: No escape mark found for "
@@ -6791,43 +6791,43 @@ msgstr "Inmatad information CRC-misslyckande för %S"
 msgid "Entry information CRC failure"
 msgstr "Inmatad information CRC-misslyckande"
 
-#: src/libdar/cat_entree.cpp:468
+#: src/libdar/cat_entree.cpp:473
 msgid "directory"
 msgstr "mapp"
 
-#: src/libdar/cat_entree.cpp:472
+#: src/libdar/cat_entree.cpp:477
 msgid "hard linked inode"
 msgstr "hårdlänkad inode"
 
-#: src/libdar/cat_entree.cpp:474
+#: src/libdar/cat_entree.cpp:479
 msgid "plain file"
 msgstr "enkel fil"
 
-#: src/libdar/cat_entree.cpp:476
+#: src/libdar/cat_entree.cpp:481
 msgid "soft link"
 msgstr "mjuk länk"
 
-#: src/libdar/cat_entree.cpp:478
+#: src/libdar/cat_entree.cpp:483
 msgid "char device"
 msgstr "teckenenhet"
 
-#: src/libdar/cat_entree.cpp:480
+#: src/libdar/cat_entree.cpp:485
 msgid "block device"
 msgstr "blockenhet"
 
-#: src/libdar/cat_entree.cpp:482
+#: src/libdar/cat_entree.cpp:487
 msgid "named pipe"
 msgstr "namnad pipe"
 
-#: src/libdar/cat_entree.cpp:484
+#: src/libdar/cat_entree.cpp:489
 msgid "unix socket"
 msgstr "unix sockel"
 
-#: src/libdar/cat_entree.cpp:486
+#: src/libdar/cat_entree.cpp:491
 msgid "deleted entry"
 msgstr "fördröjd inmatning"
 
-#: src/libdar/cat_entree.cpp:488
+#: src/libdar/cat_entree.cpp:493
 msgid "door inode"
 msgstr "'door' inod"
 
@@ -7739,43 +7739,38 @@ msgstr "Ogiltigt arkivnummer: "
 msgid "Initialization problem for liblzo2 library"
 msgstr "Initieringsproblem för liblzo2-biblioteket"
 
-#: src/libdar/get_version.cpp:163
-#, c-format
-msgid "Error while activating libgcrypt's memory guard: %s/%s"
-msgstr "Fel vid aktivering av 'libgcrypts' minnesskydd: %s/%s"
-
-#: src/libdar/get_version.cpp:170 src/libdar/get_version.cpp:188
+#: src/libdar/get_version.cpp:164 src/libdar/get_version.cpp:182
 #, fuzzy, c-format
 msgid "Too old version for libgcrypt, minimum required version is %s"
 msgstr "För gammal version av libgcrypt, som minst krävs version %s\n"
 
-#: src/libdar/get_version.cpp:179
+#: src/libdar/get_version.cpp:173
 #, c-format
 msgid "Error while telling libgcrypt that initialization is finished: %s/%s"
 msgstr ""
 "Fel vid meddelande till 'libgcrypt' att initialiseringen är avslutad: %s/%s"
 
-#: src/libdar/get_version.cpp:184
+#: src/libdar/get_version.cpp:178
 msgid "libgcrypt not initialized and libdar not allowed to do so"
 msgstr "'libgcrypt' är ej initialiserad och 'libdar' ej tillåten att göra så"
 
-#: src/libdar/get_version.cpp:199
+#: src/libdar/get_version.cpp:193
 #, c-format
 msgid "GPGME version requirement is not satisfied, requires version > %s"
 msgstr ""
 
-#: src/libdar/get_version.cpp:203
+#: src/libdar/get_version.cpp:197
 #, c-format
 msgid "GPGME engine not available: %s"
 msgstr ""
 
-#: src/libdar/get_version.cpp:213 src/libdar/get_version.cpp:217
-#: src/libdar/get_version.cpp:219
+#: src/libdar/get_version.cpp:207 src/libdar/get_version.cpp:211
+#: src/libdar/get_version.cpp:213
 #, fuzzy, c-format
 msgid "libcurl initialization failed: %s"
 msgstr "Minnestilldelning misslyckades : %s"
 
-#: src/libdar/get_version.cpp:238
+#: src/libdar/get_version.cpp:232
 #, c-format
 msgid ""
 "libthreader version %d.%d.%d is too old, need version %s.%s.%s or more recent"
@@ -8343,16 +8338,16 @@ msgstr "Fel vid skapande av hash handle: %s/%s"
 msgid "unknown hash algorithm corresponding to char `%c'"
 msgstr ""
 
-#: src/libdar/fichier_libcurl.cpp:207
+#: src/libdar/fichier_libcurl.cpp:208
 msgid "libcurl does not allow skipping in write mode"
 msgstr ""
 
-#: src/libdar/fichier_libcurl.cpp:261
+#: src/libdar/fichier_libcurl.cpp:262
 msgid ""
 "libcurl does not allow truncating at a given position while uploading files"
 msgstr ""
 
-#: src/libdar/fichier_libcurl.cpp:582
+#: src/libdar/fichier_libcurl.cpp:584
 msgid ""
 "Integer too large for libcurl, cannot skip at the requested offset in the "
 "remote repository"
@@ -8615,6 +8610,10 @@ msgstr "EN INTE IMPLEMENTERAD FUNKTION har använts: "
 #, fuzzy
 msgid "FATAL error from operating system, aborting operation: "
 msgstr "FATALT fel, avbryter åtgärd"
+
+#, c-format
+#~ msgid "Error while activating libgcrypt's memory guard: %s/%s"
+#~ msgstr "Fel vid aktivering av 'libgcrypts' minnesskydd: %s/%s"
 
 #~ msgid "#   UNEXPECTED EXCEPTION,                     #"
 #~ msgstr "#   OVÄNTAT AVBROTT,                          #"

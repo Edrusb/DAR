@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: dar 2.7.15.RC2\n"
+"Project-Id-Version: dar 2.7.15\n"
 "Report-Msgid-Bugs-To: https://github.com/Edrusb/DAR/issues\n"
-"POT-Creation-Date: 2024-06-11 17:58+0200\n"
+"POT-Creation-Date: 2024-06-29 17:30+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2721,12 +2721,12 @@ msgstr ""
 
 #: src/libdar/crypto_asym.cpp:328
 #, c-format
-msgid "No valid signing key could be find for %S"
+msgid "No valid signing key could be found for %S"
 msgstr ""
 
 #: src/libdar/crypto_asym.cpp:330
 #, c-format
-msgid "No valid encryption key could be find for %S"
+msgid "No valid encryption key could be found for %S"
 msgstr ""
 
 #: src/libdar/crypto_asym.cpp:341
@@ -6035,29 +6035,29 @@ msgstr ""
 msgid "No Filesystem Specific Attribute to compare with"
 msgstr ""
 
-#: src/libdar/cat_inode.cpp:502
+#: src/libdar/cat_inode.cpp:505
 msgid "inode last change date (ctime) greater, FSA might be different"
 msgstr ""
 
-#: src/libdar/cat_inode.cpp:505
+#: src/libdar/cat_inode.cpp:510
 msgid "Filesystem Specific Attribute are missing"
 msgstr ""
 
-#: src/libdar/cat_inode.cpp:792
+#: src/libdar/cat_inode.cpp:801
 msgid "CRC error detected while reading EA"
 msgstr ""
 
-#: src/libdar/cat_inode.cpp:936
+#: src/libdar/cat_inode.cpp:945
 msgid ""
 "Error while reading CRC for EA from the archive: No escape mark found for "
 "that file"
 msgstr ""
 
-#: src/libdar/cat_inode.cpp:1163
+#: src/libdar/cat_inode.cpp:1172
 msgid "CRC error detected while reading FSA"
 msgstr ""
 
-#: src/libdar/cat_inode.cpp:1287
+#: src/libdar/cat_inode.cpp:1296
 msgid ""
 "Error while reading CRC for FSA from the archive: No escape mark found for "
 "that file"
@@ -6138,43 +6138,43 @@ msgstr ""
 msgid "Entry information CRC failure"
 msgstr ""
 
-#: src/libdar/cat_entree.cpp:468
+#: src/libdar/cat_entree.cpp:473
 msgid "directory"
 msgstr ""
 
-#: src/libdar/cat_entree.cpp:472
+#: src/libdar/cat_entree.cpp:477
 msgid "hard linked inode"
 msgstr ""
 
-#: src/libdar/cat_entree.cpp:474
+#: src/libdar/cat_entree.cpp:479
 msgid "plain file"
 msgstr ""
 
-#: src/libdar/cat_entree.cpp:476
+#: src/libdar/cat_entree.cpp:481
 msgid "soft link"
 msgstr ""
 
-#: src/libdar/cat_entree.cpp:478
+#: src/libdar/cat_entree.cpp:483
 msgid "char device"
 msgstr ""
 
-#: src/libdar/cat_entree.cpp:480
+#: src/libdar/cat_entree.cpp:485
 msgid "block device"
 msgstr ""
 
-#: src/libdar/cat_entree.cpp:482
+#: src/libdar/cat_entree.cpp:487
 msgid "named pipe"
 msgstr ""
 
-#: src/libdar/cat_entree.cpp:484
+#: src/libdar/cat_entree.cpp:489
 msgid "unix socket"
 msgstr ""
 
-#: src/libdar/cat_entree.cpp:486
+#: src/libdar/cat_entree.cpp:491
 msgid "deleted entry"
 msgstr ""
 
-#: src/libdar/cat_entree.cpp:488
+#: src/libdar/cat_entree.cpp:493
 msgid "door inode"
 msgstr ""
 
@@ -6981,42 +6981,37 @@ msgstr ""
 msgid "Initialization problem for liblzo2 library"
 msgstr ""
 
-#: src/libdar/get_version.cpp:163
-#, c-format
-msgid "Error while activating libgcrypt's memory guard: %s/%s"
-msgstr ""
-
-#: src/libdar/get_version.cpp:170 src/libdar/get_version.cpp:188
+#: src/libdar/get_version.cpp:164 src/libdar/get_version.cpp:182
 #, c-format
 msgid "Too old version for libgcrypt, minimum required version is %s"
 msgstr ""
 
-#: src/libdar/get_version.cpp:179
+#: src/libdar/get_version.cpp:173
 #, c-format
 msgid "Error while telling libgcrypt that initialization is finished: %s/%s"
 msgstr ""
 
-#: src/libdar/get_version.cpp:184
+#: src/libdar/get_version.cpp:178
 msgid "libgcrypt not initialized and libdar not allowed to do so"
 msgstr ""
 
-#: src/libdar/get_version.cpp:199
+#: src/libdar/get_version.cpp:193
 #, c-format
 msgid "GPGME version requirement is not satisfied, requires version > %s"
 msgstr ""
 
-#: src/libdar/get_version.cpp:203
+#: src/libdar/get_version.cpp:197
 #, c-format
 msgid "GPGME engine not available: %s"
 msgstr ""
 
-#: src/libdar/get_version.cpp:213 src/libdar/get_version.cpp:217
-#: src/libdar/get_version.cpp:219
+#: src/libdar/get_version.cpp:207 src/libdar/get_version.cpp:211
+#: src/libdar/get_version.cpp:213
 #, c-format
 msgid "libcurl initialization failed: %s"
 msgstr ""
 
-#: src/libdar/get_version.cpp:238
+#: src/libdar/get_version.cpp:232
 #, c-format
 msgid ""
 "libthreader version %d.%d.%d is too old, need version %s.%s.%s or more recent"
@@ -7546,16 +7541,16 @@ msgstr ""
 msgid "unknown hash algorithm corresponding to char `%c'"
 msgstr ""
 
-#: src/libdar/fichier_libcurl.cpp:207
+#: src/libdar/fichier_libcurl.cpp:208
 msgid "libcurl does not allow skipping in write mode"
 msgstr ""
 
-#: src/libdar/fichier_libcurl.cpp:261
+#: src/libdar/fichier_libcurl.cpp:262
 msgid ""
 "libcurl does not allow truncating at a given position while uploading files"
 msgstr ""
 
-#: src/libdar/fichier_libcurl.cpp:582
+#: src/libdar/fichier_libcurl.cpp:584
 msgid ""
 "Integer too large for libcurl, cannot skip at the requested offset in the "
 "remote repository"
