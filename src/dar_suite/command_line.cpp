@@ -3143,7 +3143,7 @@ static mask *make_exclude_path_ordered(const string & x, mask_opt opt)
         }
         else // regex
         {
-            ret = new (nothrow) regular_mask(line_tools_build_regex_for_exclude_mask(opt.prefix.display(), x), opt.case_sensit);
+            ret = new (nothrow) regular_mask(tools_build_regex_for_exclude_mask(opt.prefix.display(), x), opt.case_sensit);
 
             if(ret == nullptr)
                 throw Ememory("make_exclude_path");
@@ -3170,7 +3170,7 @@ static mask *make_exclude_path_unordered(const string & x, mask_opt opt)
         if(opt.glob_exp)
             ret = new (nothrow) simple_mask((opt.prefix + x).display(), opt.case_sensit);
         else
-            ret = new (nothrow) regular_mask(line_tools_build_regex_for_exclude_mask(opt.prefix.display(), x), opt.case_sensit);
+            ret = new (nothrow) regular_mask(tools_build_regex_for_exclude_mask(opt.prefix.display(), x), opt.case_sensit);
     if(ret == nullptr)
         throw Ememory("make_exclude_path");
 

@@ -714,6 +714,15 @@ namespace libdar
 
     extern infinint tools_rounded_cube_root(const infinint & ref);
 
+        /// builds a regex from root directory and user provided regex to be applied to the relative path
+
+	/// \param[in] prefix is the root portion of the path
+	/// \param[in] relative_part is the user provided regex to be applied to the relative path
+	/// \return the corresponding regex to be applied to full absolute path
+    extern std::string tools_build_regex_for_exclude_mask(const std::string & prefix,
+							  const std::string & relative_part);
+
+
         /// @}
 
 } /// end of namespace

@@ -2397,5 +2397,46 @@ namespace libdar
 	return tools_lower_rounded_exp2(tools_upper_rounded_log2(ref) / 3);
     }
 
+    string tools_build_regex_for_exclude_mask(const string & prefix,
+					      const string & relative_part)
+    {
+	string result = "^";
+	string::const_iterator it = prefix.begin();
+
+	    // prepending any non alpha numeric char of the root by a anti-slash
+
+	for( ; it != prefix.end() ; ++it)
+	{
+	    if(isalnum(*it) || *it == '/' || *it == ' ')
+		result += *it;
+	    else
+	    {
+		result += '\\';
+		result += *it;
+	    }
+	}
+
+	    // adding a trailing / if necessary
+
+	string::reverse_iterator tr = result.rbegin();
+	if(tr == result.rend() || *tr != '/')
+	    result += '/';
+
+	    // adapting and adding the relative_part
+
+	it = relative_part.begin();
+
+	if(it != relative_part.end() && *it == '^')
+	    it++; // skipping leading ^
+	else
+	    result += ".*"; // prepending wilde card sub-expression
+
+	for( ; it != relative_part.end() && *it != '$' ; ++it)
+	    result += *it;
+
+	result += "(/.+)?$";
+
+	return result;
+    }
 
 } // end of namespace

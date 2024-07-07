@@ -1628,48 +1628,6 @@ void line_tools_read_range(const string & s, S_I & min, U_I & max)
     }
 }
 
-string line_tools_build_regex_for_exclude_mask(const string & prefix,
-					  const string & relative_part)
-{
-    string result = "^";
-    string::const_iterator it = prefix.begin();
-
-	// prepending any non alpha numeric char of the root by a anti-slash
-
-    for( ; it != prefix.end() ; ++it)
-    {
-	if(isalnum(*it) || *it == '/' || *it == ' ')
-	    result += *it;
-	else
-	{
-	    result += '\\';
-	    result += *it;
-	}
-    }
-
-	// adding a trailing / if necessary
-
-    string::reverse_iterator tr = result.rbegin();
-    if(tr == result.rend() || *tr != '/')
-	result += '/';
-
-	// adapting and adding the relative_part
-
-    it = relative_part.begin();
-
-    if(it != relative_part.end() && *it == '^')
-	it++; // skipping leading ^
-    else
-	result += ".*"; // prepending wilde card sub-expression
-
-    for( ; it != relative_part.end() && *it != '$' ; ++it)
-	result += *it;
-
-    result += "(/.+)?$";
-
-    return result;
-}
-
 string line_tools_get_euid()
 {
     string ret;

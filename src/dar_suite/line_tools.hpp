@@ -429,14 +429,6 @@ template <class T> void line_tools_split_in_words(const std::string & arg, T & m
     line_tools_split_in_words(mem, mots);
 }
 
-    /// builds a regex from root directory and user provided regex to be applied to the relative path
-
-    /// \param[in] prefix is the root portion of the path
-    /// \param[in] relative_part is the user provided regex to be applied to the relative path
-    /// \return the corresponding regex to be applied to full absolute path
-extern std::string line_tools_build_regex_for_exclude_mask(const std::string & prefix,
-							   const std::string & relative_part);
-
     /// return a string containing the Effective UID
 extern std::string line_tools_get_euid();
 
