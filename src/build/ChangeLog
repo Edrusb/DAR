@@ -26,6 +26,8 @@ from 2.7.x to 2.8.0
 - adding option -afdd to dar and dar_manager to show the subsecond part of
   dates while listing a backup content (dar) or a database file information
   (dar_manager).
+- exposing build_regex_for_exclude_mask() routine in tools module (was cli
+  specific in line_tools module).
 
 from 2.7.14 to 2.7.15
 - updating libdar about CURLINFO_CONTENT_LENGTH_DOWNLOAD symbol which is
