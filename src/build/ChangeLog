@@ -1,3 +1,8 @@
+from 2.7.15 to 2.7.16
+- fixed mask building of path exclusion (dar's -P option) when used with
+  regular expression (problem met while testing or merging a backup)
+
+from 2.7.14 to 2.7.15
 - updating libdar about CURLINFO_CONTENT_LENGTH_DOWNLOAD symbol which is
   reported as deprecated by recent libcurl libraries.
 - fixed compilation problem under MacOS Mojave
@@ -7,20 +12,6 @@
   initializing libgcrypt. This led to libgcrypt initialization to fail
   with libgcrypt 1.11 and more recent versions.
 - fixed listing but about "present but unsaved" FSA status
-- fixed dead-lock condition in libdar when used with libcurl > 0.74.0 at
-  the end of closing sftp session (undocumented changed behavior in
-  libcurl).
-
-from 2.7.14 to 2.7.15
-- updating libdar about CURLINFO_CONTENT_LENGTH_DOWNLOAD symbol which is
-  reported as deprecated by recent libcurl libraries.
-- fixed compilation problem under MacOS Mojave
-- fixed bug that lead the warning about a backup operation about to save
-  the backup itslef, to not show
-- removing obsolete call to gcry_control(GCRYCTL_ENABLE_M_GUARD) while
-  initializing libgcrypt. This lead to libgcrypt initialization to fail
-  with libgcrypt 1.11 and more recent versions.
-- fixed display bug about present but unsaved FSA status while listing
 - fixed dead-lock condition in libdar when used with libcurl > 0.74.0 at
   the end of closing sftp session (undocumented changed behavior in
   libcurl).
