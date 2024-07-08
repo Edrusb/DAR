@@ -1614,17 +1614,19 @@ string line_tools_build_regex_for_exclude_mask(const string & prefix,
     string result = "^";
     string::const_iterator it = prefix.begin();
 
-	// prepending any non alpha numeric char of the root by a anti-slash
+	// prepending any regex specific char of the root by a anti-slash
 
     for( ; it != prefix.end() ; ++it)
     {
-	if(isalnum(*it) || *it == '/' || *it == ' ')
-	    result += *it;
-	else
+	if(*it == '.' || *it == '?' || *it == '+' || *it == '*' ||
+	   *it == '^' || *it == '$' || *it == '[' || *it == '|' ||
+	   *it == '{' || *it == '(' || *it == ')' || *it == '\\')
 	{
 	    result += '\\';
 	    result += *it;
 	}
+	else
+	    result += *it;
     }
 
 	// adding a trailing / if necessary

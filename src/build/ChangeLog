@@ -3,6 +3,10 @@ from 2.7.x to 2.8.0
   than the last slice to fetch archive format when reading an archive with
   the help of an external catalog in direct access mode.
 
+from 2.7.15 to 2.7.16
+- fixed mask building of path exclusion (dar's -P option) when used with
+  regular expression (problem met while testing or merging a backup)
+
 from 2.7.14 to 2.7.15
 - updating libdar about CURLINFO_CONTENT_LENGTH_DOWNLOAD symbol which is
   reported as deprecated by recent libcurl libraries.
