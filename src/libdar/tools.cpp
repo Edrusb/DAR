@@ -2407,13 +2407,15 @@ namespace libdar
 
 	for( ; it != prefix.end() ; ++it)
 	{
-	    if(isalnum(*it) || *it == '/' || *it == ' ')
-		result += *it;
-	    else
+	    if(*it == '.' || *it == '?' || *it == '+' || *it == '*' ||
+	       *it == '^' || *it == '$' || *it == '[' || *it == '|' ||
+	       *it == '{' || *it == '(' || *it == ')' || *it == '\\')
 	    {
 		result += '\\';
 		result += *it;
 	    }
+	    else
+		result += *it;
 	}
 
 	    // adding a trailing / if necessary
