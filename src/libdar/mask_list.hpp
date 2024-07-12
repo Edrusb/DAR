@@ -60,6 +60,16 @@ namespace libdar
 	    /// prefix should be either absolute, or path::FAKE_ROOT (if the operation
 	    /// does not involve an fs_root - testing, listing, merging operations for example)
 	    /// \param[in] include whether the mask_list is used for file inclusion or file exclusion
+	    /// \note: WARNING: if "include is set to false, the mask must be negated by a not_mask(),
+	    /// this is not performed here. Here the include/exclude only parameter changes the filter
+	    /// internal "formula", but for historical reasons and by homogeneity with path base filtering
+	    /// the mask negation is done outside the mask construction. In other words, the caller should
+	    /// create the mask with the following statement either:
+	    /// - not_mask(mask_list(<filename>, <case sensit>, <prefix>, false))
+	    /// or
+	    /// - mask_list(<filename>, <case sensit>, <prefix>, true))
+	    /// and pass the resulting (eventually logically anded or ored with other masks to
+	    /// libdar set_subtree() method of an archive_option_* class.
         mask_list(const std::string & filename_list_st, bool case_sensit, const path & prefix, bool include);
 	mask_list(const mask_list & ref) = default;
 	mask_list(mask_list && ref) = default;
