@@ -1,6 +1,7 @@
 from 2.7.15 to 2.7.16
 - fixed mask building of path exclusion (dar's -P option) when used with
   regular expression (problem met while testing or merging a backup)
+- adding support for progressive report to reparing operation at API level
 
 from 2.7.14 to 2.7.15
 - updating libdar about CURLINFO_CONTENT_LENGTH_DOWNLOAD symbol which is
