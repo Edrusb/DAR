@@ -143,6 +143,7 @@ namespace libdar
 	    /// \param[in] basename_dst the slices basename of the repaired archive
 	    /// \param[in] extension_dst the slices extension of the repaired archive
 	    /// \param[in] options_repair the set of option to use to write the repaired archive
+	    /// \param[out] progressive_report statistics about the operation, considering the treated files (nullptr can be given if you don't want to use this feature)
 	    /// \note the statistics fieds used are the same as the ones used for archive creation,
 	    /// though no entry should be ignored as no file or path filtering exists for this
 	    /// operation, and no skipped or tooold should increase as no comparison is performed to an existing
@@ -162,7 +163,8 @@ namespace libdar
 		const path & chem_dst,
 		const std::string & basename_dst,
 		const std::string & extension_dst,
-		const archive_options_repair & options_repair);
+		const archive_options_repair & options_repair,
+		statistics* progressive_report = nullptr); ///< nullptr given for backward compatibility
 
 
 	    /// copy constructor (not implemented, throw an exception if called explicitely or implicitely)

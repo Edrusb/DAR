@@ -136,7 +136,8 @@ namespace libdar
 		     const path & chem_dst,
 		     const string & basename_dst,
 		     const string & extension_dst,
-		     const archive_options_repair & options_repair)
+		     const archive_options_repair & options_repair,
+		     statistics * progressive_report)
     {
 	NLS_SWAP_IN;
 	try
@@ -149,7 +150,8 @@ namespace libdar
 						chem_dst,
 						basename_dst,
 						extension_dst,
-						options_repair));
+						options_repair,
+						progressive_report));
 	    if(!pimpl)
 		throw Ememory("archive::archive");
 	}

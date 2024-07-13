@@ -1818,6 +1818,22 @@ PYBIND11_MODULE(libdar, mod)
 		   const libdar::archive_options_merge & options):
 	    libdar::archive(dialog, sauv_path, ref_arch1, filename, extension, options, nullptr) {};
 
+	    // first repair with progressive report
+	py_archive(const std::shared_ptr<libdar::user_interaction> & dialog,
+		   const libdar::path & chem_src,
+		   const std::string & basename_src,
+		   const std::string & extension_src,
+		   const libdar::archive_options_read & options_read,
+		   const libdar::path & chem_dst,
+		   const std::string & basename_dst,
+		   const std::string & extension_dst,
+		   const libdar::archive_options_repair & options_repair,
+		   std::shared_ptr<libdar::statistics> progressive_report):
+	    libdar::archive(dialog, chem_src, basename_src, extension_src, options_read,
+			    chem_dst, basename_dst, extension_dst, options_repair,
+			    progressive_report.get()) {};
+
+	    // second without progressive report
 	py_archive(const std::shared_ptr<libdar::user_interaction> & dialog,
 		   const libdar::path & chem_src,
 		   const std::string & basename_src,
@@ -1828,7 +1844,8 @@ PYBIND11_MODULE(libdar, mod)
 		   const std::string & extension_dst,
 		   const libdar::archive_options_repair & options_repair):
 	    libdar::archive(dialog, chem_src, basename_src, extension_src, options_read,
-			    chem_dst, basename_dst, extension_dst, options_repair) {};
+			    chem_dst, basename_dst, extension_dst, options_repair,
+			    nullptr) {};
 
 	libdar::statistics op_extract(const libdar::path & fs_root,
 				      const libdar::archive_options_extract & options,
@@ -1910,6 +1927,19 @@ PYBIND11_MODULE(libdar, mod)
 	     const std::string &,
 	     const libdar::archive_options_repair &
 	     >())
+	.def(pybind11::init<
+	     const std::shared_ptr<libdar::user_interaction> &,
+	     const libdar::path &,
+	     const std::string &,
+	     const std::string &,
+	     const libdar::archive_options_read &,
+	     const libdar::path &,
+	     const std::string &,
+	     const std::string &,
+	     const libdar::archive_options_repair &,
+	     std::shared_ptr<libdar::statistics>
+	     >())
+
 
 	.def("op_extract", (libdar::statistics (py_archive::*)(const libdar::path &, const libdar::archive_options_extract &)) &py_archive::op_extract)
 	.def("op_extract", (libdar::statistics (py_archive::*)(const libdar::path &, const libdar::archive_options_extract &, std::shared_ptr<libdar::statistics>)) &py_archive::op_extract)

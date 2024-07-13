@@ -801,11 +801,11 @@ namespace libdar
 				  const path & chem_dst,
 				  const string & basename_dst,
 				  const string & extension_dst,
-				  const archive_options_repair & options_repair): mem_ui(dialog)
+				  const archive_options_repair & options_repair,
+				  statistics* progressive_report): mem_ui(dialog)
     {
 	archive_options_read my_options_read = options_read;
 	bool initial_pause = (*options_read.get_entrepot() == *options_repair.get_entrepot() && chem_src == chem_dst);
-	statistics not_filled;
 
 	    ////
 	    // initializing object fields
@@ -930,7 +930,7 @@ namespace libdar
 			     src.pimpl->ver.get_kdf_hash(),
 			     delta_sig_block_size(), // sig block size is not used for repairing, build_delta_sig is set to false above
 			     false,               // this has not importance as we keep data compressed
-			     &not_filled);        // statistics
+			     progressive_report); // statistics
 
 		// stealing src's catalogue, our's is still empty at this step
 	    catalogue *tmp = cat;

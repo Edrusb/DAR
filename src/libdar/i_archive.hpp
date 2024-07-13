@@ -91,14 +91,15 @@ namespace libdar
 	    /// this constructor create a new archive from a damaged one [this is the "repair" constructor]
 
 	i_archive(const std::shared_ptr<user_interaction> & dialog,
-		const path & chem_src,
-		const std::string & basename_src,
-		const std::string & extension_src,
-		const archive_options_read & options_read,
-		const path & chem_dst,
-		const std::string & basename_dst,
-		const std::string & extension_dst,
-		const archive_options_repair & options_repair);
+		  const path & chem_src,
+		  const std::string & basename_src,
+		  const std::string & extension_src,
+		  const archive_options_read & options_read,
+		  const path & chem_dst,
+		  const std::string & basename_dst,
+		  const std::string & extension_dst,
+		  const archive_options_repair & options_repair,
+		  statistics * progressive_report);
 
 	    /// copy constructor (not implemented, throw an exception if called explicitely or implicitely)
 
