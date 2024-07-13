@@ -90,16 +90,16 @@ namespace libdar
 	    /// \param[in] options optional parameters to use for the operation
  	    /// \param[out] progressive_report statistics about the operation, considering the treated files (nullptr can be given if you don't want to use this feature)
 	    /// \note the statistics fields used are:
-	    /// - .treated: the total number of files seen
-	    /// - .hard_link: the number of hard linked inodes
-	    /// - .tooold: the number of files that changed at the time they were saved and that could not be resaved (due to repeat limit or byte limit)
-	    /// - .skipped: number of files not changed (differential backup)
-	    /// - .errored: number of files concerned by filesystem error
-	    /// - .ignored: number of files excluded by filters
-	    /// - .deleted: number of files recorded as deleted
-	    /// - .ea_treated: number of entry having some EA
-	    /// - .byte_amount : number of wasted bytes due to repeat on change feature
-	    /// .
+	    /// - treated: the total number of files seen
+	    /// - hard_link: the number of hard linked inodes
+	    /// - tooold: the number of files that changed at the time they were saved and that could not be resaved (due to repeat limit or byte limit)
+	    /// - skipped: number of files not changed (differential backup)
+	    /// - errored: number of files concerned by filesystem error
+	    /// - ignored: number of files excluded by filters
+	    /// - deleted: number of files recorded as deleted
+	    /// - ea_treated: number of entry having some EA
+	    /// - byte_amount : number of wasted bytes due to repeat on change feature
+
 	archive(const std::shared_ptr<user_interaction> & dialog,
 		const path & fs_root,
 		const path & sauv_path,
@@ -118,12 +118,11 @@ namespace libdar
 	    /// \param[in] options optional parameters to be used for the operation
 	    /// \param[out] progressive_report statistics about the operation, considering the treated files (nullptr can be given if you don't want to use this feature)
 	    /// \note the statistics fields used are:
-	    /// - .treated: the total number of files seen
-	    /// - .hard_link: the number of hard linked inodes
-	    /// - .ignored: number of files excluded by filters
-	    /// - .deleted: number of files recorded as deleted
-	    /// - .ea_treated: number of entry with EA
-	    /// .
+	    /// - treated: the total number of files seen
+	    /// - hard_link: the number of hard linked inodes
+	    /// - ignored: number of files excluded by filters
+	    /// - deleted: number of files recorded as deleted
+	    /// - ea_treated: number of entry with EA
 
 	archive(const std::shared_ptr<user_interaction> & dialog,
 		const path & sauv_path,
@@ -144,6 +143,16 @@ namespace libdar
 	    /// \param[in] basename_dst the slices basename of the repaired archive
 	    /// \param[in] extension_dst the slices extension of the repaired archive
 	    /// \param[in] options_repair the set of option to use to write the repaired archive
+	    /// \note the statistics fieds used are the same as the ones used for archive creation,
+	    /// though no entry should be ignored as no file or path filtering exists for this
+	    /// operation, and no skipped or tooold should increase as no comparison is performed to an existing
+	    /// filesystem:
+	    /// - treated: the total number of files seen
+	    /// - hard_link: the number of hard linked inodes
+	    /// - errored: number of files concerned by filesystem error
+	    /// - deleted: number of files recorded as deleted
+	    /// - ea_treated: number of entry having some EA
+	    /// - byte_amount : number of wasted bytes due to repeat on change feature
 
 	archive(const std::shared_ptr<user_interaction> & dialog,
 		const path & chem_src,
@@ -182,15 +191,15 @@ namespace libdar
 	    /// this should speed up the operation by a little amount.
 	    /// \return the statistics about the operation, considering the treated files
 	    /// \note the statistics fields used are:
-	    /// - .treated: the total number of files restored
-	    /// - .skipped: number of files not saved in the archive
-	    /// - .tooold: number of file not restored due to overwriting policy decision
-	    /// - .errored: number of files concerned by filesystem error
-	    /// - .ignored: number of files excluded by filters
-	    /// - .deleted: number of files deleted
-	    /// - .hard_links: number of hard link restored
-	    /// - .ea_treated: number of entry having some EA
-	    /// .
+	    /// - treated: the total number of files restored
+	    /// - skipped: number of files not saved in the archive
+	    /// - tooold: number of file not restored due to overwriting policy decision
+	    /// - errored: number of files concerned by filesystem error
+	    /// - ignored: number of files excluded by filters
+	    /// - deleted: number of files deleted
+	    /// - hard_links: number of hard link restored
+	    /// - ea_treated: number of entry having some EA
+
 	statistics op_extract(const path &fs_root,
 			      const archive_options_extract & options,
 			      statistics *progressive_report);
@@ -211,8 +220,8 @@ namespace libdar
 	    /// \param[in] options list of optional parameters to use for the operation
 	    /// \note if callback is nullptr (or NULL), the output is done using user_interaction provided with archive constructor
 	    /// \note alternative way to get archive contents:
-	    /// . archive::get_children_of() method
-	    /// . archive::init_catalogue()+get_children_in_table()
+	    /// - archive::get_children_of() method
+	    /// - archive::init_catalogue()+get_children_in_table()
 	void op_listing(archive_listing_callback callback,
 			void *context,
 			const archive_options_listing & options) const;
@@ -227,10 +236,9 @@ namespace libdar
 	    /// this should speed up the operation by a little amount.
 	    /// \return the statistics about the operation, considering the treated files
 	    /// \note the statistics fields used are:
-	    /// - .treated: the total number of files seen
-	    /// - .errored: number of files that do not match or could not be read
-	    /// - .ignored: number of files excluded by filters
-	    /// .
+	    /// - treated: the total number of files seen
+	    /// - errored: number of files that do not match or could not be read
+	    /// - ignored: number of files excluded by filters
 	statistics op_diff(const path & fs_root,
 			   const archive_options_diff & options,
 			   statistics * progressive_report);
@@ -252,10 +260,9 @@ namespace libdar
 	    /// this way only you can be sure your archive is properly tested.
 	    /// \return the statistics about the operation, considering the treated files
 	    /// \note the statistics fields used are:
-	    /// - .treated: the total number of files seen
-	    /// - .skipped: number of file older than the one on filesystem
-	    /// - .errored: number of files with error
-	    /// .
+	    /// - treated: the total number of files seen
+	    /// - skipped: number of file older than the one on filesystem
+	    /// - errored: number of files with error
 	statistics op_test(const archive_options_test & options,
 			   statistics * progressive_report);
 

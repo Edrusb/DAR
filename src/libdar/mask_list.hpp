@@ -65,6 +65,16 @@ namespace libdar
 	    /// \param[in] eol_list list of string that mean the end of a line
 	    /// providing an empty list as is the default value, means the list { "\n" ,  "\n\r" }
 	    /// for backward compatibility
+	    /// \note: WARNING: if "include is set to false, the mask must be negated by a not_mask(),
+	    /// this is not performed here. Here the include/exclude only parameter changes the filter
+	    /// internal "formula", but for historical reasons and by homogeneity with path base filtering
+	    /// the mask negation is done outside the mask construction. In other words, the caller should
+	    /// create the mask with the following statement either:
+	    /// - not_mask(mask_list(<filename>, <case sensit>, <prefix>, false))
+	    /// or
+	    /// - mask_list(<filename>, <case sensit>, <prefix>, true))
+	    /// and pass the resulting (eventually logically anded or ored with other masks to
+	    /// libdar set_subtree() method of an archive_option_* class.
         mask_list(const std::string & filename_list_st,
 		  bool case_sensit,
 		  const path & prefix,
