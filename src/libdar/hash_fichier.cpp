@@ -81,8 +81,8 @@ namespace libdar
 					  gcry_strsource(err),
 					  gcry_strerror(err)));
 #else
-	    throw Ecompilation(gettext("Missing %s hash algorithm support (which is provided with strong encryption support, using libgcrypt)"),
-			       hash_algo_to_string(algo).c_str());
+	    throw Ecompilation(tools_printf(gettext("Missing %s hash algorithm support (which is provided with strong encryption support, using libgcrypt)"),
+					    hash_algo_to_string(algo).c_str()));
 #endif
 	    break;
 
