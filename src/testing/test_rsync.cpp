@@ -32,6 +32,9 @@ extern "C"
 {
 }
 
+#ifndef RS_DEFAULT_BLOCK_LEN
+#define RS_DEFAULT_BLOCK_LEN 2048
+#endif
 
 using namespace std;
 using namespace libdar;
