@@ -69,6 +69,8 @@ int main(int argc, char *argv[])
 
 void f1(int argc, char *argv[])
 {
+#if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
+
     mycurl_param_list mylist;
     string type1 = "hello world";
     S_I type2 = 50;
@@ -131,10 +133,13 @@ void f1(int argc, char *argv[])
     cout << "size = " << mylist.size() << endl;
     if(mylist.get_val(CURLOPT_HEADER, type2_ptr))
 	cout << "val(HEADER) = " << *type2_ptr << endl;
+#endif
 }
 
 void f2()
 {
+#if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
+
     mycurl_param_list current;
     mycurl_param_list wanted;
     const foo* ptr;
@@ -164,10 +169,13 @@ void f2()
 	cout << "modified = " << *modit << endl;
 	++modit;
     }
+#endif
 }
 
 void f3()
 {
+#if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
+
     mycurl_param_list source;
 
     source.add(CURLOPT_VERBOSE, foo(1));
@@ -178,4 +186,5 @@ void f3()
     cout << source.size() << endl;
     cout << dst.size() << endl;
     cout << dst2.size() << endl;
+#endif
 }

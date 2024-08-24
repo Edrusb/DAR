@@ -306,7 +306,6 @@ extern void line_tools_read_range(const std::string & s, S_I & min, U_I & max);
 
     /// \param[in,out] f is the file to read
     /// \param[out] mots std container to receive the split result
-    /// \return the list of words found in this order in the file
     /// \note The different quotes are taken into account
 template <class T> void line_tools_split_in_words(generic_file & f, T & mots)
 {
@@ -407,9 +406,8 @@ template <class T> void line_tools_split_in_words(generic_file & f, T & mots)
 
     /// read a std::string and split its contents into words
 
-    /// \param[in,out] arg is the string to read
+    /// \param[in] arg is the string to read
     /// \param[out] mots a std container to receive the split result
-    /// \return the list of words found in this order in the file
     /// \note The different quotes are taken into account
 template <class T> void line_tools_split_in_words(const std::string & arg, T & mots)
 {
