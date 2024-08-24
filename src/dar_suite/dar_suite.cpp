@@ -31,6 +31,10 @@ extern "C"
 #include <signal.h>
 #endif
 
+#if HAVE_STRING_H
+#include <string.h>
+#endif
+
 #if HAVE_STDLIB_H
 #include <stdlib.h>
 #endif
@@ -296,11 +300,7 @@ static void signal_abort_now(int l)
 
 static void signals_abort(int l, bool now)
 {
-#if HAVE_DECL_SYS_SIGLIST
-    general_report(tools_printf(gettext("Received signal: %s"), sys_siglist[l]));
-#else
-    general_report(tools_printf(gettext("Received signal: %d"), l));
-#endif
+    general_report(tools_printf(gettext("Received signal: %s"), strsignal(l)));
 
 #if MUTEX_WORKS
     if(now)

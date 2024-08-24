@@ -31,9 +31,6 @@
 
 extern "C"
 {
-#if STDC_HEADERS
-#include <stdarg.h>
-#endif
 #if HAVE_SIGNAL_H
 #include <signal.h>
 #endif
@@ -47,6 +44,7 @@ extern "C"
 #include <deque>
 #include <map>
 #include <set>
+#include <cstdarg>
 #include "path.hpp"
 #include "infinint.hpp"
 #include "generic_file.hpp"

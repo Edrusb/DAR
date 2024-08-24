@@ -21,8 +21,8 @@
 
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.69)
-AC_INIT([DAR], [2.8.0-dev], [[http://sourceforge.net/tracker/?group_id=65612&atid=511612]])
+AC_PREREQ([2.71])
+AC_INIT([DAR],[2.8.0-dev],[[http://sourceforge.net/tracker/?group_id=65612&atid=511612]])
 AC_CONFIG_HEADERS([config.h])
 AC_LANG([C++])
 AC_CONFIG_SRCDIR([src/libdar/catalogue.cpp])
@@ -65,7 +65,7 @@ AC_ARG_WITH([pkgconfigdir],
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_CC
-AC_PROG_LIBTOOL
+LT_INIT
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 
@@ -131,7 +131,9 @@ AC_ARG_ENABLE( [libdl-linking],
 
 # Checks for header files.
 AC_HEADER_DIRENT
-AC_HEADER_STDC
+AC_CHECK_INCLUDES_DEFAULT
+AC_PROG_EGREP
+
 AC_HEADER_SYS_WAIT
 
 AC_CHECK_HEADERS([fcntl.h netinet/in.h arpa/inet.h stdint.h stdlib.h string.h sys/ioctl.h sys/socket.h termios.h unistd.h utime.h sys/types.h signal.h errno.h sys/un.h sys/stat.h time.h fnmatch.h regex.h pwd.h grp.h stdio.h pthread.h ctype.h getopt.h limits.h stddef.h sys/utsname.h libintl.h sys/capability.h linux/capability.h utimes.h sys/time.h wchar.h wctype.h stddef.h])
@@ -145,7 +147,7 @@ AC_TYPE_OFF_T
 AC_TYPE_PID_T
 AC_TYPE_SIZE_T
 AC_CHECK_MEMBERS([struct stat.st_rdev])
-AC_DECL_SYS_SIGLIST
+
 AC_CHECK_TYPE(size_t, [AC_CHECK_SIZEOF(size_t)], [AC_MSG_ERROR([Cannot find size_t type])], [])
 AC_CHECK_TYPE(time_t, [AC_CHECK_SIZEOF(time_t)], [AC_MSG_ERROR([Cannot find time_t type])], [])
 AC_CHECK_TYPE(off_t, [AC_CHECK_SIZEOF(off_t)], [AC_MSG_ERROR([Cannot find off_t type])], [])
@@ -158,10 +160,9 @@ AC_PROG_GCC_TRADITIONAL
 AC_FUNC_LSTAT
 AC_HEADER_MAJOR
 AC_FUNC_MALLOC
-AC_TYPE_SIGNAL
 AC_FUNC_STAT
 AC_FUNC_UTIME_NULL
-AC_HEADER_TIME
+
 AC_CHECK_FUNCS([lchown mkdir regcomp rmdir strerror_r utime fdopendir readdir_r ctime_r getgrnam_r getpwnam_r localtime_r])
 
 AC_MSG_CHECKING([for c++14 support])
@@ -529,7 +530,7 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C"
 # DAR's features
 
 AC_ARG_ENABLE( [linux-statx],
-               AC_HELP_STRING(--disable-linux-statx, [ignore linux's statx() system call and do not save birthtime of files under Linux because it is only possible to set and thus restore it under BSD systems like MACOS X, no under Linux today]),
+               AS_HELP_STRING([--disable-linux-statx],[ignore linux's statx() system call and do not save birthtime of files under Linux because it is only possible to set and thus restore it under BSD systems like MACOS X, no under Linux today]),
                [explicit_linux_statx=yes],
                [enable_linux_statx=yes])
 
@@ -851,7 +852,7 @@ AS_IF(       [test "x$enable_libzstd_linking" != "xyes"],
      )
 
 AC_ARG_ENABLE( [liblz4-linking],
-               AC_HELP_STRING(--disable-liblz4-linking, [disable linking with liblz4 and disable lz4 compression support]),
+               AS_HELP_STRING([--disable-liblz4-linking],[disable linking with liblz4 and disable lz4 compression support]),
                [explicit_liblz4_linking=yes],
                [enable_liblz4_linking=yes]
              )
@@ -2055,7 +2056,7 @@ AS_IF(
 )
 
 AC_ARG_ENABLE([libargon2-linking],
-              AC_HELP_STRING(--disable-libargon2-linking, [avoid linking with libargon2 if available to prevent the argon2 hashing algorithm to be used]),
+              AS_HELP_STRING([--disable-libargon2-linking],[avoid linking with libargon2 if available to prevent the argon2 hashing algorithm to be used]),
               [explicit_libargon2_linking=yes],
               [enable_libargon2_linking=yes])
 

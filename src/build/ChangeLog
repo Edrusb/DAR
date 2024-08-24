@@ -28,6 +28,8 @@ from 2.7.x to 2.8.0
   (dar_manager).
 - exposing build_regex_for_exclude_mask() routine in tools module (was cli
   specific in line_tools module).
+- updating code to work with autoconf tool to 2.71
+- replaced the deprecated use of sys_siglist by strsignal()
 
 from 2.7.15 to 2.7.16
 - fixed mask building of path exclusion (dar's -P option) when used with

@@ -23,7 +23,7 @@
 
 extern "C"
 {
-#if STDC_HEADERS
+#if HAVE_STDLIB_H
 #include <stdlib.h>
 #endif
 

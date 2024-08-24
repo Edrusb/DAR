@@ -23,7 +23,7 @@
 
 extern "C"
 {
-#if STDC_HEADERS
+#if HAVE_STDLIB_H
 #include <stdlib.h>
 #endif
 
@@ -35,18 +35,8 @@ extern "C"
 #if HAVE_SIGNAL_H
 #endif
 
-#if STDC_HEADERS
+#if HAVE_STRING_H
 # include <string.h>
-#else
-# if !HAVE_STRCHR
-#  define strchr index
-#  define strrchr rindex
-# endif
-    char *strchr (), *strrchr ();
-# if !HAVE_MEMCPY
-#  define memcpy(d, s, n) bcopy ((s), (d), (n))
-#  define memmove(d, s, n) bcopy ((s), (d), (n))
-# endif
 #endif
 } // end extern "C"
 

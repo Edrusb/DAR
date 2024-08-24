@@ -23,7 +23,7 @@
 
 extern "C"
 {
-#if STDC_HEADERS
+#if HAVE_CTYPE_H
 #include <ctype.h>
 #endif
 } // end extern "C"

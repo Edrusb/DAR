@@ -31,18 +31,8 @@ extern "C"
 #include <strings.h>
 #endif
 
-#if STDC_HEADERS
+#if HAVE_STRING_H
 # include <string.h>
-#else
-# if !HAVE_STRCHR
-#  define strchr index
-#  define strrchr rindex
-# endif
-    char *strchr (), *strrchr ();
-# if !HAVE_MEMCPY
-#  define memcpy(d, s, n) bcopy ((s), (d), (n))
-#  define memmove(d, s, n) bcopy ((s), (d), (n))
-# endif
 #endif
 
 #if HAVE_UNISTD_H
@@ -61,12 +51,10 @@ extern "C"
 #include <fcntl.h>
 #endif
 
-#if STDC_HEADERS
-#include <stdarg.h>
-#endif
 } // end extern "C"
 
 #include <iostream>
+#include <cstdarg>
 
 #include "user_interaction.hpp"
 #include "erreurs.hpp"

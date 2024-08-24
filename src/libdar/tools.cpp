@@ -31,18 +31,8 @@ extern "C"
 #include <strings.h>
 #endif
 
-#if STDC_HEADERS
+#if HAVE_STRING_H
 # include <string.h>
-#else
-# if !HAVE_STRCHR
-#  define strchr index
-#  define strrchr rindex
-# endif
-    char *strchr (), *strrchr ();
-# if !HAVE_MEMCPY
-#  define memcpy(d, s, n) bcopy ((s), (d), (n))
-#  define memmove(d, s, n) bcopy ((s), (d), (n))
-# endif
 #endif
 
 #if HAVE_SYS_TYPES_H
@@ -554,11 +544,7 @@ namespace libdar
                             try
                             {
                                 dialog.pause(string(dar_gettext("DAR terminated upon signal reception: "))
-#if HAVE_DECL_SYS_SIGLIST
-                                             + (WTERMSIG(status) < NSIG ? sys_siglist[WTERMSIG(status)] : tools_int2str(WTERMSIG(status)))
-#else
-                                             + tools_int2str(WTERMSIG(status))
-#endif
+                                             + (WTERMSIG(status) < NSIG ? strsignal(WTERMSIG(status)) : tools_int2str(WTERMSIG(status)))
                                              + dar_gettext(" . Retry to launch dar as previously ?"));
                                 loop = true;
                             }
@@ -661,12 +647,8 @@ namespace libdar
                             try
                             {
                                 dialog->pause(string(dar_gettext("DAR terminated upon signal reception: "))
-#if HAVE_DECL_SYS_SIGLIST
-                                             + (WTERMSIG(status) < NSIG ? sys_siglist[WTERMSIG(status)] : tools_int2str(WTERMSIG(status)))
-#else
-                                             + tools_int2str(WTERMSIG(status))
-#endif
-                                             + dar_gettext(" . Retry to launch dar as previously ?"));
+					      + (WTERMSIG(status) < NSIG ? strsignal(WTERMSIG(status)) : tools_int2str(WTERMSIG(status)))
+					      + dar_gettext(" . Retry to launch dar as previously ?"));
                                 loop = true;
                             }
                             catch(Euser_abort & e)

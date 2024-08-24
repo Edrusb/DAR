@@ -37,15 +37,12 @@ extern "C"
 #include <arpa/inet.h>
 #endif
 
-#if TIME_WITH_SYS_TIME
-# include <sys/time.h>
+#if HAVE_TIME_H
 # include <time.h>
-#else
-# if HAVE_SYS_TIME_H
-#  include <sys/time.h>
-# else
-#  include <time.h>
-# endif
+#endif
+
+#if HAVE_SYS_TIME_H
+# include <sys/time.h>
 #endif
 } // end extern "C"
 

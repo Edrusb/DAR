@@ -28,25 +28,27 @@ extern "C"
 #if HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
+
 #if HAVE_NETINET_IN_H
 #include <netinet/in.h>
 #endif
+
 #if HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
-#ifdef STDC_HEADERS
+
+#ifdef HAVE_CTYPE_H
 #include <ctype.h>
 #endif
-#if TIME_WITH_SYS_TIME
-# include <sys/time.h>
+
+#if HAVE_TIME_H
 # include <time.h>
-#else
-# if HAVE_SYS_TIME_H
-# include <sys/time.h>
-# else
-# include <time.h>
-# endif
 #endif
+
+#if HAVE_SYS_TIME_H
+# include <sys/time.h>
+#endif
+
 #if HAVE_LIMITS_H
 #include <limits.h>
 #endif
