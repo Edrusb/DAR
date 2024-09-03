@@ -172,7 +172,7 @@ namespace libdar
 	    /// whether we only read the archive header and exit
 	void set_header_only(bool val) { x_header_only = val; };
 
-	    /// whether to avoid display low importance messages
+	    /// whether to avoid display message about the fact a wrong key is not possible to detect when reading cyphered archive/backup
 	void set_silent(bool val) { x_silent = val; };
 
 	    /// whether to perform early memory release of the catalogue
