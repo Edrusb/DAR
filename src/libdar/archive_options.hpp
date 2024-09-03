@@ -368,7 +368,7 @@ namespace libdar
 	    /// compression is performed without block in one single stream per file.
 	    /// This is the historical way used by libdar, it gives the best result
 	    /// and the lowest compute overhead, though it cannot be parallelized.
-	    /// At the opposite using compresion per block reduce the compression ratio
+	    /// At the opposite using compression per block reduce the compression ratio
 	    /// but allows the block to be compressed/decompressed in parallel and thus
 	    /// leverage multi-core systems. When the block size increase you tend to the
 	    /// same compression ratio as compression ration without block
