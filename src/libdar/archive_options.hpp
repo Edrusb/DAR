@@ -154,7 +154,7 @@ namespace libdar
 	    /// defines the protocol to use to retrieve slices
 	void set_entrepot(const std::shared_ptr<entrepot> & entr) { if(!entr) throw Erange("archive_options_read::set_entrepot", "null entrepot pointer given in argument"); x_entrepot = entr; };
 
-	    /// whether to warn (true) or ignore (false) signature failure (default is true)
+	    /// whether to warn (false) or ignore (true) signature failure (default is false, signature failure is reported)
 	void set_ignore_signature_check_failure(bool val) { x_ignore_signature_check_failure = val; };
 
 	    /// whether libdar is allowed to create several thread to work possibly faster on multicore CPU (need libthreadar to be effective)
