@@ -1302,6 +1302,9 @@ namespace libdar
 			dialog->message(gettext("WARNING: support for secure memory was not available at compilation time, in case of heavy memory load, this may lead the password/passphrase provided to be wrote to disk (swap space) in clear. You have been warned!"));
 		}
 
+		if(! gnupg_signatories.empty() && gnupg_recipients.empty())
+		    throw Erange("macro_tools_create_layers", gettext("Archive signature is only possible with gnupg encryption (and at least one recipient)"));
+
 		if(!gnupg_recipients.empty())
 		{
 #if GPGME_SUPPORT

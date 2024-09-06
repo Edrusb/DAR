@@ -1990,7 +1990,7 @@ AS_IF(
                        [[
 		        unsigned int maj, med, min;
                         libthreadar::get_version(maj, med, min);
-			if(libthreadar::barrier::used_implementation() != "")
+			if(libthreadar::barrier::used_implementation() == "pthread_barrier_t")
 			    return 0;
 			else
 			    return 1;
@@ -1998,13 +1998,14 @@ AS_IF(
      ],
      [
 	local_threadar_barrier_mac=yes
-	AC_DEFINE(LIBTHREADAR_BARRIER_MAC, 1, [if libthreadar has different possible implementation])
+	AC_DEFINE(LIBTHREADAR_BARRIER_MAC, 1, [libthreadar can emulate barrier feature on MacOS])
      ],
      [
         local_threadar_barrier_mac=no
      ]
     )
   ]
+  [ local_threadar_barrier_mac=no ]
 )
 
 AC_ARG_ENABLE([libargon2-linking],
