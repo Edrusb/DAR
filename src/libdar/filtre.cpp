@@ -2339,15 +2339,6 @@ namespace libdar
 							    // update back hard link counter
 							st.decr_hard_links();
 
-							    // updating counter from pointed to inode
-
-							const cat_inode*al_ptr_ino = al_mir->get_inode();
-							if(al_ptr_ino == nullptr)
-							    throw SRC_BUG;
-							else
-							    if(al_ptr_ino->ea_get_saved_status() == ea_saved_status::full)
-								st.decr_ea_treated();
-
 							    // cleaning the corres_copy map from the pointed to cat_etoile object reference if necessary
 							clean_hard_link_base_from(al_mir, corres_copy);
 						    }
