@@ -299,6 +299,8 @@ namespace libdar
     class archive_options_create
     {
     public:
+	static constexpr const char* default_excluding_ea = "user.libdar_no_backup";
+
 	    // default constructors and destructor.
 
 	archive_options_create();
@@ -456,7 +458,7 @@ namespace libdar
 	    /// defines whether to ignore files having a given EA
 	    /// \note if ea_name is set to "" the default ea_name "user.libdar_no_backup" is used.
 	void set_exclude_by_ea(const std::string & ea_name)
-	{ exclude_by_ea = (ea_name == "" ? "user.libdar_no_backup" : ea_name); };
+	{ exclude_by_ea = (ea_name == "" ? default_excluding_ea : ea_name); };
 
 	    /// set the fields to consider when comparing inodes with reference archive (see comparison_fields enumeration in catalogue.hpp)
 	void set_what_to_check(comparison_fields what_to_check) { x_what_to_check = what_to_check; };
