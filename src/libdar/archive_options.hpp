@@ -588,7 +588,7 @@ namespace libdar
 	    /// provide a list of full path which if are symlinks will be considered as the inode they point to
 
 	    /// \note this is espetially intended for use with symlinks pointing to directories
-	    /// to have dar recursing in such pointed to directory instead of just recording that directory
+	    /// to have dar recursing in such pointed to directory instead of just recording that symlink
 	void set_ignored_as_symlink(const std::set<std::string> & list) { x_ignored_as_symlink = list; };
 
 	    /// defines when to resave a file's data which inode metadata changed
