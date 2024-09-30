@@ -43,7 +43,7 @@ namespace libdar
     enum class modified_data_detection
     {
 	any_inode_change, ///< historical behavior, resave an inode on any metadata change
-        mtime_size,       ///< default behavior since release 2.6.0 resave only if file size of mtime changed
+        mtime_size,       ///< default behavior since release 2.6.0 resave only if file size or mtime changed
     };
 
 
