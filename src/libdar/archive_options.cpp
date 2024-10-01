@@ -37,6 +37,10 @@ using namespace std;
 
 namespace libdar
 {
+	// public default values
+    const infinint default_iteration_count = 200000;
+    const infinint default_iteration_count_argon2 = 10000;
+
 	// general default values
 
     static const U_32 default_crypto_size = 10240;
@@ -46,8 +50,6 @@ namespace libdar
     static const crit_constant_action default_crit_action = crit_constant_action(data_preserve, EA_preserve);
     static const string default_user_comment = "N/A";
     static const U_32 default_delta_sig_min_size = 10240;
-    static const infinint default_iteration_count = 200000;
-    static const infinint default_iteration_count_argon2 = 10000;
 
 	// some local helper functions
 
