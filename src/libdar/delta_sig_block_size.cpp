@@ -44,11 +44,11 @@ namespace libdar
 {
     void delta_sig_block_size::reset()
     {
-	fs_function = square2;
+	fs_function = root2;
 	multiplier = 1;
 	divisor = 1;
 	min_block_len = RS_DEFAULT_BLOCK_LEN;
-	max_block_len = 128*1024;
+	max_block_len = 64*RS_DEFAULT_BLOCK_LEN;
     }
 
     bool delta_sig_block_size::operator == (const delta_sig_block_size & ref) const
@@ -83,10 +83,10 @@ namespace libdar
 	case log2:
 	    val *= tools_upper_rounded_log2(filesize);
 	    break;
-	case square2:
+	case root2:
 	    val *= tools_rounded_square_root(filesize);
 	    break;
-	case square3:
+	case root3:
 	    val *= tools_rounded_cube_root(filesize);
 	    break;
 	default:

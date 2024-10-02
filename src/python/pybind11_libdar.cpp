@@ -1342,8 +1342,8 @@ PYBIND11_MODULE(libdar, mod)
 	.value("fixed", libdar::delta_sig_block_size::fixed)
 	.value("linear", libdar::delta_sig_block_size::linear)
 	.value("log2", libdar::delta_sig_block_size::log2)
-	.value("square2", libdar::delta_sig_block_size::square2)
-	.value("square3", libdar::delta_sig_block_size::square3);
+	.value("root2", libdar::delta_sig_block_size::root2)
+	.value("root3", libdar::delta_sig_block_size::root3);
 
     dsbs
 	.def_readwrite("fs_function", &libdar::delta_sig_block_size::fs_function)

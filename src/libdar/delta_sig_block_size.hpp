@@ -51,8 +51,10 @@ namespace libdar
 	    fixed,      ///< block size is independant from file size
 	    linear,     ///< block size if proportionnal to file size
 	    log2,       ///< block size is proportional to log2(file size)
-	    square2,    ///< block size is proportional to filesize^2
-	    square3     ///< block size if proportional to filesize^3
+	    root2,      ///< block size is proportional to the square root of file size
+	    root3       ///< block size if proportional to the cube root of the file size
+		// square2 (inexact naming) -> use root2 since release 2.8.0, same behavior just renaming
+		// square3 (inexact naming) -> use root3 since release 2.8.0, same behavior just renaming
 	};
 
 	fs_function_t fs_function; //< the function to use to calculate the signature block len

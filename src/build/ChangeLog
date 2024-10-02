@@ -30,6 +30,8 @@ from 2.7.x to 2.8.0
   specific in line_tools module).
 - updating code to work with autoconf tool to 2.71
 - replaced the deprecated use of sys_siglist by strsignal()
+- for pertience, changed the name of function square2 to root2 and function
+  square3 to root3 when using extended syntax of "--delta sig" option.
 
 from 2.7.15 to 2.7.16
 - fixed mask building of path exclusion (dar's -P option) when used with

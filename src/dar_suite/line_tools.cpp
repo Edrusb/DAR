@@ -1719,10 +1719,10 @@ delta_sig_block_size::fs_function_t line_tools_string_to_sig_block_size_function
 	return delta_sig_block_size::linear;
     if(funname == "log2")
 	return delta_sig_block_size::log2;
-    if(funname == "square2")
-	return delta_sig_block_size::square2;
-    if(funname == "square3")
-	return delta_sig_block_size::square3;
+    if(funname == "square2" || funname == "root2") // keeping square2 for backward compatibility
+	return delta_sig_block_size::root2;
+    if(funname == "square3" || funname == "root3") // keeping square3 for backward compatibility
+	return delta_sig_block_size::root3;
     throw Erange("line_tools_string_to_sig_block_function", gettext("unknown name give for delta signature block len function"));
 }
 
