@@ -34,10 +34,6 @@ extern "C"
 #include "erreurs.hpp"
 #include "tools.hpp"
 
-#ifndef RS_DEFAULT_BLOCK_LEN
-#define RS_DEFAULT_BLOCK_LEN 2048
-#endif
-
 using namespace std;
 
 namespace libdar

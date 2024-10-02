@@ -34,6 +34,9 @@ extern "C"
 
 #include "infinint.hpp"
 
+#ifndef RS_DEFAULT_BLOCK_LEN
+#define RS_DEFAULT_BLOCK_LEN 2048
+#endif
 
 namespace libdar
 {
