@@ -287,3 +287,12 @@ namespace libdar
 
 
 } // end of namespace
+
+extern "C"
+{
+    unsigned int for_autoconf(unsigned int x)
+    {
+        return x+1;
+    }
+}
+

@@ -149,4 +149,14 @@ namespace libdar
 
 } // end of namespace
 
+extern "C"
+{
+        /// in case you use autoconf AC_CHECK_LIB in your program to detect the availability of libdar
+
+        /// use AC_CHECK_LIB(dar, [for_autoconf], [], [])
+        /// to have autoconf based configure script properly detecting
+        /// the presence and usability of libthreadar
+    extern unsigned int for_autoconf(unsigned int x);
+}
+
 #endif
