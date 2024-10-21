@@ -587,6 +587,9 @@ namespace libdar
 	    /// \note by default a min size of 10 kiB is used
 	void set_delta_sig_min_size(const infinint & val) { x_delta_sig_min_size = val; };
 
+	    /// block size to use to build delta signatures
+	void set_sig_block_len(delta_sig_block_size val) { val.check(); x_sig_block_len = val; };
+
 	    /// whether to automatically zeroing negative dates read from the filesystem (just warn, don't ask whether to pursue)
 	void set_auto_zeroing_neg_dates(bool val) { x_auto_zeroing_neg_dates = val; };
 
@@ -605,9 +608,6 @@ namespace libdar
 
 	    /// hash algo used for key derivation
 	void set_kdf_hash(hash_algo algo) { x_kdf_hash = algo; };
-
-	    /// block size to use to build delta signatures
-	void set_sig_block_len(delta_sig_block_size val) { val.check(); x_sig_block_len = val; };
 
 	    /// never try resaving uncompressed when compression ratio is bad
 	void set_never_resave_uncompressed(bool val) { x_never_resave_uncompressed = val; };
@@ -677,12 +677,12 @@ namespace libdar
 	const mask & get_delta_mask() const { return *x_delta_mask; }
 	bool get_has_delta_mask_been_set() const { return has_delta_mask_been_set; };
 	const infinint & get_delta_sig_min_size() const { return x_delta_sig_min_size; };
+	delta_sig_block_size get_sig_block_len() const { return x_sig_block_len; };
 	bool get_auto_zeroing_neg_dates() const { return x_auto_zeroing_neg_dates; };
 	const std::set<std::string> & get_ignored_as_symlink() const { return x_ignored_as_symlink; };
 	modified_data_detection get_modified_data_detection() const { return x_modified_data_detection; };
 	const infinint & get_iteration_count() const { return x_iteration_count; };
 	hash_algo get_kdf_hash() const { return x_kdf_hash; };
-	delta_sig_block_size get_sig_block_len() const { return x_sig_block_len; };
 	bool get_never_resave_uncompressed() const { return x_never_resave_uncompressed; };
 
     private:
@@ -749,12 +749,12 @@ namespace libdar
 	mask *x_delta_mask;
 	bool has_delta_mask_been_set;
 	infinint x_delta_sig_min_size;
+	delta_sig_block_size x_sig_block_len;
 	bool x_auto_zeroing_neg_dates;
 	std::set<std::string> x_ignored_as_symlink;
 	modified_data_detection x_modified_data_detection;
 	infinint x_iteration_count;
 	hash_algo x_kdf_hash;
-	delta_sig_block_size x_sig_block_len;
 	bool x_never_resave_uncompressed;
 
 	void nullifyptr() noexcept;
@@ -902,10 +902,17 @@ namespace libdar
 	void set_multi_threaded_compress(U_I num) { x_multi_threaded_compress = num; };
 
 
-	    /// whether signature to base binary delta on the future has to be calculated and stored beside saved files
+	    /// whether signature to base binary delta on, has to be transfered from the source to the isolated catalogue and sotred beside saved files inode information
 	void set_delta_signature(bool val) { x_delta_signature = val; };
 
-	    /// whether to derogate to defaut delta file consideration while calculation delta signatures
+	    /// whether to derogate from the current existing binary delta signatures and drop/recalculate for file that do not have delta signatures
+
+	    /// \note only set_delta_signature() is called, and set_delta_mask() is not called, delta signature are just transmitted to isolated catalogue from the source
+	    /// archive. File without delta sig will not have delta sig on the isolated catalog, file with delta sign will have their delta sig copied to the isolated
+	    /// catalogue. Using set_delta_mask() let dar reconsider this delta sig transfer and lead libdar to drop delta sig if file does not match the mask and have a
+	    /// delta sig, have the delta sig transfered if it match the mask and already have a delta sig, recompute the delta sig if the file has no delta sig in the source
+	    /// archive and is covered by the provided mask here. Note that in this later case, access to the file's data is necessary to performe binary delta signature
+	    /// computation.
 	void set_delta_mask(const mask & delta_mask);
 
 	    /// whether to never calculate delta signature for files which size is smaller or equal to the given argument
@@ -913,14 +920,15 @@ namespace libdar
 	    /// \note by default a min size of 10 kiB is used
 	void set_delta_sig_min_size(const infinint & val) { x_delta_sig_min_size = val; };
 
+	    /// block size to use to build delta signatures
+	void set_sig_block_len(delta_sig_block_size val) { val.check(); x_sig_block_len = val; };
+
 	    /// key derivation
 	void set_iteration_count(const infinint & val) { x_iteration_count = val; };
 
 	    /// hash algo used for key derivation
 	void set_kdf_hash(hash_algo algo) { x_kdf_hash = algo; };
 
-	    /// block size to use to build delta signatures
-	void set_sig_block_len(delta_sig_block_size val) { val.check(); x_sig_block_len = val; };
 
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
@@ -955,9 +963,9 @@ namespace libdar
 	const mask & get_delta_mask() const { return *x_delta_mask; }
 	bool get_has_delta_mask_been_set() const { return has_delta_mask_been_set; };
 	const infinint & get_delta_sig_min_size() const { return x_delta_sig_min_size; };
+	delta_sig_block_size get_sig_block_len() const { return x_sig_block_len; };
 	const infinint & get_iteration_count() const { return x_iteration_count; };
 	hash_algo get_kdf_hash() const { return x_kdf_hash; };
-	delta_sig_block_size get_sig_block_len() const { return x_sig_block_len; };
 
 
     private:
@@ -991,9 +999,9 @@ namespace libdar
 	mask *x_delta_mask;
 	bool has_delta_mask_been_set;
 	infinint x_delta_sig_min_size;
+	delta_sig_block_size x_sig_block_len;
 	infinint x_iteration_count;
 	hash_algo x_kdf_hash;
-	delta_sig_block_size x_sig_block_len;
 
 	void copy_from(const archive_options_isolate & ref);
 	void move_from(archive_options_isolate && ref) noexcept;
@@ -1206,14 +1214,14 @@ namespace libdar
 	    /// \note by default a min size of 10 kiB is used
 	void set_delta_sig_min_size(const infinint & val) { x_delta_sig_min_size = val; };
 
+	    /// block size to use to build delta signatures
+	void set_sig_block_len(delta_sig_block_size val) { val.check(); x_sig_block_len = val; };
+
 	    /// key derivation
 	void set_iteration_count(const infinint & val) { x_iteration_count = val; };
 
 	    /// hash algo used for key derivation
 	void set_kdf_hash(hash_algo algo) { x_kdf_hash = algo; };
-
-	    /// block size to use to build delta signatures
-	void set_sig_block_len(delta_sig_block_size val) { val.check(); x_sig_block_len = val; };
 
 	    /// never try resaving uncompressed when compression ratio is bad
 	void set_never_resave_uncompressed(bool val) { x_never_resave_uncompressed = val; };
@@ -1267,9 +1275,9 @@ namespace libdar
 	const mask & get_delta_mask() const { return *x_delta_mask; }
 	bool get_has_delta_mask_been_set() const { return has_delta_mask_been_set; };
 	const infinint & get_delta_sig_min_size() const { return x_delta_sig_min_size; };
+	delta_sig_block_size get_sig_block_len() const { return x_sig_block_len; };
 	const infinint & get_iteration_count() const { return x_iteration_count; };
 	hash_algo get_kdf_hash() const { return x_kdf_hash; };
-	delta_sig_block_size get_sig_block_len() const { return x_sig_block_len; };
 	bool get_never_resave_uncompressed() const { return x_never_resave_uncompressed; };
 
     private:
@@ -1318,9 +1326,9 @@ namespace libdar
 	mask *x_delta_mask;
 	bool has_delta_mask_been_set;
 	infinint x_delta_sig_min_size;
+	delta_sig_block_size x_sig_block_len;
 	infinint x_iteration_count;
 	hash_algo x_kdf_hash;
-	delta_sig_block_size x_sig_block_len;
 	bool x_never_resave_uncompressed;
 
 	void destroy() noexcept;
