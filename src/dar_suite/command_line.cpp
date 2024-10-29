@@ -1310,9 +1310,11 @@ static bool get_args_recursive(recursive_param & rec,
             case 'T':
 		if(p.op == create
 		   || p.op == merging
-		   || p.op == isolate)
+		   || p.op == isolate
+		   || p.op == repairing)
 		{
 			// this is the --kdf-iter-count option
+
 		    if(optarg == nullptr)
 			throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
 

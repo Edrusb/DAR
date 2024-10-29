@@ -2081,6 +2081,16 @@ namespace libdar
                 throw Ememory("archive_options_repair::clear");
             x_multi_threaded_crypto = 1;
 	    x_multi_threaded_compress = 1;
+	    if(compile_time::libargon2())
+	    {
+		x_iteration_count = default_iteration_count_argon2;
+		x_kdf_hash = hash_algo::argon2;
+	    }
+	    else
+	    {
+		x_kdf_hash = hash_algo::sha1;
+		x_iteration_count = default_iteration_count;
+	    }
         }
         catch(...)
         {
@@ -2125,6 +2135,8 @@ namespace libdar
 	x_entrepot = ref.x_entrepot;
 	x_multi_threaded_crypto = ref.x_multi_threaded_crypto;
 	x_multi_threaded_compress = ref.x_multi_threaded_compress;
+	x_iteration_count = ref.x_iteration_count;
+	x_kdf_hash = ref.x_kdf_hash;
     }
 
     void archive_options_repair::move_from(archive_options_repair && ref) noexcept
@@ -2155,6 +2167,9 @@ namespace libdar
 	x_slice_min_digits = move(ref.x_slice_min_digits);
 	x_multi_threaded_crypto = move(ref.x_multi_threaded_crypto);
 	x_multi_threaded_compress = move(ref.x_multi_threaded_compress);
+	x_iteration_count = move(ref.x_iteration_count);
+	x_kdf_hash = move(ref.x_kdf_hash);
+
     }
 
 } // end of namespace

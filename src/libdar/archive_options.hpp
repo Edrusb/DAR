@@ -1949,6 +1949,13 @@ namespace libdar
 	    /// how much thread libdar will use for compression (need libthreadar too and compression_block_size > 0)
 	void set_multi_threaded_compress(U_I num) { x_multi_threaded_compress = num; };
 
+		    /// key derivation
+	void set_iteration_count(const infinint & val) { x_iteration_count = val; };
+
+	    /// hash algo used for key derivation
+	void set_kdf_hash(hash_algo algo) { x_kdf_hash = algo; };
+
+
 
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
@@ -1979,6 +1986,9 @@ namespace libdar
 	const std::shared_ptr<entrepot> & get_entrepot() const { return x_entrepot; };
 	U_I get_multi_threaded_crypto() const { return x_multi_threaded_crypto; };
 	U_I get_multi_threaded_compress() const { return x_multi_threaded_compress; };
+	const infinint & get_iteration_count() const { return x_iteration_count; };
+	hash_algo get_kdf_hash() const { return x_kdf_hash; };
+
 
     private:
 	bool x_allow_over;
@@ -2007,6 +2017,8 @@ namespace libdar
 	std::shared_ptr<entrepot> x_entrepot;
 	U_I x_multi_threaded_crypto;
 	U_I x_multi_threaded_compress;
+	infinint x_iteration_count;
+	hash_algo x_kdf_hash;
 
 	void nullifyptr() noexcept {};
 	void copy_from(const archive_options_repair & ref);
