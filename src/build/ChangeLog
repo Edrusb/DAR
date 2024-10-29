@@ -10,6 +10,8 @@ from 2.7.15 to 2.7.16
   overwriting policy drives entry to be removed from the resulting archive adding
   to that, the very specific/rare condition where the number of removals exceeds
   more than the half of kept entries...
+- adding kdf support for repairing operation instead of using the values of the
+  archive/backup under reparation.
 
 
 from 2.7.14 to 2.7.15
