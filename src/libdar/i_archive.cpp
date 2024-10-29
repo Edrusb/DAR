@@ -781,6 +781,8 @@ namespace libdar
 				  const archive_options_repair & options_repair,
 				  statistics* progressive_report): mem_ui(dialog)
     {
+	statistics st = false;
+	statistics* st_ptr = progressive_report == nullptr ? &st : progressive_report;
 	archive_options_read my_options_read = options_read;
 	bool initial_pause = (*options_read.get_entrepot() == *options_repair.get_entrepot() && chem_src == chem_dst);
 
@@ -906,7 +908,7 @@ namespace libdar
 			     src.pimpl->ver.get_iteration_count(),
 			     src.pimpl->ver.get_kdf_hash(),
 			     delta_sig_block_size(), // sig block size is not used for repairing, build_delta_sig is set to false above
-			     progressive_report); // statistics
+			     st_ptr);             // statistics
 
 		// stealing src's catalogue, our's is still empty at this step
 	    catalogue *tmp = cat;
