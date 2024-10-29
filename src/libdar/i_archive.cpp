@@ -905,8 +905,8 @@ namespace libdar
 			     false,               // zeroing_neg_date
 			     set<string>(),       // ignored_symlinks
 			     modified_data_detection::any_inode_change, // not used for repairing
-			     src.pimpl->ver.get_iteration_count(),
-			     src.pimpl->ver.get_kdf_hash(),
+			     options_repair.get_iteration_count(),
+			     options_repair.get_kdf_hash(),
 			     delta_sig_block_size(), // sig block size is not used for repairing, build_delta_sig is set to false above
 			     st_ptr);             // statistics
 
