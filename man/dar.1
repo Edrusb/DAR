@@ -1208,6 +1208,9 @@ With this option set, when comparing a symlink, no message shows when symlink in
 .TP 20
 -ap, --alter=place
 is also available as described just above for restoration options.
+.TP 20
+-az, --alter=zeroing-negative-dates
+dar/libdar saves dates as a number of seconds since the beginning of year 1970, the well known "Unix time" (plus a positive fraction for sub-second time-stamping). Some systems may return a negative number as the Unix time of a given file (files having dates before 1970), in that situation by default and since release 2.5.12 dar pauses and asks the user whether to assume the date as being zero. But with -az option, dar/libdar automatically assumes such negative dates to be zero and just issue a warning about the problem met.
 .PP
 No other specific option, but all general options are available except for example -w which is useless, as testing and comparing only read data. -A option is available as described in GENERAL OPTIONS to backup of internal catalogue of the archive (assuming you have a previously isolated catalogue available).
 .PP
