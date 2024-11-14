@@ -1015,6 +1015,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		diff_options.set_compare_symlink_date(param.no_compare_symlink_date);
 		diff_options.set_fsa_scope(param.scope);
 		diff_options.set_in_place(param.in_place);
+		diff_options.set_auto_zeroing_neg_dates(param.zeroing_neg_dates);
 
                 st = arch->op_diff(*param.fs_root,
 				   diff_options,
