@@ -1467,7 +1467,8 @@ namespace libdar
 				  options.get_hourshift(),
 				  options.get_compare_symlink_date(),
 				  options.get_fsa_scope(),
-				  isolated_mode);
+				  isolated_mode,
+				  options.get_auto_zeroing_neg_dates());
             }
             catch(Euser_abort & e)
             {

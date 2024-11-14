@@ -1207,7 +1207,8 @@ namespace libdar
 			   const infinint & hourshift,
 			   bool compare_symlink_date,
 			   const fsa_scope & scope,
-			   bool isolated_mode)
+			   bool isolated_mode,
+			   bool auto_zeroing_neg_dates)
     {
 	if(!dialog)
 	    throw SRC_BUG; // dialog points to nothing
@@ -1225,6 +1226,9 @@ namespace libdar
 					 info_details),
 			   scope);
 	thread_cancellation thr_cancel;
+
+	if(auto_zeroing_neg_dates)
+	    fs.zeroing_negative_dates_without_asking();
 
 	if(display_treated_only_dir && display_treated)
 	    display_treated = false;

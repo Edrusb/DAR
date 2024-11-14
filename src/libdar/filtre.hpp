@@ -129,7 +129,8 @@ namespace libdar
 				  const infinint & hourshift,
 				  bool compare_symlink_date,
 				  const fsa_scope & scope,
-				  bool isolated_mode);
+				  bool isolated_mode,
+				  bool auto_zeroing_neg_dates);
 
     extern void filtre_test(const std::shared_ptr<user_interaction> & dialog,
 			    const mask &filtre,
