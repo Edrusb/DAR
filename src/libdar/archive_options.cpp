@@ -1747,6 +1747,7 @@ namespace libdar
 	    x_compare_symlink_date = true;
 	    x_scope = all_fsa_families();
 	    x_in_place = false;
+	    x_auto_zeroing_neg_dates = false;
 	}
         catch(...)
         {
@@ -1884,6 +1885,7 @@ namespace libdar
 	    x_compare_symlink_date = ref.x_compare_symlink_date;
 	    x_scope = ref.x_scope;
 	    x_in_place = ref.x_in_place;
+	    x_auto_zeroing_neg_dates = ref.x_auto_zeroing_neg_dates;
 	}
 	catch(...)
 	{
@@ -1910,6 +1912,7 @@ namespace libdar
 	x_compare_symlink_date = move(ref.x_compare_symlink_date);
 	x_scope = move(ref.x_scope);
 	x_in_place = move(ref.x_in_place);
+	x_auto_zeroing_neg_dates = move(ref.x_auto_zeroing_neg_dates);
     }
 
 

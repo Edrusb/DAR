@@ -1674,6 +1674,10 @@ namespace libdar
 	    /// whether to ignore fs_root and use in-place path stored in the archive
 	void set_in_place(bool arg) { x_in_place = arg; };
 
+	    /// whether to automatically zeroing negative dates read from the filesystem (just warn, don't ask whether to pursue)
+	void set_auto_zeroing_neg_dates(bool val) { x_auto_zeroing_neg_dates = val; };
+
+
 
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
@@ -1692,6 +1696,7 @@ namespace libdar
 	bool get_compare_symlink_date() const { return x_compare_symlink_date; };
 	const fsa_scope & get_fsa_scope() const { return x_scope; };
 	bool get_in_place() const { return x_in_place; };
+	bool get_auto_zeroing_neg_dates() const { return x_auto_zeroing_neg_dates; };
 
     private:
 	mask * x_selection;
@@ -1709,6 +1714,7 @@ namespace libdar
 	bool x_compare_symlink_date;
 	fsa_scope x_scope;
 	bool x_in_place;
+	bool x_auto_zeroing_neg_dates;
 
 	void destroy() noexcept;
 	void nullifyptr() noexcept;
