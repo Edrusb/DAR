@@ -518,7 +518,18 @@ namespace libdar
 		// chdir on symlink pointing to nondir inode will fail, but at least this stay an
 		// option, which would not be the case if we assume all symlinks not to point to
 		// directories: chdir to them would then be forbidden by entrepot_libcurl...
-	    found->second = (line[0] == 'd' || line[0] == 'l') ? inode_type::isdir : inode_type::nondir;
+	    switch(line[0])
+	    {
+	    case 'd':
+		found->second = inode_type::isdir;
+		break;
+	    case 'l':
+		found->second = inode_type::symlink;
+		break;
+	    default:
+		found->second = inode_type::nondir;
+		break;
+	    }
 
 		// we now remove the best_entry from temporary_list to speed up future search
 

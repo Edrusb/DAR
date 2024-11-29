@@ -161,6 +161,8 @@ namespace libdar
 			fichier.push_back(cell(string(ret->d_name), inode_type::isdir));
 			break;
 		    case DT_LNK:
+			fichier.push_back(cell(string(ret->d_name), inode_type::symlink));
+			break;
 		    case DT_UNKNOWN:
 			fichier.push_back(cell(string(ret->d_name), inode_type::unknown));
 			break;

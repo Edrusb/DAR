@@ -35,11 +35,11 @@
 namespace libdar
 {
 
-    	/// \addtogroup API
+	/// \addtogroup API
 	/// @{
 
 	/// type of inode
-    enum class inode_type { nondir, isdir, unknown };
+    enum class inode_type { nondir, symlink, isdir, unknown };
 
 
 	/// @}
