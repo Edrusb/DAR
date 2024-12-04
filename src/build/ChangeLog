@@ -12,7 +12,9 @@ from 2.7.15 to 2.7.16
   more than the half of kept entries...
 - adding kdf support for repairing operation instead of using the values of the
   archive/backup under reparation.
-
+- fixing bug in thread_cancellation class that led a cancelled thread kept
+  being recorded as cancelled forever, leading libdar to abort immediately when
+  run in a new thread having the the same tid.
 
 from 2.7.14 to 2.7.15
 - updating libdar about CURLINFO_CONTENT_LENGTH_DOWNLOAD symbol which is
