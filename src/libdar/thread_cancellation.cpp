@@ -81,7 +81,7 @@ namespace libdar
 		status.cancellation = false;
 		status.flag = 0;
 	    }
-	    else // pending cancellation for that thread
+	    else // pending cancellation information for that thread
 	    {
 		status = *it;
 		preborn.erase(it);
@@ -118,11 +118,7 @@ namespace libdar
 	    if(*ptr == nullptr)
 		bug = true;
 	    else
-	    {
-		if((*ptr)->status.cancellation) // cancellation for that thread
-		    preborn.push_back((*ptr)->status);
 		info.erase(ptr);
-	    }
 	CRITICAL_END;
 
 	if(bug)

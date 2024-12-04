@@ -95,7 +95,7 @@
 	  you need an Internet access to read it.
 	</p>
 	<p>
-	  This make the free space on the first usb key floppy a bit smaller, I let
+	  This make the free space on the first usb key a bit smaller, I let
 	  you make the substraction because this is subject to change from system
 	  to system, but let's assume dar_static is less than 5 MiB, thus the
 	  initial slice should not exceed 95 MB:
@@ -315,7 +315,7 @@
       verify that all expected files are present in the output:
     </p>
     <code class=block>
-      dar -l /mnt/usb key/linux_full
+      dar -l /mnt/usb/linux_full
     </code>
     <h3>Testing the backup</h3>
     <p>
@@ -326,7 +326,7 @@
       backup process):
     </p>
     <code class=block>
-      dar -t /mnt/usb key/linux_full
+      dar -t /mnt/usb/linux_full
     </code>
     <p>
       If using removable media of poor quality, it is
@@ -552,7 +552,7 @@
 	<p>
 	  If you have a lot of file to restore, you can activate the swap
 	  on the partition of your new hard drive:
-	  <code>swapon /dev/hda2</code>
+	  <code>swapon /dev/sda2</code>
 	</p>
       </li>
       <li>
