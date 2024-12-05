@@ -15,6 +15,8 @@ from 2.7.15 to 2.7.16
 - fixing bug in thread_cancellation class that led a cancelled thread kept
   being recorded as cancelled forever, leading libdar to abort immediately when
   run in a new thread having the the same tid.
+- fixing bug in libdar leading an API call to return zero instead of the total
+  size of the backup/archive (not use in dar CLI).
 
 from 2.7.14 to 2.7.15
 - updating libdar about CURLINFO_CONTENT_LENGTH_DOWNLOAD symbol which is
