@@ -1190,11 +1190,8 @@ namespace libdar
 		    first_slice_size = last_slice_size;
 		    archive_size = last_slice_size;
 		}
-
-		if(slice_number > 1)
-		    archive_size = first_slice_size + (slice_number - 2)*sub_slice_size + last_slice_size;
 		else
-		    archive_size = 0; // unknown
+		    archive_size = first_slice_size + (slice_number - 2)*sub_slice_size + last_slice_size;
 	    }
 	    else // not reading from a sar
 	    {
