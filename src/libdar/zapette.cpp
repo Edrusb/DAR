@@ -218,7 +218,7 @@ namespace libdar
     infinint zapette::get_first_slice_header_size() const
     {
 	infinint ret;
-	S_I tmp;
+	S_I tmp = 0;
 
 	if(is_terminated())
 	    throw SRC_BUG;
@@ -251,7 +251,7 @@ namespace libdar
         {
             infinint not_used;
             U_16 pas;
-            S_I ret;
+            S_I ret = 0;
 
             do
             {

@@ -22,7 +22,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.69)
-AC_INIT([DAR], [2.7.15_no_last_slice], [[https://github.com/Edrusb/DAR/issues]])
+AC_INIT([DAR], [2.7.16_no_last_slice], [[https://github.com/Edrusb/DAR/issues]])
 AC_CONFIG_HEADERS([config.h])
 AC_LANG([C++])
 AC_CONFIG_SRCDIR([src/libdar/catalogue.cpp])
@@ -1844,7 +1844,7 @@ AS_IF(       [ test "x$enable_threadar" != "xyes" ],
                                 [
 				  # for libthreadar before release 1.5.1;
 				  AC_CHECK_LIB(threadar, [for_autoconf], [], [])
-				  # ofr libthreadar since release 1.5.1:
+				  # for libthreadar since release 1.5.1:
                                   AC_CHECK_LIB(threadar, [libthreadar_for_autoconf], [], [])
                                 ])
                CPPFLAGS__cache="$CPPFLAGS"

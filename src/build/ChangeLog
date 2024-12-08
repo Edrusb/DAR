@@ -6,22 +6,25 @@ from 2.7.x to 2.8.0
 from 2.7.15 to 2.7.16
 - fixed mask building of path exclusion (dar's -P option) when used with
   regular expression (problem met while testing or merging a backup)
-- adding support for progressive report to reparing operation at API level
+- adding support for progressive report to repairing operation at API level
 - warning before processing to the backup if gnupg signatories are provided
   without any gnupg recipient.
 - fixing bug reporting the following message:
-"Subtracting an "infinint" greater than the first, "infinint" cannot be negative
-  which was due to duplicated counter decrement while merging two archives and
-  overwriting policy drives entry to be removed from the resulting archive adding
-  to that, the very specific/rare condition where the number of removals exceeds
-  more than the half of kept entries...
-- adding kdf support for repairing operation instead of using the values of the
-  archive/backup under reparation.
-- fixing bug in thread_cancellation class that led a cancelled thread kept
-  being recorded as cancelled forever, leading libdar to abort immediately when
-  run in a new thread having the the same tid.
-- fixing bug in libdar leading an API call to return zero instead of the total
-  size of the backup/archive (not use in dar CLI).
+  /Subtracting an "infinint" greater than the first, "infinint" cannot be
+  negative/. This was due to duplicated counter decrement while merging two
+  archives and overwriting policy drives entry to be removed from the
+  resulting archive adding to that, the very specific/rare condition where
+  the number of removals exceeds more than the half of kept entries...
+- adding kdf support for repairing operation instead of using the values of
+  the archive/backup under reparation.
+- fixing bug in thread_cancellation class that led a canceled thread kept
+  being recorded as canceled forever, leading libdar to abort immediately
+  when run in a new thread having the the same tid.
+- fixing bug in libdar leading an API call to return zero instead of the
+  total size of the backup/archive (not use in dar CLI).
+- applying patch from Gentoo about the "which" command replacement in
+  scripts
+- fixing some non-initialized variables as reported by cppcheck tool.
 
 from 2.7.14 to 2.7.15
 - updating libdar about CURLINFO_CONTENT_LENGTH_DOWNLOAD symbol which is
