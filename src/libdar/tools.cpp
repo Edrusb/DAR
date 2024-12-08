@@ -1422,7 +1422,7 @@ namespace libdar
                             const map<char, string> & corres)
     {
         string ret = "";
-        string::iterator it = const_cast<string &>(hook).begin();
+        string::const_iterator it = hook.begin();
 
         while(it != hook.end())
         {

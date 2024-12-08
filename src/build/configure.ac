@@ -1892,7 +1892,7 @@ AS_IF(       [ test "x$enable_threadar" != "xyes" ],
                                 [
 				  # for libthreadar before release 1.5.1;
 				  AC_CHECK_LIB(threadar, [for_autoconf], [], [])
-				  # ofr libthreadar since release 1.5.1:
+				  # for libthreadar since release 1.5.1:
                                   AC_CHECK_LIB(threadar, [libthreadar_for_autoconf], [], [])
                                 ])
                CPPFLAGS__cache="$CPPFLAGS"

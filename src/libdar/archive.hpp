@@ -130,7 +130,7 @@ namespace libdar
 		const std::string & filename,
 		const std::string & extension,
 		const archive_options_merge & options,
-		statistics * progressive_report);
+		statistics* progressive_report);
 
 	    /// this constructor create a new archive from a damaged one [this is the "repair" constructor]
 

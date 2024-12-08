@@ -75,4 +75,4 @@ compressible_file: bnonzero
 	./bnonzero compressible_file 1 2048
 
 uncompressible_file:
-	bzip2 -c9 < `which sh` > uncompressible_file
+	bzip2 -c9 < $(SHELL) > uncompressible_file
