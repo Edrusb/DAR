@@ -238,18 +238,26 @@ static int copy_max(user_interaction & dialog, int src, int dst)
 	    off_t local_missed;
 	    off_t current = lseek(src, 0, SEEK_CUR);
 
-            printf(gettext("Error reading source file (we are at %.2f %% of data copied), trying to read further: %s\n"), (float)(current)/(float)(taille)*100, strerror(errno));
+            printf(gettext("[%.2f %% read, %.2f %% missing] Error reading source file, trying to read further: %s\n"),
+		   (float)(current)/(float)(taille)*100,
+		   (float)(missed)/(float)(taille)*100,
+		   strerror(errno));
             xfer_before_error(BUF_SIZE/2, buffer, src, dst);
             if(skip_to_next_readable(BUF_SIZE/2, buffer, src, dst, local_missed))
 	    {
-		printf(gettext("Skipping done (missing %.0f byte(s)), found correct data to read, continuing the copy...\n"), (float)local_missed);
 		missed += local_missed;
+		printf(gettext("[%.2f %% read, %.2f %% missing] Skipping done (missing %.0f byte(s)), found correct data to read continuing the copy...\n"),
+		       (float)(current)/(float)(taille)*100,
+		       (float)(missed)/(float)(taille)*100,
+		       (float)local_missed);
                 lu = 1;
 	    }
             else
 	    {
-		dialog.message(tools_printf(gettext("Reached End of File, no correct data could be found after the last error\n")));
 		missed += (taille - current);
+		dialog.message(tools_printf(gettext("[%.2f %% read, %.2f %% missing] Reached End of File, no correct data could be found after the last error\n"),
+					    (float)(current)/(float)(taille)*100,
+					    (float)(missed)/(float)(taille)*100));
                 lu = 0;
 	    }
         }
