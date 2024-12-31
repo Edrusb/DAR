@@ -33,6 +33,8 @@ from 2.7.x to 2.8.0
 - for pertience, changed the name of function square2 to root2 and function
   square3 to root3 when using extended syntax of "--delta sig" option.
 - added support for -az option to comparison operation
+- enhanced display of dar_cp with the ratio of lost data beside the ratio of
+  read data.
 
 from 2.7.15 to 2.7.16
 - fixed mask building of path exclusion (dar's -P option) when used with
