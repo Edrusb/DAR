@@ -133,7 +133,7 @@ namespace libdar
 	if(!x_entrepot)
 	    throw Ememory("archive_options_read::clear");
 	x_ignore_signature_check_failure = false;
-	x_multi_threaded_crypto = 1;
+	x_multi_threaded_crypto = 2;
 	x_multi_threaded_compress = 1;
 	x_header_only = false;
 	x_silent = false;
@@ -382,7 +382,7 @@ namespace libdar
 	    if(!x_entrepot)
 		throw Ememory("archive_options_create::clear");
 	    x_scope = all_fsa_families();
-	    x_multi_threaded_crypto = 1;
+	    x_multi_threaded_crypto = 2;
 	    x_multi_threaded_compress = 1;
 	    x_delta_diff = true;
 	    x_delta_signature = false;
@@ -814,7 +814,7 @@ namespace libdar
 	    x_entrepot = shared_ptr<entrepot>(new (nothrow) entrepot_local("", "", false)); // never using furtive_mode to read slices
 	    if(!x_entrepot)
 		throw Ememory("archive_options_isolate::clear");
-	    x_multi_threaded_crypto = 1;
+	    x_multi_threaded_crypto = 2;
 	    x_multi_threaded_compress = 1;
 	    x_delta_signature = false;
 	    archive_option_clean_mask(x_delta_mask);
@@ -1015,7 +1015,7 @@ namespace libdar
 	    if(x_entrepot == nullptr)
 		throw Ememory("archive_options_merge::clear");
 	    x_scope = all_fsa_families();
-	    x_multi_threaded_crypto = 1;
+	    x_multi_threaded_crypto = 2;
 	    x_multi_threaded_compress = 1;
 	    x_delta_signature = true;
 	    has_delta_mask_been_set = false;
@@ -2082,7 +2082,7 @@ namespace libdar
             x_entrepot = shared_ptr<entrepot>(new (nothrow) entrepot_local( "", "", false)); // never using furtive_mode to read slices
             if(x_entrepot == nullptr)
                 throw Ememory("archive_options_repair::clear");
-            x_multi_threaded_crypto = 1;
+            x_multi_threaded_crypto = 2;
 	    x_multi_threaded_compress = 1;
 	    if(compile_time::libargon2())
 	    {

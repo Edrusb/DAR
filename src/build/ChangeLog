@@ -35,6 +35,8 @@ from 2.7.x to 2.8.0
 - added support for -az option to comparison operation
 - enhanced display of dar_cp with the ratio of lost data beside the ratio of
   read data.
+- changed default number of thread used for ciphering from 1 to 2 at libdar
+  API level (in coherence with CLI defaults).
 
 from 2.7.15 to 2.7.16
 - fixed mask building of path exclusion (dar's -P option) when used with
