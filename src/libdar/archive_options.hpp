@@ -1395,7 +1395,7 @@ namespace libdar
 	    /// whether to display files that have been excluded by filters
 	void set_display_skipped(bool display_skipped) { x_display_skipped = display_skipped; };
 
-	    /// defines which Extended Attributes to save
+	    /// defines which Extended Attributes to restore
 	void set_ea_mask(const mask & ea_mask);
 
 	    /// whether to ignore directory structure and restore all files in the same directory
