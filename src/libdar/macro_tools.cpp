@@ -884,7 +884,7 @@ namespace libdar
 
 	    version_check(*dialog, ver);
 
-	    if(ver.get_compression_block_size().is_zero())
+	    if(ver.get_compression_block_size().is_zero() || ver.get_compression_algo() == compression::none)
 	    {
 		tmp = macro_tools_build_streaming_compressor(ver.get_compression_algo(),
 							     *(stack.top()),
@@ -1654,7 +1654,7 @@ namespace libdar
 
 		if(info_details && algo != compression::none)
 		    dialog->message(gettext("Adding a new layer on top: compression..."));
-		if(compression_block_size == 0)
+		if(compression_block_size == 0 || algo == compression::none)
 		{
 		    tmp = macro_tools_build_streaming_compressor(algo, *(layers.top()), compression_level, multi_threaded_compress);
 		    if(info_details)
