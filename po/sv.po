@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sv\n"
 "Report-Msgid-Bugs-To: https://github.com/Edrusb/DAR/issues\n"
-"POT-Creation-Date: 2024-12-08 17:08+0100\n"
+"POT-Creation-Date: 2025-02-13 12:07+0100\n"
 "PO-Revision-Date: 2012-04-15 11:28+0200\n"
 "Last-Translator: Peter Landgren <peter.talken@telia.com>\n"
 "Language-Team: Swedish <kde-i18n-doc@kde.org>\n"
@@ -7805,7 +7805,7 @@ msgstr "%S är ej en giltig sökväg: %S"
 msgid "Cannot add an absolute path"
 msgstr "Kan ej lägga till en etikett till en tom stack"
 
-#: src/libdar/path.cpp:358
+#: src/libdar/path.cpp:357 src/libdar/path.cpp:362
 msgid "Empty string as subdirectory does not make a valid path"
 msgstr "En tom sträng som undermapp utgör inte en giltig sökväg"
 

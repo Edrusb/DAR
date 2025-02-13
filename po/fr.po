@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: DAR 2.7.0\n"
 "Report-Msgid-Bugs-To: https://github.com/Edrusb/DAR/issues\n"
-"POT-Creation-Date: 2024-12-08 17:08+0100\n"
+"POT-Creation-Date: 2025-02-13 12:07+0100\n"
 "PO-Revision-Date: 2024-12-08 17:13+0100\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
@@ -6032,7 +6032,9 @@ msgstr ""
 msgid ""
 "Archive signature is only possible with gnupg encryption (and at least one "
 "recipient)"
-msgstr "La signature d'un archive n'est possible qu'avec le chiffrement gnupg (et au moins un destinataire)"
+msgstr ""
+"La signature d'un archive n'est possible qu'avec le chiffrement gnupg (et au "
+"moins un destinataire)"
 
 #: src/libdar/macro_tools.cpp:1315
 msgid "Generating random key for symmetric encryption..."
@@ -8076,7 +8078,7 @@ msgstr "%S n'est pas un chemin valide : %S"
 msgid "Cannot add an absolute path"
 msgstr "Impossible d'ajouter un chemin absolu"
 
-#: src/libdar/path.cpp:358
+#: src/libdar/path.cpp:357 src/libdar/path.cpp:362
 msgid "Empty string as subdirectory does not make a valid path"
 msgstr ""
 "Une chaîne vide en tant que sous-répertoire ne donne pas un chemin valide"
