@@ -907,7 +907,7 @@ namespace libdar
 
 	    /// whether to derogate from the current existing binary delta signatures and drop/recalculate for file that do not have delta signatures
 
-	    /// \note only set_delta_signature() is called, and set_delta_mask() is not called, delta signature are just transmitted to isolated catalogue from the source
+	    /// \note if only set_delta_signature() is called, and set_delta_mask() is not called, delta signature are just transmitted to isolated catalogue from the source
 	    /// archive. File without delta sig will not have delta sig on the isolated catalog, file with delta sign will have their delta sig copied to the isolated
 	    /// catalogue. Using set_delta_mask() let dar reconsider this delta sig transfer and lead libdar to drop delta sig if file does not match the mask and have a
 	    /// delta sig, have the delta sig transfered if it match the mask and already have a delta sig, recompute the delta sig if the file has no delta sig in the source

@@ -83,7 +83,7 @@ namespace libdar
 	    /// this constuctor create an archive (full or differential) [this is the "create" constructor]
 
 	    /// \param[in,out] dialog for user interaction
-	    /// \param[in] fs_root the filesystem to take as root for the backup
+	    /// \param[in] fs_root the filesystem to take as root for the backup (if relative path is given it is made absolute using the current working directory of the process libdar runs in)
 	    /// \param[in] sauv_path the path where to create slices
 	    /// \param[in] filename base name of the slices. If "-" is given the archive will be produced in standard output
 	    /// \param[in] extension slices extension ("dar")
@@ -185,7 +185,7 @@ namespace libdar
 
 	    /// extraction of data from an archive
 
-	    /// \param[in] fs_root the filesystem to take as root for the restoration
+	    /// \param[in] fs_root the filesystem to take as root for the restoration (if relative path is given it is made absolute using the current working directory of the process libdar runs in)
 	    /// \param[in] options optional parameter to be used for the operation
 	    /// \param[in,out] progressive_report points to an already existing statistics object that can be consulted at any time
 	    /// during the call (see the returned value to know the useful fields and their meining),
@@ -230,7 +230,7 @@ namespace libdar
 
 	    /// archive comparison with filesystem
 
-	    /// \param[in] fs_root the filesystem to take as root for the comparison
+	    /// \param[in] fs_root the filesystem to take as root for the comparison (if relative path is given it is made absolute using the current working directory of the process libdar runs in)
 	    /// \param[in] options optional parameters to be used with the operation
 	    /// \param[in,out] progressive_report points to an already existing statistics object that can be consulted at any time
 	    /// during the call (see the returned value to know the useful fields and their meining),
