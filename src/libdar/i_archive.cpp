@@ -984,7 +984,6 @@ namespace libdar
 		get_ui().pause(gettext("File ownership will not be restored du to the lack of privilege, you can disable this message by asking not to restore file ownership"));
 	    }
 
-	    fs_root.explode_undisclosed();
 	    enable_natural_destruction();
 
 	    if(options.get_in_place())
@@ -1434,7 +1433,6 @@ namespace libdar
 	    }
                 // end of sanity checks
 
-	    fs_root.explode_undisclosed();
             enable_natural_destruction();
 
 	    if(options.get_in_place())
@@ -2098,8 +2096,6 @@ namespace libdar
 	check_libgcrypt_hash_bug(get_ui(), hash, first_file_size, file_size);
 
             // end of sanity checks
-
-	fs_root.explode_undisclosed();
 
 	catalogue *ref_cat = nullptr;
 	bool initial_pause = false;
