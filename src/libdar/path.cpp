@@ -351,7 +351,11 @@ namespace libdar
 
         root = string(p.begin(), it);
         if(it != p.end())
+	{
             p = string(it+1, p.end());
+	    if(p.empty())
+		throw Erange("path_get_root", dar_gettext("Empty string as subdirectory does not make a valid path"));
+	}
         else
             p = "";
         if(root.empty())
