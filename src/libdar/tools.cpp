@@ -1101,7 +1101,7 @@ namespace libdar
                         break;
                     case 'x':
                         test = va_arg(ap, U_I);
-                        output += tools_string_to_hexa(deci(test).human());
+                        output += tools_U_I_to_hexa(test);
                         break;
 		    case 'o':
 			test = va_arg(ap, U_I);
@@ -2060,6 +2060,15 @@ namespace libdar
 
         return ret;
     }
+
+    string tools_U_I_to_hexa(U_I x)
+    {
+	stringstream sgs;
+
+	sgs << "0x" << std::hex << x;
+	return sgs.str();
+    }
+
 
     infinint tools_file_size_to_crc_size(const infinint & size)
     {

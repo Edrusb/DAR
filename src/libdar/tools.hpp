@@ -595,12 +595,14 @@ namespace libdar
 	/// \return the string representing the value of x written in hexadecimal
     extern std::string tools_unsigned_char_to_hexa(unsigned char x);
 
-	/// convert a string into its hexadecima representation
+	/// convert a string into its hexadecima representation (string containing an integer not its decimal representation!)
 
 	/// \param[in] input input string to convert
 	/// \return a string containing an hexadecimal number corresponding to the bytes of the input string
-
     extern std::string tools_string_to_hexa(const std::string & input);
+
+	/// convert a unsigned integer to its hexadecimal representation
+    extern std::string tools_U_I_to_hexa(U_I x);
 
 	/// Defines the CRC size to use for a given filesize
 
