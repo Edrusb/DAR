@@ -106,9 +106,8 @@ namespace libdar
 	    /// marks the thread given in argument as to be canceled
 
 	    /// \param[in] tid the thread ID of the thread where any libdar call must abort
-	    /// \param[in] x_immediate whether the cancellation must be as fast as possible or can take a
+	    /// \param[in] x_immediate whether the cancellation must be as fast as possible or can take a little time to make a usable archive
 	    /// \param[in] x_flag is a value to transmit to the Ethread_cancel exception used to cancel libdar's call stack
-	    /// little time to make a usable archive
 	static void cancel(pthread_t tid, bool x_immediate, U_64 x_flag);
 
 	    /// gives the cancellation status of the given thread ID
