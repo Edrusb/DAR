@@ -92,6 +92,10 @@ namespace libdar
             // a call with nullptr as first argument means to set the current dir the parent directory
 	void remove_read_entry(std::string & name);
 	    // in the currently read directory, removes the entry which name is given in argument
+
+	    /// remove last read entry
+	void remove_last_read();
+
 	const cat_directory & get_current_reading_dir() const { if(current_read == nullptr) throw SRC_BUG; return *current_read; };
 	    // remove from the catalogue all the entries that have not yet been read
 	    // by read().

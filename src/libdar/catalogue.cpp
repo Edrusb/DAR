@@ -352,6 +352,26 @@ namespace libdar
 	current_read->remove(name);
     }
 
+    void catalogue::remove_last_read()
+    {
+	if(current_read == nullptr)
+	    throw Erange("catalogue::remove_read_entry", gettext("no current reading directory defined"));
+
+	if(! current_read->remove_last_read() && current_read != contenu)
+	{
+		// if current_read could not remove the last entry (was empty for example)
+		// and if we are not already in the root directory
+		// we remove the current directory and point to its parent
+
+	    string name = current_read->get_name();
+
+	    current_read = current_read->get_parent();
+	    if(current_read == nullptr)
+		throw SRC_BUG;
+	    current_read->remove(name);
+	}
+    }
+
     void catalogue::tail_catalogue_to_current_read(bool including_last_read)
     {
 	while(current_read != nullptr)
