@@ -1659,6 +1659,15 @@ namespace libdar
                 dialog->message(string(gettext("ERR ")) + juillet.get_string() + " : " + e.get_message());
 		if(e_dir == nullptr || !cat.read_second_time_dir())
 		    st.incr_errored();
+		    // last read inode may have failed reading EA and FSA due to data missing
+		    // we completely remove it from the catalog as this part of the code is used
+		    // also for archive isolation (in sequential read mode) and here better
+		    // drop the inode for it can be resaved later, while for test operation this
+		    // has no impact at all.
+		catalogue* ncat = const_cast<catalogue*>(&cat);
+		if(ncat == nullptr)
+		    throw SRC_BUG;
+		ncat->remove_last_read();
             }
         }
     }
