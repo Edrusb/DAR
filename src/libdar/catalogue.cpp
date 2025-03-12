@@ -555,6 +555,13 @@ namespace libdar
 	current_read->add_children(ref);
     }
 
+    void catalogue::remove_in_current_add(const string & name)
+    {
+	if(current_add == nullptr)
+	    throw SRC_BUG;
+	current_add->remove(name);
+    }
+
     void catalogue::reset_compare() const
     {
 	if(contenu == nullptr)
