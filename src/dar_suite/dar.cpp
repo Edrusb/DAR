@@ -388,7 +388,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 				// is requested
 				// We may also need to read delta_sig
 				// to perform the delta difference
-			    arch->drop_all_filedescriptors();
+			    arch->drop_all_filedescriptors(false);
 			create_options.set_reference(arch);
 		    }
 		    create_options.set_selection(*param.selection);
@@ -748,6 +748,14 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    // yes this is "ref_repo" where is located the -A-pointed-to archive
 		    // -C-pointed-to archive is located in the "repo" entrepot
 		read_options.set_silent(param.quiet_crypto);
+		read_options.set_force_first_slice(param.force_first_slice);
+		if(param.isolation_repair) // this field is used for isolation options
+		{
+			// forced options
+		    read_options.set_force_first_slice(true);
+		    read_options.set_sequential_read(true);
+		}
+
 
 		arch.reset(new (nothrow) archive(dialog,
 						 *param.ref_root,
@@ -758,7 +766,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    throw Ememory("little_main");
 
 		if(!param.delta_sig)
-		    arch->drop_all_filedescriptors();
+		    arch->drop_all_filedescriptors(param.isolation_repair);
 
 		line_tools_crypto_split_algo_pass(param.pass,
 						  crypto,
@@ -806,6 +814,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		if(param.kdf_hash != hash_algo::none)
 		    isolate_options.set_kdf_hash(param.kdf_hash);
 		isolate_options.set_sig_block_len(param.delta_sig_len);
+		isolate_options.set_repair_mode(param.isolation_repair);
 
                 arch->op_isolate(*param.sauv_root,
 				 param.filename,

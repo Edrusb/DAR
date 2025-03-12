@@ -329,6 +329,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
     p.never_resave_uncompr = false;
     p.force_first_slice = false;
     p.fully_detailed_dates = false;
+    p.isolation_repair = false;
 
     if(!dialog)
 	throw SRC_BUG;
@@ -1673,6 +1674,8 @@ static bool get_args_recursive(recursive_param & rec,
 		    p.force_first_slice = true;
 		else if(strcasecmp("fully-detailed-dates", optarg) == 0 || strcasecmp("fdd", optarg) == 0)
 		    p.fully_detailed_dates = true;
+		else if(strcasecmp("rep", optarg) == 0 || strcasecmp("repair", optarg) == 0)
+		    p.isolation_repair = true;
 		else
                     throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext("Unknown argument given to -a : %s"), optarg));
                 break;

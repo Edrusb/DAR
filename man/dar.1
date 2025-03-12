@@ -1169,6 +1169,9 @@ Without --kdf-param the KDF fonction uses 200,000 iterations for md5, sha1 and s
 -anru, --alter=never-resave-uncompressed
 At creation time or when re-compressing data at merging time (thus when option -ak is not used), by default dar tries to re-save file uncompressed if the compression result takes more space than the uncompressed original data. This has the drawback to lead dar to skip back the archive about to be created, the advantage is to not waste storage space. This option let you disable this feature: dar will then not skip back and will keep files compressed even if their compressed data takes more space as what they would take uncompressed.
 .PP
+.TP 20
+-arep, --alter=repair
+For isolation operation only, this option make dar able to isolate a catalog from a truncated backup. This option transparently implies --sequential-read and --alter=force-firs-slice to be able to read the content of the truncated archive to isolate.
 .PP
 .B RESTORATION SPECIFIC OPTIONS (to use with -x)
 .TP 20
@@ -1205,7 +1208,7 @@ Do not restore unix-sockets. By default saved unix sockets are recreated at rest
 Since version 2.7.1 libdar stores the filesystem root path (given -R option) used when creating a backup, this is the known as the 'in-place' path. At restoration time by default, dar uses the provided -R option or if not specified uses the current directory as root directory for the restoration operation. Using -ap option lead dar to read the in-place path from the backup and restore the data using this path instead. This option is thus exclusive with -R option and may lead dar to report an error if the archive has not stored any in-place path (older archive format or backup resulting of the merging of two backups having different in-place path).
 .TP 20
 -affs, --alter=force-first-slice
-This option only applies when restoring a backup with the help of an isolated catalogue. In that context dar still needs to read the archive format from the backup to restore. In direct access mode, this information is always fetched from the beginning of the archive, but in direct access mode it may be fetched reading the end of the last slice (default behavior) or reading the beginning of the first slice (when -affs is set). The objective is to avoid fetching the last slice when using very large backups. One can define a first slice (see -S option) of for example 1 kB while other slices (-s option) can be specified arbitrarily large. With the help of an isolated catalogue based on this archive and the first (small) slice, reading some data from this large backup then only needs the few (big) slices where the data is located, not more.
+This option first purpose was at restoration time when using an isolated catalogue. In that context dar still needs to read the archive format from the backup to restore. In direct access mode, this information is always fetched from the beginning of the archive, but in direct access mode it may be fetched reading the end of the last slice (default behavior) or reading the beginning of the first slice (when -affs is set). The objective is to avoid fetching the last slice when using very large backups. One can define a first slice (see -S option) of for example 1 kB while other slices (-s option) can be specified arbitrarily large. With the help of an isolated catalogue based on this archive and the first (small) slice, reading some data from this large backup then only needs the few (big) slices where the data is located, not more.
 .PP
 .B TESTING AND DIFFERENCE SPECIFIC OPTIONS (to use with -t or -d)
 .PP

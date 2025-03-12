@@ -36,6 +36,7 @@ a * alteration of operation		--alter	  argument:
 							    nru [never-resave-uncompressed]
 							    p[lace]
 							    r[egex]
+							    rep[air] (isolation mode)
 						            s[aved]
 							    secu
 							    SI[-unit[s]]

@@ -176,6 +176,7 @@ struct line_param
     bool never_resave_uncompr;    ///< never resave uncompressed when compression ratio is bad
     bool force_first_slice;       ///< whether to read the first instead of the last slice when a isolated catalogue is given in complement
     bool fully_detailed_dates;    ///< whether to show subsecond value of dates
+    bool isolation_repair;        ///< whether to try isolate content of a truncated archive
 
 	// constructor for line_param
     line_param()
