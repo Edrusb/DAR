@@ -113,10 +113,14 @@ namespace libdar
             // a call with nullptr as first argument means to set the current dir the parent directory
 	void remove_read_entry(std::string & name);
 	    // in the currently read directory, removes the entry which name is given in argument
+
+	    /// remove last read entry
+	virtual void remove_last_read();
+
 	const cat_directory & get_current_reading_dir() const { if(current_read == nullptr) throw SRC_BUG; return *current_read; };
 	    // remove from the catalogue all the entries that have not yet been read
 	    // by read().
-	virtual void tail_catalogue_to_current_read();
+	virtual void tail_catalogue_to_current_read(bool including_last_read);
 
 	    // return true if the last read entry has already been read
 	    // and has not to be counted again. This is never the case for catalogue but may occur
@@ -150,7 +154,7 @@ namespace libdar
 	void re_add_in_replace(const cat_directory &dir); // same as re_add_in but also set the properties of the existing directory to those of the given argument
         void add_in_current_read(cat_nomme *ref); // add in currently read directory
 	const cat_directory & get_current_add_dir() const { if(current_add == nullptr) throw SRC_BUG; return *current_add; };
-
+	void remove_in_current_add(const std::string & name); ///< remove entry of given name that was added
 
 
 	    // Comparison methods. The comparision is here also iterative and uses its specific current_compare directory pointer

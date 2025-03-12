@@ -1666,6 +1666,15 @@ namespace libdar
                 dialog->message(string(gettext("ERR ")) + juillet.get_string() + " : " + e.get_message());
 		if(e_dir == nullptr || !cat.read_second_time_dir())
 		    st.incr_errored();
+		    // last read inode may have failed reading EA and FSA due to data missing
+		    // we completely remove it from the catalog as this part of the code is used
+		    // also for archive isolation (in sequential read mode) and here better
+		    // drop the inode for it can be resaved later, while for test operation this
+		    // has no impact at all.
+		catalogue* ncat = const_cast<catalogue*>(&cat);
+		if(ncat == nullptr)
+		    throw SRC_BUG;
+		ncat->remove_last_read();
             }
         }
     }
@@ -2906,17 +2915,19 @@ namespace libdar
 	{
 	    Ethread_cancel* e_thread = dynamic_cast<Ethread_cancel*>(&e);
 	    Erange* e_range = dynamic_cast<Erange*>(&e);
+	    Euser_abort *e_abort = dynamic_cast<Euser_abort*>(&e);
 
 	    if(info_details)
 	    {
 		string msg = e.get_message();
 		dialog->message(tools_printf(gettext("error met while creating archive: %S"), & msg));
 	    }
-	    if(e_thread == nullptr && e_range == nullptr)
+	    if(e_thread == nullptr && e_range == nullptr && ! repair_mode)
 		throw;
 
 	    if(!repair_mode)
-		cat.tail_catalogue_to_current_read();
+		cat.tail_catalogue_to_current_read(false);
+
 	    cat.change_location(pdesc);
 	    if(pdesc.compr->is_compression_suspended())
 	    {
@@ -2924,7 +2935,15 @@ namespace libdar
 		pdesc.compr->resume_compression();
 	    }
 	    thr_cancel.block_delayed_cancellation(false);
-	    throw;
+
+	    if(repair_mode && e_abort != nullptr)
+		    // we assume the abortion came from the
+		    // fact user could not produce a missing
+		    // slice, thus we replace the exception
+		    // by a Erange one.
+		throw Erange("filtre_merge_step2", e.get_message());
+	    else
+		throw;
 	}
 
 	cat.change_location(pdesc);
@@ -3925,16 +3944,16 @@ namespace libdar
         {
             throw;
         }
-        catch(Euser_abort & e)
-        {
-            throw;
-        }
 	catch(Ethread_cancel & e)
 	{
 	    throw;
 	}
         catch(Egeneric & e)
         {
+	    Euser_abort* e_abort = dynamic_cast<Euser_abort*>(&e);
+	    if(e_abort != nullptr && ! repair_mode)
+		throw;
+
             dialog->message(string(gettext("Error saving Extended Attributes for ")) + info_quoi + ": " + e.get_message());
 	    if(repair_mode)
 	    {
@@ -3944,7 +3963,6 @@ namespace libdar
         }
         return ret;
     }
-
 
     static void restore_atime(const string & chemin, const cat_inode * & ptr)
     {
@@ -4042,16 +4060,16 @@ namespace libdar
         {
             throw;
         }
-        catch(Euser_abort & e)
-        {
-            throw;
-        }
 	catch(Ethread_cancel & e)
 	{
 	    throw;
 	}
         catch(Egeneric & e)
         {
+	    Euser_abort* e_abort = dynamic_cast<Euser_abort*>(&e);
+	    if(e_abort != nullptr && ! repair_mode)
+		throw;
+
             dialog->message(string(gettext("Error saving Filesystem Specific Attributes for ")) + info_quoi + ": " + e.get_message());
 	    if(repair_mode)
 	    {

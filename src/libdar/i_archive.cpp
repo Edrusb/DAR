@@ -1666,39 +1666,59 @@ namespace libdar
 	    if(cat == nullptr)
 		throw SRC_BUG;
 
-		// note:
-		// an isolated catalogue keeps the data, EA and FSA pointers of the archive they come from
-		// but have their own copy of the delta signature if present, in order to be able to make
-		// a differential/incremental delta binary based on an isolated catalogue. The drawback is
-		// that reading an archive with the help of an isolated catalogue, the delta signature used
-		// will always be those of the isolated catalogue, not those of the archive the catalogue
-		// has been isolated from.
-		// Using an isolated catalogue as backup of the internal catalogue stays possible but not
-		// for the delta_signature which are ignored by libdar in that situation (archive reading).
-		// However as delta_signature are only used at archive creation time this does not hurt. Delta
-		// signature will be available during a differential backup either from the isolated catalogue
-		// using its own copy of them, or from the original archive which would contain their original
-		// version.
-
-	    if(options.get_delta_signature())
+	    try
 	    {
-		pile_descriptor pdesc = & layers;
-		cat->transfer_delta_signatures(pdesc,
-					       sequential_read,
-					       options.get_has_delta_mask_been_set(),
-					       options.get_delta_mask(),
-					       options.get_delta_sig_min_size(),
-					       options.get_sig_block_len());
+
+		    // note:
+		    // an isolated catalogue keeps the data, EA and FSA pointers of the archive they come from
+		    // but have their own copy of the delta signature if present, in order to be able to make
+		    // a differential/incremental delta binary based on an isolated catalogue. The drawback is
+		    // that reading an archive with the help of an isolated catalogue, the delta signature used
+		    // will always be those of the isolated catalogue, not those of the archive the catalogue
+		    // has been isolated from.
+		    // Using an isolated catalogue as backup of the internal catalogue stays possible but not
+		    // for the delta_signature which are ignored by libdar in that situation (archive reading).
+		    // However as delta_signature are only used at archive creation time this does not hurt. Delta
+		    // signature will be available during a differential backup either from the isolated catalogue
+		    // using its own copy of them, or from the original archive which would contain their original
+		    // version.
+
+		if(options.get_delta_signature())
+		{
+		    pile_descriptor pdesc = & layers;
+		    cat->transfer_delta_signatures(pdesc,
+						   sequential_read,
+						   options.get_has_delta_mask_been_set(),
+						   options.get_delta_mask(),
+						   options.get_delta_sig_min_size(),
+						   options.get_sig_block_len());
+		}
+		else
+			// we drop the delta signature as they will never be used
+			// because none will be in the isolated catalogue
+			// and that an isolated catalogue as backup of an internal
+			// catalogue cannot rescue the delta signature (they have
+			// to be in the isolated catalogue)
+		    cat->drop_delta_signatures();
 	    }
-	    else
-		    // we drop the delta signature as they will never be used
-		    // because none will be in the isolated catalogue
-		    // and that an isolated catalogue as backup of an internal
-		    // catalogue cannot rescue the delta signature (they have
-		    // to be in the isolated catalogue)
-		cat->drop_delta_signatures();
+	    catch(Ebug & e)
+	    {
+		throw;
+	    }
+	    catch(Egeneric & e)
+	    {
+		    // including Euser_abort in case a slide is missing
+		    // and user could not provide it
 
-
+		if(options.get_repair_mode())
+		{
+			// dropping the latest read entry (obviously corrupted)
+			// but not throwing any exception
+		    cat->tail_catalogue_to_current_read(true);
+		}
+		else
+		    throw;
+	    }
 
 	    if(isol_data_name == cat->get_data_name())
 		throw SRC_BUG;

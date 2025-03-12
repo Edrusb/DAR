@@ -431,12 +431,52 @@ namespace libdar
 	ordered_fils.erase(debut, fin);
     }
 
-
-    void cat_directory::tail_to_read_children()
+    bool cat_directory::remove_last_read()
     {
+	if(it != ordered_fils.begin())
+	{
+	    it -= 1;
+
+	    if(*it != nullptr)
+	    {
+#ifdef LIBDAR_FAST_DIR
+		string name = (*it)->get_name();
+		map<string, cat_nomme*>::iterator fit = fils.find(name);
+		if(fit == fils.end())
+		    throw SRC_BUG;
+		fils.erase(fit);
+#endif
+		delete *it;
+		cat_nomme** tmp = const_cast<cat_nomme**>(&(*it));
+		*tmp = nullptr;
+		if(*it != nullptr)
+		    throw SRC_BUG;
+	    }
+
+		ordered_fils.erase(it);
+	    it = ordered_fils.end();
+	    return true;
+	}
+	else
+	    return false;
+    }
+
+    bool cat_directory::tail_to_read_children(bool including_last_read)
+    {
+	bool found_last_read = true;
+	std::deque<cat_nomme*>::const_iterator drop_start = it;
+
+	if(including_last_read)
+	{
+	    if(drop_start == ordered_fils.begin())
+		found_last_read = false;
+	    else
+		drop_start -= 1;
+	}
+
 #ifdef LIBDAR_FAST_DIR
 	map<string, cat_nomme *>::iterator dest;
-	deque<cat_nomme *>::const_iterator ordered_dest = it;
+	deque<cat_nomme *>::const_iterator ordered_dest = drop_start;
 
 	while(ordered_dest != ordered_fils.end())
 	{
@@ -452,15 +492,28 @@ namespace libdar
 	    }
 	    catch(...)
 	    {
-		erase_ordered_fils(it, ordered_dest);
+		erase_ordered_fils(drop_start, ordered_dest);
 		it = ordered_fils.end();
 		throw;
 	    }
 	}
 #endif
-	erase_ordered_fils(it, ordered_fils.end());
+	for(it = drop_start; it != ordered_fils.end(); ++it)
+	{
+	    if(*it != nullptr)
+	    {
+		delete *it;
+		cat_nomme** tmp = const_cast<cat_nomme**>(&(*it));
+		*tmp = nullptr;
+		if(*it != nullptr)
+		    throw SRC_BUG;
+	    }
+	}
+	erase_ordered_fils(drop_start, ordered_fils.end());
 	it = ordered_fils.end();
 	recursive_flag_size_to_update();
+
+	return found_last_read;
     }
 
     void cat_directory::remove(const string & name)
@@ -604,6 +657,20 @@ namespace libdar
 #ifdef LIBDAR_FAST_DIR
 	fils.clear();
 #endif
+	it = ordered_fils.begin();
+	while(it != ordered_fils.end())
+	{
+	    if(*it != nullptr)
+	    {
+		delete *it;
+		cat_nomme** tmp = const_cast<cat_nomme**>(&(*it));
+		*tmp = nullptr;
+		if(*it != nullptr)
+		    throw SRC_BUG;
+	    }
+	    ++it;
+	}
+
 	erase_ordered_fils(ordered_fils.begin(), ordered_fils.end());
 	ordered_fils.clear();
 	it = ordered_fils.begin();

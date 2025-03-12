@@ -575,6 +575,8 @@ namespace libdar
 			{
 			    bool is_eod = ref_eod != nullptr;
 			    cat_entree *ref_nc = const_cast<cat_entree *>(ref);
+			    const cat_nomme *ref_nom = dynamic_cast<const cat_nomme*>(ref);
+
 			    string current_dir_name;
 
 			    if(is_eod && get_early_mem_release())
@@ -587,7 +589,15 @@ namespace libdar
 				current_dir_name = get_current_add_dir().get_name();
 			    }
 
+			    if(ref_nc == nullptr)
+				throw SRC_BUG;
 			    ceci->add(ref_nc);
+
+			    if(ref_nom == nullptr)
+				ceci->last_added_name = "";
+			    else
+				ceci->last_added_name = ref_nom->get_name();
+
 			    if(!wait_parent_depth.is_zero()) // we must not return this object as it is member of a skipped dir
 			    {
 				if(depth < wait_parent_depth) // we are back out of the skipped directory
@@ -819,10 +829,26 @@ namespace libdar
 	return catalogue::read_if_present(name, ref);
     }
 
-    void escape_catalogue::tail_catalogue_to_current_read()
+    void escape_catalogue::tail_catalogue_to_current_read(bool including_last_read)
     {
+	catalogue::tail_catalogue_to_current_read(including_last_read);
 	reset_reading_process();
-	catalogue::tail_catalogue_to_current_read();
+    }
+
+    void escape_catalogue::remove_last_read()
+    {
+	if(status == ec_marks)
+	{
+	    if(! last_added_name.empty())
+	    {
+		remove_in_current_add(last_added_name);
+		last_added_name = "";
+	    }
+	    else
+		throw SRC_BUG; // implementing only one removal of last read element
+	}
+	else
+	    catalogue::remove_last_read();
     }
 
     void escape_catalogue::set_in_place(const path & arg)

@@ -930,6 +930,9 @@ namespace libdar
 	void set_kdf_hash(hash_algo algo) { x_kdf_hash = algo; };
 
 
+	    /// repair mode making at most rebuild a catalog from a truncate or corrupted backup
+	void set_repair_mode(bool mode) { x_repair_mode = mode; };
+
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods
 
@@ -966,7 +969,7 @@ namespace libdar
 	delta_sig_block_size get_sig_block_len() const { return x_sig_block_len; };
 	const infinint & get_iteration_count() const { return x_iteration_count; };
 	hash_algo get_kdf_hash() const { return x_kdf_hash; };
-
+	bool get_repair_mode() const { return x_repair_mode; };
 
     private:
 	bool x_allow_over;
@@ -1002,6 +1005,7 @@ namespace libdar
 	delta_sig_block_size x_sig_block_len;
 	infinint x_iteration_count;
 	hash_algo x_kdf_hash;
+	bool x_repair_mode;
 
 	void copy_from(const archive_options_isolate & ref);
 	void move_from(archive_options_isolate && ref) noexcept;
