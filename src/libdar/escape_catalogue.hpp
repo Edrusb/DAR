@@ -90,10 +90,12 @@ namespace libdar
 	virtual void skip_read_to_parent_dir() const override;
 	virtual bool read(const cat_entree * & ref) const override;
 	virtual bool read_if_present(std::string *name, const cat_nomme * & ref) const override;
+	virtual void remove_last_read() override;
 	virtual void tail_catalogue_to_current_read(bool including_last_read) override;
 	virtual bool read_second_time_dir() const override { return status == ec_detruits; };
 	virtual void set_in_place(const path & arg) override;
 	virtual void clear_in_place() override;
+
 
     private:
 	enum state
@@ -112,6 +114,7 @@ namespace libdar
 	bool x_lax;
 	std::map <infinint, cat_etoile *> corres;
         state status;
+	std::string last_added_name;///< last entry added to catalogue during a read() operation (to be able to remove_in_current_add()
 	catalogue *cat_det;         ///< holds the final catalogue's detruit objects when no more file can be read from the archive
 	infinint min_read_offset;   ///< next offset in archive should be greater than that to identify a mark
 	infinint depth;             ///< directory depth of archive being read sequentially
