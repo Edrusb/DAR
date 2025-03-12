@@ -275,6 +275,7 @@ namespace libdar
         try
         {
 	    tmp = pimpl->op_test(options,
+				 false, // repairing is not exposed
 				 progressive_report);
         }
         catch(...)
@@ -428,12 +429,12 @@ namespace libdar
         NLS_SWAP_OUT;
     }
 
-    void archive::drop_all_filedescriptors()
+    void archive::drop_all_filedescriptors(bool repairing)
     {
         NLS_SWAP_IN;
         try
         {
-	    pimpl->drop_all_filedescriptors();
+	    pimpl->drop_all_filedescriptors(repairing);
         }
         catch(...)
         {

@@ -143,6 +143,7 @@ namespace libdar
 	    /// test the archive integrity
 
 	statistics op_test(const archive_options_test & options,
+			   bool reparing,  ///< use for isolation of a truncated archive
 			   statistics * progressive_report);
 
 
@@ -184,7 +185,7 @@ namespace libdar
 
 	    /// closes all filedescriptors and associated even when in sequential read mode
 
-	void drop_all_filedescriptors();
+	void drop_all_filedescriptors(bool repairing);
 
 	    /// change all inode as unsaved (equal to differential backup with no change met)
 	void set_to_unsaved_data_and_FSA() { if(cat == nullptr) throw SRC_BUG; cat->set_to_unsaved_data_and_FSA(); };
@@ -382,7 +383,7 @@ namespace libdar
 	bool only_contains_an_isolated_catalogue() const; ///< true if the current archive only contains an isolated catalogue
 	void check_against_isolation(bool lax) const; ///< throw Erange exception if the archive only contains an isolated catalogue
 	const cat_directory *get_dir_object(const std::string & dir) const;
-	void load_catalogue();
+	void load_catalogue(bool repairing);
     };
 
 } // end of namespace

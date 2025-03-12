@@ -1495,6 +1495,7 @@ namespace libdar
     }
 
     statistics archive::i_archive::op_test(const archive_options_test & options,
+					   bool repairing,
 					   statistics * progressive_report)
     {
         statistics st = false;  // false => no lock for this internal object
@@ -1549,6 +1550,7 @@ namespace libdar
 				    options.get_display_treated_only_dir(),
 				    options.get_display_skipped(),
 				    options.get_empty(),
+				    repairing,
 				    *st_ptr);
 		}
 		catch(Erange & e)
@@ -1745,7 +1747,7 @@ namespace libdar
 	sauv_path_t.reset();
     }
 
-    void archive::i_archive::load_catalogue()
+    void archive::i_archive::load_catalogue(bool repairing)
     {
 	if(exploitable && sequential_read) // the catalogue is not even yet read, so we must first read it entirely
 	{
@@ -1764,7 +1766,9 @@ namespace libdar
 		    // here we have a plain archive, doing the test operation
 		    // is the simplest way to read the whole archive and thus get its contents
 		    // (i.e.: the catalogue)
-		(void)op_test(archive_options_test(), nullptr);
+		(void)op_test(archive_options_test(),
+			      repairing,
+			      nullptr);
 	}
     }
 
@@ -1784,7 +1788,7 @@ namespace libdar
 	if(cat != nullptr && cat->get_early_memory_release())
 	    throw Erange("i_archive::load_catalogue", gettext("get_children_of is not possible on a catalogue set with early memory release"));
 
-	load_catalogue();
+	load_catalogue(false);
 	    // OK, now that we have the whole catalogue available in memory, let's rock!
 
 	vector<list_entry> tmp = get_children_in_table(dir,fetch_ea);
@@ -1821,7 +1825,7 @@ namespace libdar
 	if(cat != nullptr && cat->get_early_memory_release())
 	    throw Erange("i_archive::load_catalogue", gettext("get_children_in_table is not possible on a catalogue set with early memory release"));
 
-	me->load_catalogue();
+	me->load_catalogue(false);
 
 	const cat_directory* parent = get_dir_object(dir);
 	const cat_nomme* tmp_ptr = nullptr;
@@ -1921,7 +1925,7 @@ namespace libdar
 	return *cat;
     }
 
-    void archive::i_archive::drop_all_filedescriptors()
+    void archive::i_archive::drop_all_filedescriptors(bool repairing)
     {
 	if(exploitable && sequential_read)
 	{
@@ -1934,7 +1938,7 @@ namespace libdar
 		cat->reset_read();
 	    }
 	    else
-		(void)op_test(archive_options_test(), nullptr);
+		(void)op_test(archive_options_test(), repairing, nullptr);
 	}
 
 	stack.clear();

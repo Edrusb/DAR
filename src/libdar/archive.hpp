@@ -326,7 +326,7 @@ namespace libdar
 
 	    /// \note once this method has been called, the archive object can only be used
 	    /// as reference for a differential archive.
-	void drop_all_filedescriptors();
+	void drop_all_filedescriptors(bool repairing = false);
 
 	    /// change all inode as unsaved (equal to differential backup with no change met)
 	void set_to_unsaved_data_and_FSA();

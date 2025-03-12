@@ -1407,6 +1407,7 @@ namespace libdar
 		     bool display_treated_only_dir,
 		     bool display_skipped,
 		     bool empty,
+		     bool repairing,
                      statistics & st)
     {
         const cat_entree *e;
@@ -1434,249 +1435,260 @@ namespace libdar
         st.clear();
 	cat.set_all_mirage_s_inode_wrote_field_to(false);
         cat.reset_read();
-        while(cat.read(e))
-        {
-	    const cat_file *e_file = dynamic_cast<const cat_file *>(e);
-	    const cat_inode *e_ino = dynamic_cast<const cat_inode *>(e);
-	    const cat_directory *e_dir = dynamic_cast<const cat_directory *>(e);
-	    const cat_nomme *e_nom = dynamic_cast<const cat_nomme *>(e);
-	    const cat_mirage *e_mir = dynamic_cast<const cat_mirage *>(e);
-
-            juillet.enfile(e);
-	    thr_cancel.check_self_cancellation();
-	    if(display_treated_only_dir)
+	try
+	{
+	    while(cat.read(e))
 	    {
-		if(e_dir != nullptr)
-		    dialog->message(string(gettext("Inspecting directory ")) + juillet.get_string());
-	    }
+		const cat_file *e_file = dynamic_cast<const cat_file *>(e);
+		const cat_inode *e_ino = dynamic_cast<const cat_inode *>(e);
+		const cat_directory *e_dir = dynamic_cast<const cat_directory *>(e);
+		const cat_nomme *e_nom = dynamic_cast<const cat_nomme *>(e);
+		const cat_mirage *e_mir = dynamic_cast<const cat_mirage *>(e);
 
-	    perimeter = "";
-            try
-            {
-		if(e_mir != nullptr)
+		juillet.enfile(e);
+		thr_cancel.check_self_cancellation();
+		if(display_treated_only_dir)
 		{
-		    if(!e_mir->is_inode_wrote())
-		    {
-			e_file = dynamic_cast<const cat_file *>(e_mir->get_inode());
-			e_ino = e_mir->get_inode();
-		    }
+		    if(e_dir != nullptr)
+			dialog->message(string(gettext("Inspecting directory ")) + juillet.get_string());
 		}
 
-                if(e_nom != nullptr)
-                {
-                    if(subtree.is_covered(juillet.get_path()) && (e_dir != nullptr || filtre.is_covered(e_nom->get_name())))
-                    {
-                            // checking data file if any
-
-                        if(e_file != nullptr &&
-			   (e_file->get_saved_status() == saved_status::saved
-			    || e_file->get_saved_status() == saved_status::delta))
-                        {
-			    perimeter = gettext("Data");
-			    if(!empty)
-			    {
-				bool dirty_file;
-
-				do
-				{
-				    generic_file *dat = e_file->get_data(cat_file::normal, nullptr, 0, nullptr);
-				    if(dat == nullptr)
-					throw Erange("filtre_test", gettext("Can't read saved data."));
-
-				    dirty_file = false;
-
-				    try
-				    {
-					infinint crc_size;
-					crc *check = nullptr;
-					const crc *original = nullptr;
-
-					if(!e_file->get_crc_size(crc_size))
-					    crc_size = tools_file_size_to_crc_size(e_file->get_size());
-
-					dat->skip(0);
-					    // in sequential read mode, storage_size is zero
-					    // which leads to ask an endless read_ahead (up to eof)
-					    // thus the read_ahaead will be bounded by the escape
-					    // layer up to the next tape mark, as expected
-					dat->read_ahead(e_file->get_storage_size());
-					try
-					{
-					    dat->copy_to(black_hole, crc_size, check);
-					}
-					catch(...)
-					{
-						// in sequential read mode we must
-						// try to read the CRC for the object
-						// be completed and not generating an
-						// error due to absence of CRC later on
-					    e_file->get_crc(original);
-					    throw;
-					}
-					if(check == nullptr)
-					    throw SRC_BUG;
-
-					try
-					{
-						// due to possible sequential reading mode, the CRC
-						// must not be fetched before the data has been copied
-					    if(e_file->get_crc(original))
-					    {
-						if(original == nullptr)
-						    throw SRC_BUG;
-						if(typeid(*check) != typeid(*original))
-						    throw SRC_BUG;
-						if(*check != *original)
-						    throw Erange("fitre_test", gettext("CRC error: data corruption."));
-					    }
-					}
-					catch(...)
-					{
-					    delete check;
-					    throw;
-					}
-					delete check;
-				    }
-				    catch(...)
-				    {
-					delete dat;
-					throw;
-				    }
-				    delete dat;
-
-				    if(cat.get_escape_layer() != nullptr
-				       && cat.get_escape_layer()->skip_to_next_mark(escape::seqt_changed, false))
-				    {
-					dirty_file = true;
-					cat_file *modif_e_file = const_cast<cat_file *>(e_file);
-					if(modif_e_file == nullptr)
-					    throw SRC_BUG;
-					modif_e_file->drop_crc();
-					modif_e_file->set_storage_size(0);
-					modif_e_file->set_offset(cat.get_escape_layer()->get_position());
-				    }
-				}
-				while(dirty_file);
-			    }
-                        }
-
-
-			    // checking delta signature if any
-
-			if(e_file != nullptr && e_file->has_delta_signature_structure())
+		perimeter = "";
+		try
+		{
+		    if(e_mir != nullptr)
+		    {
+			if(!e_mir->is_inode_wrote())
 			{
-			    try
-			    {
-				    // reading the delta signature
-
-				e_file->read_delta_signature(delta_sig, sig_block_len);
-				if(delta_sig)
-				    delta_sig.reset();
-
-				if(perimeter == "")
-				    perimeter = "Delta sig";
-				else
-				    perimeter += " + Delta sig";
-			    }
-			    catch(...)
-			    {
-				e_file->drop_delta_signature_data();
-				throw;
-			    }
-			    e_file->drop_delta_signature_data();
+			    e_file = dynamic_cast<const cat_file *>(e_mir->get_inode());
+			    e_ino = e_mir->get_inode();
 			}
-
-
-			    // checking inode EA if any
-
-			if(e_ino != nullptr && e_ino->ea_get_saved_status() == ea_saved_status::full && !cat.read_second_time_dir())
-			{
-			    if(perimeter == "")
-				perimeter = "EA";
-			    else
-				perimeter += " + EA";
-			    if(!empty)
-			    {
-				ea_attributs tmp = *(e_ino->get_ea());
-				perimeter += "(" + deci(tmp.size()).human() +")";
-				e_ino->ea_detach();
-			    }
-			}
-
-			    // checking FSA if any
-			if(e_ino != nullptr && e_ino->fsa_get_saved_status() == fsa_saved_status::full && !cat.read_second_time_dir())
-			{
-			    if(perimeter == "")
-				perimeter = "FSA";
-			    else
-				perimeter += " + FSA";
-			    if(!empty)
-			    {
-				const filesystem_specific_attribute_list *tmp = e_ino->get_fsa();
-				if(tmp == nullptr)
-				    throw SRC_BUG;
-				perimeter += "(" + deci(tmp->size()).human() + ")";
-				e_ino->fsa_detach();
-			    }
-			}
-
-			if(e_dir == nullptr || !cat.read_second_time_dir())
-			    st.incr_treated();
-
-			if(e_mir != nullptr)
-			    e_mir->set_inode_wrote(true);
-
-			    // still no exception raised, this all is fine
-			if(display_treated)
-			    dialog->message(string(gettext("OK  ")) + juillet.get_string() + "  " + perimeter);
 		    }
-                    else // excluded by filter
-                    {
-			if(display_skipped)
-			    dialog->message(string(gettext(SKIPPED)) + juillet.get_string());
 
-                        if(e_dir != nullptr)
-                        {
-                            juillet.enfile(&tmp_eod);
-                            cat.skip_read_to_parent_dir();
-                        }
-			if(e_dir == nullptr || !cat.read_second_time_dir())
-			    st.incr_skipped();
-                    }
-                }
+		    if(e_nom != nullptr)
+		    {
+			if(subtree.is_covered(juillet.get_path()) && (e_dir != nullptr || filtre.is_covered(e_nom->get_name())))
+			{
+				// checking data file if any
+
+			    if(e_file != nullptr &&
+			       (e_file->get_saved_status() == saved_status::saved
+				|| e_file->get_saved_status() == saved_status::delta))
+			    {
+				perimeter = gettext("Data");
+				if(!empty)
+				{
+				    bool dirty_file;
+
+				    do
+				    {
+					generic_file *dat = e_file->get_data(cat_file::normal, nullptr, 0, nullptr);
+					if(dat == nullptr)
+					    throw Erange("filtre_test", gettext("Can't read saved data."));
+
+					dirty_file = false;
+
+					try
+					{
+					    infinint crc_size;
+					    crc *check = nullptr;
+					    const crc *original = nullptr;
+
+					    if(!e_file->get_crc_size(crc_size))
+						crc_size = tools_file_size_to_crc_size(e_file->get_size());
+
+					    dat->skip(0);
+						// in sequential read mode, storage_size is zero
+						// which leads to ask an endless read_ahead (up to eof)
+						// thus the read_ahaead will be bounded by the escape
+						// layer up to the next tape mark, as expected
+					    dat->read_ahead(e_file->get_storage_size());
+					    try
+					    {
+						dat->copy_to(black_hole, crc_size, check);
+					    }
+					    catch(...)
+					    {
+						    // in sequential read mode we must
+						    // try to read the CRC for the object
+						    // be completed and not generating an
+						    // error due to absence of CRC later on
+						e_file->get_crc(original);
+						throw;
+					    }
+					    if(check == nullptr)
+						throw SRC_BUG;
+
+					    try
+					    {
+						    // due to possible sequential reading mode, the CRC
+						    // must not be fetched before the data has been copied
+						if(e_file->get_crc(original))
+						{
+						    if(original == nullptr)
+							throw SRC_BUG;
+						    if(typeid(*check) != typeid(*original))
+							throw SRC_BUG;
+						    if(*check != *original)
+							throw Erange("fitre_test", gettext("CRC error: data corruption."));
+						}
+					    }
+					    catch(...)
+					    {
+						delete check;
+						throw;
+					    }
+					    delete check;
+					}
+					catch(...)
+					{
+					    delete dat;
+					    throw;
+					}
+					delete dat;
+
+					if(cat.get_escape_layer() != nullptr
+					   && cat.get_escape_layer()->skip_to_next_mark(escape::seqt_changed, false))
+					{
+					    dirty_file = true;
+					    cat_file *modif_e_file = const_cast<cat_file *>(e_file);
+					    if(modif_e_file == nullptr)
+						throw SRC_BUG;
+					    modif_e_file->drop_crc();
+					    modif_e_file->set_storage_size(0);
+					    modif_e_file->set_offset(cat.get_escape_layer()->get_position());
+					}
+				    }
+				    while(dirty_file);
+				}
+			    }
+
+
+				// checking delta signature if any
+
+			    if(e_file != nullptr && e_file->has_delta_signature_structure())
+			    {
+				try
+				{
+					// reading the delta signature
+
+				    e_file->read_delta_signature(delta_sig, sig_block_len);
+				    if(delta_sig)
+					delta_sig.reset();
+
+				    if(perimeter == "")
+					perimeter = "Delta sig";
+				    else
+					perimeter += " + Delta sig";
+				}
+				catch(...)
+				{
+				    e_file->drop_delta_signature_data();
+				    throw;
+				}
+				e_file->drop_delta_signature_data();
+			    }
+
+
+				// checking inode EA if any
+
+			    if(e_ino != nullptr && e_ino->ea_get_saved_status() == ea_saved_status::full && !cat.read_second_time_dir())
+			    {
+				if(perimeter == "")
+				    perimeter = "EA";
+				else
+				    perimeter += " + EA";
+				if(!empty)
+				{
+				    ea_attributs tmp = *(e_ino->get_ea());
+				    perimeter += "(" + deci(tmp.size()).human() +")";
+				    e_ino->ea_detach();
+				}
+			    }
+
+				// checking FSA if any
+			    if(e_ino != nullptr && e_ino->fsa_get_saved_status() == fsa_saved_status::full && !cat.read_second_time_dir())
+			    {
+				if(perimeter == "")
+				    perimeter = "FSA";
+				else
+				    perimeter += " + FSA";
+				if(!empty)
+				{
+				    const filesystem_specific_attribute_list *tmp = e_ino->get_fsa();
+				    if(tmp == nullptr)
+					throw SRC_BUG;
+				    perimeter += "(" + deci(tmp->size()).human() + ")";
+				    e_ino->fsa_detach();
+				}
+			    }
+
+			    if(e_dir == nullptr || !cat.read_second_time_dir())
+				st.incr_treated();
+
+			    if(e_mir != nullptr)
+				e_mir->set_inode_wrote(true);
+
+				// still no exception raised, this all is fine
+			    if(display_treated)
+				dialog->message(string(gettext("OK  ")) + juillet.get_string() + "  " + perimeter);
+			}
+			else // excluded by filter
+			{
+			    if(display_skipped)
+				dialog->message(string(gettext(SKIPPED)) + juillet.get_string());
+
+			    if(e_dir != nullptr)
+			    {
+				juillet.enfile(&tmp_eod);
+				cat.skip_read_to_parent_dir();
+			    }
+			    if(e_dir == nullptr || !cat.read_second_time_dir())
+				st.incr_skipped();
+			}
+		    }
+		}
+		catch(Ebug & e)
+		{
+		    throw;
+		}
+		catch(Escript & e)
+		{
+		    throw;
+		}
+		catch(Ethread_cancel & e)
+		{
+		    throw;
+		}
+		catch(Egeneric & e)
+		{
+		    Euser_abort *eabort = dynamic_cast<Euser_abort*>(&e);
+
+		    if(eabort != nullptr && ! repairing)
+			throw;
+
+		    dialog->message(string(gettext("ERR ")) + juillet.get_string() + " : " + e.get_message());
+		    if(e_dir == nullptr || !cat.read_second_time_dir())
+			st.incr_errored();
+			// last read inode may have failed reading EA and FSA due to data missing
+			// we completely remove it from the catalog as this part of the code is used
+			// also for archive isolation (in sequential read mode) and here better
+			// drop the inode for it can be resaved later, while for test operation this
+			// has no impact at all.
+		    catalogue* ncat = const_cast<catalogue*>(&cat);
+		    if(ncat == nullptr)
+			throw SRC_BUG;
+		    ncat->remove_last_read();
+		}
 	    }
-            catch(Euser_abort & e)
-            {
-                throw;
-            }
-            catch(Ebug & e)
-            {
-                throw;
-            }
-            catch(Escript & e)
-            {
-                throw;
-            }
-	    catch(Ethread_cancel & e)
-	    {
+	}
+	catch(Egeneric & e)
+	{
+	    Euser_abort *eabort = dynamic_cast<Euser_abort*>(&e);
+
+	    if(eabort != nullptr && ! repairing)
 		throw;
-	    }
-            catch(Egeneric & e)
-            {
-                dialog->message(string(gettext("ERR ")) + juillet.get_string() + " : " + e.get_message());
-		if(e_dir == nullptr || !cat.read_second_time_dir())
-		    st.incr_errored();
-		    // last read inode may have failed reading EA and FSA due to data missing
-		    // we completely remove it from the catalog as this part of the code is used
-		    // also for archive isolation (in sequential read mode) and here better
-		    // drop the inode for it can be resaved later, while for test operation this
-		    // has no impact at all.
-		catalogue* ncat = const_cast<catalogue*>(&cat);
-		if(ncat == nullptr)
-		    throw SRC_BUG;
-		ncat->remove_last_read();
-            }
-        }
+	}
     }
 
     void filtre_merge(const shared_ptr<user_interaction> & dialog,

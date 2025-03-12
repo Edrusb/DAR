@@ -141,6 +141,7 @@ namespace libdar
 			    bool display_treated_only_dir,
 			    bool display_skipped,
 			    bool empty,
+			    bool repairing,
                             statistics & st);
 
     extern void filtre_merge(const std::shared_ptr<user_interaction> & dialog,
