@@ -95,7 +95,7 @@ namespace libdar
 	const cat_directory & get_current_reading_dir() const { if(current_read == nullptr) throw SRC_BUG; return *current_read; };
 	    // remove from the catalogue all the entries that have not yet been read
 	    // by read().
-	virtual void tail_catalogue_to_current_read();
+	virtual void tail_catalogue_to_current_read(bool including_last_read);
 
 
         void reset_sub_read(const path &sub); // initialise sub_read to the given directory

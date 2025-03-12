@@ -352,11 +352,11 @@ namespace libdar
 	current_read->remove(name);
     }
 
-    void catalogue::tail_catalogue_to_current_read()
+    void catalogue::tail_catalogue_to_current_read(bool including_last_read)
     {
 	while(current_read != nullptr)
 	{
-	    current_read->tail_to_read_children();
+	    including_last_read = ! current_read->tail_to_read_children(including_last_read);
 	    current_read = current_read->get_parent();
 	}
 

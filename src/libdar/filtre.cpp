@@ -2906,7 +2906,7 @@ namespace libdar
 		throw;
 
 	    if(!repair_mode)
-		cat.tail_catalogue_to_current_read();
+		cat.tail_catalogue_to_current_read(false);
 
 	    cat.change_location(pdesc);
 	    if(pdesc.compr->is_compression_suspended())
