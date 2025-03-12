@@ -432,11 +432,22 @@ namespace libdar
     }
 
 
-    void cat_directory::tail_to_read_children()
+    bool cat_directory::tail_to_read_children(bool including_last_read)
     {
+	bool found_last_read = true;
+	std::deque<cat_nomme*>::const_iterator drop_start = it;
+
+	if(including_last_read)
+	{
+	    if(drop_start == ordered_fils.begin())
+		found_last_read = false;
+	    else
+		drop_start -= 1;
+	}
+
 #ifdef LIBDAR_FAST_DIR
 	map<string, cat_nomme *>::iterator dest;
-	deque<cat_nomme *>::const_iterator ordered_dest = it;
+	deque<cat_nomme *>::const_iterator ordered_dest = drop_start;
 
 	while(ordered_dest != ordered_fils.end())
 	{
@@ -452,12 +463,13 @@ namespace libdar
 	    }
 	    catch(...)
 	    {
-		erase_ordered_fils(it, ordered_dest);
+		erase_ordered_fils(drop_start, ordered_dest);
 		it = ordered_fils.end();
 		throw;
 	    }
 	}
 #endif
+
 	for(it = drop_start; it != ordered_fils.end(); ++it)
 	{
 	    if(*it != nullptr)
@@ -472,6 +484,8 @@ namespace libdar
 	erase_ordered_fils(drop_start, ordered_fils.end());
 	it = ordered_fils.end();
 	recursive_flag_size_to_update();
+
+	return found_last_read;
     }
 
     void cat_directory::remove(const string & name)

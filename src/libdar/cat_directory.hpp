@@ -83,8 +83,12 @@ namespace libdar
         void reset_read_children() const;
 	void end_read() const;
         bool read_children(const cat_nomme * &r) const; // read the direct children of the cat_directory, returns false if no more is available
-	    // remove all entry not yet read by read_children
-	void tail_to_read_children();
+
+	    /// remove all entry not yet read by read_children
+
+	    /// \param[in] including_last_read if true also delete the last object return by read in addition to the one not yet read()
+	    /// \return returns true except when including_last_read was true and the current reading object could not be deleted (because the directory was empty)
+	bool tail_to_read_children(bool including_last_read);
 
 
 	    /// remove the given entry from the catalogue
