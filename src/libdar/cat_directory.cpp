@@ -458,7 +458,18 @@ namespace libdar
 	    }
 	}
 #endif
-	erase_ordered_fils(it, ordered_fils.end());
+	for(it = drop_start; it != ordered_fils.end(); ++it)
+	{
+	    if(*it != nullptr)
+	    {
+		delete *it;
+		cat_nomme** tmp = const_cast<cat_nomme**>(&(*it));
+		*tmp = nullptr;
+		if(*it != nullptr)
+		    throw SRC_BUG;
+	    }
+	}
+	erase_ordered_fils(drop_start, ordered_fils.end());
 	it = ordered_fils.end();
 	recursive_flag_size_to_update();
     }
@@ -593,6 +604,20 @@ namespace libdar
 #ifdef LIBDAR_FAST_DIR
 	fils.clear();
 #endif
+	it = ordered_fils.begin();
+	while(it != ordered_fils.end())
+	{
+	    if(*it != nullptr)
+	    {
+		delete *it;
+		cat_nomme** tmp = const_cast<cat_nomme**>(&(*it));
+		*tmp = nullptr;
+		if(*it != nullptr)
+		    throw SRC_BUG;
+	    }
+	    ++it;
+	}
+
 	erase_ordered_fils(ordered_fils.begin(), ordered_fils.end());
 	ordered_fils.clear();
 	it = ordered_fils.begin();
