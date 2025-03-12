@@ -431,6 +431,35 @@ namespace libdar
 	ordered_fils.erase(debut, fin);
     }
 
+    bool cat_directory::remove_last_read()
+    {
+	if(it != ordered_fils.begin())
+	{
+	    it -= 1;
+
+	    if(*it != nullptr)
+	    {
+#ifdef LIBDAR_FAST_DIR
+		string name = (*it)->get_name();
+		map<string, cat_nomme*>::iterator fit = fils.find(name);
+		if(fit == fils.end())
+		    throw SRC_BUG;
+		fils.erase(fit);
+#endif
+		delete *it;
+		cat_nomme** tmp = const_cast<cat_nomme**>(&(*it));
+		*tmp = nullptr;
+		if(*it != nullptr)
+		    throw SRC_BUG;
+	    }
+
+		ordered_fils.erase(it);
+	    it = ordered_fils.end();
+	    return true;
+	}
+	else
+	    return false;
+    }
 
     bool cat_directory::tail_to_read_children(bool including_last_read)
     {
