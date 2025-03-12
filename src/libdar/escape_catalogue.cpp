@@ -791,8 +791,8 @@ namespace libdar
 
     void escape_catalogue::tail_catalogue_to_current_read()
     {
-	reset_reading_process();
 	catalogue::tail_catalogue_to_current_read();
+	reset_reading_process();
     }
 
     void escape_catalogue::set_in_place(const path & arg)
