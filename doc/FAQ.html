@@ -90,6 +90,8 @@
 	<a href="#full-from-diff">I have a diff/incremental backup and I want to convert it to a full backup, how to do that?</a><br/>
 	<a href="#tapes">How to use dar with tapes (like LTO tapes)?</a><br/>
 	<a href="#Smallfiles">Why dar does not compress small files toghether for better compression ratio?</a><br/>
+	<a href="#truncated">What to do when a backup was interrupted?</a><br/>
+
       </div>
     </div>
 
@@ -3653,6 +3655,113 @@
 	  </p>
 	  </p>
 	</li>
-      </ol>
-    </div> </body>
+</ol>
+
+<a name="truncated"><b>What to do when a backup was interrupted?</b></a><br/>
+
+<p>
+  There are different results of a backup interruption: If this was by mean of CTRL-C or
+  by a OS shutdown, there is a lot of chances dar could have the time to properly close the archive,
+  so you obtain a well structured dar backup or archive, ready for use.
+  It can then be used as reference for a differential backup to continue the backup process, and you
+  don't need to through away the interrupted archive, which saves you the time spent to get so far.
+  <br/>
+  But what if the interruption occured due to a <b>power outage</b> or <b>lack of disk space</b>?
+  This is what we will have a look at here.
+</p>
+
+<p>
+  In such condition you get a truncated archive: it is missing the table of content at its end: the so called "catalogue" (= catalog).
+  Unless you have used the <code>-at</code> option <u>which is not recommended</u> as it removes metadata redundancy in the archive, you should not have
+  to through away and restart from scratch your backup, as we can use this redundancy to rebuild the "catalogue".
+</p>
+
+<p>
+  But first just reminding you that, thanks to this metadata redundancy, the truncated archive is still usable, using the <code>--sequential-read</code> option.
+  You can thus still list its content, restore data, and so on. But of course, don't be alarmed: you will get an error at the end of
+  the operation as dar will look for a catalogue "tape mark" at the end of this operation, mark that has not been written to the archive.
+</p>
+
+<code class=block>
+  dar -t some/other/path/truncated --sequential-read [other options...]
+
+  dar -x some/other/path/truncated --sequential-read -R /where/to/restore [other options...]
+
+</code>
+
+<p>
+  ... but doing that way is slow as dar reads sequentially the whole backup (like what tar does on tar archives).
+  Dar cannot jump directly to the files to restore as it miss the "catalogue". Hopefully such truncated archive/backup is also repairable.
+  Repairing the backup is done this way:
+</p>
+
+<code class=block>
+  dar --add-missing-catalogue some/path/repaired -A some/other/path/truncated [other options...]
+
+  # and as always: test your backup!!!
+  dar -t some/path/repaired
+
+  # now, your can are free to remove the old truncated backup... it is no more needed
+  rm some/other/path/truncated.*.dar
+
+</code>
+
+<p>
+  The repairing process does not touch the truncated archive, but creates a new "repaired" backup. If you used slicing and want to keep
+  that for the repaired backup, the 'other options' should specify it (with -s and -S options). Same thing if you want encryption.
+  Compression is kept the same so there and there is no available option to change it at repairing time.
+</p>
+
+<p>
+  Ok the drawback is that it leads you to copy possibly a lot of data.
+</p>
+
+</p>
+<b>As an alternative</b> to the archive repairing, an isolated catalogue can be created from the truncated backup:
+</p>
+
+<code class=block>
+  dar -C some/path/isolated_cat -A some/other/path/truncated --alter=repair [other options...]
+
+</code>
+
+<p>
+  Here the 'other options' are usually compression, eventually encryption. Slicing is also possible but
+  as an isolated catalogue is usually small this is rarely used in that context. The <code>--alter=repair</code>
+  (or its short version <code>-arep</code>) is mandatory here for the isolation to succeed, as the source
+  archive is truncated which would lead the operation to fail.
+  Once this is done you can now test, compare, extract the backup with the assistance
+  of this isolated catalogue:
+</p>
+
+<code class=block>
+  dar -t some/other/path/truncated -A some/path/isolated_cat -affs [other options...]
+  dar -d some/other/path/truncated -A some/path/isolated_cat -affs -R /path/to/compare/to [other options...]
+  dar -x some/other/path/truncated -A some/path/isolated_cat -affs -R /path/where/to/restore [other options...]
+
+</code>
+
+<p>
+  Here the <code>-affs</code> option (which long version is <code>--alter=force-first-slice</code> is necessary
+  for dar not try to read the archive format version at the end of the truncated backup, but at the beginning where a copy
+  has been dropped. Then dar reads the table of content (the "catalogue") from the <code>isolated_cat</code>
+  so you can now have very quick operations when in concerns only a few files spread along the backup/archive.
+</p>
+
+<p>
+  Of course if you want to list the backup content or use this backup as reference for a differential backup
+  you only need the isolated catalog:
+
+</p>
+
+<code class=block>
+  dar -l some/path/isolated_cat [other options...]
+
+  dar -c some/new/backup -A some/path/isolated_cat -R /path/to/backup [other options...]
+
+</code>
+
+
+</div>
+</body>
 </html>
