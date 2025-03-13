@@ -789,10 +789,10 @@ namespace libdar
 	return catalogue::read_if_present(name, ref);
     }
 
-    void escape_catalogue::tail_catalogue_to_current_read()
+    void escape_catalogue::tail_catalogue_to_current_read(bool including_last_read)
     {
+	catalogue::tail_catalogue_to_current_read(including_last_read);
 	reset_reading_process();
-	catalogue::tail_catalogue_to_current_read();
     }
 
     void escape_catalogue::set_in_place(const path & arg)

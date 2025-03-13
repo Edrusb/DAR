@@ -239,8 +239,16 @@ namespace libdar
 	    throw SRC_BUG;
 
         reset_crc(crc_size);
-        copy_to(ref);
-        value = get_crc();
+	try
+	{
+	    copy_to(ref);
+	}
+	catch(...)
+	{
+	    value = get_crc();
+	    throw;
+	}
+	value = get_crc();
     }
 
     U_32 generic_file::copy_to(generic_file & ref, U_32 size)
