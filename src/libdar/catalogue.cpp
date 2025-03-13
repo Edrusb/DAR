@@ -380,6 +380,7 @@ namespace libdar
 	current_read->remove(name);
     }
 
+
     void catalogue::remove_last_read()
     {
 	if(current_read == nullptr)

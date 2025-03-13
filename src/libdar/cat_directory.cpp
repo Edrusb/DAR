@@ -498,6 +498,7 @@ namespace libdar
 	    }
 	}
 #endif
+
 	for(it = drop_start; it != ordered_fils.end(); ++it)
 	{
 	    if(*it != nullptr)
