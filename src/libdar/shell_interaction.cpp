@@ -203,6 +203,8 @@ namespace libdar
 	interaction = ref.interaction;
 	initial_noecho = ref.initial_noecho;
 	has_terminal = ref.has_terminal;
+	at_once = ref.at_once;
+	count = ref.count;
     }
 
 
@@ -428,7 +430,6 @@ namespace libdar
 	{
 	    sigset_t old_mask;
 	    S_I tmp_ret, errno_bk, tmp_sup, errno_sup;
-
 
 	    do
 	    {
