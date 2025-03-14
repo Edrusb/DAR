@@ -593,6 +593,8 @@ namespace libdar
 
             try
             {
+		struct sigaction sigact;
+
                 tube = new (nothrow) tuyau(dialog);
                 if(tube == nullptr)
                     throw Ememory("tools_system_with_pipe");
@@ -602,7 +604,8 @@ namespace libdar
                 S_I status;
 
                 argv[2] = read_fd.c_str();
-                signal(SIGCHLD, &abort_on_deadson); // do not accept child death
+		sigact.sa_handler = &abort_on_deadson;
+		sigaction(SIGCHLD, &sigact, nullptr); // do not accept child death
 
                 loop = false;
                 S_I pid = fork();

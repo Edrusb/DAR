@@ -72,15 +72,26 @@ static void general_report(const std::string & msg);
 void dar_suite_reset_signal_handler()
 {
 #if HAVE_SIGNAL_H
-    signal(SIGTERM, &signal_abort_delayed);
-    signal(SIGINT, &signal_abort_delayed);
-    signal(SIGQUIT, &signal_abort_delayed);
-    signal(SIGHUP, &signal_abort_delayed);
-    signal(SIGUSR1, &signal_abort_delayed);
-    signal(SIGUSR2, &signal_abort_now);
+    struct sigaction sigact;
+
+    sigact.sa_handler = &signal_abort_delayed;
+    sigact.sa_mask = 0;
+    sigact.sa_flags = SA_RESTART;
+
+    sigaction(SIGTERM, &sigact, nullptr);
+    sigaction(SIGINT, &sigact, nullptr);
+    sigaction(SIGQUIT, &sigact, nullptr);
+    sigaction(SIGHUP, &sigact, nullptr);
+    sigaction(SIGUSR1, &sigact, nullptr);
+
+    sigact.sa_handler = &signal_abort_now;
+    sigaction(SIGUSR2, &sigact, nullptr);
+
 #if GPGME_SUPPORT
 	// for GPGME:
-    signal(SIGPIPE, SIG_IGN);
+    sigact.sa_handler = SIG_IGN;
+    sigact.sa_flags = 0;
+    sigaction(SIGPIPE, &sigact, nullptr);
 #endif
 #endif
 }
@@ -300,6 +311,12 @@ static void signal_abort_now(int l)
 
 static void signals_abort(int l, bool now)
 {
+#if HAVE_SIGNAL_H
+    struct sigaction sigact;
+    sigact.sa_handler = SIG_DFL;
+    sigact.sa_flags = 0;
+#endif
+
     general_report(tools_printf(gettext("Received signal: %s"), strsignal(l)));
 
 #if MUTEX_WORKS
@@ -312,7 +329,7 @@ static void signals_abort(int l, bool now)
 	general_report(string(gettext("Archive delayed termination engaged")));
     }
 #if HAVE_SIGNAL_H
-    signal(l, SIG_DFL);
+    sigaction(l, &sigact, nullptr);
     general_report(string(gettext("Disabling signal handler, the next time this signal is received the program will abort immediately")));
 #endif
     cancel_thread(pthread_self(), now);
