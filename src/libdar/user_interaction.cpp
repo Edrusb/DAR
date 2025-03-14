@@ -79,14 +79,24 @@ namespace libdar
 {
     void user_interaction::pause(const string & message)
     {
+	static const char* errmsg = "user_interaction::inherited_pause should not throw an exception toward libdar";
+
 	bool ret = false;
 	try
 	{
 	    ret = inherited_pause(message);
 	}
+	catch(Ebug & e)
+	{
+	    throw;
+	}
+	catch(Egeneric & e)
+	{
+	    throw Elibcall("user_interaction::pause", tools_printf("%s : %s", errmsg, e.get_message().c_str()));
+	}
 	catch(...)
 	{
-	    throw Elibcall("user_interaction::pause", "user_interaction::inherited_pause should not throw an exception toward libdar");
+	    throw Elibcall("user_interaction::pause", errmsg);
 	}
 	if(!ret)
 	    throw Euser_abort(message);
@@ -94,37 +104,67 @@ namespace libdar
 
     void user_interaction::message(const string & message)
     {
+	static const char* errmsg = "user_interaction::inherited_warning should not throw an exception toward libdar";
+
 	try
 	{
 	    return inherited_message(message);
 	}
+	catch(Ebug & e)
+	{
+	    throw;
+	}
+	catch(Egeneric & e)
+	{
+	    throw Elibcall("user_interaction::warning", tools_printf("%s : %s", errmsg, e.get_message().c_str()));
+	}
 	catch(...)
 	{
-	    throw Elibcall("user_interaction::warning", "user_interaction::inherited_warning should not throw an exception toward libdar");
+	    throw Elibcall("user_interaction::warning", errmsg);
 	}
     }
 
     string user_interaction::get_string(const string & message, bool echo)
     {
+	static const char* errmsg = "user_interaction::inherited_get_string should not throw an exception toward libdar";
+
 	try
 	{
 	    return inherited_get_string(message, echo);
 	}
-	catch(...)
+	catch(Ebug & e)
 	{
-	    throw Elibcall("user_interaction::get_string", "user_interaction::inherited_get_string should not throw an exception toward libdar");
+	    throw;
+	}
+	catch(Egeneric & e)
+	{
+	    throw Elibcall("user_interaction::get_string", tools_printf("%s : %s", errmsg, e.get_message().c_str()));
+	}
+		catch(...)
+	{
+	    throw Elibcall("user_interaction::get_string", errmsg);
 	}
     }
 
     secu_string user_interaction::get_secu_string(const string & message, bool echo)
     {
+	static const char* errmsg = "user_interaction::inherited_get_secu_string should not throw an exception toward libdar";
+
 	try
 	{
 	    return inherited_get_secu_string(message, echo);
 	}
+	catch(Ebug & e)
+	{
+	    throw;
+	}
+	catch(Egeneric & e)
+	{
+	    throw Elibcall("user_interaction::get_secu_string", tools_printf("%s : %s", errmsg, e.get_message().c_str()));
+	}
 	catch(...)
 	{
-	    throw Elibcall("user_interaction::get_secu_string", "user_interaction::inherited_get_secu_string should not throw an exception toward libdar");
+	    throw Elibcall("user_interaction::get_secu_string", errmsg);
 	}
     }
 
