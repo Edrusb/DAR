@@ -451,7 +451,7 @@ namespace libdar
 
 		tools_blocking_read(input, false);
 		errno_sup = EAGAIN+1; // = something different from EAGAIN, whatever it is...
-		usleep(10000); // let a change for any other typed character to reach the input device
+		usleep(10000); // let a chance for any other typed character to reach the input device
 		tmp_sup = read(input, &b, 1);
 		errno_sup = errno;
 		tools_blocking_read(input, true);
