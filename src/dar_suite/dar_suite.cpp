@@ -75,7 +75,6 @@ void dar_suite_reset_signal_handler()
     struct sigaction sigact;
 
     sigact.sa_handler = &signal_abort_delayed;
-    sigact.sa_mask = 0;
     sigact.sa_flags = SA_RESTART;
 
     sigaction(SIGTERM, &sigact, nullptr);
