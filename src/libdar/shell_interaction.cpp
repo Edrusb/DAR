@@ -405,10 +405,20 @@ namespace libdar
 
     bool shell_interaction::inherited_pause(const string &message)
     {
+	    // static variable to not having recreate it and re-initialize it
+	    // at each time user interaction is in action
+	static deque<int> not_blocked;
+
 	char buffer[bufsize];
 	char & a = buffer[0];
 	char & b = buffer[1];
 	bool ret;
+
+	if(not_blocked.empty())
+	{
+	    not_blocked.push_back(SIGINT);
+	    not_blocked.push_back(SIGTERM);
+	}
 
 	if(!has_terminal)
 	    return false;
@@ -434,7 +444,7 @@ namespace libdar
 		    // now asking the user
 
 		*(inter) << message << gettext(" [return = YES | Esc = NO]") << (beep ? "\007\007\007" : "") << endl;
-		tools_block_all_signals(old_mask);
+		tools_block_all_signals_except(not_blocked, old_mask);
 		tmp_ret = read(input, &a, 1);
 		errno_bk = errno;
 
