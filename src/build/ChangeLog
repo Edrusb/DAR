@@ -3,6 +3,9 @@ from 2.7.16 to 2.7.17
   mechanism (-P/-g/-[/-] options).
 - added FAQ about HOME variable under Windows (John Slattery's feedback)
 - fixed bug where repairing failed with sliced backups
+- making exceptions thrown from shell_interaction class get their error
+  message passed and reported to the user.
+
 
 from 2.7.15 to 2.7.16
 - fixed mask building of path exclusion (dar's -P option) when used with
