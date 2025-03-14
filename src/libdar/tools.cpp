@@ -1273,7 +1273,9 @@ namespace libdar
     {
         sigset_t all;
 
-        sigfillset(&all);
+        if(sigfillset(&all) != 0)
+                throw Erange("tools_block_all_signals", string("sigfillset() failed: ") + tools_strerror_r(errno));
+
 #if HAVE_LIBPTHREAD
         if(pthread_sigmask(SIG_BLOCK, &all, &old_mask) != 0)
 #else
