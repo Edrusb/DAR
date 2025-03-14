@@ -461,9 +461,23 @@ namespace libdar
 
 		tools_set_back_blocked_signals(old_mask);
 		if(tmp_ret < 0)
+		{
 		    if(errno_bk != EINTR)
 			throw Erange("shell_interaction:interaction_pause", string(gettext("Error while reading user answer from terminal: ")) + strerror(errno_bk));
+		    else // a signal interrupted the read() system call
+		    {
+			    // emulating the answer of an escape char (= "NO" answer)
+
+			a = 27;
+			tmp_sup = 0;
+			errno_sup = EAGAIN+1;
+		    }
+		}
 	    }
+		// we are looping back if:
+		// - the char read is neither a 'carriage return' nor an 'escape' char
+		// - *or* the non-blocking read() of a second char did not return a positive value meaning there was zero or more char available on the input
+		// - *or* the non-blocking read() of this second char failed due to signal reception)
 	    while((a != 27 && a != '\n') || tmp_sup != -1 || errno_sup != EAGAIN);
 
 	    if(a != 27)
