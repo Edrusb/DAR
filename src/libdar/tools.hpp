@@ -375,6 +375,14 @@ namespace libdar
 	/// \exception Erange is thrown if system call failed for some reason
     extern void tools_block_all_signals(sigset_t &old_mask);
 
+	/// block all signals except those given in first argument
+
+	/// \param[in] non_blocked list of signals to exclude from the signals to block
+	/// \param[out] old_mask is set to the old mask value (for later unmasking signals)
+	/// \exception Erange is thrown if any system call failed for some reason
+    extern void tools_block_all_signals_except(const std::deque<int> & non_blocked, sigset_t &old_mask);
+
+
 	/// unblock signals according to given mask
 
 	/// \param[in] old_mask value to set to blocked signal mask

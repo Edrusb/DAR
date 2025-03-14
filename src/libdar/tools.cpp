@@ -1284,6 +1284,31 @@ namespace libdar
                 throw Erange("tools_block_all_signals", string(dar_gettext("Cannot block signals: "))+tools_strerror_r(errno));
     }
 
+    void tools_block_all_signals_except(const deque<int> & non_blocked, sigset_t &old_mask)
+    {
+        sigset_t all;
+	deque<int>::const_iterator it = non_blocked.begin();
+
+	if(sigfillset(&all) != 0)
+	    throw Erange("tools_block_all_signals_except", string("sigfillset() failed: ") + tools_strerror_r(errno));
+
+	while(it != non_blocked.end())
+	{
+	    if(sigdelset(&all, *it) != 0)
+		throw Erange("tools_block_all_signals_except", string("sigdelset() failed: ") + tools_strerror_r(errno));
+
+	    ++it;
+	}
+
+#if HAVE_LIBPTHREAD
+        if(pthread_sigmask(SIG_BLOCK, &all, &old_mask) != 0)
+#else
+            if(sigprocmask(SIG_BLOCK, &all, &old_mask) != 0)
+#endif
+                throw Erange("tools_block_all_signals_except", string(dar_gettext("Cannot block signals: "))+tools_strerror_r(errno));
+    }
+
+
     void tools_set_back_blocked_signals(sigset_t old_mask)
     {
 #if HAVE_LIBPTHREAD
