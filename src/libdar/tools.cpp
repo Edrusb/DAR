@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002-2024 Denis Corbin
+// Copyright (C) 2002-2025 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -1273,7 +1273,9 @@ namespace libdar
     {
         sigset_t all;
 
-        sigfillset(&all);
+        if(sigfillset(&all) != 0)
+                throw Erange("tools_block_all_signals", string("sigfillset() failed: ") + tools_strerror_r(errno));
+
 #if HAVE_LIBPTHREAD
         if(pthread_sigmask(SIG_BLOCK, &all, &old_mask) != 0)
 #else

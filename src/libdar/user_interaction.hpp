@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002-2024 Denis Corbin
+// Copyright (C) 2002-2025 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -61,7 +61,7 @@ namespace libdar
 	std::string get_string(const std::string & message, bool echo);
 	secu_string get_secu_string(const std::string & message, bool echo);
 
-	    /// libdar uses this call to format output before send to message() method.
+	    /// libdar uses this call to format output before sending to the message() method.
 
 	    /// This is not a virtual method, it has not to be overwritten, it is
 	    /// just a sublayer over warning()

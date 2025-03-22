@@ -1,6 +1,6 @@
 #######################################################################
 # dar - disk archive - a backup/restoration program
-# Copyright (C) 2002-2024 Denis Corbin
+# Copyright (C) 2002-2025 Denis Corbin
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -22,7 +22,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.69)
-AC_INIT([DAR], [2.7.16_no_last_slice], [[https://github.com/Edrusb/DAR/issues]])
+AC_INIT([DAR], [2.7.17_no_last_slice], [[https://github.com/Edrusb/DAR/issues]])
 AC_CONFIG_HEADERS([config.h])
 AC_LANG([C++])
 AC_CONFIG_SRCDIR([src/libdar/catalogue.cpp])

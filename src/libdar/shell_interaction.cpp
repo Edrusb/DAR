@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002-2024 Denis Corbin
+// Copyright (C) 2002-2025 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -203,6 +203,8 @@ namespace libdar
 	interaction = ref.interaction;
 	initial_noecho = ref.initial_noecho;
 	has_terminal = ref.has_terminal;
+	at_once = ref.at_once;
+	count = ref.count;
     }
 
 
@@ -429,7 +431,6 @@ namespace libdar
 	    sigset_t old_mask;
 	    S_I tmp_ret, errno_bk, tmp_sup, errno_sup;
 
-
 	    do
 	    {
 		    // flushing any character remaining in the input stream
@@ -450,7 +451,7 @@ namespace libdar
 
 		tools_blocking_read(input, false);
 		errno_sup = EAGAIN+1; // = something different from EAGAIN, whatever it is...
-		usleep(10000); // let a change for any other typed character to reach the input device
+		usleep(10000); // let a chance for any other typed character to reach the input device
 		tmp_sup = read(input, &b, 1);
 		errno_sup = errno;
 		tools_blocking_read(input, true);
