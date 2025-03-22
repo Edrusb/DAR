@@ -19,6 +19,22 @@
 // to contact the author, see the AUTHOR file
 /*********************************************************************/
 
+    // the following macro is for glibc < 2.19 in order
+    // be able to have signals leading system calls being
+    // interrupted with errno set to EINTR
+
+#ifndef _BSD_SOURCE
+#define _BSD_SOURCE 1
+#endif
+
+    // the following macro is for glibc >= 2.19 in order
+    // be able to have signals leading system calls being
+    // interrupted with errno set to EINTR
+
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE 1
+#endif
+
 #include "../my_config.h"
 
 extern "C"
@@ -75,8 +91,8 @@ void dar_suite_reset_signal_handler()
     struct sigaction sigact;
 
     sigact.sa_handler = &signal_abort_delayed;
-    sigact.sa_mask = 0;
-    sigact.sa_flags = SA_RESTART;
+    sigemptyset(&sigact.sa_mask);
+    sigact.sa_flags = 0;
 
     sigaction(SIGTERM, &sigact, nullptr);
     sigaction(SIGINT, &sigact, nullptr);
