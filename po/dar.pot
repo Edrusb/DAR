@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: dar 2.7.17.RC1\n"
+"Project-Id-Version: dar 2.7.17\n"
 "Report-Msgid-Bugs-To: https://github.com/Edrusb/DAR/issues\n"
-"POT-Creation-Date: 2025-02-13 12:07+0100\n"
+"POT-Creation-Date: 2025-03-22 10:32+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1260,7 +1260,7 @@ msgstr ""
 msgid "Auto detecting min-digits to be %i"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1568 src/libdar/tools.cpp:2117
+#: src/dar_suite/line_tools.cpp:1568 src/libdar/tools.cpp:2119
 msgid "Cannot get full path of current working directory: "
 msgstr ""
 
@@ -3496,158 +3496,158 @@ msgstr ""
 msgid "Adding Hard link to archive: "
 msgstr ""
 
-#: src/libdar/filtre.cpp:2902
+#: src/libdar/filtre.cpp:2903
 #, c-format
 msgid "error met while creating archive: %S"
 msgstr ""
 
-#: src/libdar/filtre.cpp:2970
+#: src/libdar/filtre.cpp:2980
 msgid "failed reading CRC from file: "
 msgstr ""
 
-#: src/libdar/filtre.cpp:2998
+#: src/libdar/filtre.cpp:3008
 msgid "Failed reading CRC for EA and FSA: "
 msgstr ""
 
-#: src/libdar/filtre.cpp:3009
+#: src/libdar/filtre.cpp:3019
 msgid "Error met while reading next entry: "
 msgstr ""
 
-#: src/libdar/filtre.cpp:3139
+#: src/libdar/filtre.cpp:3149
 #, c-format
 msgid "Adding only inode metadata to archive: %S"
 msgstr ""
 
-#: src/libdar/filtre.cpp:3151
+#: src/libdar/filtre.cpp:3161
 msgid "Resaving file without compression: "
 msgstr ""
 
-#: src/libdar/filtre.cpp:3155
+#: src/libdar/filtre.cpp:3165
 msgid "Delta saving file to archive: "
 msgstr ""
 
-#: src/libdar/filtre.cpp:3159
+#: src/libdar/filtre.cpp:3169
 #, c-format
 msgid "Adding %S to archive: %S"
 msgstr ""
 
-#: src/libdar/filtre.cpp:3199 src/libdar/filtre.cpp:3211
+#: src/libdar/filtre.cpp:3209 src/libdar/filtre.cpp:3221
 #, c-format
 msgid "building delta signature with block size of %d bytes"
 msgstr ""
 
-#: src/libdar/filtre.cpp:3304
+#: src/libdar/filtre.cpp:3314
 #, c-format
 msgid ""
 "Failed reading data CRC for %S, file may be damaged and will be marked dirty"
 msgstr ""
 
-#: src/libdar/filtre.cpp:3347
+#: src/libdar/filtre.cpp:3357
 #, c-format
 msgid ""
 "Failed setting storage size to zero for this file with missing data CRC, CRC "
 "error will be reported for that file while reading the repaired archive"
 msgstr ""
 
-#: src/libdar/filtre.cpp:3377
+#: src/libdar/filtre.cpp:3387
 msgid "Copied data does not match CRC"
 msgstr ""
 
-#: src/libdar/filtre.cpp:3406
+#: src/libdar/filtre.cpp:3416
 #, c-format
 msgid "Failed to set fadvise() for file %S, this is not crucial, no problem"
 msgstr ""
 
-#: src/libdar/filtre.cpp:3557
+#: src/libdar/filtre.cpp:3567
 msgid " : Failed resaving uncompressed the inode data"
 msgstr ""
 
-#: src/libdar/filtre.cpp:3567
+#: src/libdar/filtre.cpp:3577
 msgid ""
 " : Resaving uncompressed the inode data to gain space is not possible, "
 "keeping data compressed"
 msgstr ""
 
-#: src/libdar/filtre.cpp:3611
+#: src/libdar/filtre.cpp:3621
 #, c-format
 msgid ""
 "File has disappeared while we were reading it, cannot check whether it has "
 "changed during its backup: %S"
 msgstr ""
 
-#: src/libdar/filtre.cpp:3669
+#: src/libdar/filtre.cpp:3679
 #, c-format
 msgid ""
 "WARNING! File modified while reading it for backup. Performing retry %i of %i"
 msgstr ""
 
-#: src/libdar/filtre.cpp:3686
+#: src/libdar/filtre.cpp:3696
 msgid ""
 "WARNING! File modified while reading it for backup. No more retry for that "
 "file to not exceed the wasted byte limit. File is "
 msgstr ""
 
-#: src/libdar/filtre.cpp:3693
+#: src/libdar/filtre.cpp:3703
 msgid ""
 "WARNING! File modified while reading it for backup, but no more retry "
 "allowed: "
 msgstr ""
 
-#: src/libdar/filtre.cpp:3715
+#: src/libdar/filtre.cpp:3725
 msgid "Dumping delta signature structure for saved file: "
 msgstr ""
 
-#: src/libdar/filtre.cpp:3843
+#: src/libdar/filtre.cpp:3853
 msgid "Saving Extended Attributes for "
 msgstr ""
 
-#: src/libdar/filtre.cpp:3878
+#: src/libdar/filtre.cpp:3888
 #, c-format
 msgid ""
 "Computed EA CRC for file %S differs from what was stored in the archive, "
 "this file's EA may have been corrupted"
 msgstr ""
 
-#: src/libdar/filtre.cpp:3925
+#: src/libdar/filtre.cpp:3935
 msgid "Error saving Extended Attributes for "
 msgstr ""
 
-#: src/libdar/filtre.cpp:3929
+#: src/libdar/filtre.cpp:3939
 msgid ""
 "be advised that a CRC error will be reported for the EA of that file while "
 "sequentially reading the repaired archive"
 msgstr ""
 
-#: src/libdar/filtre.cpp:3964
+#: src/libdar/filtre.cpp:3973
 msgid "Saving Filesystem Specific Attributes for "
 msgstr ""
 
-#: src/libdar/filtre.cpp:3997
+#: src/libdar/filtre.cpp:4006
 #, c-format
 msgid ""
 "Computed FSA CRC for file %S differs from what was stored in the archive, "
 "this file's EA may have been corrupted"
 msgstr ""
 
-#: src/libdar/filtre.cpp:4042
+#: src/libdar/filtre.cpp:4051
 msgid "Error saving Filesystem Specific Attributes for "
 msgstr ""
 
-#: src/libdar/filtre.cpp:4046
+#: src/libdar/filtre.cpp:4055
 msgid ""
 "be advised that a CRC error will be reported for the FSA of that file while "
 "sequentially reading the repaired archive"
 msgstr ""
 
-#: src/libdar/filtre.cpp:4604
+#: src/libdar/filtre.cpp:4613
 msgid "Copying delta signature structure from the archive of reference: "
 msgstr ""
 
-#: src/libdar/filtre.cpp:4634
+#: src/libdar/filtre.cpp:4643
 msgid "Calculating delta signature from filesystem: "
 msgstr ""
 
-#: src/libdar/filtre.cpp:4714
+#: src/libdar/filtre.cpp:4723
 #, c-format
 msgid ""
 "Furtive read mode requires either root permission and FOWNER capability, "
@@ -4594,146 +4594,146 @@ msgstr ""
 msgid "Current Working Directory cannot be a relative path"
 msgstr ""
 
-#: src/libdar/tools.cpp:1282
+#: src/libdar/tools.cpp:1284
 msgid "Cannot block signals: "
 msgstr ""
 
-#: src/libdar/tools.cpp:1292
+#: src/libdar/tools.cpp:1294
 msgid "Cannot unblock signals: "
 msgstr ""
 
-#: src/libdar/tools.cpp:1323 src/libdar/tools.cpp:1360
+#: src/libdar/tools.cpp:1325 src/libdar/tools.cpp:1362
 #, c-format
 msgid "Cannot get last modification date: %s"
 msgstr ""
 
-#: src/libdar/tools.cpp:1364
+#: src/libdar/tools.cpp:1366
 #, c-format
 msgid "Cannot get size of %S: not a plain file"
 msgstr ""
 
-#: src/libdar/tools.cpp:1420
+#: src/libdar/tools.cpp:1422
 #, c-format
 msgid "Unknown suffix [%c] in string %S"
 msgstr ""
 
-#: src/libdar/tools.cpp:1447
+#: src/libdar/tools.cpp:1449
 msgid "Unknown substitution string: %"
 msgstr ""
 
-#: src/libdar/tools.cpp:1454
+#: src/libdar/tools.cpp:1456
 msgid ""
 "last char of user command-line to execute is '%', (use '%%' instead to avoid "
 "this message)"
 msgstr ""
 
-#: src/libdar/tools.cpp:1510
+#: src/libdar/tools.cpp:1512
 msgid "execve() failed. (process table is full ?)"
 msgstr ""
 
-#: src/libdar/tools.cpp:1512
+#: src/libdar/tools.cpp:1514
 msgid "system() call failed: "
 msgstr ""
 
-#: src/libdar/tools.cpp:1514
+#: src/libdar/tools.cpp:1516
 #, c-format
 msgid "execution of [ %S ] returned error code: %d"
 msgstr ""
 
-#: src/libdar/tools.cpp:1521
+#: src/libdar/tools.cpp:1523
 msgid "Error during user command line execution: "
 msgstr ""
 
-#: src/libdar/tools.cpp:1521
+#: src/libdar/tools.cpp:1523
 msgid " . Retry command-line ?"
 msgstr ""
 
-#: src/libdar/tools.cpp:1526
+#: src/libdar/tools.cpp:1528
 msgid "Ignore previous error on user command line and continue ?"
 msgstr ""
 
-#: src/libdar/tools.cpp:1568
+#: src/libdar/tools.cpp:1570
 msgid "Fatal error on user command line: "
 msgstr ""
 
-#: src/libdar/tools.cpp:1650 src/libdar/tools.cpp:1656
+#: src/libdar/tools.cpp:1652 src/libdar/tools.cpp:1658
 msgid "Badly formated octal number"
 msgstr ""
 
-#: src/libdar/tools.cpp:1761
+#: src/libdar/tools.cpp:1763
 msgid "Cannot get effective permission given a file descriptor: "
 msgstr ""
 
-#: src/libdar/tools.cpp:1777
+#: src/libdar/tools.cpp:1779
 #, c-format
 msgid "Error while setting file permission: %s"
 msgstr ""
 
-#: src/libdar/tools.cpp:1798
+#: src/libdar/tools.cpp:1800
 msgid "An empty string is not a valid user name"
 msgstr ""
 
-#: src/libdar/tools.cpp:1836 src/libdar/tools.cpp:1858
+#: src/libdar/tools.cpp:1838 src/libdar/tools.cpp:1860
 msgid "Unknown user"
 msgstr ""
 
-#: src/libdar/tools.cpp:1838 src/libdar/tools.cpp:1860
+#: src/libdar/tools.cpp:1840 src/libdar/tools.cpp:1862
 #, c-format
 msgid "Error found while looking for UID of user %s: %S"
 msgstr ""
 
-#: src/libdar/tools.cpp:1868 src/libdar/tools.cpp:1962
+#: src/libdar/tools.cpp:1870 src/libdar/tools.cpp:1964
 msgid ""
 "Cannot convert username to uid in statically linked binary, either directly "
 "provide the UID or run libdar from a dynamically linked executable"
 msgstr ""
 
-#: src/libdar/tools.cpp:1893
+#: src/libdar/tools.cpp:1895
 msgid "An empty string is not a valid group name"
 msgstr ""
 
-#: src/libdar/tools.cpp:1929 src/libdar/tools.cpp:1952
+#: src/libdar/tools.cpp:1931 src/libdar/tools.cpp:1954
 msgid "Unknown group"
 msgstr ""
 
-#: src/libdar/tools.cpp:1931
+#: src/libdar/tools.cpp:1933
 #, c-format
 msgid "Error found while looking fo GID of group %s: %S"
 msgstr ""
 
-#: src/libdar/tools.cpp:1954
+#: src/libdar/tools.cpp:1956
 #, c-format
 msgid "Error found while looking for GID of group %s: %S"
 msgstr ""
 
-#: src/libdar/tools.cpp:1991
+#: src/libdar/tools.cpp:1993
 #, c-format
 msgid "Error while setting file user ownership: %s"
 msgstr ""
 
-#: src/libdar/tools.cpp:2150
+#: src/libdar/tools.cpp:2152
 msgid "Worse"
 msgstr ""
 
-#: src/libdar/tools.cpp:2170
+#: src/libdar/tools.cpp:2172
 #, c-format
 msgid "Error code %d to message conversion failed"
 msgstr ""
 
-#: src/libdar/tools.cpp:2225
+#: src/libdar/tools.cpp:2227
 msgid "Invalid wide-char found in string: "
 msgstr ""
 
-#: src/libdar/tools.cpp:2254
+#: src/libdar/tools.cpp:2256
 msgid "Invalid wide-char found in string:"
 msgstr ""
 
-#: src/libdar/tools.cpp:2308
+#: src/libdar/tools.cpp:2310
 #, c-format
 msgid "Error unlinking %S: %S"
 msgstr ""
 
-#: src/libdar/tools.cpp:2355
+#: src/libdar/tools.cpp:2357
 msgid ""
 "Cannot convert negative floating point value to unsigned (positive) integer"
 msgstr ""
@@ -5569,19 +5569,19 @@ msgstr ""
 msgid "Writing to a read only generic_file"
 msgstr ""
 
-#: src/libdar/generic_file.cpp:340
+#: src/libdar/generic_file.cpp:348
 msgid "Cannot compare files in write only mode"
 msgstr ""
 
-#: src/libdar/generic_file.cpp:427
+#: src/libdar/generic_file.cpp:435
 msgid "Cannot truncate a read-only generic_file"
 msgstr ""
 
-#: src/libdar/generic_file.cpp:438
+#: src/libdar/generic_file.cpp:446
 msgid "Cannot sync write on a read-only generic_file"
 msgstr ""
 
-#: src/libdar/generic_file.cpp:449
+#: src/libdar/generic_file.cpp:457
 msgid "Cannot flush read a write-only generic_file"
 msgstr ""
 
@@ -6251,7 +6251,7 @@ msgid ""
 "Incoherent catalogue structure: unknown status flag for hard linked inode"
 msgstr ""
 
-#: src/libdar/user_interaction5.cpp:167 src/libdar/shell_interaction.cpp:407
+#: src/libdar/user_interaction5.cpp:167 src/libdar/shell_interaction.cpp:409
 msgid "Continue? "
 msgstr ""
 
@@ -7306,63 +7306,63 @@ msgstr ""
 msgid "compression used: %S"
 msgstr ""
 
-#: src/libdar/database5.cpp:83 src/libdar/shell_interaction.cpp:322
+#: src/libdar/database5.cpp:83 src/libdar/shell_interaction.cpp:324
 #, c-format
 msgid "archive #   |    path      |    basename"
 msgstr ""
 
-#: src/libdar/database5.cpp:97 src/libdar/shell_interaction.cpp:330
+#: src/libdar/database5.cpp:97 src/libdar/shell_interaction.cpp:332
 msgid "<empty>"
 msgstr ""
 
-#: src/libdar/database5.cpp:148 src/libdar/shell_interaction.cpp:380
+#: src/libdar/database5.cpp:148 src/libdar/shell_interaction.cpp:382
 #, c-format
 msgid "  archive #   |  most recent/total data |  most recent/total EA"
 msgstr ""
 
-#: src/libdar/database5.cpp:149 src/libdar/shell_interaction.cpp:381
+#: src/libdar/database5.cpp:149 src/libdar/shell_interaction.cpp:383
 #, c-format
 msgid "--------------+-------------------------+-----------------------"
 msgstr ""
 
-#: src/libdar/database5.cpp:181 src/libdar/shell_interaction.cpp:936
+#: src/libdar/database5.cpp:181 src/libdar/shell_interaction.cpp:937
 msgid "[ Saved ]"
 msgstr ""
 
 #: src/libdar/database5.cpp:183 src/libdar/database5.cpp:188
-#: src/libdar/shell_interaction.cpp:938 src/libdar/shell_interaction.cpp:943
+#: src/libdar/shell_interaction.cpp:939 src/libdar/shell_interaction.cpp:944
 msgid "[       ]"
 msgstr ""
 
-#: src/libdar/database5.cpp:186 src/libdar/shell_interaction.cpp:941
+#: src/libdar/database5.cpp:186 src/libdar/shell_interaction.cpp:942
 msgid "[  EA   ]"
 msgstr ""
 
-#: src/libdar/database5.cpp:203 src/libdar/shell_interaction.cpp:957
+#: src/libdar/database5.cpp:203 src/libdar/shell_interaction.cpp:958
 msgid "removed "
 msgstr ""
 
-#: src/libdar/database5.cpp:204 src/libdar/shell_interaction.cpp:958
+#: src/libdar/database5.cpp:204 src/libdar/shell_interaction.cpp:959
 msgid "present "
 msgstr ""
 
-#: src/libdar/database5.cpp:205 src/libdar/shell_interaction.cpp:959
+#: src/libdar/database5.cpp:205 src/libdar/shell_interaction.cpp:960
 msgid "saved   "
 msgstr ""
 
-#: src/libdar/database5.cpp:206 src/libdar/shell_interaction.cpp:960
+#: src/libdar/database5.cpp:206 src/libdar/shell_interaction.cpp:961
 msgid "absent  "
 msgstr ""
 
-#: src/libdar/database5.cpp:207 src/libdar/shell_interaction.cpp:961
+#: src/libdar/database5.cpp:207 src/libdar/shell_interaction.cpp:962
 msgid "patch   "
 msgstr ""
 
-#: src/libdar/database5.cpp:208 src/libdar/shell_interaction.cpp:962
+#: src/libdar/database5.cpp:208 src/libdar/shell_interaction.cpp:963
 msgid "BROKEN  "
 msgstr ""
 
-#: src/libdar/database5.cpp:209 src/libdar/shell_interaction.cpp:963
+#: src/libdar/database5.cpp:209 src/libdar/shell_interaction.cpp:964
 msgid "inode   "
 msgstr ""
 
@@ -7594,83 +7594,83 @@ msgid ""
 "the program."
 msgstr ""
 
-#: src/libdar/shell_interaction.cpp:239
+#: src/libdar/shell_interaction.cpp:241
 msgid "Error reading character: "
 msgstr ""
 
-#: src/libdar/shell_interaction.cpp:265
+#: src/libdar/shell_interaction.cpp:267
 #, c-format
 msgid ""
 "[Data ][D][ EA  ][FSA][Compr][S]| Permission | User  | Group | Size    "
 "|          Date                 |    filename"
 msgstr ""
 
-#: src/libdar/shell_interaction.cpp:270
+#: src/libdar/shell_interaction.cpp:272
 #, c-format
 msgid ""
 "Access mode    | User | Group | Size   |          Date                 |"
 "[Data ][D][ EA  ][FSA][Compr][S]|   Filename"
 msgstr ""
 
-#: src/libdar/shell_interaction.cpp:316
+#: src/libdar/shell_interaction.cpp:318
 #, c-format
 msgid "dar path         : %S"
 msgstr ""
 
-#: src/libdar/shell_interaction.cpp:317
+#: src/libdar/shell_interaction.cpp:319
 #, c-format
 msgid "dar options      : %S"
 msgstr ""
 
-#: src/libdar/shell_interaction.cpp:318
+#: src/libdar/shell_interaction.cpp:320
 #, c-format
 msgid "database version : %S"
 msgstr ""
 
-#: src/libdar/shell_interaction.cpp:319
+#: src/libdar/shell_interaction.cpp:321
 #, c-format
 msgid "compression used : %S"
 msgstr ""
 
-#: src/libdar/shell_interaction.cpp:320
+#: src/libdar/shell_interaction.cpp:322
 #, c-format
 msgid "compression level: %d"
 msgstr ""
 
-#: src/libdar/shell_interaction.cpp:444
+#: src/libdar/shell_interaction.cpp:445
 msgid " [return = YES | Esc = NO]"
 msgstr ""
 
-#: src/libdar/shell_interaction.cpp:463
+#: src/libdar/shell_interaction.cpp:464
 msgid "Error while reading user answer from terminal: "
 msgstr ""
 
-#: src/libdar/shell_interaction.cpp:468
+#: src/libdar/shell_interaction.cpp:469
 msgid "Continuing..."
 msgstr ""
 
-#: src/libdar/shell_interaction.cpp:470
+#: src/libdar/shell_interaction.cpp:471
 msgid "Escaping..."
 msgstr ""
 
-#: src/libdar/shell_interaction.cpp:535
+#: src/libdar/shell_interaction.cpp:536
 msgid "Secured string can only be read from a terminal"
 msgstr ""
 
-#: src/libdar/shell_interaction.cpp:560
+#: src/libdar/shell_interaction.cpp:561
 msgid "provided password is too long for the allocated memory"
 msgstr ""
 
-#: src/libdar/shell_interaction.cpp:596
+#: src/libdar/shell_interaction.cpp:597
 msgid "Error while changing user terminal properties: "
 msgstr ""
 
-#: src/libdar/shell_interaction.cpp:638
+#: src/libdar/shell_interaction.cpp:639
 #, c-format
 msgid "%S [%c] [ REMOVED ENTRY ] (%S)  %S"
 msgstr ""
 
-#: src/libdar/shell_interaction.cpp:668 src/libdar/shell_interaction.cpp:720
+#: src/libdar/shell_interaction.cpp:669 src/libdar/shell_interaction.cpp:721
 msgid "      Extended Attribute: ["
 msgstr ""
 
@@ -7684,7 +7684,7 @@ msgstr ""
 msgid "missing data to build a cat_directory"
 msgstr ""
 
-#: src/libdar/cat_directory.cpp:476
+#: src/libdar/cat_directory.cpp:501
 #, c-format
 msgid "Cannot remove nonexistent entry %S from catalogue"
 msgstr ""
