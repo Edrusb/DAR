@@ -37,6 +37,7 @@
 #include "slice_layout.hpp"
 #include "contextual.hpp"
 #include "mem_ui.hpp"
+#include "thread_cancellation.hpp"
 
 namespace libdar
 {
@@ -224,6 +225,7 @@ namespace libdar
 	bool lax;                    ///< whether to try to go further reading problems
 	infinint to_read_ahead;      ///< amount of data to read ahead for next slices
 	bool seq_read;               ///< whether sequential read has been requested
+	thread_cancellation thcl;    ///< to avoid asking question when cancellation has been requested
 
         bool skip_forward(U_I x);                    ///< skip forward in sar global contents
         bool skip_backward(U_I x);                   ///< skip backward in sar global contents

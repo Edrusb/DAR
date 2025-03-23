@@ -1348,7 +1348,7 @@ namespace libdar
 			deci conv = of_current;
 			bool ready = false;
 
-			while(!ready)
+			while(! ready && ! thcl.self_is_under_cancellation())
 			{
 			    try
 			    {
@@ -1358,9 +1358,11 @@ namespace libdar
 			    catch(Euser_abort & e)
 			    {
 				get_ui().message(string(gettext("If you really want to abort the archive creation hit CTRL-C, then press enter.")));
-				ready = false;
 			    }
 			}
+
+			if(thcl.self_is_under_cancellation())
+			    get_ui().message(tools_printf(gettext("Finished writing to file %s, bypassing pause due to operation termination requested"), conv.human().c_str()));
 		    }
 		}
 		else
