@@ -1348,7 +1348,7 @@ namespace libdar
 			deci conv = of_current;
 			bool ready = false;
 
-			while(! ready && ! thcl.self_is_under_cancellation())
+			while(! ready && ! get_ui().cancellation_requested())
 			{
 			    try
 			    {
@@ -1361,7 +1361,7 @@ namespace libdar
 			    }
 			}
 
-			if(thcl.self_is_under_cancellation())
+			if(get_ui().cancellation_requested())
 			    get_ui().message(tools_printf(gettext("Finished writing to file %s, bypassing pause due to operation termination requested"), conv.human().c_str()));
 		    }
 		}
