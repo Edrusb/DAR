@@ -515,12 +515,12 @@ namespace libdar
 
     void generic_file::move_from(generic_file && ref) noexcept
     {
-	rw = move(ref.rw);
+	rw = std::move(ref.rw);
 	swap(checksum, ref.checksum);
-	terminated = move(ref.terminated);
-	no_read_ahead = move(ref.no_read_ahead);
-	active_read = move(ref.active_read);
-	active_write = move(ref.active_write);
+	terminated = std::move(ref.terminated);
+	no_read_ahead = std::move(ref.no_read_ahead);
+	active_read = std::move(ref.active_read);
+	active_write = std::move(ref.active_write);
     }
 
 } // end of namespace

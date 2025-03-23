@@ -39,7 +39,7 @@ namespace libdar
 							 generic_file & compressed_side,
 							 U_I uncompressed_bs):
 	proto_compressor((compressed_side.get_mode() == gf_read_only)? gf_read_only: gf_write_only),
-	zipper(move(block_zipper)),
+	zipper(std::move(block_zipper)),
 	compressed(&compressed_side),
 	uncompressed_block_size(uncompressed_bs)
     {

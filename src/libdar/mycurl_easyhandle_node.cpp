@@ -65,8 +65,8 @@ namespace libdar
     {
 	handle = ref.handle;
 	ref.handle = nullptr;
-	current = move(ref.current);
-	wanted = move(ref.wanted);
+	current = std::move(ref.current);
+	wanted = std::move(ref.wanted);
     }
 
     mycurl_easyhandle_node & mycurl_easyhandle_node::operator = (const mycurl_easyhandle_node & ref)

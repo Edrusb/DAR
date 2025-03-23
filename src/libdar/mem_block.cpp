@@ -47,7 +47,7 @@ namespace libdar
 	try
 	{
 	    data = nullptr;
-	    move_from(move(ref));
+	    move_from(std::move(ref));
 	}
 	catch(...)
 	{
@@ -65,7 +65,7 @@ namespace libdar
     {
 	try
 	{
-	    move_from(move(ref));
+	    move_from(std::move(ref));
 	}
 	catch(...)
 	{
@@ -150,10 +150,10 @@ namespace libdar
     void mem_block::move_from(mem_block && ref)
     {
 	swap(data, ref.data);
-	alloc_size = move(ref.alloc_size);
-	data_size = move(ref.data_size);
-	read_cursor = move(ref.read_cursor);
-	write_cursor = move(ref.write_cursor);
+	alloc_size = std::move(ref.alloc_size);
+	data_size = std::move(ref.data_size);
+	read_cursor = std::move(ref.read_cursor);
+	write_cursor = std::move(ref.write_cursor);
     }
 
 } // end of namespace

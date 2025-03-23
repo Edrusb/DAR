@@ -91,9 +91,9 @@ namespace libdar
 
     regular_mask & regular_mask::operator = (regular_mask && ref) noexcept
     {
-	mask::operator = (move(ref));
+	mask::operator = (std::move(ref));
 	detruit();
-	move_from(move(ref));
+	move_from(std::move(ref));
 
 	return *this;
     }
@@ -138,8 +138,8 @@ namespace libdar
 
     void regular_mask::move_from(regular_mask && ref) noexcept
     {
-	mask_exp = move(ref.mask_exp);
-	case_sensit = move(ref.case_sensit);
+	mask_exp = std::move(ref.mask_exp);
+	case_sensit = std::move(ref.case_sensit);
 	preg = ref.preg; // yes we copy the data, not the possibly pointed to data though
 	ref.detruit();
     }
@@ -249,7 +249,7 @@ namespace libdar
     void et_mask::move_from(et_mask && m) noexcept
     {
 	detruit();
-	lst = move(m.lst);
+	lst = std::move(m.lst);
 	m.lst.clear();
     }
 

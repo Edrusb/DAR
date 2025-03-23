@@ -566,15 +566,15 @@ namespace libdar
     {
 	    // we assume the current object has no field assigned
 	    // same as for copy_from():
-	reading_ver = move(ref.reading_ver);
-	algo = move(ref.algo);
-	hashed_password = move(ref.hashed_password);
-	essiv_password = move(ref.essiv_password);
-	main_clef = move(ref.main_clef);
-	essiv_clef = move(ref.essiv_clef);
-	algo_block_size = move(ref.algo_block_size);
-	ivec = move(ref.ivec);
-	sel = move(ref.sel);
+	reading_ver = std::move(ref.reading_ver);
+	algo = std::move(ref.algo);
+	hashed_password = std::move(ref.hashed_password);
+	essiv_password = std::move(ref.essiv_password);
+	main_clef = std::move(ref.main_clef);
+	essiv_clef = std::move(ref.essiv_clef);
+	algo_block_size = std::move(ref.algo_block_size);
+	ivec = std::move(ref.ivec);
+	sel = std::move(ref.sel);
 	ref.main_clef = nullptr;
 	ref.essiv_clef = nullptr;
 	ivec = nullptr;

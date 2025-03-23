@@ -135,17 +135,17 @@ namespace libdar
 	swap(lock_mutex, ref.lock_mutex);
 #endif
 	swap(locking, ref.locking);
-	treated = move(ref.treated);
-	hard_links = move(ref.hard_links);
-	skipped = move(ref.skipped);
-	inode_only = move(ref.inode_only);
-	ignored = move(ref.ignored);
-	tooold = move(ref.tooold);
-	errored = move(ref.errored);
-	deleted = move(ref.deleted);
-	ea_treated = move(ref.ea_treated);
-	byte_amount = move(ref.byte_amount);
-	fsa_treated = move(ref.fsa_treated);
+	treated = std::move(ref.treated);
+	hard_links = std::move(ref.hard_links);
+	skipped = std::move(ref.skipped);
+	inode_only = std::move(ref.inode_only);
+	ignored = std::move(ref.ignored);
+	tooold = std::move(ref.tooold);
+	errored = std::move(ref.errored);
+	deleted = std::move(ref.deleted);
+	ea_treated = std::move(ref.ea_treated);
+	byte_amount = std::move(ref.byte_amount);
+	fsa_treated = std::move(ref.fsa_treated);
     }
 
     void statistics::dump(user_interaction & dialog) const

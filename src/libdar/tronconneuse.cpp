@@ -70,7 +70,7 @@ namespace libdar
 	weof = false;
 	reof = false;
 	reading_ver = x_reading_ver;
-	crypto = move(ptr);
+	crypto = std::move(ptr);
 	if(!crypto)
 	    throw Erange("tronconneuse::tronconneuse", "null pointer given as crypto_module to tronconneuse");
 	trailing_clear_data = nullptr;
@@ -363,26 +363,26 @@ namespace libdar
 
     void tronconneuse::move_from(tronconneuse && ref) noexcept
     {
-	initial_shift = move(ref.initial_shift);
-	buf_offset = move(ref.buf_offset);
-	buf_byte_data = move(ref.buf_byte_data);
-	buf_size = move(ref.buf_size);
+	initial_shift = std::move(ref.initial_shift);
+	buf_offset = std::move(ref.buf_offset);
+	buf_byte_data = std::move(ref.buf_byte_data);
+	buf_size = std::move(ref.buf_size);
 	std::swap(buf, ref.buf);
-	clear_block_size = move(ref.clear_block_size);
-	current_position = move(ref.current_position);
-	block_num = move(ref.block_num);
+	clear_block_size = std::move(ref.clear_block_size);
+	current_position = std::move(ref.current_position);
+	block_num = std::move(ref.block_num);
 	encrypted = ref.encrypted; // yes, we copy the pointed to object address, here
-	encrypted_buf_size = move(ref.encrypted_buf_size);
-	encrypted_buf_data = move(ref.encrypted_buf_data);
+	encrypted_buf_size = std::move(ref.encrypted_buf_size);
+	encrypted_buf_data = std::move(ref.encrypted_buf_data);
 	std::swap(encrypted_buf, ref.encrypted_buf);
-	extra_buf_offset = move(ref.extra_buf_offset);
-	extra_buf_size = move(ref.extra_buf_size);
+	extra_buf_offset = std::move(ref.extra_buf_offset);
+	extra_buf_size = std::move(ref.extra_buf_size);
 	std::swap(extra_buf, ref.extra_buf);
-	weof = move(ref.weof);
-	reof = move(ref.reof);
-	reading_ver = move(ref.reading_ver);
-	crypto = move(ref.crypto);
-	trailing_clear_data = move(ref.trailing_clear_data);
+	weof = std::move(ref.weof);
+	reof = std::move(ref.reof);
+	reading_ver = std::move(ref.reading_ver);
+	crypto = std::move(ref.crypto);
+	trailing_clear_data = std::move(ref.trailing_clear_data);
     }
 
     U_32 tronconneuse::fill_buf()

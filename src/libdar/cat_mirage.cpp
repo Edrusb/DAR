@@ -250,7 +250,7 @@ namespace libdar
     cat_mirage & cat_mirage::operator = (cat_mirage && ref)
     {
 	    // moving the cat_nomme part of these objects
-	cat_nomme::operator = (move(ref));
+	cat_nomme::operator = (std::move(ref));
 
 	if(ref.star_ref != nullptr)
 	{

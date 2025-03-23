@@ -642,21 +642,21 @@ namespace libdar
 
     void header_version::move_from(header_version && ref) noexcept
     {
-	edition = move(ref.edition);
-	algo_zip = move(ref.algo_zip);
-	cmd_line = move(ref.cmd_line);
-	initial_offset = move(ref.initial_offset);
-	sym = move(ref.sym);
+	edition = std::move(ref.edition);
+	algo_zip = std::move(ref.algo_zip);
+	cmd_line = std::move(ref.cmd_line);
+	initial_offset = std::move(ref.initial_offset);
+	sym = std::move(ref.sym);
 	swap(crypted_key, ref.crypted_key);
 	swap(ref_layout, ref.ref_layout);
-	has_tape_marks = move(ref.has_tape_marks);
-	ciphered = move(ref.ciphered);
-	arch_signed = move(ref.arch_signed);
-	has_kdf_params = move(ref.has_kdf_params);
-	salt = move(ref.salt);
-	iteration_count = move(ref.iteration_count);
-	kdf_hash = move(ref.kdf_hash);
-	compr_bs = move(ref.compr_bs);
+	has_tape_marks = std::move(ref.has_tape_marks);
+	ciphered = std::move(ref.ciphered);
+	arch_signed = std::move(ref.arch_signed);
+	has_kdf_params = std::move(ref.has_kdf_params);
+	salt = std::move(ref.salt);
+	iteration_count = std::move(ref.iteration_count);
+	kdf_hash = std::move(ref.kdf_hash);
+	compr_bs = std::move(ref.compr_bs);
     }
 
     void header_version::detruit()

@@ -285,8 +285,8 @@ namespace libdar
 
     void cat_delta_signature::move_from(cat_delta_signature && ref) noexcept
     {
-	delta_sig_offset = move(ref.delta_sig_offset);
-	delta_sig_size = move(ref.delta_sig_size);
+	delta_sig_offset = std::move(ref.delta_sig_offset);
+	delta_sig_size = std::move(ref.delta_sig_size);
 
        	    // we can swap the memory file, because sig_is_ours is swapped
 	    // too and we will known when destroying ref whether we own
@@ -294,9 +294,9 @@ namespace libdar
 	sig.swap(ref.sig);
 	swap(patch_base_check, ref.patch_base_check);
 	swap(patch_result_check, ref.patch_result_check);
-	src = move(ref.src);
-	zip = move(ref.zip);
-	pending_read = move(ref.pending_read);
+	src = std::move(ref.src);
+	zip = std::move(ref.zip);
+	pending_read = std::move(ref.pending_read);
     }
 
     void cat_delta_signature::destroy() noexcept

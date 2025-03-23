@@ -38,7 +38,7 @@ namespace libdar
 
     Ethread_cancel_with_attr & Ethread_cancel_with_attr::operator = (Ethread_cancel_with_attr && ref) noexcept
     {
-	Ethread_cancel::operator = (move(ref));
+	Ethread_cancel::operator = (std::move(ref));
 	swap(x_attr, ref.x_attr);
 	return *this;
     }

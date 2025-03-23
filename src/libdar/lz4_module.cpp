@@ -71,7 +71,7 @@ namespace libdar
     {
 	state = nullptr;
 	swap(state, ref.state);
-	acceleration = move(ref.acceleration);
+	acceleration = std::move(ref.acceleration);
     }
 
     lz4_module & lz4_module::operator = (const lz4_module & ref)
@@ -87,7 +87,7 @@ namespace libdar
 
     lz4_module & lz4_module::operator = (lz4_module && ref) noexcept
     {
-	acceleration = move(ref.acceleration);
+	acceleration = std::move(ref.acceleration);
 	swap(state, ref.state);
 
 	return *this;

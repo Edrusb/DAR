@@ -148,13 +148,13 @@ namespace libdar
 
     void semaphore::move_from(semaphore && ref) noexcept
     {
-	count = move(ref.count);
-	chem = move(ref.chem);
-	filename = move(ref.filename);
-	uid = move(ref.uid);
-	gid = move(ref.gid);
-	sig = move(ref.sig);
-	execute = move(ref.execute);
+	count = std::move(ref.count);
+	chem = std::move(ref.chem);
+	filename = std::move(ref.filename);
+	uid = std::move(ref.uid);
+	gid = std::move(ref.gid);
+	sig = std::move(ref.sig);
+	execute = std::move(ref.execute);
 	swap(match, ref.match);
     }
 

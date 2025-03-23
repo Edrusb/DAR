@@ -76,7 +76,7 @@ namespace libdar
 
     ea_attributs::ea_attributs(ea_attributs && ref) noexcept
     {
-        attr = move(ref.attr);
+        attr = std::move(ref.attr);
         alire = attr.begin();
     }
 
@@ -90,7 +90,7 @@ namespace libdar
 
     ea_attributs & ea_attributs::operator = (ea_attributs && ref) noexcept
     {
-        attr = move(ref.attr);
+        attr = std::move(ref.attr);
         alire = attr.begin();
 
 	return *this;

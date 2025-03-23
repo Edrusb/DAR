@@ -1444,15 +1444,15 @@ namespace libdar
 
     void cat_inode::move_from(cat_inode && ref) noexcept
     {
-	uid = move(ref.uid);
-	gid = move(ref.gid);
-	perm = move(ref.perm);
-	last_acc = move(ref.last_acc);
-	last_mod = move(ref.last_mod);
-	last_cha = move(ref.last_cha);
-	ea_saved = move(ref.ea_saved);
-	fsa_saved = move(ref.fsa_saved);
-	small_read = move(ref.small_read);
+	uid = std::move(ref.uid);
+	gid = std::move(ref.gid);
+	perm = std::move(ref.perm);
+	last_acc = std::move(ref.last_acc);
+	last_mod = std::move(ref.last_mod);
+	last_cha = std::move(ref.last_cha);
+	ea_saved = std::move(ref.ea_saved);
+	fsa_saved = std::move(ref.fsa_saved);
+	small_read = std::move(ref.small_read);
 	swap(ref.ea_offset, ea_offset);
 	swap(ref.ea, ea);
 	swap(ref.ea_size, ea_size);
@@ -1463,7 +1463,7 @@ namespace libdar
 	swap(ref.fsa_size, fsa_size);
 	swap(ref.fsa_crc, fsa_crc);
 	swap(ref.fs_dev, fs_dev);
-	edit = move(ref.edit);
+	edit = std::move(ref.edit);
     }
 
 

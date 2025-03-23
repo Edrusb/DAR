@@ -1001,18 +1001,18 @@ namespace libdar
     void escape::move_from(escape && ref) noexcept
     {
 	swap(x_below, ref.x_below);
-	write_buffer_size = move(ref.write_buffer_size);
+	write_buffer_size = std::move(ref.write_buffer_size);
 	swap(write_buffer, ref.write_buffer);
-	read_buffer_size = move(ref.read_buffer_size);
-	read_buffer_alloc = move(ref.read_buffer_alloc);
+	read_buffer_size = std::move(ref.read_buffer_size);
+	read_buffer_alloc = std::move(ref.read_buffer_alloc);
 	swap(read_buffer, ref.read_buffer);
-	already_read = move(ref.already_read);
-	read_eof = move(ref.read_eof);
-	escape_seq_offset_in_buffer = move(ref.escape_seq_offset_in_buffer);
-	unjumpable = move(ref.unjumpable);
+	already_read = std::move(ref.already_read);
+	read_eof = std::move(ref.read_eof);
+	escape_seq_offset_in_buffer = std::move(ref.escape_seq_offset_in_buffer);
+	unjumpable = std::move(ref.unjumpable);
 	swap(fixed_sequence, ref.fixed_sequence);
-	escaped_data_count_since_last_skip = move(ref.escaped_data_count_since_last_skip);
-	below_position = move(ref.below_position);
+	escaped_data_count_since_last_skip = std::move(ref.escaped_data_count_since_last_skip);
+	below_position = std::move(ref.below_position);
     }
 
     bool escape::mini_read_buffer()
