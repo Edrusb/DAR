@@ -1348,7 +1348,7 @@ namespace libdar
 			deci conv = of_current;
 			bool ready = false;
 
-			while(! ready && ! get_ui().cancellation_requested())
+			while(! ready && ! thr.self_is_under_cancellation())
 			{
 			    try
 			    {
@@ -1361,7 +1361,15 @@ namespace libdar
 			    }
 			}
 
-			if(get_ui().cancellation_requested())
+			thr.check_self_cancellation();
+			    // this call may throw an exception
+			    // we do it now before we open a new
+			    // slice, as the exception would occur
+			    // right after this new slide creation
+			    // leading the user to be asked for slice
+			    // overwriting confirmation...
+
+			if(thr.self_is_under_cancellation())
 			    get_ui().message(tools_printf(gettext("Finished writing to file %s, bypassing pause due to operation termination requested"), conv.human().c_str()));
 		    }
 		}
