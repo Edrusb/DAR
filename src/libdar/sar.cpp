@@ -1357,7 +1357,7 @@ namespace libdar
 			    }
 			    catch(Euser_abort & e)
 			    {
-				get_ui().message(string(gettext("If you really want to abort the archive creation hit CTRL-C, then press enter.")));
+				    // nothing to do, we'll only looping
 			    }
 			}
 
