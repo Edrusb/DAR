@@ -467,10 +467,9 @@ namespace libdar
 		    else // a signal interrupted the read() system call
 		    {
 			    // emulating the answer of an escape char (= "NO" answer)
-
 			a = 27;
-			tmp_sup = 0;
-			errno_sup = EAGAIN+1;
+			tmp_sup = -1;
+			errno_sup = EAGAIN;
 		    }
 		}
 	    }
