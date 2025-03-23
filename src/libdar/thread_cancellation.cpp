@@ -79,6 +79,7 @@ namespace libdar
 		status.block_delayed = false;
 		status.immediate = true;
 		status.cancellation = false;
+		status.thrown = false;
 		status.flag = 0;
 	    }
 	    else // pending cancellation information for that thread
@@ -129,10 +130,16 @@ namespace libdar
     void thread_cancellation::check_self_cancellation() const
     {
 #if MUTEX_WORKS
-	if(status.cancellation && (status.immediate || !status.block_delayed))
+	if(status.cancellation && ! status.thrown && (status.immediate || !status.block_delayed))
 	{
-	    (void)clear_pending_request(status.tid); // avoid other object of that thread to throw exception
-	    throw Ethread_cancel(status.immediate, status.flag); // we can throw the exception now
+	    bool found = false;
+
+	    if(flag_exception_thrown(status.tid, found))
+	    {
+		if(!found)
+		    throw SRC_BUG;
+		throw Ethread_cancel(status.immediate, status.flag); // we can throw the exception now
+	    }
 	}
 #endif
     }
@@ -141,6 +148,7 @@ namespace libdar
     {
 #if MUTEX_WORKS
 	list<thread_cancellation *>::iterator ptr;
+	bool bug = false;
 
 	    // we update all object of the current thread
 	CRITICAL_START;
@@ -148,15 +156,19 @@ namespace libdar
 	while(ptr != info.end())
 	{
 	    if(*ptr == nullptr)
-		throw SRC_BUG;
+		bug = true;
 	    if((*ptr)->status.tid == status.tid)
 		(*ptr)->status.block_delayed = mode;
 	    ptr++;
 	}
 	CRITICAL_END;
 
+	if(bug)
+	    throw SRC_BUG;
+
 	if(status.block_delayed != mode)
 	    throw SRC_BUG;
+
 	if(!mode)
 	    check_self_cancellation();
 #endif
@@ -171,7 +183,7 @@ namespace libdar
 	multimap<pthread_t, pthread_t>::iterator fin;
 
 	CRITICAL_START;
-	set_cancellation_in_info_for(tid, true, x_immediate, x_flag, found, notused, bug);
+	set_cancellation_in_info_for(tid, true, x_immediate, false, x_flag, found, notused, bug);
 
 	if(!found && !bug)  // no thread_cancellation object exist for that thread
 	    add_to_preborn(tid, x_immediate, x_flag);
@@ -181,7 +193,7 @@ namespace libdar
 			   fin);
 	while(debut != fin && !bug)
 	{
-	    set_cancellation_in_info_for(debut->second, true, x_immediate, x_flag, found, notused, bug);
+	    set_cancellation_in_info_for(debut->second, true, x_immediate, false, x_flag, found, notused, bug);
 	    if(!found && !bug)
 		add_to_preborn(debut->second, x_immediate, x_flag);
 	    ++debut;
@@ -234,7 +246,7 @@ namespace libdar
 	multimap<pthread_t, pthread_t>::iterator fin;
 
 	CRITICAL_START;
-	set_cancellation_in_info_for(tid, false, false, 0, found, ret, bug);
+	set_cancellation_in_info_for(tid, false, false, false, 0, found, ret, bug);
 	if(!found && !bug)
 	    remove_from_preborn(tid, found, ret);
 
@@ -244,7 +256,7 @@ namespace libdar
 
 	while(debut != fin && !bug)
 	{
-	    set_cancellation_in_info_for(debut->second, false, false, 0, found, ret, bug);
+	    set_cancellation_in_info_for(debut->second, false, false, false, 0, found, ret, bug);
 	    if(!found && !bug)
 		remove_from_preborn(debut->second, found, ret);
 	    ++debut;
@@ -304,6 +316,7 @@ namespace libdar
     void thread_cancellation::set_cancellation_in_info_for(pthread_t tid,
 							   bool cancel_status,
 							   bool x_immediate,
+							   bool thrown,
 							   U_64 x_flag,
 							   bool & found,
 							   bool & previous_val,
@@ -321,9 +334,10 @@ namespace libdar
 		if((*ptr)->status.tid == tid)
 		{
 		    found = true;
-		    (*ptr)->status.immediate = x_immediate;
 		    previous_val = (*ptr)->status.cancellation;
+		    (*ptr)->status.immediate = x_immediate;
 		    (*ptr)->status.cancellation = cancel_status;
+		    (*ptr)->status.thrown = thrown;
 		    (*ptr)->status.flag = x_flag;
 		}
 	    ptr++;
@@ -339,6 +353,7 @@ namespace libdar
 	tmp.block_delayed = false;
 	tmp.immediate = x_immediate;
 	tmp.cancellation = true;
+	tmp.thrown = false;
 	tmp.flag = x_flag;
 
 	while(it != preborn.end() && it->tid != tid)
@@ -376,6 +391,36 @@ namespace libdar
 	pair< multimap<pthread_t, pthread_t>::iterator, multimap<pthread_t, pthread_t>::iterator > tmp = thread_asso.equal_range(tid);
 	debut = tmp.first;
 	fin = tmp.second;
+    }
+
+    bool thread_cancellation::flag_exception_thrown(pthread_t tid, bool & found)
+    {
+	bool ret = false;
+	bool bug = false;
+
+	CRITICAL_START;
+	for(list<thread_cancellation*>::iterator it = info.begin();
+	    it != info.end();
+	    ++it)
+	{
+	    if(*it == nullptr)
+		bug = true;
+	    else
+	    {
+		if((*it)->status.tid == tid)
+		{
+		    ret |= ! (*it)->status.thrown;
+		    (*it)->status.thrown = true;
+		    found = true;
+		}
+	    }
+	}
+	CRITICAL_END;
+
+	if(bug)
+	    throw SRC_BUG;
+
+	return ret;
     }
 
 #endif

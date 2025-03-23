@@ -89,9 +89,17 @@ namespace libdar
 
 	    /// Checkpoint test : whether the current libdar call must abort or not
 
-	    /// \exception Euser_abort is thrown if the thread the checkpoint is running
+	    /// \exception Ethread_cancel is thrown if the thread the checkpoint is running
 	    /// from is marked as to be canceled.
 	void check_self_cancellation() const;
+
+	    /// get the current thread status
+
+	    /// at the difference of check_self_cancellation() which throws an exception
+	    /// self_is_under_cancellation() return true if cancellation has been request for
+	    /// that thread and false if not. An exception may have already been thrown or not yet
+	    /// thrown by a call to check_self_cancellation(), this is independent.
+	bool self_is_under_cancellation() const { return status.cancellation; };
 
 	    /// by default delayed (non immediate) cancellation generate a specific exception,
 	    /// it is possible for delayed cancellation only, do block such exceptions for a certain time
@@ -167,7 +175,8 @@ namespace libdar
 	    pthread_t tid;             ///< thread id of the current thread
 	    bool block_delayed;        ///< whether we buffer any delayed cancellation requests for "this" thread
 	    bool immediate;            ///< whether we take a few more second to make a real usable archive
-	    bool cancellation;         ///< true if a thread has to be canceled
+	    bool cancellation;         ///< true if this thread has been asked to cancel
+	    bool thrown;               ///< true if an exception has been thrown and need not to be thrown again
 	    U_64 flag;                 ///< user defined informational field, given to the Ethread_cancel constructor
 	};
 
@@ -186,6 +195,7 @@ namespace libdar
 	static void set_cancellation_in_info_for(pthread_t tid,
 						 bool cancel_status,
 						 bool x_immediate,
+						 bool thrown,
 						 U_64 x_flag,
 						 bool & found,
 						 bool & previous_val,
@@ -195,6 +205,9 @@ namespace libdar
 	static void find_asso_tid_with(pthread_t tid,
 				       std::multimap<pthread_t, pthread_t>::iterator & begin,
 				       std::multimap<pthread_t, pthread_t>::iterator & end);
+
+	    /// return true if the flag was not yet set (else no need to throw exception)
+	static bool flag_exception_thrown(pthread_t tid, bool & found);
 
 #endif
     };
