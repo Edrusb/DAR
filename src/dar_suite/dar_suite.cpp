@@ -294,7 +294,7 @@ int dar_suite_global(int argc,
     }
 
 #if MUTEX_WORKS
-    if(get_thread_count() != 0)
+    if(get_thread_count() != (ui ? 1 : 0)) // user_interaction objects relies on one thread_cancellation object... we must add one if ui points to a such valid object
     {
 	general_report(string(gettext("SANITY CHECK: AT LEAST ONE THREAD_CANCELLATION OBJECT HAS NOT BEEN DESTROYED AND REMAINS IN MEMORY WHILE THE PROGRAM REACHED ITS END")));
     }
