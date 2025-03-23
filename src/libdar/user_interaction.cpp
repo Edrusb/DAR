@@ -72,7 +72,14 @@ namespace libdar
 	bool ret = false;
 	try
 	{
-	    ret = inherited_pause(message);
+	    if(! cancellation_requested())
+		ret = inherited_pause(message);
+	    else
+	    {
+		inherited_message(tools_printf(gettext("libdar has been asked to end, assuming negative response to the following question: %s"),
+					       message.c_str()));
+		ret = false;
+	    }
 	}
 	catch(Ebug & e)
 	{
@@ -86,6 +93,7 @@ namespace libdar
 	{
 	    throw Elibcall("user_interaction::pause", errmsg);
 	}
+
 	if(!ret)
 	    throw Euser_abort(message);
     }
@@ -171,5 +179,63 @@ namespace libdar
         }
         va_end(ap);
     }
+
+    bool user_interaction::cancellation_requested() const
+    {
+#if MUTEX_WORKS
+#if HAVE_PTHREAD_H
+	bool ret = thcancel.self_is_under_cancellation();
+	std::list<pthread_t>::const_iterator it = monitoring.begin();
+
+	while(!ret && it != monitoring.end())
+	{
+	    ret |= thcancel.cancel_status(*it);
+	    ++it;
+	}
+
+	return ret;
+#else
+	return false;
+#endif
+#else
+	return false;
+#endif
+    }
+
+    void user_interaction::add_thread_to_monitor(pthread_t tid)
+    {
+#if MUTEX_WORKS
+#if HAVE_PTHREAD_H
+	for(list<pthread_t>::iterator it = monitoring.begin();
+	    it != monitoring.end();
+	    ++it)
+	{
+	    if(*it == tid)
+		throw SRC_BUG;
+	}
+
+	monitoring.push_back(tid);
+#endif
+#endif
+    }
+
+
+    void user_interaction::remove_thread_from_monitor(pthread_t tid)
+    {
+#if MUTEX_WORKS
+#if HAVE_PTHREAD_H
+	list<pthread_t>::iterator it = monitoring.begin();
+
+	while(it != monitoring.end() && *it != tid)
+	    ++it;
+
+	if(it == monitoring.end())
+	    throw SRC_BUG;
+	else
+	    monitoring.erase(it);
+#endif
+#endif
+    }
+
 
 } // end of namespace

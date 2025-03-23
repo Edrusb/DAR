@@ -28,9 +28,20 @@
 
 #include "../my_config.h"
 
+extern "C"
+{
+#if MUTEX_WORKS
+#if HAVE_PTHREAD_H
+#include <pthread.h>
+#endif
+#endif
+}
+
 #include <string>
+#include <list>
 #include "secu_string.hpp"
 #include "infinint.hpp"
+#include "thread_cancellation.hpp"
 
 namespace libdar
 {
@@ -72,6 +83,39 @@ namespace libdar
 	    /// .
 	virtual void printf(const char *format, ...);
 
+	    /// known whether cancellation was requested for the current thread or an added thread
+
+	bool cancellation_requested() const;
+
+#if MUTEX_WORKS
+#if HAVE_PTHREAD_H
+
+	    /// add a thread to monitor
+
+	    /// when a thread cancellation is requested for a thread
+	    /// libdar do no more pause() but assume negative answer and
+	    /// invoke message() with the context and question. However
+	    /// the user_interaction object may run in a different thread
+	    /// than a libdar thread, it is thus necessary to inform the
+	    /// user interaction object of the additional thread_id to monitor
+	    /// for thread cancellation request and adapt the behavior of
+	    /// this object. This is the purpose of this call, in addition
+	    /// to the thread the user_interaction is running, at the time of any
+	    /// pause() request the user_interaction will call message() if
+	    /// the current thread or any of the added thread_id are under
+	    /// a cancellation request
+
+	void add_thread_to_monitor(pthread_t tid);
+
+	    /// remove a thread from monitoring
+
+	void remove_thread_from_monitor(pthread_t tid);
+
+#endif
+#endif
+
+
+
 
     protected:
 	    /// method used to display a warning or a message to the user.
@@ -108,6 +152,15 @@ namespace libdar
 	    /// its up to the implementation to separate messages by the adequate mean
 	virtual secu_string inherited_get_secu_string(const std::string & message, bool echo) = 0;
 
+    private:
+
+#if MUTEX_WORKS
+#if HAVE_PTHREAD_H
+	thread_cancellation thcancel;
+
+	std::list<pthread_t> monitoring;
+#endif
+#endif
 
     };
 
