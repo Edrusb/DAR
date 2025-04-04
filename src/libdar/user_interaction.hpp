@@ -100,7 +100,7 @@ namespace libdar
 	    /// user interaction object of the additional thread_id to monitor
 	    /// for thread cancellation request and adapt the behavior of
 	    /// this object. This is the purpose of this call, in addition
-	    /// to the thread the user_interaction is running, at the time of any
+	    /// to the thread the user_interaction is running in, at the time of any
 	    /// pause() request the user_interaction will call message() if
 	    /// the current thread or any of the added thread_id are under
 	    /// a cancellation request
