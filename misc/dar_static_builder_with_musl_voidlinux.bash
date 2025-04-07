@@ -3,21 +3,32 @@
 if [ ! -z "$1" ] && [ "$1" -gt 1 ] ; then
     export MAKE_FLAGS="-j $1"
 else
-    echo "usage: $0 <num CPU cores to use>"
+    echo "usage: $0 <num CPU cores to use> [root]"
     exit 1
 fi
 
+if [ -z "$2" ] ; then
+    export ROOT_PERM=no
+else
+    export ROOT_PERM=yes
+fi
+
+echo "ROOT_PERM = $ROOT_PERM"
+
 # config/compilation/linking related variables
 
-export LOCAL_PKG_CONFIG_DIR="$(pwd)/pkgconfig"
+export LOCAL_PREFIX="$HOME/usr"
 
-export MAKE_FLAGS="-j 8"
-export PKG_CONFIG_PATH="${LOCAL_PKG_CONFIG_DIR}":/usr/local/lib/pkgconfig:/lib/pkgconfig:/usr/lib/pkgconfig
-export LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib64:/usr/lib
+export LOCAL_PKG_CONFIG_DIR1="$LOCAL_PREFIX/lib/pkgconfig"
+export LOCAL_PKG_CONFIG_DIR2="$LOCAL_PREFIX/lib64/pkgconfig"
 
-#export LDFLAGS=-L/usr/local/lib
-#export CFLAGS=-I/usr/local/include
-#export CXXFLAGS=${CFLAGS}
+export PKG_CONFIG_PATH="$LOCAL_PKG_CONFIG_DIR1:$LOCAL_PKG_CONFIG_DIR2:/usr/lib/pkgconfig:/usr/lib64/pkgconfig:/usr/local/lib/pkgconfig:/usr/local/lib64/pkgconfig"
+export CFLAGS="-I$LOCAL_PREFIX/include -I/usr/local/include -I/usr/include"
+export CXXFLAGS="$CFLAGS"
+export LDFLAGS="-L$LOCAL_PREFIX/lib -L$LOCAL_PREFIX/lib64 -L/usr/local/lib -L/usr/local/lib64 -L/usr/lib -L/usr/lib64 -L/lib -L/lib64"
+export LD_LIBRARY_PATH="$LOCAL_PREFIX/lib:$LOCAL_PREFIX/lib64:/usr/local/lib:/usr/local/lib64:/usr/lib:/usr/lib64:/lib:/lib64"
+export PATH="$LOCAL_PREFIX/bin:/usr/local/bin:$PATH"
+
 
 # packages version
 
@@ -39,7 +50,7 @@ LIBSSH=1
 
 # wget options need for gnutls website that does not provide all chain of trust in its certificate
 GNUTLS_WGET_OPT="--no-check-certificate"
-REPO=$(pwd)/REPO
+REPO="$LOCAL_PREFIX/src"
 
 #
 check()
@@ -51,21 +62,25 @@ check()
     fi
 
     if [ "$(lsb_release -i | sed -rn -e 's/^Distributor ID:\s+//p')" != "VoidLinux" ] ; then
-	echo "THis script is only expected to work on VoidLinux Distribution"
+	echo "This script is only expected to work on VoidLinux Distribution"
 	exit 1
     fi
 
     # checking for xbps-install
-    if [ "$(which xbps-install | wc -l)" -eq 0 ] ; then
-	echo "Missing xbps-instal command"
-	exit 1
+    if [ "$ROOT_PERM" = "yes" ] ; then
+	if [ "$(which xbps-install | wc -l)" -eq 0 ] ; then
+	    echo "Missing xbps-install command"
+	    exit 1
+	fi
     fi
 
     # checking musl libc is the system standard C library
-    if [ $(xbps-query -l | grep musl | wc -l) -le 0 ] ; then
-	echo "Cannot find musl standard C library"
-	echo "static linking with glibc is broken, musl is needed"
-	exit 1
+    if [ "$ROOT_PERM" = "yes" ] ; then
+	if [ $(xbps-query -l | grep musl | wc -l) -le 0 ] ; then
+	    echo "Cannot find musl standard C library"
+	    echo "static linking with glibc is broken, musl is needed"
+	    exit 1
+	fi
     fi
 
     if [ ! -f configure -o ! -f configure.ac ] || [ $(grep DAR_VERSION configure.ac | wc -l) -ne 1 ] ; then
@@ -82,51 +97,60 @@ check()
        exit 1
     fi
 
-    if [ ! -e "${LOCAL_PKG_CONFIG_DIR}" ] ; then
-	mkdir "${LOCAL_PKG_CONFIG_DIR}"
+    if [ ! -e "${LOCAL_PKG_CONFIG_DIR1}" ] ; then
+	mkdir -p "${LOCAL_PKG_CONFIG_DIR1}"
     fi
 
-    if [ ! -d "${LOCAL_PKG_CONFIG_DIR}" ] ; then
-	echo "${LOCAL_PKG_CONFIG_DIR} exists but is not a directory, aborting"
+    if [ ! -e "${LOCAL_PKG_CONFIG_DIR2}" ] ; then
+	mkdir -p "${LOCAL_PKG_CONFIG_DIR2}"
+    fi
+
+    if [ ! -d "${LOCAL_PKG_CONFIG_DIR1}" ] ; then
+	echo "${LOCAL_PKG_CONFIG_DIR1} exists but is not a directory, aborting"
+	exit 1
+    fi
+
+    if [ ! -d "${LOCAL_PKG_CONFIG_DIR2}" ] ; then
+	echo "${LOCAL_PKG_CONFIG_DIR2} exists but is not a directory, aborting"
 	exit 1
     fi
 }
 
 requirements()
 {
+    if [ "$ROOT_PERM" = "yes" ] ; then
+	#updating xbps db
+	xbps-install -SU -y
 
-    #updating xbps db
-    xbps-install -SU -y
+	# tools used to build the different packages involved here
+	xbps-install -y gcc make wget pkg-config cmake xz || exit 1
 
-    # tools used to build the different packages involved here
-    xbps-install -y gcc make wget pkg-config cmake xz || exit 1
+	#direct dependencies of libdar
+	xbps-install -y bzip2-devel e2fsprogs-devel libargon2-devel libgcc-devel libgcrypt-devel liblz4-devel \
+		     liblzma-devel libstdc++-devel libzstd-devel lz4-devel \
+		     lzo-devel musl-devel zlib-devel || exit 1
 
-    #direct dependencies of libdar
-    xbps-install -y bzip2-devel e2fsprogs-devel libargon2-devel libgcc-devel libgcrypt-devel liblz4-devel \
-		 liblzma-devel libstdc++-devel libzstd-devel lz4-devel \
-		 lzo-devel musl-devel zlib-devel || exit 1
+	# needed to build static flavor of librsync
+	xbps-install -y libb2-devel || exit 1
 
-    # needed to build static flavor of librsync
-    xbps-install -y libb2-devel || exit 1
+	# needed to build static flavor of gnutls
+	xbps-install -y  nettle-devel libtasn1-devel libunistring-devel unbound-devel unbound || exit 1
 
-    # needed to build static flavor of gnutls
-    xbps-install -y  nettle-devel libtasn1-devel libunistring-devel unbound-devel unbound || exit 1
+	#needed for static flavor of libcurl
+	xbps-install -y libssp-devel || echo "ignoring error if libssp-devel fails to install due to musl-devel already installed"
 
-    #needed for static flavor of libcurl
-    xbps-install -y libssp-devel || echo "ignoring error if libssp-devel fails to install due to musl-devel already installed"
+	# optional but interesting to get a smaller dar_static binary
+	xbps-install -y upx || echo "" && echo "WARNING!" && echo "Failed to install upx, will do without" && echo && sleep 3
+    fi
 
     # need to tweak the hogweed.pc file provided by the system, we do not modify the system but shadow it by a local version located in higher priority dir
     HOGWEED_PC=/usr/lib/pkgconfig/hogweed.pc
     if [ -e "${HOGWEED_PC}" ] ; then
-	sed -r -e 's/#\snettle/nettle/' < "${HOGWEED_PC}" > "${LOCAL_PKG_CONFIG_DIR}/$(basename ${HOGWEED_PC})"
+	sed -r -e 's/#\snettle/nettle/' < "${HOGWEED_PC}" > "${LOCAL_PKG_CONFIG_DIR1}/$(basename ${HOGWEED_PC})"
     else
 	echo "${HOGWEED_PC} not found"
 	exit 1
     fi
-
-    # optional but interesting to get a smaller dar_static binary
-    xbps-install -y upx || echo "" && echo "WARNING!" && echo "Failed to install upx, will do without" && echo && sleep 3
-
 }
 
 libthreadar()
@@ -136,7 +160,7 @@ libthreadar()
     if [ ! -e "${REPO}/${LIBTHREADAR_PKG}" ] ; then wget "https://dar.edrusb.org/libthreadar/Releases/${LIBTHREADAR_PKG}" && mv "${LIBTHREADAR_PKG}" "${REPO}" || exit 1 ; fi
     tar -xf "${REPO}/${LIBTHREADAR_PKG}" || exit 1
     cd libthreadar-${LIBTHREADAR_VERSION} || exit 1
-    ./configure && make ${MAKE_FLAGS} || exit 1
+    ./configure --prefix="$LOCAL_PREFIX" && make ${MAKE_FLAGS} || exit 1
     make install
     cd ..
     ldconfig
@@ -150,7 +174,7 @@ libgpg-error()
     if [ ! -e "${REPO}/${LIBGPG_ERROR_PKG}" ] ; then wget https://www.gnupg.org/ftp/gcrypt/libgpg-error/${LIBGPG_ERROR_PKG} && mv "${LIBGPG_ERROR_PKG}" "${REPO}" || exit 1 ; fi
     tar -xf "${REPO}/${LIBGPG_ERROR_PKG}"
     cd libgpg-error-${LIBGPG_ERROR_VERSION}
-    ./configure --enable-static
+    ./configure --enable-static --prefix="$LOCAL_PREFIX"
     make ${MAKE_FLAGS}
     make install
     cd ..
@@ -166,7 +190,7 @@ librsync()
     if [ ! -e "${REPO}/${LIBRSYNC_PKG}" ] ; then wget "https://github.com/librsync/librsync/archive/refs/tags/${LIBRSYNC_PKG}" && mv "${LIBRSYNC_PKG}" "${REPO}" || exit 1 ; fi
     tar -xf "${REPO}/${LIBRSYNC_PKG}"
     cd librsync-${LIBRSYNC_VERSION}
-    cmake .
+    cmake --install-prefix "$LOCAL_PREFIX" .
     make ${MAKE_FLAGS}
     make install
     cmake -DBUILD_SHARED_LIBS=OFF .
@@ -186,7 +210,7 @@ gnutls()
     if [ ! -e "${REPO}/${GNUTLS_PKG}" ] ; then wget ${GNUTLS_WGET_OPT} "https://www.gnupg.org/ftp/gcrypt/gnutls/v${REPODIR}/${GNUTLS_PKG}" && mv "${GNUTLS_PKG}" "${REPO}" || exit 1 ; fi
     tar -xf "${REPO}/${GNUTLS_PKG}"
     cd "gnutls-${GNUTLS_VERSION}"
-    ./configure --enable-static --without-p11-kit
+    ./configure --enable-static --without-p11-kit --prefix="$LOCAL_PREFIX"
     unbound-anchor -a "/etc/unbound/root.key"
     make ${MAKE_FLAGS}
     make install
@@ -206,7 +230,7 @@ libssh()
     cd libssh-${LIBSSH_VERSION}
     mkdir ${builddir} || (echo "Failed creating build dir for libssh" && return 1)
     cd ${builddir}
-    cmake -DUNIT_TESTING=OFF -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=OFF -DWITH_GCRYPT=ON ..
+    cmake -DUNIT_TESTING=OFF -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=OFF -DWITH_GCRYPT=ON --install-prefix "$LOCAL_PREFIX" ..
     make ${MAKE_FLAGS}
     make install
     cd ../..
@@ -227,7 +251,7 @@ libssh2()
     if [ ! -e "${REPO}/${LIBSSH2_PKG}" ] ; then wget "https://www.libssh2.org/download/${LIBSSH2_PKG}" && mv "${LIBSSH2_PKG}" "${REPO}" || exit 1 ; fi
     tar -xf "${REPO}/${LIBSSH2_PKG}"
     cd libssh2-${LIBSSH2_VERSION}
-    ./configure --enable-shared --without-libssl --with-libz --with-crypto=libgcrypt
+    ./configure --enable-shared --without-libssl --with-libz --with-crypto=libgcrypt --prefix="$LOCAL_PREFIX"
     make ${MAKE_FLAGS}
     make install
     cd ..
@@ -242,7 +266,7 @@ libcurl()
     if [ ! -e "${REPO}/${LIBCURL_PKG}" ] ; then wget "https://curl.se/download/${LIBCURL_PKG}" && mv "${LIBCURL_PKG}" "${REPO}" || exit 1 ; fi
     tar -xf "${REPO}/${LIBCURL_PKG}"
     cd curl-${LIBCURL_VERSION}
-    ./configure --with-gnutls ${SSH_CURL_OPT} --disable-shared
+    ./configure --with-gnutls ${SSH_CURL_OPT} --disable-shared --prefix="$LOCAL_PREFIX"
     make ${MAKE_FLAGS}
     make install
     cd ..
@@ -269,14 +293,14 @@ dar_static()
 		--enable-threadar\
 		--enable-libargon2-linking\
 		--disable-python-binding\
-		--prefix=/DAR || exit 1
+		--prefix="$LOCAL_PREFIX" || exit 1
     make ${MAKE_FLAGS} || exit 1
-    make DESTDIR=${tmp_dir} install-strip || exit 1
-    mv ${tmp_dir}/DAR/bin/dar_static . && echo "dar_static binary is available in the current directory"
-    rm -rf ${tmp_dir}/DAR
+    make install-strip || exit 1
+    cp ${LOCAL_PREFIX}/bin/dar_static . && echo "dar_static binary is available in the current directory"
 }
 
 check
+
 requirements || (echo "Failed setting up requirements" && exit 1)
 libthreadar || (echo "Failed building libthreadar" && exit 1)
 libgpg-error || (echo "Failed building libgpg-error static version" && exit 1)
