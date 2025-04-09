@@ -17,7 +17,11 @@ echo "ROOT_PERM = $ROOT_PERM"
 
 # config/compilation/linking related variables
 
-export LOCAL_PREFIX="$HOME/usr"
+if [ "$ROOT_PERM" = "no" ] ; then
+    export LOCAL_PREFIX="$HOME/usr"
+else
+    export LOCAL_PREFIX="/usr/local"
+fi
 
 export LOCAL_PKG_CONFIG_DIR1="$LOCAL_PREFIX/lib/pkgconfig"
 export LOCAL_PKG_CONFIG_DIR2="$LOCAL_PREFIX/lib64/pkgconfig"
