@@ -118,10 +118,10 @@ namespace libdar
 	void append_at(U_I offset, int fd, U_I size);
 
 	    /// append some data at the end of the string
-	void append(const char *ptr, U_I size) { append_at(*string_size, ptr, size); };
+	void append(const char *ptr, U_I size) { append_at(get_size(), ptr, size); };
 
 	    /// append some data at the end of the string
-	void append(int fd, U_I size) { append_at(*string_size, fd, size); };
+	void append(int fd, U_I size) { append_at(get_size(), fd, size); };
 
 	    /// shorten the string (do not change the allocated size)
 	    ///
@@ -133,7 +133,7 @@ namespace libdar
 
 
 	    /// clear the string (set to an empty string)
-	void clear() { *string_size = 0; };
+	void clear() { if(!zero_length) *string_size = 0; };
 
 	    /// clear and resize the string to the defined allocated size
 
@@ -149,12 +149,12 @@ namespace libdar
 
 	    /// \return the address of the first byte of the string
 	    /// \note check the "size" method to know how much bytes can be read
-	const char* c_str() const { return mem == nullptr ? throw SRC_BUG : mem; };
-	char* c_str() { return mem == nullptr ? throw SRC_BUG : mem; };
+	const char* c_str() const { if(zero_length) return nullptr; return mem == nullptr ? throw SRC_BUG : mem; };
+	char* c_str() { if(zero_length) return nullptr; return mem == nullptr ? throw SRC_BUG : mem; };
 	void set_size(U_I size);
 
 	    /// non constant flavor of direct secure memory access
-	char * get_array() { return mem == nullptr ? throw SRC_BUG : mem; };
+	char * get_array();
 
 	    /// get access to the secure string by index
 
@@ -163,23 +163,24 @@ namespace libdar
 	char operator[](U_I index) const { return (const_cast<secu_string *>(this))->operator[](index); };
 
 	    /// get the size of the string
-	U_I get_size() const { if(string_size == nullptr) throw SRC_BUG; return *string_size; }; // returns the size of the string
+	U_I get_size() const { if(zero_length) return 0; if(string_size == nullptr) throw SRC_BUG; return *string_size; }; // returns the size of the string
 
 	    /// tell whether string is empty
-	bool empty() const { if(string_size == nullptr) throw SRC_BUG; return *string_size == 0; };
+	bool empty() const { if(zero_length) return true; if(string_size == nullptr) throw SRC_BUG; return *string_size == 0; };
 
 	    /// get the size of the allocated secure space
-	U_I get_allocated_size() const { return *allocated_size - 1; };
+	U_I get_allocated_size() const { if(zero_length) return 0; return zero_length ? 0 : *allocated_size - 1; };
 
     private:
-	U_I *allocated_size;
-	char *mem;
-	U_I *string_size;
+	bool zero_length;     ///< true if none of the other field are set due to zero byte length string requested
+	U_I *allocated_size;  ///< stores the allocated size of the secu_string
+	char *mem;            ///< pointer to allocated block of data
+	U_I *string_size;     ///< stores the string info size in the secu string (*string_size < *allocated_size)
 
-	void nullifyptr() noexcept { allocated_size = string_size = nullptr; mem = nullptr; };
+	void nullifyptr() noexcept { allocated_size = string_size = nullptr; mem = nullptr; zero_length = true; };
 	void init(U_I size);   //< to be used at creation time or after clean_and_destroy() only
 	void copy_from(const secu_string & ref); //< to be used at creation time or after clean_and_destroy() only
-	void move_from(secu_string && ref) noexcept { std::swap(allocated_size, ref.allocated_size); std::swap(mem, ref.mem); std::swap(string_size, ref.string_size); };
+	void move_from(secu_string && ref) noexcept;
 	bool compare_with(const char *ptr, U_I size) const; // return true if given sequence is the same as the one stored in "this"
 	void clean_and_destroy();
     };
