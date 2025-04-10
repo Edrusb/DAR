@@ -48,7 +48,7 @@ namespace libdar
                                                          U_I uncompressed_bs):
         proto_compressor((compressed_side.get_mode() == gf_read_only)? gf_read_only: gf_write_only),
         num_w(num_workers),
-        zipper(move(block_zipper)),
+        zipper(std::move(block_zipper)),
         compressed(&compressed_side),
         uncompressed_block_size(uncompressed_bs)
     {
@@ -253,7 +253,7 @@ namespace libdar
                         ret += lus_data.front()->clear_data.read(a + ret, size - ret);
                         if(lus_data.front()->clear_data.all_is_read())
                         {
-                            tas->put(move(lus_data.front()));
+                            tas->put(std::move(lus_data.front()));
                             lus_data.pop_front();
                             lus_flags.pop_front();
                         }
@@ -272,7 +272,7 @@ namespace libdar
                             // a single worker have reported an error and is till alive
                             // we drop this single order
                             // to cleanly stop threads
-                        tas->put(move(lus_data.front()));
+                        tas->put(std::move(lus_data.front()));
                         lus_data.pop_front();
                         lus_flags.pop_front();
                             // no we can stop the threads poperly
@@ -571,7 +571,7 @@ namespace libdar
                     if(ret == compressor_block_flags::worker_error)
                         expected = 0;
                 }
-                tas->put(move(lus_data.front()));
+                tas->put(std::move(lus_data.front()));
                 lus_data.pop_front();
                 lus_flags.pop_front();
             }
@@ -774,7 +774,7 @@ namespace libdar
     {
 	should_i_stop = false;
 	if(ptr)
-	    tas->put(move(ptr));
+	    tas->put(std::move(ptr));
     }
 
     void zip_below_read::inherited_run()
@@ -786,7 +786,7 @@ namespace libdar
 	catch(...)
 	{
 	    if(ptr)
-		tas->put(move(ptr));
+		tas->put(std::move(ptr));
 	    push_flag_to_all_workers(compressor_block_flags::error);
 
 	    throw; // relaunching the exception now as we end the thread
@@ -842,7 +842,7 @@ namespace libdar
 
 		if(aux > ptr->crypted_data.get_max_size())
 		{
-		    tas->put(move(ptr));
+		    tas->put(std::move(ptr));
 		    push_flag_to_all_workers(compressor_block_flags::error);
 		    end = true;
 		}
@@ -854,7 +854,7 @@ namespace libdar
 		    {
 			    // we should have the whole data filled, not less than aux!
 
-			tas->put(move(ptr));
+			tas->put(std::move(ptr));
 			push_flag_to_all_workers(compressor_block_flags::error);
 			end = true;
 		    }
@@ -896,7 +896,7 @@ namespace libdar
 			   bool compress):
 	reader(read_side),
 	writer(write_side),
-	compr(move(ptr)),
+	compr(std::move(ptr)),
 	do_compress(compress)
     {
 	if(!reader)

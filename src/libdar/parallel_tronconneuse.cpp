@@ -71,7 +71,7 @@ namespace libdar
 	current_position = 0;
 	initial_shift = 0;
 	reading_ver = ver;
-	crypto = move(crypto_ptr);
+	crypto = std::move(crypto_ptr);
 	t_status = thread_status::dead;
 	ignore_stop_acks = 0;
 	mycallback = nullptr;
@@ -279,10 +279,10 @@ namespace libdar
 	    }
 	    catch(...)
 	    {
-		tas->put(move(aux));
+		tas->put(std::move(aux));
 		throw;
 	    }
-	    tas->put(move(aux));
+	    tas->put(std::move(aux));
 	}
 
 	return ret;
@@ -380,7 +380,7 @@ namespace libdar
 		ret += lus_data.front()->clear_data.read(a + ret, size - ret);
 		if(lus_data.front()->clear_data.all_is_read())
 		{
-		    tas->put(move(lus_data.front()));
+		    tas->put(std::move(lus_data.front()));
 		    lus_data.pop_front();
 		    lus_flags.pop_front();
 		}
@@ -389,7 +389,7 @@ namespace libdar
 		if(ignore_stop_acks > 0)
 		{
 		    --ignore_stop_acks;
-		    tas->put(move(lus_data.front()));
+		    tas->put(std::move(lus_data.front()));
 		    lus_data.pop_front();
 		    lus_flags.pop_front();
 		    if(ignore_stop_acks == 0)
@@ -423,7 +423,7 @@ namespace libdar
 
 		if(mycallback != nullptr)
 		{
-		    unique_ptr<crypto_segment> current(move(lus_data.front()));
+		    unique_ptr<crypto_segment> current(std::move(lus_data.front()));
 		    if(!current)
 			throw SRC_BUG;
 
@@ -494,7 +494,7 @@ namespace libdar
 		    }
 		    catch(...)
 		    {
-			tas->put(move(current));
+			tas->put(std::move(current));
 			throw;
 		    }
 
@@ -502,7 +502,7 @@ namespace libdar
 			// thus deciphering succeeded and we can reinsert the 'current'
 			// crypto_segment at the front of lus_data with a normal flag:
 
-		    lus_data.push_front((move(current)));
+		    lus_data.push_front((std::move(current)));
 		    lus_flags.push_front(static_cast<int>(tronco_flags::normal));
 		}
 		else // mycallback == nullptr
@@ -968,7 +968,7 @@ namespace libdar
 			// we just have to drive the threads to die to
 			// get the worker exception thrown in the current thread
 		    lus_flags.pop_front();
-		    tas->put(move(lus_data.front()));
+		    tas->put(std::move(lus_data.front()));
 		    lus_data.pop_front();
 		    send_read_order(tronco_flags::die);	// this leads to a recursive call !!!
 		    join_threads(); // this should propagate the worker exception
@@ -985,7 +985,7 @@ namespace libdar
 		}
 
 		lus_flags.pop_front();
-		tas->put(move(lus_data.front()));
+		tas->put(std::move(lus_data.front()));
 		lus_data.pop_front();
 	    }
 	}
@@ -1089,7 +1089,7 @@ namespace libdar
 			lus_flags.pop_front();
 			if(lus_data.empty())
 			    throw SRC_BUG;
-			tas->put(move(lus_data.front()));
+			tas->put(std::move(lus_data.front()));
 			lus_data.pop_front();
 		    }
 		}
@@ -1168,7 +1168,7 @@ namespace libdar
 		else
 		{
 		    current_position += alire;
-		    tas->put(move(lus_data.front()));
+		    tas->put(std::move(lus_data.front()));
 		    lus_data.pop_front();
 		    lus_flags.pop_front();
 		    if(current_position == pos && !lus_data.empty())
@@ -1325,11 +1325,11 @@ namespace libdar
 	    ptr = tas->get();
 	    if(ptr->clear_data.get_max_size() < clear_buf_size)
 	    {
-		tas->put(move(ptr));
+		tas->put(std::move(ptr));
 		throw SRC_BUG;
 	    }
 	    encrypted_buf_size = ptr->crypted_data.get_max_size();
-	    tas->put(move(ptr));
+	    tas->put(std::move(ptr));
 	    index_num = get_ready_for_new_offset();
 
 	    work();
@@ -1433,7 +1433,7 @@ namespace libdar
 			workers->scatter(ptr, static_cast<int>(tronco_flags::normal));
 		    }
 		    else
-			tas->put(move(ptr));
+			tas->put(std::move(ptr));
 		}
 		else
 		    flag = tronco_flags::eof;
@@ -1595,7 +1595,7 @@ namespace libdar
 		    throw SRC_BUG;
 	    }
 
-	    tas->put(move(ones.front()));
+	    tas->put(std::move(ones.front()));
 	    ones.pop_front();
 	    flags.pop_front();
 	}

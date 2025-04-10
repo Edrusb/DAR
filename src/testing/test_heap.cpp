@@ -81,7 +81,7 @@ void f1()
     cout << montas.get_size() << endl;
     cout << *ptr << endl;
     *ptr = 6;
-    montas.put(move(ptr));
+    montas.put(std::move(ptr));
     cout << bool(ptr) << endl;
     ptr = montas.get();
     cout << bool(ptr) << endl;

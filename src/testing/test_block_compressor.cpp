@@ -92,7 +92,7 @@ void f1()
 	unique_ptr<fichier_local> dst = make_unique<fichier_local>(ui, ZIPPED, gf_write_only, 0644, false, true, false);
 	unique_ptr<compress_module> lz4 = make_unique<lz4_module>();
 	parallel_block_compressor comp(2,
-				       move(lz4),
+				       std::move(lz4),
 		 		       *dst);
 
 	src->copy_to(comp);
@@ -104,7 +104,7 @@ void f1()
 	unique_ptr<fichier_local> dst = make_unique<fichier_local>(ui, BACK, gf_write_only, 0644, false, true, false);
 	unique_ptr<compress_module> lz4 = make_unique<lz4_module>();
 	parallel_block_compressor decomp(2,
-					 move(lz4),
+					 std::move(lz4),
 					 *src);
 
 	decomp.copy_to(*dst);

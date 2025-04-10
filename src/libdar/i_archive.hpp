@@ -142,9 +142,10 @@ namespace libdar
 
 	    /// test the archive integrity
 
-	statistics op_test(const archive_options_test & options,
+	statistics op_test(const archive_options_test & options, ///< testing options
 			   bool reparing,  ///< use for isolation of a truncated archive
-			   statistics * progressive_report);
+			   statistics * progressive_report ///< if not null structured filled during the call
+	    );
 
 
 	    /// this methodes isolates the catalogue of a the current archive into a separated archive

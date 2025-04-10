@@ -181,7 +181,7 @@ void f3()
     source.add(CURLOPT_VERBOSE, foo(1));
 
     mycurl_param_list dst(source);
-    mycurl_param_list dst2(move(source));
+    mycurl_param_list dst2(std::move(source));
 
     cout << source.size() << endl;
     cout << dst.size() << endl;

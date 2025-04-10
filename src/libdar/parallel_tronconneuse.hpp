@@ -335,7 +335,7 @@ namespace libdar
             trailing_clear_data(nullptr)
         { flag = tronco_flags::normal; };
 
-        ~read_below() { if(ptr) tas->put(move(ptr)); cancel(); join(); };
+        ~read_below() { if(ptr) tas->put(std::move(ptr)); cancel(); join(); };
 
             /// let the caller give a callback function that given a generic_file with mixed cyphered and clear data, is able
             /// to return the offset of the first clear byte located *after* all the cyphered data, this
@@ -496,7 +496,7 @@ namespace libdar
 	    reader(read_side),
 	    writer(write_side),
 	    waiting(waiter),
-	    crypto(move(ptr)),
+	    crypto(std::move(ptr)),
 	    do_encrypt(encrypt),
 	    abort(status::fine)
 	{ if(!reader || !writer || !waiting || !crypto) throw SRC_BUG; };
