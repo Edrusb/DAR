@@ -68,6 +68,26 @@ namespace libdar
 #endif
     }
 
+    bool secu_string::operator == (const string &ref) const
+    {
+	return compare_with(ref.c_str(),(U_I)(ref.size()));
+    }
+
+    bool secu_string::operator == (const secu_string &ref) const
+    {
+	if(zero_length)
+	    if(ref.zero_length)
+		return true;
+	    else
+		return *(ref.string_size) == 0;
+	else
+	    if(ref.zero_length)
+		return false;
+	    else
+		return compare_with(ref.mem, *(ref.string_size));
+    }
+
+
     void secu_string::set(int fd, U_I size)
     {
 	U_I offset = 0;
