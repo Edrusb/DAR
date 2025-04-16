@@ -1,3 +1,7 @@
+from 2.7.17 to 2.7.18
+- fixed bug that broke the ability to repair an archive through ftp/sftp
+  (repaing stays possible locally on the machine where resides the backup)
+
 from 2.7.16 to 2.7.17
 - fixed bug where -R path ending with // was breaking the path filtering
   mechanism (-P/-g/-[/-] options).
