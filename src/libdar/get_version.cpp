@@ -78,10 +78,14 @@ extern "C"
 
 using namespace std;
 
+#define DEFAULT_SECURED_MEMORY_SIZE 262144
+
 namespace libdar
 {
-    static void libdar_init(bool init_libgcrypt_if_not_done, // drives the "libdar_initialized" variable
-			    bool init_gpgme); // whether to initialize gpgme
+    static void libdar_init(bool init_libgcrypt_if_not_done, ///< drives the "libdar_initialized" variable
+			    U_I libgcrypt_secured_memory_size, ///< secured memory size to allocated (0 to disable, while still initializing libgcrypt
+			    bool init_gpgme ///< whether to initialize gpgme
+	);
 
     static bool libdar_initialized = false; //< static variable modified once during the first get_version call
 #ifdef CRYPTO_AVAILABLE
@@ -94,7 +98,9 @@ namespace libdar
 	NLS_SWAP_IN;
         major = LIBDAR_COMPILE_TIME_MAJOR;
         minor = LIBDAR_COMPILE_TIME_MINOR;
-	libdar_init(init_libgcrypt, true);
+	libdar_init(init_libgcrypt,
+		    DEFAULT_SECURED_MEMORY_SIZE,
+		    true);
 	NLS_SWAP_OUT;
     }
 
@@ -111,7 +117,9 @@ namespace libdar
         major = LIBDAR_COMPILE_TIME_MAJOR;
 	medium = LIBDAR_COMPILE_TIME_MEDIUM;
         minor = LIBDAR_COMPILE_TIME_MINOR;
-	libdar_init(init_libgcrypt, true);
+	libdar_init(init_libgcrypt,
+		    DEFAULT_SECURED_MEMORY_SIZE,
+		    true);
 	NLS_SWAP_OUT;
     }
 
@@ -122,11 +130,28 @@ namespace libdar
         major = LIBDAR_COMPILE_TIME_MAJOR;
 	medium = LIBDAR_COMPILE_TIME_MEDIUM;
         minor = LIBDAR_COMPILE_TIME_MINOR;
-	libdar_init(init_libgcrypt, init_gpgme);
+	libdar_init(init_libgcrypt,
+		    DEFAULT_SECURED_MEMORY_SIZE,
+		    init_gpgme);
 	NLS_SWAP_OUT;
     }
 
-    static void libdar_init(bool init_libgcrypt_if_not_done, bool init_gpgme)
+    void get_version(U_I & major, U_I & medium, U_I & minor, U_I gcrypt_secured_memory, bool init_gpgme)
+    {
+	NLS_SWAP_IN;
+
+        major = LIBDAR_COMPILE_TIME_MAJOR;
+	medium = LIBDAR_COMPILE_TIME_MEDIUM;
+        minor = LIBDAR_COMPILE_TIME_MINOR;
+	libdar_init(true,
+		    gcrypt_secured_memory,
+		    init_gpgme);
+	NLS_SWAP_OUT;
+    }
+
+    static void libdar_init(bool init_libgcrypt_if_not_done,
+			    U_I libgcrypt_secured_memory_size,
+			    bool init_gpgme)
     {
 	if(!libdar_initialized)
 	{
@@ -164,7 +189,7 @@ namespace libdar
 			throw Erange("libdar_init_libgcrypt", tools_printf(gettext("Too old version for libgcrypt, minimum required version is %s"), MIN_VERSION_GCRYPT));
 
 			// initializing default sized secured memory for libgcrypt
-		    (void)gcry_control(GCRYCTL_INIT_SECMEM, 262144);
+		    (void)gcry_control(GCRYCTL_INIT_SECMEM, libgcrypt_secured_memory_size);
 			// if secured memory could not be allocated, further request of secured memory will fail
 			// and a warning will show at that time (we cannot send a warning (just failure notice) at that time).
 

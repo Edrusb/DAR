@@ -40,6 +40,10 @@ from 2.7.x to 2.8.0
 - added opton -arep to allow catalog isolation of a truncated backup
 - signal (like CTRL-C) can now interrupt status where libdar is pending for
   a user answer, allowing automatic clean termination of the backup/archive.
+- added a new get_version() to let the caller specify the amount of secured
+  memory to reserve while initializing libgcrypt form libdar. Libgcrypt can
+  still also be initialized outside libdar in that case secured memory size
+  will have to be defined outside libdar.
 
 from 2.7.16 to 2.7.17
 - fixed bug where -R path ending with // was breaking the path filtering
