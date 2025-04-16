@@ -859,7 +859,7 @@ namespace libdar
 		throw SRC_BUG;
 
 	    op_create_in_sub(oper_repair,
-			     chem_dst,
+			     FAKE_ROOT,            // fs_root must be
 			     sauv_path_t,
 			     src.pimpl->cat,      // ref1
 			     nullptr,             // ref2
