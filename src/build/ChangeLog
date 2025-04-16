@@ -3,6 +3,10 @@ from 2.7.x to 2.8.0
   than the last slice to fetch archive format when reading an archive with
   the help of an external catalog in direct access mode.
 
+from 2.7.17 to 2.7.18
+- fixed bug that broke the ability to repair an archive through ftp/sftp
+  (repaing stays possible locally on the machine where resides the backup)
+
 from 2.7.16 to 2.7.17
 - fixed bug where -R path ending with // was breaking the path filtering
   mechanism (-P/-g/-[/-] options).
