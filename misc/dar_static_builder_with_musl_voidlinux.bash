@@ -44,6 +44,7 @@ LIBCURL_VERSION=7.86.0
 LIBP11KIT_VERSION=0.24.1
 LIBSSH_VERSION=0.10.3
 LIBSSH2_VERSION=1.10.0
+LIBRHASH_VERSION=1.4.5
 
 # define whether to use libssh or libssh2
 # note that both libraries do support ssh version 2 protocol,
@@ -278,6 +279,21 @@ libcurl()
     rm -rf curl-${LIBCURL_VERSION}
 }
 
+librhash()
+{
+    local LIBRHASH_PKG=librhash-${LIBRHASH_VERSION}.tar.gz
+
+    if [ ! -e "${REPO}/${LIBRHASH_PKG}" ] ; then wget "https://github.com/rhash/RHash/archive/refs/tags/v${LIBRHASH_VERSION}.tar.gz" && mv "v${LIBRHASH_VERSION}.tar.gz" "${REPO}"/"${LIBRHASH_PKG}" || exit 1 ; fi
+    tar -xf "${REPO}/${LIBRHASH_PKG}"
+    cd "RHash-${LIBRHASH_VERSION}"
+    ./configure --enable-static=librhash --prefix="$LOCAL_PREFIX"
+    make ${MAKE_FLAGS} lib-static lib-shared
+    make install-lib-static install-lib-shared
+    cd ..
+    ldconfig
+    rm -rf "RHash-${LIBRHASH_VERSION}"
+}
+
 dar_static()
 {
     make clean || /bin/true
@@ -297,6 +313,7 @@ dar_static()
 		--enable-threadar\
 		--enable-libargon2-linking\
 		--disable-python-binding\
+		--enable-librhash-linkling\
 		--prefix="$LOCAL_PREFIX" || exit 1
     make ${MAKE_FLAGS} || exit 1
     make install-strip || exit 1
@@ -324,4 +341,5 @@ case "$LIBSSH" in
 	exit 1
 esac
 libcurl || (echo "Failed building libcurl" && exit 1)
+librhash || (echo "Failed building librhash" && exit 1)
 dar_static || (echo "Failed building dar_static" && exit 1)
