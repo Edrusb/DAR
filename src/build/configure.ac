@@ -1952,7 +1952,6 @@ AS_IF(       [ test "x$enable_threadar" != "xyes" ],
                                [
                                  local_threadar=yes
                                  AC_DEFINE(LIBTHREADAR_AVAILABLE, 1, [when libthreadar could be found and linked against])
-                                 AC_MSG_RESULT(fine)
                                ],
                                [
                                  local_threadar=no
