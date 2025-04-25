@@ -2155,51 +2155,95 @@ AS_IF(
      )
 
 AC_MSG_CHECKING([static linking])
+LDFLAGS__cache="$LDFLAGS"
+LDFLAGS="$LDFLAGS --static"
 AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                                                 #if HAVE_STDIO_H
                                                 #include <stdio.h>
                                                 #endif
+
                                                 #if HAVE_EXECINFO_H
                                                 #include <execinfo.h>
                                                 #endif
+
                                                 #if HAVE_STDLIB_H
                                                 #include <stdlib.h>
                                                 #endif
+
                                                 #if HAVE_PTHREAD_H
                                                 #include <pthread.h>
                                                 #endif
+
                                                 #if HAVE_LIBRSYNC_H
                                                 #include <librsync.h>
                                                 #endif
+
                                                 #if HAVE_PTHREAD_H
                                                 #include <pthread.h>
                                                 #endif
-                                                #if HAVE_LIBRSYNC_H
-                                                #include <stdio.h>
-                                                #include <librsync.h>
-                                                #endif
+
                                                 #if HAVE_ZLIB_H
                                                 #include <zlib.h>
                                                 #endif
+
                                                 #if HAVE_BZLIB_H
                                                 #include <bzlib.h>
                                                 #endif
+
                                                 #if HAVE_LZO_LZO1X_H
                                                 #include <lzo/lzo1x.h>
                                                 #endif
+
                                                 #if HAVE_LZMA_H
                                                 #include <lzma.h>
                                                 #endif
+
+						#if HAVE_ZSTD_H
+						#include <zstd.h>
+						#endif
+
+						#if HAVE_LZ4_H
+						#include <lz4.h>
+						#endif
+
                                                 #if HAVE_GCRYPT_H
                                                 #include <gcrypt.h>
                                                 #endif
+
                                                 #if HAVE_CURL_CURL_H
                                                 #include <curl/curl.h>
                                                 #endif
+
                                                 #if HAVE_GPGME_H
                                                 #include <gpgme.h>
                                                 #endif
+
+						#ifdef LIBDAR_NODUMP_FEATURE
+						#if HAVE_SYS_IOCTL_H
+						#include <sys/ioctl.h>
+						#endif
+						#if HAVE_LINUX_EXT2_FS_H
+						#include <linux/ext2_fs.h>
+						#endif
+						#if HAVE_EXT2FS_EXT2_FS_H
+						#include <ext2fs/ext2_fs.h>
+						#endif
+						#endif
+
+						#if HAVE_ARGON2_H
+						#include <argon2.h>
+						#endif
+
+						#if HAVE_RHASH_H
+						#include <rhash.h>
+						#endif
                                              }
+
+					      /* C++ included files */
+
+					     #if HAVE_LIBTHREADAR_LIBTHREADAR_HPP
+					     #include <libthreadar/libthreadar.hpp>
+					     #endif
                                ]],
                                [[
                                #if BACKTRACE_AVAILABLE
@@ -2274,6 +2318,23 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                                }
                                #endif
 
+			       #if LIBZSTD_AVAILABLE
+			       if(1)
+			       {
+			          ZSTD_CStream *compr;
+				  unsigned int vers = ZSTD_versionNumber();
+                                  printf("testing zstd availability in static linked mode... version found: %d", vers);
+			       }
+			       #endif
+
+			       #if LIBLZ4_AVAILABLE
+			       if(1)
+			       {
+				  unsigned int size = LZ4_sizeofState();
+                                  printf("testing lz4 availability in static linked mode...");
+			       }
+			       #endif
+
                                #if CRYPTO_AVAILABLE
                                   printf("testing gcrypt availability in static linked mode...");
                                   if(!gcry_check_version(MIN_VERSION_GCRYPT))
@@ -2294,12 +2355,55 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                                if(1)
                                {
                                  gpgme_ctx_t context;
+				 gpgme_encrypt_flags_t flag;
                                  gpgme_error_t err = gpgme_new(&context);
+				 err = gpgme_set_protocol(context, GPGME_PROTOCOL_OpenPGP);
+				 gpgme_set_passphrase_cb(context, nullptr, nullptr);
+				 err = gpgme_signers_add(context, nullptr); // just for testing linking availability
+				 err = gpgme_op_encrypt(context, nullptr, flag, nullptr, nullptr);
+				 err = gpgme_op_encrypt_sign(context, nullptr, flag, nullptr, nullptr);
+				 err = gpgme_op_decrypt_verify(context, nullptr, nullptr);
+
                                  gpgme_release(context);
                                }
                                #endif
 
-                                 return 0;
+			       #ifdef LIBDAR_NODUMP_FEATURE
+			       if(1)
+			       {
+			         signed int f;
+				 signed int ret = ioctl(0, EXT2_IOC_GETFLAGS, &f);
+				 bool flag = f & EXT2_NODUMP_FL;
+				 printf("testing ext2fs availability in static linked mode...");
+			       }
+			       #endif
+
+			       #if LIBTHREADAR_AVAILABLE
+			       if(1)
+			       {
+			          unsigned int maj, med, min;
+				  libthreadar::get_version(maj, med, min);
+				  printf("testing libthreadar availability in static linked mode...");
+			       }
+			       #endif
+
+			       #if LIBARGON2_AVAILABLE
+			       if(1)
+			       {
+			          signed int err = argon2id_hash_raw(100, 100, 1, "", 0, "", 0, (void*)"", 0);
+				  printf("testing libargon2 availability in static linked mode...");
+			       }
+			       #endif
+
+			       #if RHASH_AVAILABLE
+			       if(1)
+			       {
+			          rhash rhash_ctxt = rhash_init(RHASH_WHIRLPOOL);
+				  printf("testing librhash availability in static linked mode...");
+			       }
+			       #endif
+
+			       return 0;
                                ]])
                ],
                [
@@ -2313,6 +2417,8 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                         [ AC_MSG_ERROR([Cannot build dar-static on this system, check config.log]) ]
                       )
                ])
+LDFLAGS="$LDFLAGS__cache"
+
 
 AC_ARG_ENABLE( [python-binding],
                AS_HELP_STRING(--disable-python-binding, [ignore python binding even if it is possible to build it]),
@@ -2646,7 +2752,7 @@ if [ "$static_pb" = "yes" -a "$build_static" = "yes" ] ; then
    echo "    If  you  want to know  which libraries  are not available  as  static"
    echo "    libraries check the logs in the config.log generated file. the command"
    echo ""
-   echo "         'grep -e -static -A 2 config.log'"
+   echo "         'grep -e \"static linking\" -A 5 config.log'"
    echo ""
    echo "    should bring you to the essentials."
    echo ""
