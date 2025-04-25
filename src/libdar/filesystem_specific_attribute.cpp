@@ -38,20 +38,19 @@ extern "C"
 #if HAVE_STRING_H
 #include <string.h>
 #endif
+
 #ifdef LIBDAR_NODUMP_FEATURE
 #if HAVE_SYS_IOCTL_H
 #include <sys/ioctl.h>
 #endif
-#if LIBDAR_NODUMP_FEATURE == NODUMP_LINUX
+#if HAVE_LINUX_EXT2_FS_H
 #include <linux/ext2_fs.h>
-#else
-#if LIBDAR_NODUMP_FEATURE == NODUMP_EXT2FS
+#endif
+#if HAVE_EXT2FS_EXT2_FS_H
 #include <ext2fs/ext2_fs.h>
-#else
-#error "unknown location of ext2_fs.h include file"
 #endif
 #endif
-#endif
+
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif

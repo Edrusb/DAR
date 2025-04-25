@@ -136,7 +136,7 @@ AC_PROG_EGREP
 
 AC_HEADER_SYS_WAIT
 
-AC_CHECK_HEADERS([fcntl.h netinet/in.h arpa/inet.h stdint.h stdlib.h string.h sys/ioctl.h sys/socket.h termios.h unistd.h utime.h sys/types.h signal.h errno.h sys/un.h sys/stat.h time.h fnmatch.h regex.h pwd.h grp.h stdio.h pthread.h ctype.h getopt.h limits.h stddef.h sys/utsname.h libintl.h sys/capability.h linux/capability.h utimes.h sys/time.h wchar.h wctype.h stddef.h])
+AC_CHECK_HEADERS([fcntl.h netinet/in.h arpa/inet.h stdint.h stdlib.h string.h sys/ioctl.h sys/socket.h termios.h unistd.h utime.h sys/types.h signal.h errno.h sys/un.h sys/stat.h time.h fnmatch.h regex.h pwd.h grp.h stdio.h pthread.h ctype.h getopt.h limits.h stddef.h sys/utsname.h libintl.h sys/capability.h linux/capability.h utimes.h sys/time.h wchar.h wctype.h stddef.h ext2fs/ext2_fs.h linux/ext2_fs.h])
 
 AC_SYS_LARGEFILE
 
@@ -1191,40 +1191,31 @@ AC_ARG_ENABLE(  [nodump-flag],
 AS_IF(          [test "x$enable_nodump_flag" != "xyes"],
                 [AC_MSG_RESULT([extX FSA disabled])],
                 [AC_LINK_IFELSE([AC_LANG_PROGRAM([[extern "C" {
-                                                    #include <ext2fs/ext2_fs.h>
-                                                    #if HAVE_SYS_IOCTL_H
-                                                    #include <sys/ioctl.h>
-                                                    #endif
+						    #if HAVE_SYS_IOCTL_H
+						    #include <sys/ioctl.h>
+						    #endif
+						    #if HAVE_LINUX_EXT2_FS_H
+						    #include <linux/ext2_fs.h>
+						    #endif
+						    #if HAVE_EXT2FS_EXT2_FS_H
+						    #include <ext2fs/ext2_fs.h>
+						    #endif
                                                     }]],[[int fd, f; ioctl(fd, EXT2_IOC_GETFLAGS, &f);]]
                                                 )
                                 ],
                                 [
-                                AC_DEFINE(LIBDAR_NODUMP_FEATURE, [NODUMP_EXT2FS], [if defined, activates the ext2/3 nodump flag feature])
-                                local_nodump_feature="yes"
-                                AC_MSG_RESULT([found <ext2fs/ext2_fs.h>])
+                                  AC_DEFINE(LIBDAR_NODUMP_FEATURE, 1, [if defined, activates the ext2/3 nodump flag feature])
+                                  local_nodump_feature="yes"
+                                  AC_MSG_RESULT([found <ext2_fs.h> include file])
                                 ],
                                 [
-                                AC_LINK_IFELSE(  [AC_LANG_PROGRAM([[extern "C" {
-                                                                    #include <linux/ext2_fs.h>
-                                                                    #if HAVE_SYS_IOCTL_H
-                                                                    #include <sys/ioctl.h>
-                                                                    #endif
-                                                                    }]],[[int fd, f; ioctl(fd, EXT2_IOC_GETFLAGS, &f);]])
-                                                 ],
-                                                 [
-                                                   AC_DEFINE(LIBDAR_NODUMP_FEATURE, [NODUMP_LINUX], [if defined, activates the ext2/3 nodump flag feature])
-                                                   local_nodump_feature="yes"
-                                                   AC_MSG_RESULT([found <linux/ext2_fs.h>])
-                                                 ],
-                                                 [
-                                                   AC_MSG_RESULT([NOT FOUND])
-                                                   local_nodump_feature="no"
-                                                   AC_MSG_WARN([cannot find ext2_fs.h header file, nodump-flag and extX FSA features will not be available])
-                                                 ])
+                                   AC_MSG_RESULT([NOT FOUND])
+                                   local_nodump_feature="no"
+                                   AC_MSG_WARN([cannot find ext2_fs.h header file, nodump-flag and extX FSA features will not be available])
                                 ])
-                  AS_IF( [ test "x$explicit_nodump_flag" = "xyes" -a "$local_nodump_feature" != "yes" ],
-                         [ AC_MSG_ERROR([Failed activating nodump feature]) ]
-                       )
+	         AS_IF( [ test "x$explicit_nodump_flag" = "xyes" -a "$local_nodump_feature" != "yes" ],
+                        [ AC_MSG_ERROR([Failed activating nodump feature]) ]
+                      )
                 ]
      )
 

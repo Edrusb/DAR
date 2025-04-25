@@ -71,14 +71,11 @@ extern "C"
 #if HAVE_SYS_IOCTL_H
 #include <sys/ioctl.h>
 #endif
-#if LIBDAR_NODUMP_FEATURE == NODUMP_LINUX
+#if HAVE_LINUX_EXT2_FS_H
 #include <linux/ext2_fs.h>
-#else
-#if LIBDAR_NODUMP_FEATURE == NODUMP_EXT2FS
-#include <ext2fs/ext2_fs.h>
-#else
-#error "unknown location of ext2_fs.h include file"
 #endif
+#if HAVE_EXT2FS_EXT2_FS_H
+#include <ext2fs/ext2_fs.h>
 #endif
 #endif
 
