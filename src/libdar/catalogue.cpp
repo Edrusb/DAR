@@ -158,7 +158,14 @@ namespace libdar
 		    try
 		    {
 			tools_read_string(*pdesc.stack, tmp);
-			in_place = path(tmp);
+			try
+			{
+			    in_place = path(tmp, false);
+			}
+			catch(Erange & e)
+			{
+			    in_place = path(tmp, true);
+			}
 		    }
 		    catch(Erange & e)
 		    {
