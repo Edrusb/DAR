@@ -453,7 +453,7 @@ namespace libdar
 		    throw SRC_BUG;
 	    }
 
-		ordered_fils.erase(it);
+	    ordered_fils.erase(it);
 	    it = ordered_fils.end();
 	    return true;
 	}
