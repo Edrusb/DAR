@@ -6,6 +6,9 @@ from 2.7.x to 2.8.0
 from 2.7.17 to 2.7.18
 - fixed bug that broke the ability to repair an archive through ftp/sftp
   (repaing stays possible locally on the machine where resides the backup)
+- fixed the reading of archive header (in-place field) when the -R path
+  given at creation time was valid or common unix path (/some//path for
+  example).
 
 from 2.7.16 to 2.7.17
 - fixed bug where -R path ending with // was breaking the path filtering
