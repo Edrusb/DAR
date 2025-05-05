@@ -303,7 +303,7 @@ namespace libdar
 	if(tmp == nullptr)
 	    throw Erange("catalogue::skip_read_to_parent_dir", gettext("root does not have a parent directory"));
 	if(early_mem_release)
-	    tmp->remove(current_read->get_name());
+	    tmp->remove_if_no_mirage(current_read->get_name());
 	current_read = tmp;
     }
 
@@ -336,7 +336,7 @@ namespace libdar
 	    {
 
 		if(early_mem_release)
-		    papa->remove(current_read->get_name());
+		    papa->remove_if_no_mirage(current_read->get_name());
 		    // this unlink current_read from 'papa'
 		    // but also delete the object and all
 		    // its children if any
@@ -361,7 +361,7 @@ namespace libdar
 	    else
 	    {
 		if(early_mem_release)
-		    parent->remove(current_read->get_name());
+		    parent->remove_if_no_mirage(current_read->get_name());
 		current_read = parent;
 	    }
 	    ref = nullptr;

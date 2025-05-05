@@ -623,7 +623,7 @@ namespace libdar
 				    const cat_directory & here = get_current_add_dir();
 				    cat_directory *here_nc = const_cast<cat_directory*>(& here);
 				    if(here_nc != nullptr)
-					here_nc->remove(current_dir_name);
+					here_nc->remove_if_no_mirage(current_dir_name);
 				    else
 					throw SRC_BUG;
 				}
