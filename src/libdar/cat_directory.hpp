@@ -102,7 +102,15 @@ namespace libdar
 	    /// no need to call reset_read_children(), if the argument removed was the
 	    /// one about to be read by read_children() the one following the removed entry
 	    /// will be returned the next time read_children() is invoked.
+	    /// \note calling remove() on a directory having cat_mirage objects may lead to
+	    /// delete the hard linked inode from memory (stored in the pointed to cat_etoile)
+	    /// if a next cat_mirage referring to that inode (through the use of the same etiquette number)
+	    /// comes to be read, this will lead dar to report a corrupted cat_directory/catalogue
+	    /// in that context, rather use remove_if_no_mirage()
 	void remove(const std::string & name);
+
+	    /// remove the given entry if it is not a cat_mirage or a directory tree with cat_mirage objects
+	void remove_if_no_mirage(const std::string & name);
 
 	    /// remove all entries contained in this directory (recursively)
 	void clear();
@@ -184,6 +192,14 @@ namespace libdar
 	void recursive_flag_size_to_update() const;
 	void erase_ordered_fils(std::deque<cat_nomme *>::const_iterator debut,
 				std::deque<cat_nomme *>::const_iterator fin);
+
+	    /// remove all entry of the current directory except cat_mirage or cat_directory containing cat_mirage
+
+	    /// \return true if no cat_mirage was found and all entries have been removed from the cat_directory object
+	    /// \note this is a recursive call, remains the directory tree where are located cat_mirages objects
+	bool remove_all_except_mirages();
+
+
     };
 
 	/// @}

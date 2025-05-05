@@ -582,6 +582,41 @@ namespace libdar
 	recursive_flag_size_to_update();
     }
 
+    void cat_directory::remove_if_no_mirage(const std::string & name)
+    {
+	const cat_nomme* ref = nullptr;
+
+	if(search_children(name, ref))
+	{
+	    if(ref == nullptr)
+		throw SRC_BUG;
+	    const cat_mirage* ref_mir = dynamic_cast<const cat_mirage*>(ref);
+	    const cat_directory* ref_dir = dynamic_cast<const cat_directory*>(ref);
+
+		// if this is a mirage, we must not remove it
+
+	    if(ref_mir != nullptr)
+		return;
+
+		// if this is a directory, we can remove it only if it does not contain mirage
+
+	    if(ref_dir != nullptr)
+	    {
+		cat_directory* ncst_ref_dir = const_cast<cat_directory*>(ref_dir);
+		if(ncst_ref_dir == nullptr)
+		    throw SRC_BUG;
+		if(ncst_ref_dir->remove_all_except_mirages())
+		    remove(name);
+		return; // directory case treated
+	    }
+
+		// not a mirage nor a directory, we can remove it unconditionaly
+	    remove(name);
+	}
+	else
+	    throw SRC_BUG;
+    }
+
     void cat_directory::recursively_set_to_unsaved_data_and_FSA()
     {
 	deque<cat_nomme *>::iterator it = ordered_fils.begin();
@@ -917,6 +952,55 @@ namespace libdar
 
 	    ++curs;
 	}
+    }
+
+    bool cat_directory::remove_all_except_mirages()
+    {
+	bool ret = true;
+	bool sub_ret = false;
+	U_I cur = 0;
+	cat_directory* tmp_dir = nullptr;
+	cat_mirage* tmp_mir = nullptr;
+
+	while(cur < ordered_fils.size())
+	{
+	    if(ordered_fils[cur] == nullptr)
+		throw SRC_BUG;
+	    tmp_dir = dynamic_cast<cat_directory*>(ordered_fils[cur]);
+	    tmp_mir = dynamic_cast<cat_mirage*>(ordered_fils[cur]);
+
+	    if(tmp_dir != nullptr)
+	    {
+		sub_ret = tmp_dir->remove_all_except_mirages();
+		if(sub_ret)
+		{
+		    remove(ordered_fils[cur]->get_name());
+			// we do not increment cur as
+			// in the current position now
+			// resides the next entry
+		}
+		else
+		{
+		    ret = false;
+		    ++cur; // skipping this entry
+		}
+		continue; // continuing at the while loop begining
+	    }
+
+	    if(tmp_mir == nullptr)
+	    {
+		ret = false;
+		++cur; // skipping this entry
+		continue; // continuing at the while loop begining
+	    }
+
+		// *it does not point to a cat_mirage nor a cat_directory
+		// we can remove it
+	    remove(ordered_fils[cur]->get_name());
+		// we do not increment "cur"
+	}
+
+	return ret;
     }
 
 
