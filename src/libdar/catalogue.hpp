@@ -286,9 +286,6 @@ namespace libdar
 	void swap_stuff(catalogue & ref);
 
 	    /// provide to inherited class the access to the early mem release mode and fields
-	bool get_early_mem_release() const { return early_mem_release; };
-
-	    /// provide to inherited class the access to the early mem release mode and fields
 	bool is_mem_released() const { return mem_released; };
 
 	    /// let inherited class tell when memory release has completed

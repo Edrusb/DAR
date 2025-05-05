@@ -579,7 +579,7 @@ namespace libdar
 
 			    string current_dir_name;
 
-			    if(is_eod && get_early_mem_release())
+			    if(is_eod && get_early_memory_release())
 			    {
 				    // before adding the eod to the catalogue::add method right after this test
 				    // we must record the name of the current directory
@@ -618,7 +618,7 @@ namespace libdar
 
 				    // now we can remove the former current directory we
 				    // just exited from
-				if(get_early_mem_release())
+				if(get_early_memory_release())
 				{
 				    const cat_directory & here = get_current_add_dir();
 				    cat_directory *here_nc = const_cast<cat_directory*>(& here);
@@ -791,7 +791,7 @@ namespace libdar
 			// the end of the detruits
 		    if(!cat_det->read(ref))
 		    {
-			if(!get_early_mem_release())
+			if(!get_early_memory_release())
 			    ceci->merge_cat_det();
 			else
 			    ceci->set_mem_released();
