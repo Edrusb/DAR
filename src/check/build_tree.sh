@@ -53,12 +53,14 @@ mkdir "$SUB1"
 setfattr -n user.cuicui -v hellu "$SUB1"
 cd "$SUB1"
 ln ../plain_file.txt hard_linked_inode.txt
+echo "another hard linked file" > other_hard_link.txt
 cd ..
 
 mkdir "$SUB2"
 cd "$SUB2"
 ln -s "../$SUB1"/hard_linked_inode.txt symlink.txt
 ln symlink.txt hard_to_symlink.txt
+ln ../"$SUB1"/other_hard_link.txt other_hard_link.txt
 dd bs=4096 seek=10 count=1 if=/dev/zero of=sparse.txt 1> /dev/null 2> /dev/null
 echo "some chars in the middle of holes" >> sparse.txt
 dd bs=4096 conv=notrunc if=/dev/zero  count=10 >> sparse.txt 2> /dev/null
