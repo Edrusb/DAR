@@ -178,7 +178,7 @@ namespace libdar
         virtual void inherited_write(const char *a, U_I size) override;
 	virtual void inherited_truncate(const infinint & pos) override;
 	virtual void inherited_sync_write() override;
-	virtual void inherited_flush_read() override { stop_read_threads(); };
+	virtual void inherited_flush_read() override { stop_read_threads(); reof = false; };
 	virtual void inherited_terminate() override;
 
     private:
