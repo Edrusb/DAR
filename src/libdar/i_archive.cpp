@@ -808,6 +808,8 @@ namespace libdar
 	statistics* st_ptr = progressive_report == nullptr ? &st : progressive_report;
 	archive_options_read my_options_read = options_read;
 	bool initial_pause = (*options_read.get_entrepot() == *options_repair.get_entrepot() && chem_src == chem_dst);
+	infinint compr_bs;
+	U_I compr_bs_ui;
 
 	    ////
 	    // initializing object fields
@@ -858,6 +860,12 @@ namespace libdar
 	    if(src.pimpl->cat == nullptr)
 		throw SRC_BUG;
 
+	    compr_bs_ui = 0;
+	    compr_bs = src.pimpl->ver.get_compression_block_size();
+	    compr_bs.unstack(compr_bs_ui);
+	    if(! compr_bs.is_zero())
+		throw Erange("macro_tools_open_layers", gettext("compression block size used in the archive exceed integer capacity of the current system"));
+
 	    op_create_in_sub(oper_repair,
 			     FAKE_ROOT,            // fs_root must be
 			     sauv_path_t,
@@ -880,7 +888,7 @@ namespace libdar
 			     false,               // empty_dir
 			     src.pimpl->ver.get_compression_algo(),
 			     9,                   // we keep the data compressed this parameter has no importance
-			     0,                   // we keep the compression block size, this parameter has no importance
+			     compr_bs_ui,
 			     options_repair.get_slice_size(),
 			     options_repair.get_first_slice_size(),
 			     bool_mask(true),     // ea_mask
