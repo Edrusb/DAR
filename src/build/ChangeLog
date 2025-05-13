@@ -14,6 +14,13 @@ from 2.7.17 to 2.7.18
 - fixed bug avoiding dar to repair archives relying on block compression,
   testing the "repaired" archive lead to reporting corrupted data for all
   compressed files and compressed EA.
+- disabling min-digits checks for auxiliary and reference backups when
+  they are stored in a remote repository (these checks was avoiding using
+  remote auxiliary and reference backups).
+- fixing bug in libcurl adaptation layer to libdar (fichier_libcurl) where
+  while reading, the end of file was not detected properly in very rare
+  context, leading the encryption layer trying (and failing) to decipher
+  the clear data located at end of archive.
 
 from 2.7.16 to 2.7.17
 - fixed bug where -R path ending with // was breaking the path filtering
