@@ -1249,6 +1249,10 @@ namespace libdar
 	}
 	else
 	    ret.set_in_place(""); // empty string when in_place is not set
+	ret.set_compression_block_size(get_header().get_compression_block_size());
+	ret.set_salt(get_header().get_salt());
+	ret.set_iteration_count(get_header().get_iteration_count());
+	ret.set_kdf_hash(hash_algo_to_string(get_header().get_kdf_hash()));
 
 	ret.set_contents(get_cat().get_stats());
 
