@@ -273,7 +273,9 @@ namespace libdar
 
     void fichier_libcurl::inherited_read_ahead(const infinint & amount)
     {
-	relaunch_thread(amount);
+	if(!has_maxpos || current_offset < maxpos)
+	    relaunch_thread(amount);
+	    // we relaunch thread only if we are not at EOF
     }
 
     void fichier_libcurl::inherited_truncate(const infinint & pos)
@@ -408,9 +410,16 @@ namespace libdar
 	U_I delta;
 	bool maybe_eof = false;
 
-	set_subthread(size);
-
 	read = 0;
+
+	if(has_maxpos && current_offset >= maxpos)
+	{
+	    if(interthread.is_not_empty())
+		throw SRC_BUG;
+	    return true;
+	}
+
+	set_subthread(size);
 	do
 	{
 	    delta = 0;
@@ -449,7 +458,6 @@ namespace libdar
 		    // we can only now switch to data mode because current_offset is now correct.
 		    // This will (re-)launch the thread that should fill interthread pipe with data
 		set_subthread(remaining);
-		size = read + remaining;
 	    }
 	}
 	while(read < size && (is_running() || interthread.is_not_empty()));

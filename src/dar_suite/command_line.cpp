@@ -416,9 +416,13 @@ bool get_args(shared_ptr<user_interaction> & dialog,
                 throw SRC_BUG;
             else
 	    {
-                line_tools_check_basename(*dialog, *p.aux_root, *p.aux_filename, EXTENSION, false);
-		if(p.aux_num_digits.is_zero())
-		    line_tools_check_min_digits(*dialog, *p.aux_root, *p.aux_filename, EXTENSION, p.aux_num_digits);
+		bool local = p.aux_remote.ent_proto.empty();
+		if(local)
+		{
+		    line_tools_check_basename(*dialog, *p.aux_root, *p.aux_filename, EXTENSION, false);
+		    if(p.aux_num_digits.is_zero())
+			line_tools_check_min_digits(*dialog, *p.aux_root, *p.aux_filename, EXTENSION, p.aux_num_digits);
+		}
 	    }
         }
 
@@ -458,9 +462,14 @@ bool get_args(shared_ptr<user_interaction> & dialog,
                 throw SRC_BUG;
             else
 	    {
-                line_tools_check_basename(*dialog, *p.ref_root, *p.ref_filename, EXTENSION, false);
-		if(p.ref_num_digits.is_zero())
-		    line_tools_check_min_digits(*dialog, *p.ref_root, *p.ref_filename, EXTENSION, p.ref_num_digits);
+		bool local = p.ref_remote.ent_proto.empty();
+
+		if(local)
+		{
+		    line_tools_check_basename(*dialog, *p.ref_root, *p.ref_filename, EXTENSION, false);
+		    if(p.ref_num_digits.is_zero())
+			line_tools_check_min_digits(*dialog, *p.ref_root, *p.ref_filename, EXTENSION, p.ref_num_digits);
+		}
 	    }
         }
 
