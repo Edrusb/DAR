@@ -438,7 +438,6 @@ namespace libdar
 		    // we can only now switch to data mode because current_offset is now correct.
 		    // This will (re-)launch the thread that should fill interthread pipe with data
 		set_subthread(remaining);
-		size = read + remaining;
 	    }
 	}
 	while(read < size && (is_running() || interthread.is_not_empty()));
