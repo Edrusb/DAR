@@ -253,7 +253,9 @@ namespace libdar
 
     void fichier_libcurl::inherited_read_ahead(const infinint & amount)
     {
-	relaunch_thread(amount);
+	if(!has_maxpos || current_offset < maxpos)
+	    relaunch_thread(amount);
+	    // we relaunch thread only if we are not at EOF
     }
 
     void fichier_libcurl::inherited_truncate(const infinint & pos)
@@ -388,9 +390,16 @@ namespace libdar
 	U_I delta;
 	bool maybe_eof = false;
 
-	set_subthread(size);
-
 	read = 0;
+
+	if(has_maxpos && current_offset >= maxpos)
+	{
+	    if(interthread.is_not_empty())
+		throw SRC_BUG;
+	    return true;
+	}
+
+	set_subthread(size);
 	do
 	{
 	    delta = 0;
