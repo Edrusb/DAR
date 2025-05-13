@@ -42,14 +42,16 @@ namespace libdar
 	storage_size = 0;
 	data_size = 0;
 	contents.clear();
-	edition = "";
-	algo_zip = "";
-	user_comment = "";
-	cipher = "";
-	asym = "";
+	edition.clear();
+	algo_zip.clear();
+	user_comment.clear();
+	cipher.clear();
+	asym.clear();
 	is_signed = false;
 	tape_marks = false;
+	compr_block_size = 0;
+	salt.clear();
+	kdf_hash.clear();
     }
-
 
 } // end of namespace

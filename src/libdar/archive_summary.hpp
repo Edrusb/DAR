@@ -64,14 +64,18 @@ namespace libdar
 	const infinint & get_storage_size() const { return storage_size; };
 	const infinint & get_data_size() const { return data_size; };
 	const entree_stats & get_contents() const { return contents; };
-	std::string get_edition() const { return edition; };
-	std::string get_compression_algo() const { return algo_zip; };
-	std::string get_user_comment() const { return user_comment; };
-	std::string get_cipher() const { return cipher; };
-	std::string get_asym() const { return asym; };
+	const std::string & get_edition() const { return edition; };
+	const std::string & get_compression_algo() const { return algo_zip; };
+	const std::string & get_user_comment() const { return user_comment; };
+	const std::string & get_cipher() const { return cipher; };
+	const std::string & get_asym() const { return asym; };
 	bool get_signed() const { return is_signed; };
 	bool get_tape_marks() const { return tape_marks; };
-	std::string get_in_place() const { return in_place; };
+	const std::string & get_in_place() const { return in_place; };
+	const infinint & get_compression_block_size() const { return compr_block_size; };
+	const std::string & get_salt() const { return salt; };
+	const infinint & get_iteration_count() const { return iteration_count; };
+	const std::string & get_kdf_hash() const { return kdf_hash; };
 
 
 	    // SETTINGS
@@ -95,6 +99,10 @@ namespace libdar
 	void set_signed(bool arg) { is_signed = arg; };
 	void set_tape_marks(bool arg) { tape_marks = arg; };
 	void set_in_place(const std::string & arg) { in_place = arg; };
+	void set_compression_block_size(const infinint & arg) { compr_block_size = arg; };
+	void set_salt(const std::string & arg) { salt = arg; };
+	void set_iteration_count(const infinint & arg) { iteration_count = arg; };
+	void set_kdf_hash(const std::string & arg) { kdf_hash = arg; };
 
 	void clear();
 
@@ -118,7 +126,10 @@ namespace libdar
 	bool is_signed;               ///< whether the archive is signed
 	bool tape_marks;              ///< whether the archive has tape marks (for sequential reading)
 	std::string in_place;         ///< in_place path empty string if absent
-
+	infinint compr_block_size;    ///< compression block size, or zero if stream compression is used
+	std::string salt;             ///< the salt
+	infinint iteration_count;     ///< iteration count for KDF routine
+	std::string kdf_hash;         ///< kdf hash algo
     };
 
 } // end of namespace
