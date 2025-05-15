@@ -25,8 +25,8 @@
 
     /// Several classes are defined here:
     /// - class parallel_tronconneuse, which has similar interface and behavior as class tronconneuse
-    /// - class read_below, is used internally by parallel_tronconneuse in read-only mode to workers from data of the underlay
-    /// - class write_below, is used internally by parallel_tronconneuse in write-only mode to write down the data produced by the workers
+    /// - class read_below, is used internally by parallel_tronconneuse in read-only mode to feed workers with encrypted data of the underlay
+    /// - class write_below, is used internally by parallel_tronconneuse in write-only mode to write down the encrypted data produced by the workers
     /// - class crypto_workers, that transform data between parallel_tronconneuse and the read_below class or the write_below class
     /// depending on the context. Several objects of this class executes in parallel the crypto_module routine, but there is
     /// only one read_below or write_below thread, the class parallel_tronconneuse stays executed by the main/original/calling thread
@@ -271,7 +271,7 @@ namespace libdar
             /// \param[in] pos if pos is not zero and normal data is found at
             /// pos offset before all stop acks could get read, the call stops
             /// and return false. Else true is returned meaning all stop acks
-            /// has been read and removed from the pope
+            /// has been read and removed from the pipe
             /// \note this method acts the same pas purge_ratelier_from_next_order but fetch
             /// from ratelier up to data offset met of the pending ack to be all read
             /// but it then stops, it does not look for a real order after

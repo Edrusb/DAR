@@ -318,7 +318,7 @@ namespace libdar
 		    {
 			sequence_type m;
 
-			if(next_to_read_is_which_mark(m)) // this is not EOF, but unsued mark is present
+			if(next_to_read_is_which_mark(m)) // this is not EOF, but unused mark is present
 			    if(m == seqt_file)
 				throw SRC_BUG; // should have been reported above by next_to_read_is_mark(seqt_file)
 			    else
