@@ -51,7 +51,7 @@ namespace libdar
     bool tuyau_global::skip(const infinint & pos)
     {
 	if(pos < current_pos)
-	    return false;
+	    throw Erange("tuyau_global::skip", "Skipping backward on a pipe");
 	else
 	{
 	    infinint amount = pos - current_pos;
