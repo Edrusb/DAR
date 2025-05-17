@@ -25,6 +25,8 @@ from 2.7.17 to 2.7.18
 - reading a encrypted and sliced archive in sequential-read mode lead dar
   asking for the an after-last non existing slice at the end of the
   operation.
+- comparing an archive having binary delta patch for a file failed in
+  sequential read mode with self reporting bug in cat_file.cpp line 1479
 
 from 2.7.16 to 2.7.17
 - fixed bug where -R path ending with // was breaking the path filtering

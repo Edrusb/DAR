@@ -1475,8 +1475,20 @@ namespace libdar
 	{
 	    const crc *my_crc = nullptr;
 
-	    if(get_saved_status() == saved_status::delta && !has_patch_result_crc())
-		throw SRC_BUG;
+	    if(get_saved_status() == saved_status::delta)
+	    {
+		    // we need to read the patch data and its crc
+
+		const crc *value = nullptr;
+		if(!get_crc(value))
+		    throw Erange ("cat_file::sub_compare", gettext("Missing CRC field for the delta patch stored in archive"));
+
+
+		    // then we can fetch the delta sig structure and the patch result crc it contains
+
+		if(!has_patch_result_crc())
+		    throw SRC_BUG;
+	    }
 
 		// if we have a CRC available for data
 	    if((get_saved_status() != saved_status::delta && get_crc(my_crc))
