@@ -406,7 +406,6 @@ namespace libdar
 
 	    // initialized by inherited_run() / get_ready_for_new_offset()
 
-	infinint crypt_offset;                                                    ///< position to skip to in 'below' to start reading crypted data
 	U_I encrypted_buf_size;                                                   ///< size of the encrypted chunk of data
 
 	    // fields accessible by both the caller and the read_below thread

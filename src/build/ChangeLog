@@ -27,6 +27,10 @@ from 2.7.17 to 2.7.18
   operation.
 - comparing an archive having binary delta patch for a file failed in
   sequential read mode with self reporting bug in cat_file.cpp line 1479
+- fixing multi-threaded deciphering when reaching the end of the archive
+  and if a skip() instruction is given from the master thread to change
+  reading position (bug type message at parallel_tronconneuse.cpp line 662
+  was reported).
 
 from 2.7.16 to 2.7.17
 - fixed bug where -R path ending with // was breaking the path filtering
