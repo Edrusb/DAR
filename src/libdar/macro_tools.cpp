@@ -162,6 +162,7 @@ namespace libdar
 	generic_file *crypto = cata_stack.get_by_label(LIBDAR_STACK_LABEL_UNCYPHERED);
 	contextual *data_ctxt = nullptr;
 	contextual *cata_ctxt = nullptr;
+	zapette *data_zap = nullptr;
 
       	if(!dialog)
 	    throw SRC_BUG; // dialog points to nothing
@@ -174,6 +175,9 @@ namespace libdar
 	cata_stack.find_first_from_top(cata_ctxt);
 	if(cata_ctxt == nullptr)
 	    throw SRC_BUG;
+
+	data_stack.find_first_from_bottom(data_zap);
+	    // data_zap may be null, if not used
 
         if(info_details)
             dialog->message(gettext("Locating archive contents..."));
@@ -216,8 +220,44 @@ namespace libdar
 		// info without first stopping subthreads would
 		// conflict the thread that may still be reading ahead
 		// data from the archive
-	    data_stack.flush_read_above(dynamic_cast<generic_file*>(data_ctxt));
-	    cata_stack.flush_read_above(dynamic_cast<generic_file*>(cata_ctxt));
+
+		// well, the point underlined above that drove to applying
+		// flush_read to cata_stack and data_stack does not
+		// seem pertinent. The only case where set_info_status()
+		// does correspond to the description is when it is applied
+		// to a zapette object (class that overloads the set_info_status()
+		// from contextual class), and the problem reported above could not be produced.
+
+		// flushing the data_stack creates a problem in sequential read mode
+		// with ciphering when using an external catalalogue (detailed below),
+		// but hopefully, sequential-read mode and the use of zapette are mutually
+		// exclusive. This unless zapette is used in data_stack, we do not flush read
+		// anymore.
+
+	    if(data_zap != nullptr)
+	    {
+		data_stack.flush_read_above(dynamic_cast<generic_file*>(data_ctxt));
+		cata_stack.flush_read_above(dynamic_cast<generic_file*>(cata_ctxt));
+	    }
+
+		// Details of the problem (sequential read mode + external catalgue + ciphering)
+		// the data_stack is first opened and the eleastic buffer is read. But more
+		// data than just the elastic buffer has been deciphered (due to block size, and if
+		// using parallel deciphering, more blocks have been handled by workers read_below
+		// thread and the ratlier scatter above data structure hold even some more clear data.
+		// read to be read.
+
+		// The function here will then fetch the catalog on the cata_stack pile, leaving
+		// idle the data_stack, then, if the flush_read occurs on the data_stack, the way it
+		// was performed before this commit was done, all the deciphered data is lost.
+		// When it come later to read the Data and EA located right after the elastic buffer
+		// this will need to request to skip back to re-read this ciphered data, and re-decipher it.
+		// But in sequential-read mode, skipping back may not be possible (in particular when
+		// reading the archive on a pipe or stdin). This leads the sar layer to report
+		// false to the skip() request, and the few EA and Data that cannot be accessed
+		// due the their data located before the current read position of the ciphered data
+		// to be reported as corrupted (CRC on an empty data or EA, will not match the one of the
+		// real data or EA).
 
 	    try
 	    {
