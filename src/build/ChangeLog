@@ -20,8 +20,8 @@ from 2.7.17 to 2.7.18
   the help of an external catalog (the few first data and EA were reported
   as corrupted in sequential read mode, not in direct read mode or without
   the help of an external catalog).
-- fixing bug in non-regression test routines, which one fixed revealed the
-  following bugs
+- fixing bug in non-regression test routines, which, once fixed, revealed
+  the following bugs (about sequential reading mode):
 - reading a encrypted and sliced archive in sequential-read mode lead dar
   asking for the an after-last non existing slice at the end of the
   operation.
