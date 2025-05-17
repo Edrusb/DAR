@@ -31,6 +31,15 @@ from 2.7.17 to 2.7.18
   and if a skip() instruction is given from the master thread to change
   reading position (bug type message at parallel_tronconneuse.cpp line 662
   was reported).
+- fixing bug in archive class implementation met when comparing an archive
+  with filesystem in sequential read mode with the help of an isolated
+  catalogue. In such context, the hard linked inode can only be compared
+  at the first hard link encontered, other occurence are skipped. The
+  isolated catalog gave a wrong information as it was read in direct mode
+  while fetching the data and EA to compare were read in sequential mode
+  without the ability to skip back to re-read a hard linked inode, this
+  caused the second time comparison to be reported as failed instead of
+  being flagged as skipped.
 
 from 2.7.16 to 2.7.17
 - fixed bug where -R path ending with // was breaking the path filtering

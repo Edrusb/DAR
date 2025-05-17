@@ -85,7 +85,8 @@ namespace libdar
 			 const datetime & root_last_modif,
 			 const label & data_name): mem_ui(ui),
 						   out_compare("/"),
-						   in_place(".") // is absolute path when set
+						   in_place("."), // is absolute path when set
+						   faked_escape(nullptr)
     {
 	contenu = nullptr;
 
@@ -118,7 +119,8 @@ namespace libdar
 			 const label & lax_layer1_data_name,
 			 bool only_detruit): mem_ui(ui),
 					     out_compare("/"),
-					     in_place(".")
+					     in_place("."),
+					     faked_escape(nullptr)
     {
 	string tmp;
 	saved_status st;
@@ -1445,6 +1447,7 @@ namespace libdar
 	    sub_count = ref.sub_count;
 	    stats = ref.stats;
 	    ref_data_name = ref.ref_data_name;
+	    faked_escape = ref.faked_escape;
 	}
 	catch(...)
 	{
