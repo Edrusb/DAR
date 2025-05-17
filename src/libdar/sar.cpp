@@ -583,7 +583,30 @@ namespace libdar
 		    if((!size_of_current.is_zero() && of_fd->get_position() == size_of_current)  // eof of slice reached
 		       || (size_of_current.is_zero() && tmp < sz-lu)) // eof slice in sequential read mode when slice size cannot be know
 			if(tmp > 0)
+			{
 			    --tmp; // we do not "read" the terminal flag
+
+				// checking whether the slide we have completely read is the last or not
+				// this can occur in sequential read mode as we do not then fetch the flag
+				// at end of slice to setup of_last_file_knonw/of_last_file_num
+			    if(!of_last_file_known)
+			    {
+				switch(*(a + lu + tmp)) // tmp has just been decremented by one so we get the last byte read here
+				{
+				case flag_type_terminal:
+				    of_last_file_known = true;
+				    of_last_file_num = of_current;
+				    of_last_file_size = of_fd->get_size(); // or get_position() should give the same result
+				    of_flag = flag_type_terminal;
+				case flag_type_non_terminal:
+				    break; // can't know anything more
+				case flag_type_located_at_end_of_slice:
+				    throw Erange("sar::inherited_read", gettext("Data corruption met at end of slice: this flag value is not allowed at end of slice"));
+				default:
+				    throw Erange("sar::inherited_read", gettext("Data corruption met at end of slice, unknown flag found"));
+				}
+			    }
+			}
 		}
 	    }
 	    else

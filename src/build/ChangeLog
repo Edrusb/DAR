@@ -63,6 +63,17 @@ from 2.7.17 to 2.7.18
   while reading, the end of file was not detected properly in very rare
   context, leading the encryption layer trying (and failing) to decipher
   the clear data located at end of archive.
+- fixed bug met when reading a ciphered backup in sequential read mode with
+  the help of an external catalog (the few first data and EA were reported
+  as corrupted in sequential read mode, not in direct read mode or without
+  the help of an external catalog).
+- fixing bug in non-regression test routines, which, once fixed, revealed
+  the following bugs (about sequential reading mode):
+- reading a encrypted and sliced archive in sequential-read mode lead dar
+  asking for the an after-last non existing slice at the end of the
+  operation.
+- comparing an archive having binary delta patch for a file failed in
+  sequential read mode with self reporting bug in cat_file.cpp line 1479
 
 from 2.7.16 to 2.7.17
 - fixed bug where -R path ending with // was breaking the path filtering

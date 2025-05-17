@@ -122,7 +122,7 @@ namespace libdar
 	virtual std::string get_description() const override { return "file"; };
 
         void set_crc(const crc &c);
-        bool get_crc(const crc * & c) const; ///< the argument is set the an allocated crc object the owned by the "cat_file" object, its stay valid while this "cat_file" object exists and MUST NOT be deleted by the caller in any case
+        bool get_crc(const crc * & c) const; ///< the argument is set to an allocated crc object owned by the "cat_file" object, its stay valid while this "cat_file" object exists and MUST NOT be deleted by the caller in any case
 	bool has_crc() const { return check != nullptr; };
 	bool get_crc_size(infinint & val) const; ///< returns true if crc is know and puts its width in argument
 	void drop_crc() { if(check != nullptr) { delete check; check = nullptr; } };

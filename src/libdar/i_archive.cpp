@@ -193,7 +193,7 @@ namespace libdar
 						     false,
 						     options.get_silent(),
 						     false);
-				// we do not comparing the signatories of the archive of reference with the current archive
+				// we do not compare the signatories of the archive of reference with the current archive
 				// for example the isolated catalogue might be unencrypted and thus not signed
 
 			}
@@ -221,9 +221,10 @@ namespace libdar
 		    }
 		    ref_where.reset();
 
-			// fetching the catalogue in the archive of reference, making it point on the main archive layers.
+			// fetching the catalogue in the archive of reference, making it pointing on the main archive layers.
 
-		    ref_ver.set_compression_algo(ver.get_compression_algo()); // set the default encryption to use to the one of the main archive
+		    ref_ver.set_compression_algo(ver.get_compression_algo());
+			// set the default compression to use to the one of the main archive
 
 		    if(info_details)
 			dialog->message(gettext("Loading isolated catalogue in memory..."));
@@ -238,7 +239,7 @@ namespace libdar
 								   tmp2_signatories,
 								   false); // never relaxed checking for external catalogue
 		    if(!same_signatories(tmp1_signatories, tmp2_signatories))
-			dialog->pause(gettext("Archive of reference is not signed properly (no the same signatories for the archive and the internal catalogue), do we continue?"));
+			dialog->pause(gettext("Archive of reference is not signed properly (not the same signatories for the archive and the internal catalogue), do we continue?"));
 		    if(cat == nullptr)
 			throw SRC_BUG;
 
