@@ -177,6 +177,9 @@ namespace libdar
 	    /// remove/destroy from "this" all objects that are neither directory nor detruit objects
 	void drop_all_non_detruits();
 
+	    /// remove all EA and FSA (they get flagged as "partial" if they had "full" status
+	void drop_all_ea_and_fsa() { contenu->remove_all_ea_and_fsa(); };
+
 	    /// check whether all inode existing in the "this" and ref have the same attributes
 
 	    /// \note stops at the first inode found in both catalogue that do not match for at least one attribute

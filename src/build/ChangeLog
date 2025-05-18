@@ -40,6 +40,9 @@ from 2.7.17 to 2.7.18
   without the ability to skip back to re-read a hard linked inode, this
   caused the second time comparison to be reported as failed instead of
   being flagged as skipped.
+- fixing bug met when restoring gpg signed archive in sequential read
+  mode, where dar/libdar reported failed restoring EA and/or FSA for some
+  directories.
 
 from 2.7.16 to 2.7.17
 - fixed bug where -R path ending with // was breaking the path filtering
