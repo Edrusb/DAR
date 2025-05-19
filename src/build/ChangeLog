@@ -43,6 +43,9 @@ from 2.7.17 to 2.7.18
 - fixing bug met when restoring gpg signed archive in sequential read
   mode, where dar/libdar reported failed restoring EA and/or FSA for some
   directories.
+- fixing bug met when reading archive summary (-l and -q options) in
+  sequential read mode on sliced archive (was asking for the last slice
+  due to skip at end of archive while in sequential read mode)
 
 from 2.7.16 to 2.7.17
 - fixed bug where -R path ending with // was breaking the path filtering

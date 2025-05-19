@@ -1180,6 +1180,8 @@ namespace libdar
 	    if(!get_catalogue_slice_layout(slyt))
 		slyt.clear();
 
+	    init_catalogue();
+
 	    if(get_sar_param(sub_slice_size, first_slice_size, last_slice_size, slice_number))
 	    {
 		if(slice_number == 1)
