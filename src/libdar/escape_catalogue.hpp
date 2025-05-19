@@ -84,6 +84,7 @@ namespace libdar
 	virtual void pre_add_delta_sig(const pile_descriptor* dest) const override;
 	virtual escape *get_escape_layer() const override { return pdesc.is_null() ? nullptr : pdesc->esc; };
 	virtual void drop_escape_layer() override { pdesc.assign(nullptr); };
+	virtual void set_escape_layer(escape* ptr) override { throw SRC_BUG; };
 
 	virtual void reset_read() const override;
 	virtual void end_read() const override;

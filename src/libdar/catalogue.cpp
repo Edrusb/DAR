@@ -85,7 +85,8 @@ namespace libdar
 			 const datetime & root_last_modif,
 			 const label & data_name): mem_ui(ui),
 						   out_compare("/"),
-						   in_place(".") // is absolute path when set
+						   in_place("."), // is absolute path when set
+						   faked_escape(nullptr)
     {
 	contenu = nullptr;
 
@@ -118,7 +119,8 @@ namespace libdar
 			 const label & lax_layer1_data_name,
 			 bool only_detruit): mem_ui(ui),
 					     out_compare("/"),
-					     in_place(".")
+					     in_place("."),
+					     faked_escape(nullptr)
     {
 	string tmp;
 	saved_status st;
@@ -480,7 +482,7 @@ namespace libdar
 	current_add = contenu;
     }
 
-    void catalogue::add(cat_entree *ref)
+    void catalogue::add(cat_entree *ref, bool addtostats)
     {
 	if(current_add == nullptr)
 	    throw SRC_BUG;
@@ -497,7 +499,8 @@ namespace libdar
 	    current_add->add_children(n);
 	    if(t != nullptr) // ref is a directory
 		current_add = t;
-	    stats.add(ref);
+	    if(addtostats)
+		stats.add(ref);
 	}
 	else // ref is an cat_eod
 	{
@@ -1445,6 +1448,7 @@ namespace libdar
 	    sub_count = ref.sub_count;
 	    stats = ref.stats;
 	    ref_data_name = ref.ref_data_name;
+	    faked_escape = ref.faked_escape;
 	}
 	catch(...)
 	{

@@ -574,7 +574,7 @@ namespace libdar
 			    bool is_eod = ref_eod != nullptr;
 			    cat_entree *ref_nc = const_cast<cat_entree *>(ref);
 
-			    ceci->add(ref_nc);
+			    ceci->add(ref_nc, false);
 			    if(!wait_parent_depth.is_zero()) // we must not return this object as it is member of a skipped dir
 			    {
 				if(depth < wait_parent_depth) // we are back out of the skipped directory
@@ -748,6 +748,13 @@ namespace libdar
 		case ec_detruits:
 		    if(cat_det == nullptr)
 			throw SRC_BUG;
+
+			// if the archive was signed we had to load it fully (not only its detruit and directories
+			// objects to be able to compare the signature, but not we must drop the signatures (which
+			// is done if loading the catalogue in only_detruit mode, to avoid having libdar skipping back
+			// trying to fetch EA or FSA and restoring it again for directories leading to detruit objects
+		    if(x_ver.is_signed())
+			cat_det->drop_all_ea_and_fsa();
 
 			// cat_det has been set to only read detruit() objects
 			// if it fails reading this means we have reached

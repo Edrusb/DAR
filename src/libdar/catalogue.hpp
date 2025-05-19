@@ -127,10 +127,11 @@ namespace libdar
 	virtual void pre_add_fsa(const cat_entree *ref, const pile_descriptor* dest = nullptr) const {};
 	virtual void pre_add_fsa_crc(const cat_entree *ref, const pile_descriptor* dest = nullptr) const {};
 	virtual void pre_add_delta_sig(const pile_descriptor* dest = nullptr) const {};
-	virtual escape *get_escape_layer() const { return nullptr; };
-	virtual void drop_escape_layer() {};
+	virtual escape *get_escape_layer() const { return faked_escape; };
+	virtual void drop_escape_layer() { faked_escape = nullptr; };
+	virtual void set_escape_layer(escape* ptr) { faked_escape = ptr; };
 
-        void add(cat_entree *ref); // add at end of catalogue (sequential point of view)
+        void add(cat_entree *ref, bool addtostats = true); // add at end of catalogue (sequential point of view)
 	void re_add_in(const std::string &subdirname); // return into an already existing subdirectory for further addition
 	void re_add_in_replace(const cat_directory &dir); // same as re_add_in but also set the properties of the existing directory to those of the given argument
         void add_in_current_read(cat_nomme *ref); // add in currently read directory
@@ -175,6 +176,9 @@ namespace libdar
 
 	    /// remove/destroy from "this" all objects that are neither directory nor detruit objects
 	void drop_all_non_detruits();
+
+	    /// remove all EA and FSA (they get flagged as "partial" if they had "full" status
+	void drop_all_ea_and_fsa() { contenu->remove_all_ea_and_fsa(); };
 
 	    /// check whether all inode existing in the "this" and ref have the same attributes
 
@@ -277,6 +281,7 @@ namespace libdar
         entree_stats stats;                       ///< statistics catalogue contents
 	label ref_data_name;                      ///< name of the archive where is located the data
 	path in_place;                            ///< path of the directory used for root of the backup (at the time of the backup)
+	escape* faked_escape;                     ///< used when reading an archive with the help of an isolated catalog to keep trace of the sequential read mode if any
 
         void partial_copy_from(const catalogue &ref);
         void detruire();

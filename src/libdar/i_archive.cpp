@@ -252,6 +252,19 @@ namespace libdar
 			// only need delta signatures for archive differential backup, in which case we use the
 			// original archive *or* the isolated catalogue *alone*
 		    cat->drop_delta_signatures();
+
+			// we must set the catalogue to know we are using sequential
+			// reading mode, as if the catalogue has been here read in direct
+			// mode the data and EA have to be read sequentially, and the
+			// way to know how to read data from the cat_file and cat_inode
+			// objects point of view it owns is to consult the get_escape_layer()
+			// method of catalogue class
+		    if(sequential_read)
+		    {
+			if(pdesc.esc == nullptr)
+			    throw SRC_BUG;
+			cat->set_escape_layer(pdesc.esc);
+		    }
 		}
 		else // no isolated archive to fetch the catalogue from
 		{
@@ -1168,6 +1181,8 @@ namespace libdar
 	{
 	    if(!get_catalogue_slice_layout(slyt))
 		slyt.clear();
+
+	    init_catalogue();
 
 	    if(get_sar_param(sub_slice_size, first_slice_size, last_slice_size, slice_number))
 	    {
