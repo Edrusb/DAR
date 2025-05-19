@@ -911,6 +911,42 @@ namespace libdar
 	recursive_flag_size_to_update();
     }
 
+    void cat_directory::remove_all_ea_and_fsa()
+    {
+	deque<cat_nomme *>::iterator curs = ordered_fils.begin();
+	cat_directory *d = nullptr;
+	cat_inode *i = nullptr;
+
+	while(curs != ordered_fils.end())
+	{
+	    if(*curs == nullptr)
+		throw SRC_BUG;
+
+	    d = dynamic_cast<cat_directory *>(*curs);
+	    i = dynamic_cast<cat_inode *>(*curs);
+
+		// removing EA and FSA for all inodes (including directories)
+
+	    if(i != nullptr)
+	    {
+		if(i->ea_get_saved_status() == ea_saved_status::full)
+		    i->ea_set_saved_status(ea_saved_status::partial);
+
+		if(i->fsa_get_saved_status() == fsa_saved_status::full)
+		    i->fsa_set_saved_status(fsa_saved_status::partial);
+	    }
+
+		// recursive call for directories
+
+	    if(d != nullptr)
+		d->remove_all_ea_and_fsa();
+
+		// next entry of current directory
+
+	    ++curs;
+	}
+    }
+
     void cat_directory::set_all_mirage_s_inode_wrote_field_to(bool val) const
     {
 	deque <cat_nomme *>::const_iterator curs = ordered_fils.begin();

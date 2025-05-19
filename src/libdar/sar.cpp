@@ -613,7 +613,8 @@ namespace libdar
 		tmp = 0; // simulating an end of slice
 
 	    if(tmp == 0)
-                if(of_flag == flag_type_terminal || get_mode() != gf_read_only)
+                if(of_flag == flag_type_terminal || get_mode() != gf_read_only
+		   || (of_last_file_known == true && of_current >= of_last_file_num))
 		    loop = false;
 		else
 		    if(is_current_eof_a_normal_end_of_slice())

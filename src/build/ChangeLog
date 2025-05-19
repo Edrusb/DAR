@@ -74,6 +74,25 @@ from 2.7.17 to 2.7.18
   operation.
 - comparing an archive having binary delta patch for a file failed in
   sequential read mode with self reporting bug in cat_file.cpp line 1479
+- fixing multi-threaded deciphering when reaching the end of the archive
+  and if a skip() instruction is given from the master thread to change
+  reading position (bug type message at parallel_tronconneuse.cpp line 662
+  was reported).
+- fixing bug in archive class implementation met when comparing an archive
+  with filesystem in sequential read mode with the help of an isolated
+  catalogue. In such context, the hard linked inode can only be compared
+  at the first hard link encontered, other occurence are skipped. The
+  isolated catalog gave a wrong information as it was read in direct mode
+  while fetching the data and EA to compare were read in sequential mode
+  without the ability to skip back to re-read a hard linked inode, this
+  caused the second time comparison to be reported as failed instead of
+  being flagged as skipped.
+- fixing bug met when restoring gpg signed archive in sequential read
+  mode, where dar/libdar reported failed restoring EA and/or FSA for some
+  directories.
+- fixing bug met when reading archive summary (-l and -q options) in
+  sequential read mode on sliced archive (was asking for the last slice
+  due to skip at end of archive while in sequential read mode)
 
 from 2.7.16 to 2.7.17
 - fixed bug where -R path ending with // was breaking the path filtering

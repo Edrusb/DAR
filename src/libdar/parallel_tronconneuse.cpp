@@ -1403,17 +1403,18 @@ namespace libdar
 
 		if(!reof)
 		{
+		    infinint local_crypt_offset = encrypted->get_position();
 		    ptr = tas->get(); // obtaining a new segment from the heap
 		    ptr->reset();
 
 		    ptr->crypted_data.set_data_size(encrypted->read(ptr->crypted_data.get_addr(), ptr->crypted_data.get_max_size()));
 		    if( ! ptr->crypted_data.is_full())  // we have reached eof
 		    {
-			if(trailing_clear_data != nullptr) // and we have a callback to remove clear data at eof
+			if(trailing_clear_data != nullptr && ptr->crypted_data.get_data_size() > 0) // and we have a callback to remove clear data at eof
 			{
 			    unique_ptr<crypto_segment> tmp = nullptr;
 
-			    remove_trailing_clear_data_from_encrypted_buf(crypt_offset,
+			    remove_trailing_clear_data_from_encrypted_buf(local_crypt_offset,
 									  version,
 									  initial_shift,
 									  trailing_clear_data,
@@ -1429,7 +1430,6 @@ namespace libdar
 		    if(ptr->crypted_data.get_data_size() > 0)
 		    {
 			ptr->block_index = index_num++;
-			crypt_offset += ptr->crypted_data.get_data_size();
 			workers->scatter(ptr, static_cast<int>(tronco_flags::normal));
 		    }
 		    else
@@ -1455,14 +1455,15 @@ namespace libdar
     infinint read_below::get_ready_for_new_offset()
     {
 	infinint ret;
+	infinint local_crypt_offset;
 
 	position_clear2crypt(skip_to,
-			     crypt_offset,
+			     local_crypt_offset,
 			     clear_flow_start,
 			     pos_in_flow,
 			     ret);
 
-	if(!encrypted->skip(crypt_offset + initial_shift))
+	if(!encrypted->skip(local_crypt_offset + initial_shift))
 	    reof = true;
 	else
 	    reof = false;

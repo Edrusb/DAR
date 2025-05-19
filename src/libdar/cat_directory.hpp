@@ -154,6 +154,9 @@ namespace libdar
 	    /// recursively remove all mirage entries
 	void remove_all_mirages_and_reduce_dirs();
 
+	    /// remove all EA and FSA recursively (those "full" get flagged "partial")
+	void remove_all_ea_and_fsa();
+
 	    /// recursively set all mirage inode_wrote flag
 	void set_all_mirage_s_inode_wrote_field_to(bool val) const;
 

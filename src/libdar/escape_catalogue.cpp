@@ -591,7 +591,7 @@ namespace libdar
 
 			    if(ref_nc == nullptr)
 				throw SRC_BUG;
-			    ceci->add(ref_nc);
+			    ceci->add(ref_nc, false);
 
 			    if(ref_nom == nullptr)
 				ceci->last_added_name = "";
@@ -785,6 +785,13 @@ namespace libdar
 		case ec_detruits:
 		    if(cat_det == nullptr)
 			throw SRC_BUG;
+
+			// if the archive was signed we had to load it fully (not only its detruit and directories
+			// objects to be able to compare the signature, but not we must drop the signatures (which
+			// is done if loading the catalogue in only_detruit mode, to avoid having libdar skipping back
+			// trying to fetch EA or FSA and restoring it again for directories leading to detruit objects
+		    if(x_ver.is_signed())
+			cat_det->drop_all_ea_and_fsa();
 
 			// cat_det has been set to only read detruit() objects
 			// if it fails reading this means we have reached
