@@ -482,7 +482,7 @@ namespace libdar
 	current_add = contenu;
     }
 
-    void catalogue::add(cat_entree *ref)
+    void catalogue::add(cat_entree *ref, bool addtostats)
     {
 	if(current_add == nullptr)
 	    throw SRC_BUG;
@@ -499,7 +499,8 @@ namespace libdar
 	    current_add->add_children(n);
 	    if(t != nullptr) // ref is a directory
 		current_add = t;
-	    stats.add(ref);
+	    if(addtostats)
+		stats.add(ref);
 	}
 	else // ref is an cat_eod
 	{

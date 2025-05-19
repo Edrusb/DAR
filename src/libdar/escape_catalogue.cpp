@@ -574,7 +574,7 @@ namespace libdar
 			    bool is_eod = ref_eod != nullptr;
 			    cat_entree *ref_nc = const_cast<cat_entree *>(ref);
 
-			    ceci->add(ref_nc);
+			    ceci->add(ref_nc, false);
 			    if(!wait_parent_depth.is_zero()) // we must not return this object as it is member of a skipped dir
 			    {
 				if(depth < wait_parent_depth) // we are back out of the skipped directory

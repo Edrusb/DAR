@@ -131,7 +131,7 @@ namespace libdar
 	virtual void drop_escape_layer() { faked_escape = nullptr; };
 	virtual void set_escape_layer(escape* ptr) { faked_escape = ptr; };
 
-        void add(cat_entree *ref); // add at end of catalogue (sequential point of view)
+        void add(cat_entree *ref, bool addtostats = true); // add at end of catalogue (sequential point of view)
 	void re_add_in(const std::string &subdirname); // return into an already existing subdirectory for further addition
 	void re_add_in_replace(const cat_directory &dir); // same as re_add_in but also set the properties of the existing directory to those of the given argument
         void add_in_current_read(cat_nomme *ref); // add in currently read directory
