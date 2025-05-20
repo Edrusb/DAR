@@ -5,12 +5,12 @@ from 2.7.x to 2.8.0
 
 from 2.7.17 to 2.7.18
 - fixed bug that broke the ability to repair an archive through ftp/sftp
-  (repaing stays possible locally on the machine where resides the backup)
+  (repairing stays possible locally on the machine where resides the backup)
 - fixed the reading of archive header (in-place field) when the -R path
   given at creation time was valid or common unix path (/some//path for
   example).
 - fixed bug met when reading compressed data with multiple threads (-G
-  option with arguement 2 or larger) in sequential read mode.
+  option with argument 2 or larger) in sequential read mode.
 - fixed bug avoiding dar to repair archives relying on block compression,
   testing the "repaired" archive lead to reporting corrupted data for all
   compressed files and compressed EA.
@@ -39,7 +39,7 @@ from 2.7.17 to 2.7.18
 - fixing bug in archive class implementation met when comparing an archive
   with filesystem in sequential read mode with the help of an isolated
   catalogue. In such context, the hard linked inode can only be compared
-  at the first hard link encontered, other occurence are skipped. The
+  at the first hard link encountered, other occurrence are skipped. The
   isolated catalog gave a wrong information as it was read in direct mode
   while fetching the data and EA to compare were read in sequential mode
   without the ability to skip back to re-read a hard linked inode, this
