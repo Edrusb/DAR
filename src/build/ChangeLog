@@ -1,3 +1,7 @@
+from 2.7.18 to 2.7.19
+- fixed the trailing slash support in path, that was broken by commit
+  503326bf8735d8eab48d4ff0ab9c000ffa031dec added at version 2.7.17
+
 from 2.7.17 to 2.7.18
 - fixed bug that broke the ability to repair an archive through ftp/sftp
   (repairing stays possible locally on the machine where resides the backup)
