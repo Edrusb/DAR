@@ -42,12 +42,11 @@ namespace libdar
     const path FAKE_ROOT(PSEUDO_ROOT, true);
 
 
-	/// extract the first path member of a given path
+	/// splits a string in its path components
 
-	/// \param[in,out] p is the given path (in), it receive the new path without the first path member
-	/// \param[out] root this argument receive the first path member extracted from argument 'p'
-	/// \return false if given path is empty, true else. May throw exception in case of invalid path given
-    static bool path_get_root(string & p, string & root);
+	/// \param[in] aggregate the path to split
+	/// \param[out] splitted the resulted list of components
+    static void path_split(const string & aggregate, list<string> & splitted);
 
     path::path(const string & chem, bool x_undisclosed)
     {
@@ -81,8 +80,7 @@ namespace libdar
 		if(undisclosed)
 		    dirs.push_back(s);
 		else
-		    while(path_get_root(s, tmp))
-			dirs.push_back(tmp);
+		    path_split(s, dirs);
 		if(dirs.empty() && relative)
 		    throw Erange("path::path", gettext("Empty string is not a valid path"));
 		if(!undisclosed)
@@ -340,28 +338,69 @@ namespace libdar
         }
     }
 
-    static bool path_get_root(string & p, string & root)
+    static void path_split(const string & aggregate, list<string> & splitted)
     {
-        string::iterator it = p.begin();
+	splitted.clear();
 
-        if(p.empty())
-            return false;
-        while(it != p.end() && *it != '/' )
-            ++it;
+	string::const_iterator it = aggregate.begin();
+	string::const_iterator bk = it;
 
-        root = string(p.begin(), it);
-        if(it != p.end())
+	while(it != aggregate.end())
 	{
-            p = string(it+1, p.end());
-	    if(p.empty())
-		throw Erange("path_get_root", dar_gettext("Empty string as subdirectory does not make a valid path"));
-	}
-        else
-            p = "";
-        if(root.empty())
-            throw Erange("path_get_root", dar_gettext("Empty string as subdirectory does not make a valid path"));
+	    if(*it == '/')
+	    {
+		string part(bk, it);
 
-        return true;
+		if(! part.empty())
+		{
+		    if(part[part.size() - 1] == ':' // word ending with : thus :/ was read
+		       && ! aggregate[0] != '/'     // not an absolute path
+		       && splitted.empty())         // this is the first word we add so we have
+			                            // something in the form of "<protocol>:/"
+			                            // at the beginning of "aggregate"
+		    {
+			if(aggregate.size() > part.size() + 1)
+			    if(aggregate[part.size() + 1] == '/')
+				    // "<protocol>://" is found (with a second slash)
+				    // at the beginning of aggregate, we must not
+				    // drop this URL-type of information:
+				part += '/';
+			    // we store '<protocol>:/' as first word, which will
+			    // be reconstructed as <protocol>://something
+			    // if the "something" part is present in "aggregate".
+			    // But if there is no "something" after, the reconstruction will provide "<protocol>:/"
+			    // instead of "<protocol>://" (but this is not a valid URL) it match
+			    // is a subdirectory get added later: "<protocol>://subdir" so we
+			    // dont add a second / at the end of "part" in that case
+		    }
+
+		    splitted.push_back(part);
+		}
+		    // if path contains one or more following slashes
+		    // it will generate here empty strings as part,
+		    // we just ignore them, which will result in
+		    // subtituing more than one sticked slashs
+		    // by a single one when comparing it to strings.
+		    // Path normalization performed:
+		    // - replace several following / by a single one
+		    // - ignore trailing slash
+		    // - ignore initial slash (relative/absolute path)
+		    // - no / is accept as part of a directory name or
+		    //   of a filename.
+		++it;
+		bk = it;
+	    }
+	    else
+		++it;
+	}
+
+	if(bk != aggregate.end())
+	{
+	    string part(bk, it);
+	    if(! part.empty())
+		splitted.push_back(part);
+	}
     }
+
 
 } // end of namespace
