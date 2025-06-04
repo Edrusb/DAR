@@ -225,6 +225,26 @@ namespace libdar
 	void restore(const std::vector<std::string> & filename,
 		     const database_restore_options & opt);
 
+
+	    /// restore files without calling dar as a seperated process
+
+	    /// \param[in] read_options options to use to open archive for restoration
+	    /// \param[in] fs_root where to restore data
+	    /// \param[in] extract_options options to use to perform archive extraction
+	    /// \param[in] opt dar_manager relative info for this operation
+	    /// \note opt fields that are taken into account here are:
+	    ///  - set_date()
+	    ///  - set_info_details() but only for database specific informations (see archive options else)
+	    ///  - even_when_removed()
+	    ///  The fiels/methods (set_early_release(), set_extra_options_for_dar(),
+	    ///  set_ignore_dar_options_in_database() are ignored as they concern CLI
+	    ///  format of options (not defined in libdar but in dar).
+	void restore(const archive_options_read & read_options,
+		     const path & fs_root,
+		     const archive_options_extract & extract_options,
+		     const database_restore_options & opt);
+
+
 	    /// check that all files's Data and EA are more recent when archive number grows within the database, only warn the user
 
 	    /// \return true if check succeeded, false if warning have been issued

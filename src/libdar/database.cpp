@@ -445,6 +445,28 @@ namespace libdar
 	NLS_SWAP_OUT;
     }
 
+    void database::restore(const archive_options_read & read_options,
+			   const path & fs_root,
+			   const archive_options_extract & extract_options,
+			   const database_restore_options & opt)
+    {
+	NLS_SWAP_IN;
+	try
+	{
+	    pimpl->restore(read_options,
+			   fs_root,
+			   extract_options,
+			   opt);
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
+    }
+
+
     bool database::check_order() const
     {
 	bool ret;

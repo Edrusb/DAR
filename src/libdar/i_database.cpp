@@ -702,6 +702,25 @@ namespace libdar
 	NLS_SWAP_OUT;
     }
 
+    void database::i_database::restore(const archive_options_read & read_options,
+				       const path & fs_root,
+				       const archive_options_extract & extract_options,
+				       const database_restore_options & opt)
+    {
+	    // indentify the archive_num(s) to run extraction on
+
+	    // for each archive_num
+
+	    // - define a mask_database and modify the archive_options_extract to AND path with it
+
+	    // - open the archive with the provided read options
+
+	    // - extract the archive with the provided/modified extraction options
+
+	    // - close the archive (delete the archive object)
+    }
+
+
     archive_num database::i_database::get_real_archive_num(archive_num num, bool revert) const
     {
 	if(num == 0)

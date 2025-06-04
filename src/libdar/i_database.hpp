@@ -40,6 +40,8 @@
 #include "database_archives.hpp"
 #include "database.hpp"
 #include "tools.hpp"
+#include "datetime.hpp"
+#include "archive_options.hpp"
 
 namespace libdar
 {
@@ -150,6 +152,13 @@ namespace libdar
             /// restore files calling dar on the appropriated archive
         void restore(const std::vector<std::string> & filename,
                      const database_restore_options & opt);
+
+	    /// restore files calling libdar directly rather than spawning dar CLI and parsing options as CLI
+
+	void restore(const archive_options_read & read_options,
+		     const path & fs_root,
+		     const archive_options_extract & extract_options,
+		     const database_restore_options & opt);
 
             /// check that all files's Data and EA are more recent when archive number grows within the database, only warn the user
         bool check_order() const
