@@ -499,7 +499,7 @@ namespace libdar
 
 
     void database::i_database::restore(const vector<string> & filename,
-			   const database_restore_options & opt)
+				       const database_restore_options & opt)
     {
 	NLS_SWAP_IN;
 	try
@@ -575,7 +575,7 @@ namespace libdar
 			// if no data nor EA could be found
 		    if(num_ea == 0 && num_data.empty())
 		    {
-			if(!opt.get_date().is_zero()) // a date was specified
+			if(!opt.get_date().is_null()) // a date was specified
 			{
 			    string fic = anneau.front();
 			    if(opt.get_info_details())

@@ -227,7 +227,7 @@ namespace libdar
 	database_restore_options & operator = (database_restore_options && ref) noexcept = default;
 	~database_restore_options() = default;
 
-	void clear() { x_early_release = x_info_details = x_ignore_dar_options_in_database = x_even_when_removed = false; x_date = 0; x_extra_options_for_dar.clear(); };
+	void clear() { x_early_release = x_info_details = x_ignore_dar_options_in_database = x_even_when_removed = false; x_date = datetime(0); x_extra_options_for_dar.clear(); };
 
 	    // settings
 
@@ -258,7 +258,10 @@ namespace libdar
 
 	    /// informations about files more recent than the given date are ignored. So you can restore file in the most recent state before a certain "date".
 	    /// \note if set to zero, the most recent state available is looked for (this is the default value).
-	void set_date(const infinint & value) { x_date = value; };
+	void set_date(const infinint & value) { x_date = datetime(value); };
+
+	    /// date option in the new form of a datetime (eventually providing sub second precision)
+	void set_date(const datetime & value) { x_date = value; };
 
 	    /// find data or EA if they have been removed at the requested date
 
@@ -271,7 +274,7 @@ namespace libdar
 	bool get_early_release() const { return x_early_release; };
 	bool get_info_details() const { return x_info_details; };
 	const std::vector<std::string> & get_extra_options_for_dar() const { return x_extra_options_for_dar; };
-	const infinint & get_date() const { return x_date; };
+	const datetime & get_date() const { return x_date; };
 	bool get_ignore_dar_options_in_database() const { return x_ignore_dar_options_in_database; };
 	bool get_even_when_removed() const { return x_even_when_removed; };
 
@@ -279,7 +282,7 @@ namespace libdar
 	bool x_early_release;
 	bool x_info_details;
 	std::vector<std::string> x_extra_options_for_dar;
-	infinint x_date;
+	datetime x_date;
 	bool x_ignore_dar_options_in_database;
 	bool x_even_when_removed;
     };
