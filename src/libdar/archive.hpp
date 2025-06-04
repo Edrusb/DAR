@@ -55,6 +55,9 @@ namespace libdar
         /// \addtogroup API
         /// @{
 
+	/// the default extension for dar archive
+    constexpr const char* dar_extension = "dar";
+
 	/// the archive class realizes the most general operations on archives
 
 	/// the operations corresponds to the one the final user expects, these
