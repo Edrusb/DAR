@@ -46,6 +46,7 @@ a * alteration of operation		--alter	  argument:
 							    vc / verbose-libcurl
 							    y byte[s]
 							    z[eroing-negative-dates]
+							    efd[extract-from-database]
 b - terminal bell                       --bell
 c + create archive                      --create
 d + difference with filesystem          --diff

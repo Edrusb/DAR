@@ -286,7 +286,7 @@ will pause and ask the user for required slices if they are not present. The arg
 .TP 5
 - a plus sign ("+") which makes the reference be the current directory status. This argument is only available for archive creation (-c option). In other word, no file's data will be saved, just the current status of the inodes will be recorded in the catalogue. This feature is known as the "snapshot" backup. A snapshot backup can be used as reference later on to detect or save only the files that have changed since the snapshot was made.
 .TP 5
-- a <date>, if -af option has been placed before -A on the command-line or in a included file (see -B option). For more about that feature see -af option below. This form is only available for archive creation (-c option).
+- a <date>, if -af option has been placed before -A on the command-line or in a included file (see -B option). For more about that feature see -af option below.
 .RE
 .PP
 During backup operation (-c option) the archive of reference, given thanks to the -A option, is used for comparison with existing files on the filesystem. Dar will then backup only files that have changed since the archive of reference was done. If no -A option is given, the backup operation is a full backup. With -A option if the archive of reference is a full backup some call it a differential backup, while if the archive of reference is differential backup, some call this type of backup an incremental backup. For dar there is no difference in structure between incremental and differential backup, both are usually designed globally as "differential" backup in the documentation.
@@ -299,7 +299,13 @@ During testing, diff or extraction, (-t, -d or -x options respectively), the tab
 .RE
 .TP 20
 -af, --alter=fixed-date
-Modify the -A option behavior, making it receiving a <date> as argument in place of the [<path>]/<basename> default argument. The <date> is used to define which file to save: file which modification is newer or equal to <date>, and which to consider unchanged: those older than <date>. This option has only a meaning when creating an archive (-c option) and must be placed before -A option to have an effect.
+Modify the -A option behavior, making it receiving a <date> as argument in place of the [<path>]/<basename> default argument. This feature is available for archive creation (-c option) and archive restoration from a dar_manager database (see -aefd option). In any case it must be placed before -A option to have an effect.
+.RS
+.PP
+For archive creation, the <date> is used to define which file to save: file which modification is newer or equal to <date>, and which to consider unchanged: those older than <date>.
+.PP
+For archive restoration from a dar_manager database, the given date defines the latest state into which to restore the data and EA. If not set, the most recent availabe state is restored, else the state of restored file is the most recent which is not more recent than the provided date.
+.RE
 .RS
 .PP
 <date> must be a date in the two following possible formats:
@@ -1209,6 +1215,16 @@ Since version 2.7.1 libdar stores the filesystem root path (given -R option) use
 .TP 20
 -affs, --alter=force-first-slice
 This option first purpose was at restoration time when using an isolated catalogue. In that context dar still needs to read the archive format from the backup to restore. In direct access mode, this information is always fetched from the beginning of the archive, but in direct access mode it may be fetched reading the end of the last slice (default behavior) or reading the beginning of the first slice (when -affs is set). The objective is to avoid fetching the last slice when using very large backups. One can define a first slice (see -S option) of for example 1 kB while other slices (-s option) can be specified arbitrarily large. With the help of an isolated catalogue based on this archive and the first (small) slice, reading some data from this large backup then only needs the few (big) slices where the data is located, not more.
+.TP 20
+-aefd, --alter=extract-from-database
+In this mode of data restoration, the argument given to -x option should point to a dar_manager database. This is almost equivalent to use dar_manager's -r option at the difference that there is only one process and all
+dar options given on command line are available to each backup/archive referred in the database that will be used for this restoration. Dar_manager was
+designed to restore few files then extended to directories, but passing the fileset scope to restore between process is not that efficient. With -aefd
+option better performance is provided to restore the whole dataset referred from a set of full, incremental and/or differential backups referred in a dar_manager database.
+.RS
+.PP
+with -aefd restoration mode, it is possible to restore in the state at a given date by mean of -af and -A options. By default, the most recent state available is restored for all entries. File filtering mechanism can also be used to restore only certain files and directories, instead of all that were present at the latest or given date state.
+.RE
 .PP
 .B TESTING AND DIFFERENCE SPECIFIC OPTIONS (to use with -t or -d)
 .PP
