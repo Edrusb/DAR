@@ -448,7 +448,8 @@ namespace libdar
     void database::restore(const archive_options_read & read_options,
 			   const path & fs_root,
 			   const archive_options_extract & extract_options,
-			   const database_restore_options & opt)
+			   const database_restore_options & opt,
+			   statistics* progressive_report)
     {
 	NLS_SWAP_IN;
 	try
@@ -456,7 +457,8 @@ namespace libdar
 	    pimpl->restore(read_options,
 			   fs_root,
 			   extract_options,
-			   opt);
+			   opt,
+			   progressive_report);
 	}
 	catch(...)
 	{

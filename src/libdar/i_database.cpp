@@ -41,7 +41,7 @@ extern "C"
 #include "database_header.hpp"
 #include "i_archive.hpp"
 #include "i_database.hpp"
-
+#include "archive.hpp"
 
 using namespace libdar;
 using namespace std;
@@ -705,23 +705,79 @@ namespace libdar
     void database::i_database::restore(const archive_options_read & read_options,
 				       const path & fs_root,
 				       const archive_options_extract & extract_options,
-				       const database_restore_options & opt)
+				       const database_restore_options & opt,
+				       statistics* progressive_report)
     {
+
 	    // indentify the archive_num(s) to run extraction on
 	set<archive_num> to_consider;
 
+	deque<infinint> stats_data(coordinate.size(), 0);
+	deque<infinint> stats_ea(coordinate.size(), 0);
+	deque<infinint> total_data(coordinate.size(), 0);
+	deque<infinint> total_ea(coordinate.size(), 0);
 
+	if(opt.get_info_details())
+	    get_ui().message(gettext("Identifying the set of archive to use from the dar_manager database..."));
 
+	if(files == nullptr)
+	    throw SRC_BUG;
+
+	files->compute_most_recent_stats(stats_data, stats_ea, total_data, total_ea, opt.get_date());
+
+	for(unsigned int i = 0; i < coordinate.size(); ++i)
+	{
+	    if(stats_data[i] > 0)
+		to_consider.insert(i);
+	    if(stats_ea[i] > 0)
+		to_consider.insert(i);
+	}
 
 	    // for each archive_num
 
-	    // - define a mask_database and modify the archive_options_extract to AND path with it
+	for(set<archive_num>::iterator it = to_consider.begin(); it != to_consider.end(); ++it)
+	{
+	    unique_ptr<archive> arch;
 
-	    // - open the archive with the provided read options
+		// - open the archive with the provided read options
 
-	    // - extract the archive with the provided/modified extraction options
+	    if(*it >= coordinate.size())
+		throw SRC_BUG;
 
-	    // - close the archive (delete the archive object)
+	    path chem(coordinate[*it].chemin);
+	    string basename = coordinate[*it].basename;
+
+	    if(opt.get_info_details())
+	    {
+		path tmp(chem);
+
+		tmp.append(basename);
+		get_ui().message(tools_printf(gettext("Openning archive %s..."), tmp.display().c_str()));
+	    }
+
+	    arch.reset(new (nothrow) archive(get_pointer(),
+					     chem,
+					     basename,
+					     dar_extension,
+					     read_options));
+
+	    if(!arch)
+		throw Ememory("database::i_database::restore");
+
+		// - define a mask_database and modify the archive_options_extract to AND path with it
+
+		/// TO BE IMPLEMENTED WITH a new mask_database class
+
+		// - extract the archive with the provided/modified extraction options
+
+	    (void)arch->op_extract(fs_root,
+				   extract_options,
+				   progressive_report);
+
+		// - close the archive (delete the archive object)
+
+	    arch.reset();
+	}
     }
 
 
