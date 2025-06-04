@@ -202,6 +202,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 	    bool no_cipher_given;
 	    vector<string> recipients;
 	    set<string> ignored_as_symlink_listing;
+	    shared_ptr<database> extractdb;
 
 	    if(param.remote.ent_host.size() != 0)
 	    {
@@ -886,13 +887,32 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    read_options.set_force_first_slice(param.force_first_slice);
 		}
 
-		arch.reset(new (nothrow) archive(dialog,
-						 *param.sauv_root,
-						 param.filename,
-						 EXTENSION,
-						 read_options));
-		if(!arch)
-		    throw Ememory("little_main");
+		if(param.extract_from_database)
+		{
+		    database_open_options datopt;
+		    path tmp = *param.sauv_root;
+		    tmp.append(param.filename);
+
+		    datopt.set_warn_order(false);
+		    datopt.set_partial(false);
+
+		    extractdb.reset(new (nothrow) database(dialog,
+							   tmp.display(),
+							   datopt));
+
+		    if(!extractdb)
+			throw Ememory("little_main");
+		}
+		else
+		{
+		    arch.reset(new (nothrow) archive(dialog,
+						     *param.sauv_root,
+						     param.filename,
+						     EXTENSION,
+						     read_options));
+		    if(!arch)
+			throw Ememory("little_main");
+		}
 
 		extract_options.clear();
 		extract_options.set_selection(*param.selection);
@@ -935,13 +955,32 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		extract_options.set_ignore_unix_sockets(param.unix_sockets);
 		extract_options.set_in_place(param.in_place);
 
-                st = arch->op_extract(*param.fs_root,
-				      extract_options,
-				      nullptr);
-		if(!param.quiet)
-		    display_rest_stat(*dialog, st);
-                if(st.get_errored() > 0)
-                    throw Edata(gettext("All files asked could not be restored"));
+		if(param.extract_from_database)
+		{
+		    database_restore_options datopt;
+
+		    datopt.set_early_release(false);
+		    datopt.set_info_details(param.info_details);
+		    datopt.set_ignore_dar_options_in_database(true); // this is not used anyway by database::restore()
+		    datopt.set_date(param.fixed_date);
+		    datopt.set_even_when_removed(false); // do not keep file restored if they had been deleted at the requested time
+
+		    extractdb->restore(read_options,
+				       *param.fs_root,
+				       extract_options,
+				       datopt,
+				       nullptr);
+		}
+		else
+		{
+		    st = arch->op_extract(*param.fs_root,
+					  extract_options,
+					  nullptr);
+		    if(!param.quiet)
+			display_rest_stat(*dialog, st);
+		    if(st.get_errored() > 0)
+			throw Edata(gettext("All files asked could not be restored"));
+		}
                 break;
             case diff:
 		line_tools_crypto_split_algo_pass(param.pass,

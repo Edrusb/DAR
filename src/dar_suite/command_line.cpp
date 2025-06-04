@@ -330,6 +330,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
     p.force_first_slice = false;
     p.fully_detailed_dates = false;
     p.isolation_repair = false;
+    p.extract_from_database = false;
 
     if(!dialog)
 	throw SRC_BUG;
@@ -441,7 +442,13 @@ bool get_args(shared_ptr<user_interaction> & dialog,
                 throw Ememory("get_args");
 	    *p.fs_root = tools_relative2absolute_path(*p.fs_root, tools_getcwd());
         }
-        if(rec.fixed_date_mode && p.op != create)
+	if(p.extract_from_database && p.op != extract)
+	    throw Erange("get_args", gettext("-aefd option is only available with -x"));
+	if(p.extract_from_database && ! p.remote.ent_host.empty())
+	    throw Erange("get_args", gettext("remote repository not supported whith -aefd option"));
+	if(p.extract_from_database && p.aux_root != nullptr)
+	    throw Erange("get_args", gettext("-@ option not supported whith -aefd option"));
+        if(rec.fixed_date_mode && p.op != create && !p.extract_from_database) // extract_from_database is now only true in extract mode
             throw Erange("get_args", gettext("-af option is only available with -c"));
         if(p.ref_filename != nullptr && p.op == listing)
             dialog->message(gettext("-A option is not available with -l"));

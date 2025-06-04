@@ -177,6 +177,7 @@ struct line_param
     bool force_first_slice;       ///< whether to read the first instead of the last slice when a isolated catalogue is given in complement
     bool fully_detailed_dates;    ///< whether to show subsecond value of dates
     bool isolation_repair;        ///< whether to try isolate content of a truncated archive
+    bool extract_from_database;   ///< whether to extract from a dar_manager database or from a dar archive
 
 	// constructor for line_param
     line_param()
