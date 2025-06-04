@@ -86,7 +86,8 @@ namespace libdar
 	virtual void compute_most_recent_stats(std::deque<infinint> & data,
 					       std::deque<infinint> & ea,
 					       std::deque<infinint> & total_data,
-					       std::deque<infinint> & total_ea) const override;
+					       std::deque<infinint> & total_ea,
+					       const datetime & ingore_older_than_that) const override;
 
 	virtual char obj_signature() const override { return signature(); };
 	static char signature() { return 'd'; };

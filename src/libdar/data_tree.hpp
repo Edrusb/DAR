@@ -122,10 +122,21 @@ namespace libdar
 
 	    /// decrement archive numbers above num
 	virtual void skip_out(archive_num num);
+
+	    /// provide a summary of the latest version of file and ea per archive number of the database
+
+	    /// \param[out] data is a table indexed by archive num providing the number latest data version per archive
+	    /// \param[out] ea is a table indexed by archive num providing the number latest EA version per archive
+	    /// \param[out] total_data is a table indexed by archive providing the total number of entries with data, archive per archive (most recent and older)
+	    /// \param[out] total_ea is a table indexed by archive num providing the total number of entries with EA, archive per archive (most recent and older)
+	    /// \param[in] ignore_older_than_that, if not null date, ignore data et EA versions strictly more recent than this date
+	    /// \note the provided four fields that will receive table of counters per archive should be initialized by the caller
+	    /// as this is a recursive call with data_dir that increment the counter recursively.
 	virtual void compute_most_recent_stats(std::deque<infinint> & data,
 					       std::deque<infinint> & ea,
 					       std::deque<infinint> & total_data,
-					       std::deque<infinint> & total_ea) const;
+					       std::deque<infinint> & total_ea,
+					       const datetime & ignore_older_than_that) const;
 
 	virtual char obj_signature() const { return signature(); };
 	static char signature() { return 't'; };

@@ -456,14 +456,15 @@ namespace libdar
     void data_dir::compute_most_recent_stats(deque<infinint> & data,
 					     deque<infinint> & ea,
 					     deque<infinint> & total_data,
-					     deque<infinint> & total_ea) const
+					     deque<infinint> & total_ea,
+					     const datetime & ignore_older_than_that) const
     {
 	deque<data_tree *>::const_iterator it = rejetons.begin();
 
-	data_tree::compute_most_recent_stats(data, ea, total_data, total_ea);
+	data_tree::compute_most_recent_stats(data, ea, total_data, total_ea, ignore_older_than_that);
 	while(it != rejetons.end())
 	{
-	    (*it)->compute_most_recent_stats(data, ea, total_data, total_ea);
+	    (*it)->compute_most_recent_stats(data, ea, total_data, total_ea, ignore_older_than_that);
 	    ++it;
 	}
     }

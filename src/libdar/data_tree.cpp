@@ -802,7 +802,8 @@ namespace libdar
     void data_tree::compute_most_recent_stats(deque<infinint> & data,
 					      deque<infinint> & ea,
 					      deque<infinint> & total_data,
-					      deque<infinint> & total_ea) const
+					      deque<infinint> & total_ea,
+					      const datetime & ignore_older_than_that) const
     {
 	archive_num most_recent = 0;
 	datetime max = datetime(0);
@@ -812,7 +813,10 @@ namespace libdar
 	{
 	    if(itp->second.present == db_etat::et_saved)
 	    {
-		if(itp->second.date >= max)
+		if(itp->second.date >= max
+		   &&
+		   (ignore_older_than_that.is_null() || itp->second.date <= ignore_older_than_that)
+		    )
 		{
 		    most_recent = itp->first;
 		    max = itp->second.date;
@@ -832,7 +836,10 @@ namespace libdar
 	{
 	    if(it->second.present == db_etat::et_saved)
 	    {
-		if(it->second.date >= max)
+		if(it->second.date >= max
+		    &&
+		   (ignore_older_than_that.is_null() || it->second.date <= ignore_older_than_that)
+		    )
 		{
 		    most_recent = it->first;
 		    max = it->second.date;

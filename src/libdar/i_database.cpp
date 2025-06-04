@@ -478,7 +478,7 @@ namespace libdar
 	    if(callback == nullptr)
 		throw Erange("database::i_database::show_most_recent_stats", "nullptr provided as user callback function");
 
-	    files->compute_most_recent_stats(stats_data, stats_ea, total_data, total_ea);
+	    files->compute_most_recent_stats(stats_data, stats_ea, total_data, total_ea, datetime(0));
 	    try
 	    {
 		for(archive_num i = 1; i < coordinate.size(); ++i)
@@ -708,6 +708,10 @@ namespace libdar
 				       const database_restore_options & opt)
     {
 	    // indentify the archive_num(s) to run extraction on
+	set<archive_num> to_consider;
+
+
+
 
 	    // for each archive_num
 
