@@ -260,10 +260,10 @@ namespace libdar
 	    /// \note if set to zero, the most recent state available is looked for (this is the default value).
 	void set_date(const infinint & value) { x_date = value; };
 
-	    /// find data or EA if they have been removed at the requested data
+	    /// find data or EA if they have been removed at the requested date
 
-	    /// in the case a file has was removed at the request date, the data or EA
-	    /// that will be restored will be the one of it had just before being removed
+	    /// in the case a file was removed at the request date, the data or EA
+	    /// that will be restored will be the one it had just before being removed
 	void set_even_when_removed(bool value) { x_even_when_removed = value; };
 
 
