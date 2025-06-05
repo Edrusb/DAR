@@ -352,7 +352,6 @@ namespace libdar
 		// be pointing at each entry, from the smallest to the highest archive number
 
 	datetime max_seen_date = datetime(0);
-	archive_num last_archive_seen = 0; //< last archive number (in the order of the database) in which a valid entry has been found (any state)
 	candidates candy(even_when_removed); //< Au pays de Candy, comme dans tous les pays ...
 	map<archive_num, status_plus>::const_iterator it = last_mod.begin();
 
@@ -365,7 +364,6 @@ namespace libdar
 	       && (date.is_null() || it->second.date <= date))
 	    {
 		max_seen_date = it->second.date;
-		last_archive_seen = it->first;
 		candy.add(it->first, it->second.present);
 	    }
 	    ++it;
