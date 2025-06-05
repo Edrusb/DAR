@@ -42,6 +42,7 @@ extern "C"
 #include "i_archive.hpp"
 #include "i_database.hpp"
 #include "archive.hpp"
+#include "mask_database.hpp"
 
 using namespace libdar;
 using namespace std;
@@ -704,12 +705,13 @@ namespace libdar
 
     void database::i_database::restore(const archive_options_read & read_options,
 				       const path & fs_root,
-				       const archive_options_extract & extract_options,
+				       archive_options_extract extract_options,
 				       const database_restore_options & opt,
 				       statistics* progressive_report)
     {
 
-	    // indentify the archive_num(s) to run extraction on
+	    //*** indentify the archive_num(s) to run extraction on
+
 	set<archive_num> to_consider;
 
 	deque<infinint> stats_data(coordinate.size(), 0);
@@ -733,7 +735,32 @@ namespace libdar
 		to_consider.insert(i);
 	}
 
-	    // for each archive_num
+	    //*** ANDING the subdir mask of extract_option with a mask_database from us
+
+	et_mask wrapper_mask;
+
+	wrapper_mask.add_mask(mask_database(files, opt.get_date()));
+	wrapper_mask.add_mask(extract_options.get_subtree());
+	extract_options.set_subtree(wrapper_mask);
+
+	const et_mask* in_opt_et = dynamic_cast<const et_mask*>(& extract_options.get_subtree());
+	if(in_opt_et == nullptr)
+	    throw SRC_BUG; // the subtree should now be a et_mask!
+
+	if(in_opt_et->size() != 2)
+	    throw SRC_BUG; // the et_mask should have two items!
+
+	const mask_database* mask_base = dynamic_cast<const mask_database*>(in_opt_et->get_added(0));
+	if(mask_base == nullptr)
+	    throw SRC_BUG; // and the first component of the et_mask should be a mask_database!
+
+	    // Ok, now we have mask_base pointing to the
+	    // mask_databse inside the subtree() options of archive_extract,
+	    // we will be able toset the archive to focus on
+	    // without having to regenerate the whole mask stuff
+
+	    //*** for each archive_num
+
 
 	for(set<archive_num>::iterator it = to_consider.begin(); it != to_consider.end(); ++it)
 	{
@@ -764,9 +791,12 @@ namespace libdar
 	    if(!arch)
 		throw Ememory("database::i_database::restore");
 
-		// - define a mask_database and modify the archive_options_extract to AND path with it
+		// - update the mask_database according to the archive num we will restore now
 
-		/// TO BE IMPLEMENTED WITH a new mask_database class
+	    if(mask_base == nullptr)
+		throw SRC_BUG;
+
+	    mask_base->set_focus(*it);
 
 		// - extract the archive with the provided/modified extraction options
 

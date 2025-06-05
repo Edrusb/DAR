@@ -157,7 +157,7 @@ namespace libdar
 
 	void restore(const archive_options_read & read_options,
 		     const path & fs_root,
-		     const archive_options_extract & extract_options,
+		     archive_options_extract extract_options,
 		     const database_restore_options & opt,
 		     statistics* progressive_report);
 
