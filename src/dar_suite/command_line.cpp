@@ -1692,6 +1692,8 @@ static bool get_args_recursive(recursive_param & rec,
 		    p.fully_detailed_dates = true;
 		else if(strcasecmp("rep", optarg) == 0 || strcasecmp("repair", optarg) == 0)
 		    p.isolation_repair = true;
+		else if(strcasecmp("efd", optarg) == 0 || strcasecmp("extract-from-database", optarg) == 0)
+		    p.extract_from_database = true;
 		else
                     throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext("Unknown argument given to -a : %s"), optarg));
                 break;

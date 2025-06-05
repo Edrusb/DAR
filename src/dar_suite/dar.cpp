@@ -890,8 +890,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		if(param.extract_from_database)
 		{
 		    database_open_options datopt;
-		    path tmp = *param.sauv_root;
-		    tmp.append(param.filename);
+		    path tmp = param.sauv_root->append(param.filename);
 
 		    datopt.set_warn_order(false);
 		    datopt.set_partial(false);
