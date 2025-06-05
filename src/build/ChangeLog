@@ -44,6 +44,15 @@ from 2.7.x to 2.8.0
   memory to reserve while initializing libgcrypt form libdar. Libgcrypt can
   still also be initialized outside libdar in that case secured memory size
   will have to be defined outside libdar.
+- adding the ability to dar to restore from a dar_manager database (-aefd
+  option) making possible and efficient to restore all files of a backup
+  set from a single dar command (instead of calling dar manually for the
+  full then differential and/or incremental backups, which may lead to data
+  overwriting and restoring old data then more recent one). The behavoir
+  is the same as dar_manager but there is not need to transfer between
+  dar and dar_manager the list of files to restore at each backup step,
+  dar directly fetches and precompute the information in the database for
+  better efficiency.
 
 from 2.7.18 to 2.7.19
 - fixed the trailing slash support in path, that was broken by commit
