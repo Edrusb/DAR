@@ -805,52 +805,16 @@ namespace libdar
 					      deque<infinint> & total_ea,
 					      const datetime & ignore_older_than_that) const
     {
-	archive_num most_recent = 0;
-	datetime max = datetime(0);
-	map<archive_num, status_plus>::const_iterator itp = last_mod.begin();
+	set<db_etat> flag_set;
 
-	while(itp != last_mod.end())
-	{
-	    if(itp->second.present == db_etat::et_saved)
-	    {
-		if(itp->second.date >= max
-		   &&
-		   (ignore_older_than_that.is_null() || itp->second.date <= ignore_older_than_that)
-		    )
-		{
-		    most_recent = itp->first;
-		    max = itp->second.date;
-		}
-		++total_data[itp->first];
-	    }
-	    ++itp;
-	}
-	if(most_recent > 0)
-	    ++data[most_recent];
-
-	most_recent = 0;
-	max = datetime(0);
-	map<archive_num, status>::const_iterator it = last_change.begin();
-
-	while(it != last_change.end())
-	{
-	    if(it->second.present == db_etat::et_saved)
-	    {
-		if(it->second.date >= max
-		    &&
-		   (ignore_older_than_that.is_null() || it->second.date <= ignore_older_than_that)
-		    )
-		{
-		    most_recent = it->first;
-		    max = it->second.date;
-		}
-		++total_ea[it->first];
-	    }
-	    ++it;
-	}
-	if(most_recent > 0)
-	    ++ea[most_recent];
-    }
+	flag_set.insert(db_etat::et_saved);
+	compute_for_flag_set(data,
+			     ea,
+			     total_data,
+			     total_ea,
+			     ignore_older_than_that,
+			     flag_set);
+   }
 
     bool data_tree::fix_corruption()
     {
@@ -998,6 +962,60 @@ namespace libdar
 	}
 
 	return ret;
+    }
+
+    void data_tree::compute_for_flag_set(deque<infinint> & data,
+					 deque<infinint> & ea,
+					 deque<infinint> & total_data,
+					 deque<infinint> & total_ea,
+					 const datetime & ignore_older_than_that,
+					 const set<db_etat> & flag_set) const
+    {
+	archive_num most_recent = 0;
+	datetime max = datetime(0);
+	map<archive_num, status_plus>::const_iterator itp = last_mod.begin();
+
+	while(itp != last_mod.end())
+	{
+	    if(flag_set.find(itp->second.present) != flag_set.end())
+	    {
+		if(itp->second.date >= max
+		   &&
+		   (ignore_older_than_that.is_null() || itp->second.date <= ignore_older_than_that)
+		    )
+		{
+		    most_recent = itp->first;
+		    max = itp->second.date;
+		}
+		++total_data[itp->first];
+	    }
+	    ++itp;
+	}
+	if(most_recent > 0)
+	    ++data[most_recent];
+
+	most_recent = 0;
+	max = datetime(0);
+	map<archive_num, status>::const_iterator it = last_change.begin();
+
+	while(it != last_change.end())
+	{
+	    if(flag_set.find(it->second.present) != flag_set.end())
+	    {
+		if(it->second.date >= max
+		    &&
+		   (ignore_older_than_that.is_null() || it->second.date <= ignore_older_than_that)
+		    )
+		{
+		    most_recent = it->first;
+		    max = it->second.date;
+		}
+		++total_ea[it->first];
+	    }
+	    ++it;
+	}
+	if(most_recent > 0)
+	    ++ea[most_recent];
     }
 
     archive_num data_tree::data_tree_permutation(archive_num src, archive_num dst, archive_num x)

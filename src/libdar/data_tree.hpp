@@ -219,6 +219,14 @@ namespace libdar
 
 	bool check_delta_validity(); // return true if no error has been met about delta patch (no delta is broken, missing its reference)
 
+	void compute_for_flag_set(std::deque<infinint> & data,
+				  std::deque<infinint> & ea,
+				  std::deque<infinint> & total_data,
+				  std::deque<infinint> & total_ea,
+				  const datetime & ignore_older_than_that,
+				  const std::set<db_etat> & flag_set) const;
+
+
 	    /// gives new archive number when an database has its archive reordered
 
 	    /// \param[in] src the archive number to move
