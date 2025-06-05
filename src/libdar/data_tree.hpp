@@ -54,14 +54,14 @@ namespace libdar
     {
     public:
 	data_tree(const std::string &name);
-	data_tree(generic_file & f, unsigned char db_version); //< constructor does not read signature
+	data_tree(generic_file & f, unsigned char db_version); ///< constructor does not read signature
 	data_tree(const data_tree & ref) = default;
 	data_tree(data_tree && ref) noexcept = default;
 	data_tree & operator = (const data_tree & ref) = default;
 	data_tree & operator = (data_tree && ref) noexcept = default;
 	virtual ~data_tree() = default;
 
-	virtual void dump(generic_file & f) const; //< dump signature followed by data constructor will read
+	virtual void dump(generic_file & f) const; ///< dump signature followed by data constructor will read
 	std::string get_name() const { return filename; };
 	void set_name(const std::string & name) { filename = name; };
 
@@ -168,11 +168,11 @@ namespace libdar
 	    status & operator = (status && ref) noexcept = default;
 	    virtual ~status() = default;
 
-	    datetime date;                             //< date of the event
-	    db_etat present;                              //< file's status in the archive
+	    datetime date;                             ///< date of the event
+	    db_etat present;                           ///< file's status in the archive
 
-	    virtual void dump(generic_file & f) const; //< write the struct to file
-	    virtual void read(generic_file &f,         //< set the struct from file
+	    virtual void dump(generic_file & f) const; ///< write the struct to file
+	    virtual void read(generic_file &f,         ///< set the struct from file
 			      unsigned char db_version);
 	};
 
@@ -188,11 +188,11 @@ namespace libdar
 	    status_plus & operator = (status_plus && ref) noexcept { status::operator = (std::move(ref)); move_from(std::move(ref)); return *this; };
 	    ~status_plus() { detruit(); };
 
-	    crc *base; //< only present for s_delta status, to have a link with the file to apply the patch to
-	    crc *result; //< present for s_delta, s_saved, s_not_saved this is the crc of the data (or crc of the data resulting from the patch)
+	    crc *base;   ///< only present for s_delta status, to have a link with the file to apply the patch to
+	    crc *result; ///< present for s_delta, s_saved, s_not_saved this is the crc of the data (or crc of the data resulting from the patch)
 
-	    void dump(generic_file & f) const; //< write the struct to file
-	    void read(generic_file &f,         //< set the struct from file
+	    void dump(generic_file & f) const; ///< write the struct to file
+	    void read(generic_file &f,         ///< set the struct from file
 		      unsigned char db_version);
 
 	private:
@@ -204,8 +204,8 @@ namespace libdar
 
 
 	std::string filename;
-	std::map<archive_num, status_plus> last_mod; //< key is archive number ; value is last_mod time
-	std::map<archive_num, status> last_change;   //< key is archive number ; value is last_change time
+	std::map<archive_num, status_plus> last_mod; ///< key is archive number ; value is last_mod time
+	std::map<archive_num, status> last_change;   ///< key is archive number ; value is last_change time
 
 
 	    // when false is returned, this means that the user wants to ignore subsequent error of the same type
