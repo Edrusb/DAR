@@ -89,6 +89,12 @@ namespace libdar
 					       std::deque<infinint> & total_ea,
 					       const datetime & ingore_older_than_that) const override;
 
+	virtual void compute_restoration_needed_archives(std::deque<infinint> & data,
+							 std::deque<infinint> & ea,
+							 std::deque<infinint> & total_data,
+							 std::deque<infinint> & total_ea,
+							 const datetime & ignore_older_than_that) const override;
+
 	virtual char obj_signature() const override { return signature(); };
 	static char signature() { return 'd'; };
 

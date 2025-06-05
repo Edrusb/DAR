@@ -138,6 +138,17 @@ namespace libdar
 					       std::deque<infinint> & total_ea,
 					       const datetime & ignore_older_than_that) const;
 
+
+	    /// provide a summary of the archives that will be required to restore the data in the latest state
+
+	    /// \note if ignore_older_than_that this result concerns the latest state for the provided date and
+	    /// ignores data from a more recent state.
+	virtual void compute_restoration_needed_archives(std::deque<infinint> & data,
+							 std::deque<infinint> & ea,
+							 std::deque<infinint> & total_data,
+							 std::deque<infinint> & total_ea,
+							 const datetime & ignore_older_than_that) const;
+
 	virtual char obj_signature() const { return signature(); };
 	static char signature() { return 't'; };
 

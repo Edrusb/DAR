@@ -816,6 +816,29 @@ namespace libdar
 			     flag_set);
    }
 
+
+    void data_tree::compute_restoration_needed_archives(deque<infinint> & data,
+							deque<infinint> & ea,
+							deque<infinint> & total_data,
+							deque<infinint> & total_ea,
+							const datetime & ignore_older_than_that) const
+    {
+	set<db_etat> flag_set;
+
+	flag_set.insert(db_etat::et_saved);
+	flag_set.insert(db_etat::et_patch);
+	flag_set.insert(db_etat::et_inode);
+	flag_set.insert(db_etat::et_removed);
+	flag_set.insert(db_etat::et_absent);
+
+	compute_for_flag_set(data,
+			     ea,
+			     total_data,
+			     total_ea,
+			     ignore_older_than_that,
+			     flag_set);
+    }
+
     bool data_tree::fix_corruption()
     {
 	bool ret = true;
