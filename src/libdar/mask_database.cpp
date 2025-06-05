@@ -32,9 +32,24 @@ using namespace std;
 namespace libdar
 {
 
+    mask_database::mask_database(const data_dir* racine,
+				 const datetime & ignore_older_than_that):
+	zoom(0)
+    {
+	tree.reset(new (nothrow) restore_tree(racine, ignore_older_than_that));
+
+	if(!tree)
+	    throw Ememory("mask_database::mask_database");
+    }
+
     bool mask_database::is_covered(const std::string &expression) const
     {
-	return true; // temporary implementation !
+	if(!tree)
+	    throw SRC_BUG;
+	if(zoom == 0)
+	    throw SRC_BUG;
+
+	return tree->restore_from(expression, zoom);
     }
 
 } // end of namespace

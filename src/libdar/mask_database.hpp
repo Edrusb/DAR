@@ -50,6 +50,16 @@ extern "C"
 
 #include "mask.hpp"
 #include "data_dir.hpp"
+#include "datetime.hpp"
+#include "restore_tree.hpp"
+
+
+    /// class mask_database
+
+    /// given a relative path to is_covered(), returns whether this file should be restored or not
+
+    /// the value returned by is_covered() depends on the dar_manager database it has been generated from
+    /// and the current archive number under restoration process, archive number which is set calling set_focus()
 
 namespace libdar
 {
@@ -57,12 +67,16 @@ namespace libdar
     class mask_database: public mask
     {
     public:
-	mask_database(const data_dir* racine, archive_num focus) { base = racine; zoom = focus; };
+	mask_database(const data_dir* racine,
+		      const datetime & ignore_older_than_that);
 	mask_database(const mask_database & ref) = default;
 	mask_database(mask_database && ref) noexcept = default;
 	mask_database & operator = (const mask_database & ref) = default;
 	mask_database & operator = (mask_database && ref) noexcept = default;
         virtual ~mask_database() = default; // base is not
+
+	    /// condition the mask to return is_covered for this provided archive num
+	void set_focus(archive_num focus) { zoom = focus; };
 
 	    /// inherited from class mask
         virtual bool is_covered(const std::string &expression) const override;
@@ -77,8 +91,9 @@ namespace libdar
 	virtual mask_database *clone() const override { return new (std::nothrow) mask_database(*this); };
 
     private:
-	const data_dir* base;   ///< the database tree information
-	archive_num zoom;       ///< the archive to focus on
+
+	archive_num zoom;                   ///< the archive to focus on
+	std::shared_ptr<restore_tree> tree; ///< contains all info to define archive set to use to restore a given path/file
 
     };
 
