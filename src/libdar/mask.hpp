@@ -317,6 +317,9 @@ namespace libdar
 	    /// \note there is no mean to remove a given mask once it has been added (see the clear method)
         U_I size() const { return lst.size(); };
 
+	    /// return a pointer by index to composing mask (index start at zero and should be strictly less than what size() returns)
+	const mask* get_added(U_I index) const { return lst[index]; };
+
 	    /// clear the mask
 
 	    /// remove all previously added masks
