@@ -67,7 +67,17 @@ namespace libdar
     class mask_database: public mask
     {
     public:
+	    /// mask_database constructor
+
+	    /// \param[in] racine, taken from a i_dabase object (thus this object is only usable from that class)
+	    /// \param[in] fs_root, path where data will be restored and path used as prefix by the caller of is_covered()
+	    /// \param[in] ignore_older_than_that mask takes into account that version more recent that this date will be ignored
+	    /// \note, depending on the value given to set_focus() this mask's is_covered()
+	    /// will select only the file which data is the most recent for the focused archive
+	    /// this avoids restoring a given file's data for archive N when archive M (where M > N) has
+	    /// more recent data that will be restored when the focus will be set to M.
 	mask_database(const data_dir* racine,
+		      const path & fs_root,
 		      const datetime & ignore_older_than_that);
 	mask_database(const mask_database & ref) = default;
 	mask_database(mask_database && ref) noexcept = default;
@@ -92,6 +102,7 @@ namespace libdar
 
     private:
 
+	const std::string fs_racine;        ///< prefix to reach the root where restoration will take place
 	mutable archive_num zoom;           ///< the archive to focus on
 	std::shared_ptr<restore_tree> tree; ///< contains all info to define archive set to use to restore a given path/file
 

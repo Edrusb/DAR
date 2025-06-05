@@ -133,8 +133,8 @@ namespace libdar
 		files = data_dir::data_tree_read(f, db_version);
 		if(files == nullptr)
 		    throw Ememory("database::i_database::database");
-		if(files->get_name() != ".")
-		    files->set_name(".");
+		if(files->get_name() != PSEUDO_ROOT)
+		    files->set_name(PSEUDO_ROOT);
 		data_files = nullptr;
 	    }
 	    else
@@ -739,7 +739,7 @@ namespace libdar
 
 	et_mask wrapper_mask;
 
-	wrapper_mask.add_mask(mask_database(files, opt.get_date()));
+	wrapper_mask.add_mask(mask_database(files, fs_root, opt.get_date()));
 	wrapper_mask.add_mask(extract_options.get_subtree());
 	extract_options.set_subtree(wrapper_mask);
 
