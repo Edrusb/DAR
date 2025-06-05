@@ -76,7 +76,7 @@ namespace libdar
         virtual ~mask_database() = default; // base is not
 
 	    /// condition the mask to return is_covered for this provided archive num
-	void set_focus(archive_num focus) { zoom = focus; };
+	void set_focus(archive_num focus) const { zoom = focus; };
 
 	    /// inherited from class mask
         virtual bool is_covered(const std::string &expression) const override;
@@ -92,7 +92,7 @@ namespace libdar
 
     private:
 
-	archive_num zoom;                   ///< the archive to focus on
+	mutable archive_num zoom;           ///< the archive to focus on
 	std::shared_ptr<restore_tree> tree; ///< contains all info to define archive set to use to restore a given path/file
 
     };
