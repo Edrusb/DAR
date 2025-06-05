@@ -723,7 +723,7 @@ namespace libdar
 	if(files == nullptr)
 	    throw SRC_BUG;
 
-	files->compute_most_recent_stats(stats_data, stats_ea, total_data, total_ea, opt.get_date());
+	files->compute_restoration_needed_archives(stats_data, stats_ea, total_data, total_ea, opt.get_date());
 
 	for(unsigned int i = 0; i < coordinate.size(); ++i)
 	{
