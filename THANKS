@@ -1,3 +1,8 @@
+version 2.7.19
+--------------
+Thanks to RSmain at github for findings and feedback about script launching
+(-E/-F/-~ options) under Cygwin.
+
 version 2.7.18
 --------------
 Thanks to mannio on dar-support mailing-list for bug report
