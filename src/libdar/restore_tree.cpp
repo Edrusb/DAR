@@ -50,8 +50,7 @@ namespace libdar
 	data_ret = source->get_data(data_set, max_date, false);
 	ea_ret = source->get_EA(ea_num, max_date, false);
 
-	if(data_ret == db_lookup::found_present
-	   || data_ret == db_lookup::found_removed)
+	if(data_ret == db_lookup::found_present)
 	{
 	    if(ea_ret == db_lookup::found_present
 	       || ea_ret == db_lookup::found_removed)
