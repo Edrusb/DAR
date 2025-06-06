@@ -959,7 +959,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    database_restore_options datopt;
 
 		    datopt.set_early_release(false);
-		    datopt.set_info_details(param.info_details);
+		    datopt.set_info_details(param.display_treated);
 		    datopt.set_ignore_dar_options_in_database(true); // this is not used anyway by database::restore()
 		    datopt.set_date(param.fixed_date);
 		    datopt.set_even_when_removed(false); // do not keep file restored if they had been deleted at the requested time

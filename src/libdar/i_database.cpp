@@ -774,14 +774,6 @@ namespace libdar
 	    path chem(coordinate[*it].chemin);
 	    string basename = coordinate[*it].basename;
 
-	    if(opt.get_info_details())
-	    {
-		path tmp(chem);
-
-		tmp.append(basename);
-		get_ui().message(tools_printf(gettext("Openning archive %s..."), tmp.display().c_str()));
-	    }
-
 	    arch.reset(new (nothrow) archive(get_pointer(),
 					     chem,
 					     basename,
@@ -790,6 +782,14 @@ namespace libdar
 
 	    if(!arch)
 		throw Ememory("database::i_database::restore");
+
+	    if(opt.get_info_details())
+	    {
+		path tmp(chem);
+
+		get_ui().message(tools_printf(gettext("*** Archive [%s] fully loaded ***"), tmp.append(basename).display().c_str()));
+	    }
+
 
 		// - update the mask_database according to the archive num we will restore now
 
