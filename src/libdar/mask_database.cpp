@@ -46,7 +46,7 @@ namespace libdar
 
     bool mask_database::is_covered(const std::string &expression) const
     {
-	path relative_part = FAKE_ROOT;
+	string relative_part;
 	string::const_iterator eit = expression.begin();
 	string::const_iterator fsit = fs_racine.begin();
 
@@ -69,7 +69,7 @@ namespace libdar
 		else
 		{
 		    ++eit; // we skip over the last / to get a relative path to fs_racine
-		    relative_part += path(string(eit, expression.end()));
+		    relative_part += string(eit, expression.end());
 		}
 	    else  // expression equals fs_racine this the remaining part is empty
 		throw SRC_BUG;

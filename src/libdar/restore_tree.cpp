@@ -45,10 +45,6 @@ namespace libdar
 	if(source == nullptr)
 	    throw SRC_BUG;
 
-	    //*** setting up node_name
-
-	node_name = source->get_name();
-
 	    //*** setting up locations
 
 	data_ret = source->get_data(data_set, max_date, false);
@@ -64,7 +60,7 @@ namespace libdar
 	    locations = std::move(data_set);
 	}
 	    // else locations stays empty (entry is not available in any archive referred from the database)
-
+	    // which is the case for the root node.
 
 	    //*** setting up children if any
 
@@ -90,27 +86,31 @@ namespace libdar
 	}
     }
 
-    bool restore_tree::restore_from(const path & chem, archive_num num) const
+    bool restore_tree::restore_from(const string & chem, archive_num num) const
     {
-	bool ret = false;
-	string tmp;
+	const restore_tree* found = nullptr;
 
-	if(! chem.is_relative())
+	if(chem.empty())
 	    throw SRC_BUG;
-
-	chem.reset_read();
-	if(chem.read_subdir(tmp))
+	else
 	{
-	    if(tmp != node_name)
+	    path tmp = path(chem);
+
+	    if(! tmp.is_relative())
 		throw SRC_BUG;
+
+	    tmp.reset_read();
+	    found = lookup(tmp);
 	}
 
-	return restore_from_recursive(chem, num);
+	if(found == nullptr)
+	    throw SRC_BUG;
+
+	return found->result_for(num);
     }
 
-    bool restore_tree::restore_from_recursive(const path & chem, archive_num num) const
+    const restore_tree* restore_tree::lookup(path & chem) const
     {
-	bool ret = false;
 	string tmp;
 
 	if(chem.read_subdir(tmp))
@@ -122,14 +122,10 @@ namespace libdar
 	    if(! it->second)
 		throw SRC_BUG; // empty unique_ptr in map!
 
-	    ret = it->second->restore_from_recursive(chem, num);
+	    return it->second->lookup(chem);
 	}
-	else // we are the target
-	{
-	    ret = (locations.find(num) != locations.end());
-	}
-
-	return ret;
+	else
+	    return this;
     }
 
 } // end of namespace
