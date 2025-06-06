@@ -811,7 +811,8 @@ namespace libdar
 			     total_data,
 			     total_ea,
 			     ignore_older_than_that,
-			     flag_set);
+			     flag_set,
+			     true);
    }
 
 
@@ -834,7 +835,8 @@ namespace libdar
 			     total_data,
 			     total_ea,
 			     ignore_older_than_that,
-			     flag_set);
+			     flag_set,
+			     false);
     }
 
     bool data_tree::fix_corruption()
@@ -990,10 +992,12 @@ namespace libdar
 					 deque<infinint> & total_data,
 					 deque<infinint> & total_ea,
 					 const datetime & ignore_older_than_that,
-					 const set<db_etat> & flag_set) const
+					 const set<db_etat> & flag_set,
+					 bool even_when_removed) const
     {
 	archive_num most_recent = 0;
 	datetime max = datetime(0);
+	db_etat last_state = db_etat::et_absent;
 	map<archive_num, status_plus>::const_iterator itp = last_mod.begin();
 
 	while(itp != last_mod.end())
@@ -1007,16 +1011,19 @@ namespace libdar
 		{
 		    most_recent = itp->first;
 		    max = itp->second.date;
+		    last_state = itp->second.present;
 		}
 		++total_data[itp->first];
 	    }
 	    ++itp;
 	}
 	if(most_recent > 0)
-	    ++data[most_recent];
+	    if(even_when_removed || (last_state != db_etat::et_absent && last_state != db_etat::et_removed))
+		++data[most_recent];
 
 	most_recent = 0;
 	max = datetime(0);
+	last_state = db_etat::et_absent;
 	map<archive_num, status>::const_iterator it = last_change.begin();
 
 	while(it != last_change.end())
@@ -1030,13 +1037,15 @@ namespace libdar
 		{
 		    most_recent = it->first;
 		    max = it->second.date;
+		    last_state = it->second.present;
 		}
 		++total_ea[it->first];
 	    }
 	    ++it;
 	}
 	if(most_recent > 0)
-	    ++ea[most_recent];
+	    if(even_when_removed || (last_state != db_etat::et_absent && last_state != db_etat::et_removed))
+		++ea[most_recent];
     }
 
     archive_num data_tree::data_tree_permutation(archive_num src, archive_num dst, archive_num x)

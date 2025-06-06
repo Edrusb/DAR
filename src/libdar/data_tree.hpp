@@ -230,12 +230,23 @@ namespace libdar
 
 	bool check_delta_validity(); // return true if no error has been met about delta patch (no delta is broken, missing its reference)
 
+	    /// give number of entry's last state (for data and ea) per archive number, followed by the total number of stored in each archive
+
+	    /// \param[in] data table giving for each archive the number of latest data entry (considering states from the flag_set provided set argument)
+	    /// \param[in] ea table giving for each archive the number of latest EA entry (considering states from the flag_set provided set argument)
+	    /// \param[in] data table giving for each archive the total number of data entry (considering states from the flag_set provided set argument)
+	    /// \param[in] data table giving for each archive the total number of EA entry (considering states from the flag_set provided set argument)
+	    /// \param[in] ignore_older_than_that focus the computation on version not more recent that this date
+	    /// \param[in] flag_set set of state to consider (other states are not taken into account when looking for the archive number of the latest entry)
+	    /// \param[in] even_when_removed by default, do not count in any archive a entry which latest state is removed or absent, else increment the archive
+	    /// of most recent state (as define by flag_set) for each entry, even if the most recent state is removed or absent.
 	void compute_for_flag_set(std::deque<infinint> & data,
 				  std::deque<infinint> & ea,
 				  std::deque<infinint> & total_data,
 				  std::deque<infinint> & total_ea,
 				  const datetime & ignore_older_than_that,
-				  const std::set<db_etat> & flag_set) const;
+				  const std::set<db_etat> & flag_set,
+				  bool even_when_removed) const;
 
 
 	    /// gives new archive number when an database has its archive reordered
