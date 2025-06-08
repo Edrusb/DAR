@@ -351,7 +351,7 @@ In a backup context -@ option let the user specify the archive name for an on-fl
 .RE
 .TP 20
 -R, --fs-root <path>
-The path points to the directory tree containing all the files that will be enrolled in the operation (backup, restoration or comparison). By default the current directory is used. All other paths used in -P or -g options on the command line are and must be relative to this path (or to current directory if -R is not present). Note that -R is useless for testing (-t option) isolation (-C option) and merging (-+ option)
+The path points to the directory tree containing all the files that will be enrolled in the operation (backup, restoration or comparison). By default the current directory is used. All other paths used in -P or -g options on the command line are and must be relative to this path (or to current directory if -R is not present). Note that -R is useless for testing (-t option) isolation (-C option) and merging (-+ option). See also -ap option.
 .TP 20
 -X, --exclude <mask>
 The mask is a string with wildcards (like * and ? see glob(7) for details) which is applied to filenames which are not directories. If a given file matches the mask, it is excluded from the operation. By default (no -X on the command line), no file is excluded from the operation. -X may be present several times on the command line, in that case a file will not be considered for the given operation if it matches at least one -X mask. See also -ar and -am options.
