@@ -149,8 +149,8 @@ namespace libdar
 	    // of infinint. The fraction cannot handle smaller unit
 	    // than nanosecond if using 32 bits integer.
 
-	infinint val;  //< the date expressed in the "uni" time unit
-	time_unit uni; //< the time unit used to store the subsecond fraction of the timestamp.
+	infinint val;  ///< the date expressed in the "uni" time unit
+	time_unit uni; ///< the time unit used to store the subsecond fraction of the timestamp.
 
 	    /// reduce the value to the largest unit possible
 	void reduce_to_largest_unit() const;

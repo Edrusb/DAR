@@ -82,16 +82,16 @@ namespace libdar
             // ignore all entry not yet read of current directory
     private:
 
-        path *fs_root;           //< filesystem's root to consider
-        bool info_details;       //< detailed information returned to the user
-	mask *ea_mask;           //< mask defining the EA to consider
-        bool no_dump_check;      //< whether to check against the nodump flag presence
-	bool alter_atime;        //< whether to set back atime or not
-	bool furtive_read_mode;  //< whether to use furtive read mode (if true, alter_atime is ignored)
-	bool cache_directory_tagging; //< whether to consider cache directory taggin standard
-        path *current_dir;       //< needed to translate from an hard linked inode to an  already allocated object
-        std::deque<etage> pile;  //< to store the contents of a directory
-	bool ignore_unknown;     //< whether to ignore unknown inode types
+        path *fs_root;           ///< filesystem's root to consider
+        bool info_details;       ///< detailed information returned to the user
+	mask *ea_mask;           ///< mask defining the EA to consider
+        bool no_dump_check;      ///< whether to check against the nodump flag presence
+	bool alter_atime;        ///< whether to set back atime or not
+	bool furtive_read_mode;  ///< whether to use furtive read mode (if true, alter_atime is ignored)
+	bool cache_directory_tagging; ///< whether to consider cache directory taggin standard
+        path *current_dir;       ///< needed to translate from an hard linked inode to an  already allocated object
+        std::deque<etage> pile;  ///< to store the contents of a directory
+	bool ignore_unknown;     ///< whether to ignore unknown inode types
 
         void detruire();
     };

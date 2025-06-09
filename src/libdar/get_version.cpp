@@ -87,9 +87,9 @@ namespace libdar
 			    bool init_gpgme ///< whether to initialize gpgme
 	);
 
-    static bool libdar_initialized = false; //< static variable modified once during the first get_version call
+    static bool libdar_initialized = false; ///< static variable modified once during the first get_version call
 #ifdef CRYPTO_AVAILABLE
-    static bool libdar_initialized_gcrypt = false; //< to record whether libdar did initialized libgcrypt
+    static bool libdar_initialized_gcrypt = false; ///< to record whether libdar did initialized libgcrypt
 #endif
 
 

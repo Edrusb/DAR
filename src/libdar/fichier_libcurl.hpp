@@ -64,15 +64,15 @@ namespace libdar
     public:
 
 	    /// constructor
-	fichier_libcurl(const std::shared_ptr<user_interaction> & dialog,      //< for user interaction requested by fichier_global
-			const std::string & chemin,     //< full path of the file to open
-			mycurl_protocol proto,          //< to workaround some libcurl strange behavior for some protocols
-			const std::shared_ptr<mycurl_easyhandle_node> & handle, //< the easy handle wrapper object
-			gf_mode m,                      //< open mode
-			U_I waiting,                    //< retry timeout in case of network error
-			bool force_permission,          //< whether file permission should be modified
-			U_I permission,                 //< file permission to enforce if force_permission is set
-			bool erase);                    //< whether to erase the file before writing to it
+	fichier_libcurl(const std::shared_ptr<user_interaction> & dialog,      ///< for user interaction requested by fichier_global
+			const std::string & chemin,     ///< full path of the file to open
+			mycurl_protocol proto,          ///< to workaround some libcurl strange behavior for some protocols
+			const std::shared_ptr<mycurl_easyhandle_node> & handle, ///< the easy handle wrapper object
+			gf_mode m,                      ///< open mode
+			U_I waiting,                    ///< retry timeout in case of network error
+			bool force_permission,          ///< whether file permission should be modified
+			U_I permission,                 ///< file permission to enforce if force_permission is set
+			bool erase);                    ///< whether to erase the file before writing to it
 
 	    /// no copy constructor available
 

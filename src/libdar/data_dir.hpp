@@ -53,7 +53,7 @@ namespace libdar
     {
     public:
 	data_dir(const std::string &name);
-	data_dir(generic_file &f, unsigned char db_version); //< does not read signature
+	data_dir(generic_file &f, unsigned char db_version); ///< does not read signature
 	data_dir(const data_tree & ref);
 	data_dir(const data_dir & ref);
 	data_dir(data_dir && ref) = default;
@@ -61,7 +61,7 @@ namespace libdar
 	data_dir & operator = (data_dir && ref) noexcept = default;
 	~data_dir();
 
-	virtual void dump(generic_file & f) const override; //< write signature followed by data constructor will read
+	virtual void dump(generic_file & f) const override; ///< write signature followed by data constructor will read
 
 	void add(const cat_inode *entry, const archive_num & archive);
 	void add(const cat_detruit *entry, const archive_num & archive);
@@ -119,9 +119,9 @@ namespace libdar
 	static data_dir *data_tree_read(generic_file & f, unsigned char db_version);
 
     private:
-	std::deque<data_tree *> rejetons;          //< subdir and subfiles of the current dir
+	std::deque<data_tree *> rejetons;          ///< subdir and subfiles of the current dir
 
-	void add_child(data_tree *fils);          //< "this" is now responsible of "fils" disalocation
+	void add_child(data_tree *fils);          ///< "this" is now responsible of "fils" disalocation
 	void remove_child(const std::string & name);
 	data_tree *find_or_addition(const std::string & name, bool is_dir, const archive_num & archive);
 

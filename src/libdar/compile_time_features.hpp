@@ -96,9 +96,9 @@ namespace libdar
 	    /// type used to return the endian nature of the current system
 	enum endian
 	{
-	    big = 'B',    //< big endian
-	    little = 'L', //< little endian
-	    error = 'E'   //< neither big nor little endian! (libdar cannot run on such system)
+	    big = 'B',    ///< big endian
+	    little = 'L', ///< little endian
+	    error = 'E'   ///< neither big nor little endian! (libdar cannot run on such system)
 	};
 
 	    /// returns the detected integer endian of the system

@@ -59,7 +59,7 @@ namespace libdar
     static constexpr U_I FLAG_HAS_COMPRESS_BS = 0x0800;   ///< archive header contains a compression block size (else it is assumed equal to zero)
 	// when adding a new flag, all_flags_known() must be updated to pass sanity checks
 
-    static const U_I HEADER_CRC_SIZE = 2; //< CRC width (deprecated, now only used when reading old archives)
+    static const U_I HEADER_CRC_SIZE = 2; ///< CRC width (deprecated, now only used when reading old archives)
 
 	// check we are not facing a more recent format than what we know, this would fail CRC calculation before reporting the real reason of the issue
     static bool all_flags_known(header_flags flag);

@@ -427,7 +427,7 @@ namespace libdar
 	    return deci(date.get_second_value()).human() + " " + datetime::unit_symbol(datetime::tu_second);
 	else
         {
-	    static const U_I str_size = 50; //< minimum required is 26 bytes for ctime_r
+	    static const U_I str_size = 50; ///< minimum required is 26 bytes for ctime_r
 	    char *val = nullptr;
 #if HAVE_CTIME_R
 	    char *str = new (nothrow) char [str_size];

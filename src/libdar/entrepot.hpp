@@ -97,8 +97,8 @@ namespace libdar
 	void set_user_ownership(const std::string & x_user) { user = x_user; };
 	void set_group_ownership(const std::string & x_group) { group = x_group; };
 
-	virtual const path & get_location() const { return where; }; //< retreives relative to root path the current location points to
-	virtual const path & get_root() const { return root; };      //< retrieves the given root location
+	virtual const path & get_location() const { return where; }; ///< retreives relative to root path the current location points to
+	virtual const path & get_root() const { return root; };      ///< retrieves the given root location
 
 	const std::string & get_user_ownership() const { return user; };
 	const std::string & get_group_ownership() const { return group; };
@@ -187,17 +187,17 @@ namespace libdar
 	virtual entrepot *clone() const = 0;
 
     protected:
-	virtual fichier_global *inherited_open(const std::shared_ptr<user_interaction> & dialog,     //< for user interaction
-					       const std::string & filename,  //< filename to open
-					       gf_mode mode,                  //< mode to use
-					       bool force_permission,         //< set the permission of the file to open
-					       U_I permission,                //< value of the permission to assign when force_permission is true
-					       bool fail_if_exists,           //< whether to fail if file exists (write mode)
-					       bool erase) const = 0;         //< whether to erase file if file already exists (write mode)
+	virtual fichier_global *inherited_open(const std::shared_ptr<user_interaction> & dialog,     ///< for user interaction
+					       const std::string & filename,  ///< filename to open
+					       gf_mode mode,                  ///< mode to use
+					       bool force_permission,         ///< set the permission of the file to open
+					       U_I permission,                ///< value of the permission to assign when force_permission is true
+					       bool fail_if_exists,           ///< whether to fail if file exists (write mode)
+					       bool erase) const = 0;         ///< whether to erase file if file already exists (write mode)
 
 	virtual void inherited_unlink(const std::string & filename) const = 0;
 
-	virtual void read_dir_flush() = 0; //< ends the read_dir_next, (no more entry available)
+	virtual void read_dir_flush() = 0; ///< ends the read_dir_next, (no more entry available)
 
     private:
 	path where;

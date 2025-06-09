@@ -60,7 +60,7 @@ namespace libdar
 		// square3 (inexact naming) -> use root3 since release 2.8.0, same behavior just renaming
 	};
 
-	fs_function_t fs_function; //< the function to use to calculate the signature block len
+	fs_function_t fs_function; ///< the function to use to calculate the signature block len
 	infinint multiplier; ///< function dependently used multiplier
 	infinint divisor;    ///< function dependently used divisor
 	U_I min_block_len;   ///< calculated block len will never be lower than that

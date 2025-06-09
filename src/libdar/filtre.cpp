@@ -64,27 +64,27 @@ namespace libdar
 	// return true if file has not change, false if file need not resaving or does not add wasted bytes in archive
 	// throw exceptions in case of error
     static bool save_inode(const shared_ptr<user_interaction> & dialog,//< how to report to user
-			   const string &info_quoi,  //< full path name of the file to save (including its name)
-			   cat_entree * & e,         //< cat_entree to save into the archive
-			   const cat_entree * ref,   //< reference object if it exists (to grab CRC and delta signature from if present and necessary)
+			   const string &info_quoi,  ///< full path name of the file to save (including its name)
+			   cat_entree * & e,         ///< cat_entree to save into the archive
+			   const cat_entree * ref,   ///< reference object if it exists (to grab CRC and delta signature from if present and necessary)
 			   const pile_descriptor & pdesc,//< where to write to
-			   bool info_details,        //< verbose output to user
-			   bool display_treated,     //< add an information line before treating a file
-			   bool alter_atime,         //< whether to set back atime of filesystem
-			   bool check_change,        //< whether to check file change during backup
-			   bool compute_crc,         //< whether to recompute the CRC
-			   cat_file::get_data_mode keep_mode, //< whether to copy compressed data (same compression algo), uncompress but keep hole structure (change compression algo) or uncompress and fill data holes (redetect holes in file)
-			   const catalogue & cat,    //< catalogue to update for escape sequence mark
-			   const infinint & repeat_count, //< how much time to retry saving the file if it has changed during the backup
-			   const infinint & repeat_byte, //< how much byte remains to waste for saving again a changing file
-			   const infinint & hole_size,   //< the threshold for hole detection, set to zero completely disable the sparse file detection mechanism
+			   bool info_details,        ///< verbose output to user
+			   bool display_treated,     ///< add an information line before treating a file
+			   bool alter_atime,         ///< whether to set back atime of filesystem
+			   bool check_change,        ///< whether to check file change during backup
+			   bool compute_crc,         ///< whether to recompute the CRC
+			   cat_file::get_data_mode keep_mode, ///< whether to copy compressed data (same compression algo), uncompress but keep hole structure (change compression algo) or uncompress and fill data holes (redetect holes in file)
+			   const catalogue & cat,    ///< catalogue to update for escape sequence mark
+			   const infinint & repeat_count, ///< how much time to retry saving the file if it has changed during the backup
+			   const infinint & repeat_byte, ///< how much byte remains to waste for saving again a changing file
+			   const infinint & hole_size,   ///< the threshold for hole detection, set to zero completely disable the sparse file detection mechanism
 			   semaphore * sem,
-			   bool delta_signature,  //< if set, lead to delta signature to be computed, if false and delta signature already exists it is saved (which in case of merging leads to transfering it in the resulting archive)
-			   bool make_delta_diff,         //< whether delta diff is allowed
-			   infinint & new_wasted_bytes,  //< new amount of wasted bytes to return to the caller.
-			   set<string> ignored_as_symlink, //< list of file to ignore as symlink and fetch the proper mtime
-			   bool repair_mode,         //< if set, try to fix CRC and size problem flagging such fixed files as dirty
-			   U_I signature_block_size, //< block size of delta signatures
+			   bool delta_signature,  ///< if set, lead to delta signature to be computed, if false and delta signature already exists it is saved (which in case of merging leads to transfering it in the resulting archive)
+			   bool make_delta_diff,         ///< whether delta diff is allowed
+			   infinint & new_wasted_bytes,  ///< new amount of wasted bytes to return to the caller.
+			   set<string> ignored_as_symlink, ///< list of file to ignore as symlink and fetch the proper mtime
+			   bool repair_mode,         ///< if set, try to fix CRC and size problem flagging such fixed files as dirty
+			   U_I signature_block_size, ///< block size of delta signatures
 			   bool never_resave_uncompressed);
 
     static bool save_ea(const shared_ptr<user_interaction> & dialog,

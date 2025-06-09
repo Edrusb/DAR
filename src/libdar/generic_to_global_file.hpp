@@ -75,7 +75,7 @@ namespace libdar
 	    // virtual method inherited from fichier_global
 	virtual void change_ownership(const std::string & user, const std::string & group) override {};
 	virtual void change_permission(U_I perm) override {};
-	virtual infinint get_size() const override { return data->get_position(); }; //< yes, this is the drawback of this template class convertion, get_size() does not return the real size of the object
+	virtual infinint get_size() const override { return data->get_position(); }; ///< yes, this is the drawback of this template class convertion, get_size() does not return the real size of the object
 	virtual void fadvise(advise adv) const override {};
 
 

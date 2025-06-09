@@ -178,8 +178,8 @@ namespace libdar
 	U_I *string_size;     ///< stores the string info size in the secu string (*string_size < *allocated_size)
 
 	void nullifyptr() noexcept { allocated_size = string_size = nullptr; mem = nullptr; zero_length = true; };
-	void init(U_I size);   //< to be used at creation time or after clean_and_destroy() only
-	void copy_from(const secu_string & ref); //< to be used at creation time or after clean_and_destroy() only
+	void init(U_I size);   ///< to be used at creation time or after clean_and_destroy() only
+	void copy_from(const secu_string & ref); ///< to be used at creation time or after clean_and_destroy() only
 	void move_from(secu_string && ref) noexcept;
 	bool compare_with(const char *ptr, U_I size) const; // return true if given sequence is the same as the one stored in "this"
 	void clean_and_destroy();

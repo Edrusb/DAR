@@ -57,18 +57,18 @@ namespace libdar
 
     enum extension_type
     {
-	extension_none = 'N',     //< no extension (obsolete since format "08")
-	extension_size = 'S',     //< extension is the size of slices (obsolete since format "08")
-	extension_tlv =  'T'      //< extension is a TLV (systematic since format "08")
+	extension_none = 'N',     ///< no extension (obsolete since format "08")
+	extension_size = 'S',     ///< extension is the size of slices (obsolete since format "08")
+	extension_tlv =  'T'      ///< extension is a TLV (systematic since format "08")
     };
 
 
     enum tlv_type
     {
-	tlv_size = 1,             //< TLV gives the size of slices (infinint)
-	tlv_first_size = 2,       //< TLV gives the size of first slice (infinint)
-	tlv_data_name = 3,        //< TLV gives the name of the data set
-	tlv_reserved = 65535      //< TLV reserved if 16 bits type space is exhausted to signal a new (larger type storage, to be implemented of course)
+	tlv_size = 1,             ///< TLV gives the size of slices (infinint)
+	tlv_first_size = 2,       ///< TLV gives the size of first slice (infinint)
+	tlv_data_name = 3,        ///< TLV gives the name of the data set
+	tlv_reserved = 65535      ///< TLV reserved if 16 bits type space is exhausted to signal a new (larger type storage, to be implemented of course)
     };
 
 
