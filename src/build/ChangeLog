@@ -4,6 +4,8 @@ from 2.7.18 to 2.7.19
 - leveraging RSmain@github's feedback to modify dar windows packaging for
   -E/-F/-~ options to work under Cygwin. See the updated FAQ for more
   details.
+- Adding documentation on dar's man page on the way dar uses stdin, stdout
+  and stderr.
 
 from 2.7.17 to 2.7.18
 - fixed bug that broke the ability to repair an archive through ftp/sftp
