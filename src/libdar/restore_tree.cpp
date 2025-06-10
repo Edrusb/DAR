@@ -80,7 +80,15 @@ namespace libdar
 		if(!tmp_ptr)
 		    throw Ememory("restore_tree:restore_tree");
 		else
+		{
+			// we merge the child archive num, because if this
+			// parent directly is excluded by the path filter,
+			// all child will be excluded by the same filter.
+		    for(set<archive_num>::iterator pr = tmp_ptr->locations.begin(); pr != tmp_ptr->locations.end(); ++pr)
+			locations.insert(*pr);
+
 		    children[*it] = std::move(tmp_ptr);
+		}
 	    }
 	}
     }
