@@ -62,7 +62,7 @@ namespace libdar
 		      U_I signature_block_size,
 		      generic_file *below);
 
-	    /// constructor for "delta" operation
+	    /// constructor for "delta" operation (builds a patch data)
 
 	    /// in this mode the generic_rsync object is also read only, all data
 	    /// read from it is the resulting delta of the data read from "below" based
@@ -80,7 +80,7 @@ namespace libdar
 		      const infinint & crc_size,
 		      const crc **checksum);
 
-	    /// constructor for "patch" operation
+	    /// constructor for "patch" operation (applies a patch to a file)
 
 	    /// in this mode the generic_rsync object is read only, the data read from
 	    /// it is built from the current file's data and the delta signature.

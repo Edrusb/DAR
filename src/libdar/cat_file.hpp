@@ -101,7 +101,7 @@ namespace libdar
 	    /// \param[in] mode whether to return compressed, with hole or plain file
 	    /// \param[in,out] delta_sig_mem if not nullptr, write to that file the delta signature of the file
 	    /// \param[in] signature_block_size is the block size to use to build the signature (passed to librsync as is)
-	    /// \param[in] delta_ref if not nullptr, use the provided signature to generate a delta binary
+	    /// \param[in] delta_ref if not nullptr, use the provided signature to generate a delta binary patch
 	    /// \param[in] checksum if not null will set *checsum to the address of a newly allocated crc object
 	    /// that the caller has the duty to release when no more needed but *not before* the returned generic_file
 	    /// object has been destroyed first. The computed crc is against the
