@@ -579,7 +579,7 @@ namespace libdar
 	    {
 	    case empty:
 		throw SRC_BUG;
-	    from_path:
+	    case from_path:
 		if(mode != normal && mode != plain)
 		    throw SRC_BUG; // keep compressed/keep_hole is not possible on an inode take from a filesystem
 		else
@@ -857,6 +857,7 @@ namespace libdar
 			    throw;
 			}
 		    }
+		break;
 	    default:
 		throw SRC_BUG;
 	    }
