@@ -71,6 +71,7 @@ namespace libdar
 	delta_sig = nullptr;
 	delta_sig_read = false;
 	read_ver = macro_tools_supported_version;
+	in_place = nullptr;
 
         try
         {
@@ -124,6 +125,7 @@ namespace libdar
 	delta_sig = nullptr;
 	delta_sig_read = false;
 	read_ver = reading_ver;
+	in_place = nullptr;
 
 	generic_file *ptr = nullptr;
 
@@ -345,6 +347,7 @@ namespace libdar
 	delta_sig = nullptr;
 	delta_sig_read = ref.delta_sig_read;
 	read_ver = ref.read_ver;
+	in_place = ref.in_place;
 
         try
         {
@@ -558,79 +561,98 @@ namespace libdar
 		}
 	    }
 
+	    if(status == from_patch)
+	    {
+		if(in_place == nullptr)
+		    throw SRC_BUG;
+
+		if(mode != plain)
+		    throw SRC_BUG;
+
+		if(delta_ref != nullptr)
+		    throw SRC_BUG;
+	    }
+
 		//
 
-	    if(status == from_path)
+	    switch(status)
 	    {
-		fichier_local *tmp = nullptr;
+	    case empty:
+		throw SRC_BUG;
+	    from_path:
 		if(mode != normal && mode != plain)
 		    throw SRC_BUG; // keep compressed/keep_hole is not possible on an inode take from a filesystem
-		ret = tmp = new (nothrow) fichier_local(chemin, furtive_read_mode);
-		try
+		else
 		{
-		    if(tmp != nullptr)
-			    // telling *tmp to flush the data from the cache as soon as possible
-			tmp->fadvise(fichier_global::advise_dontneed);
-		}
-		catch(Erange & e)
-		{
-			// silently ignoring fadvise related error,
-			// this is not crucial
-		}
-
-		if(delta_sig_mem || delta_ref)
-		{
-		    pile *data = new (nothrow) pile();
-		    if(data == nullptr)
-			throw Ememory("cat_file::get_data");
+		    fichier_local *tmp = nullptr;
+		    ret = tmp = new (nothrow) fichier_local(chemin, furtive_read_mode);
 		    try
 		    {
-			data->push(tmp);
+			if(tmp != nullptr)
+				// telling *tmp to flush the data from the cache as soon as possible
+			    tmp->fadvise(fichier_global::advise_dontneed);
 		    }
-		    catch(...)
+		    catch(Erange & e)
 		    {
-			delete data;
-			throw;
+			    // silently ignoring fadvise related error,
+			    // this is not crucial
 		    }
-		    ret = data;
 
-		    if(delta_sig_mem)
+		    if(delta_sig_mem || delta_ref)
 		    {
-			generic_rsync *delta = new (nothrow) generic_rsync(delta_sig_mem.get(), signature_block_size, data->top());
-			if(delta == nullptr)
+			pile *data = new (nothrow) pile();
+			if(data == nullptr)
 			    throw Ememory("cat_file::get_data");
 			try
 			{
-			    data->push(delta);
+			    data->push(tmp);
 			}
 			catch(...)
 			{
-			    delete delta;
+			    delete data;
 			    throw;
 			}
-		    }
+			ret = data;
 
-		    if(delta_ref)
-		    {
-			generic_rsync *diff = new (nothrow) generic_rsync(delta_ref.get(),
-									  data->top(),
-									  tools_file_size_to_crc_size(get_size()),
-									  checksum);
-			if(diff == nullptr)
-			    throw Ememory("cat_file::get_data");
-			try
+			if(delta_sig_mem)
 			{
-			    data->push(diff);
+			    generic_rsync *delta = new (nothrow) generic_rsync(delta_sig_mem.get(), signature_block_size, data->top());
+			    if(delta == nullptr)
+				throw Ememory("cat_file::get_data");
+			    try
+			    {
+				data->push(delta);
+			    }
+			    catch(...)
+			    {
+				delete delta;
+				throw;
+			    }
 			}
-			catch(...)
+
+			if(delta_ref)
 			{
-			    delete diff;
-			    throw;
+			    generic_rsync *diff = new (nothrow) generic_rsync(delta_ref.get(),
+									      data->top(),
+									      tools_file_size_to_crc_size(get_size()),
+									      checksum);
+			    if(diff == nullptr)
+				throw Ememory("cat_file::get_data");
+			    try
+			    {
+				data->push(diff);
+			    }
+			    catch(...)
+			    {
+				delete diff;
+				throw;
+			    }
 			}
 		    }
 		}
-	    }
-	    else // inode from archive
+		break;
+	    case from_cat:
+	    case from_patch:
 		if(get_pile() == nullptr)
 		    throw SRC_BUG; // set_archive_localisation never called or with a bad argument
 		else
@@ -769,6 +791,35 @@ namespace libdar
 				}
 			    }
 
+				// considering the case where we have to on-fly apply the patch (merging context)
+
+			    parent = data->is_empty() ? get_pile() : data->top();
+
+			    if(status == from_patch)
+			    {
+				shared_ptr<memory_file> unused;
+
+				generic_rsync *patcher = new (nothrow) generic_rsync(in_place->get_data(cat_file::plain,
+													unused,
+													0,
+													unused,
+													nullptr),
+										     parent);
+				if(patcher == nullptr)
+				    throw Ememory("cat_file::get_data");
+
+				try
+				{
+				    data->push(patcher);
+				}
+				catch(...)
+				{
+				    delete patcher;
+				    throw;
+				}
+			    }
+
+
 				// if the stack to return is empty adding a tronc
 				// to have the proper offset zero at the beginning of the data
 				//
@@ -806,6 +857,9 @@ namespace libdar
 			    throw;
 			}
 		    }
+	    default:
+		throw SRC_BUG;
+	    }
 	}
 	catch(...)
 	{
@@ -824,6 +878,9 @@ namespace libdar
     {
 	switch(status)
 	{
+	case empty:
+		// nothing to do
+	    break;
 	case from_path:
 	    chemin = ""; // smallest possible memory allocation
 	    break;
@@ -831,13 +888,52 @@ namespace libdar
 	    *offset = 0; // smallest possible memory allocation
 		// warning, cannot change "size", as it is dump() in catalogue later
 	    break;
-	case empty:
-		// nothing to do
+	case from_patch:
+	    in_place == nullptr;
 	    break;
 	default:
 	    throw SRC_BUG;
 	}
 	status = empty;
+    }
+
+    bool cat_file::set_data_from_binary_patch(cat_file* in_place_addr)
+    {
+	    // do we have a patch?
+	if(get_saved_status() != saved_status::delta)
+	    return false;
+
+	    // is the in_place has data available?
+	if(in_place_addr == nullptr)
+	    return false;
+
+	if(in_place_addr->get_saved_status() != saved_status::saved)
+	    return false;
+	else
+	{
+	    const crc* data_crc = nullptr;
+	    const crc* base_crc = nullptr;
+
+	    // do in_place data matches CRC of our base CRC
+
+	    if(!in_place_addr->get_crc(data_crc))
+		return false;
+
+	    if(!get_patch_base_crc(base_crc))
+		return false;
+
+	    if(data_crc != base_crc)
+		return false;
+	}
+
+	    // record in_place address
+	in_place = in_place_addr;
+
+	    // modify our status
+	status = from_patch;
+
+	    // return appropriate value
+	return true;
     }
 
     void cat_file::set_offset(const infinint & r)

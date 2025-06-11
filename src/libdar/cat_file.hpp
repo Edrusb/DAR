@@ -116,6 +116,20 @@ namespace libdar
 				       std::shared_ptr<memory_file> delta_ref,
 				       const crc **checksum = nullptr) const;
         void clean_data(); // partially free memory (but get_data() becomes disabled)
+
+	    /// used while merging, chages the behavior of our get_data() to provide the patched version of the provided file data
+
+	    /// \return true if and only if:
+	    /// - we are a binary patch
+	    /// - the provided cat_file has data saved
+	    /// - crc of the provided file match our base CRC
+	    /// Else, the call does nothing to this object, get_data() is unchanged.
+	    /// \note if this mode is set successfully, get_data() must not be called with keep_compressed or keep_hole or normal, but in "plain" mode
+	bool set_data_from_binary_patch(cat_file* in_place_addr);
+
+	    /// return the save value as what set_data_from_binary_patch has provided
+	bool applying_binary_patch() const { return status == from_patch && in_place != nullptr; };
+
         void set_offset(const infinint & r);
 	const infinint & get_offset() const;
         virtual unsigned char signature() const override { return 'f'; };
@@ -244,7 +258,7 @@ namespace libdar
         virtual void inherited_dump(const pile_descriptor & pdesc, bool small) const override;
 	virtual void post_constructor(const pile_descriptor & pdesc) override;
 
-        enum { empty, from_path, from_cat } status;
+        enum { empty, from_path, from_cat, from_patch } status;
 
     private:
 	std::string chemin;     ///< path to the data (when read from filesystem)
@@ -262,6 +276,7 @@ namespace libdar
 	cat_delta_signature *delta_sig; ///< delta signature and associated CRC
 	mutable bool delta_sig_read; ///< whether delta sig has been read/initialized from filesystem
 	archive_version read_ver; ///< archive format used/to use
+	cat_file *in_place;    ///< when data is build from patch this is the object to apply the patch (which we store)
 
 	void sub_compare_internal(const cat_inode & other,
 				  bool can_read_my_data,
