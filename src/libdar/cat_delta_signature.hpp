@@ -68,6 +68,12 @@ namespace libdar
 	// | size > 0) |               | size > 0 |
 	// +-----------+---------------+----------+
 	//
+	// Note that the SEQUENTIAL MODE is wrapping the DIRECT MODE structure in the core
+	// of the archive, the core of the archive contains either the sequential mode structure
+	// or the direct mode. While in the catalogue, the "sig offset" fields points to the
+	// offset of the direct mode in the core (possibly wrapped in the structure forming the
+	// one of the sequential mode).
+	//
 	// (*) base_CRC has been moved to cat_file structure since format 11,2
 	//     in order to read this field before the delta patch in sequential read mode
 	//
