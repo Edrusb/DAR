@@ -169,7 +169,9 @@ namespace libdar
 
 	/// try to modify the to_be_added for it provides the patched data based on in_place instead of providing (get_data()) the patch data itself
 
-	/// \return true up success, get_data() will then provide the batched version of the file
+	/// \param[in] in_place inode to base the patch on (or nullptr or anything else)
+	/// \param|in] to_be_added inode with binary patch to apply (or nullptr or anything else)
+	/// \return true upon success, get_data() will then provide the batched version of the file, return false else (not a cat_file, no patch data...)
     static bool merge_applying_patch_possible(const cat_entree* in_place,
 					      cat_entree* to_be_added);
 
