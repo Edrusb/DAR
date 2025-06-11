@@ -167,6 +167,12 @@ namespace libdar
 			      const shared_ptr<user_interaction> & dialog,
 			      bool verbose);
 
+	/// try to modify the to_be_added for it provides the patched data based on in_place instead of providing (get_data()) the patch data itself
+
+	/// \return true up success, get_data() will then provide the batched version of the file
+    static bool merge_applying_patch_possible(const cat_entree* in_place,
+					      cat_entree* to_be_added);
+
     void filtre_restore(const shared_ptr<user_interaction> & dialog,
 			const mask & filtre,
 			const mask & subtree,
@@ -1988,7 +1994,8 @@ namespace libdar
 					if(dolly_mir != nullptr)
 					    dolly_ino = dolly_mir->get_inode();
 
-					if(cat.read_if_present(& the_name, already_here)) // An entry of that name already exists in the resulting catalogue
+					if(cat.read_if_present(& the_name, already_here) // An entry of that name already exists in the resulting catalogue
+					   && ! merge_applying_patch_possible(already_here, dolly)) // and already_here is not a binary patch to apply on the in_place object
 					{
 
 						// some different types of pointer to the "already_here" object (aka 'inplace" object)
@@ -2802,7 +2809,7 @@ namespace libdar
 
 		    if(e_file != nullptr)
 		    {
-			if(!delta_signature) // instructed to remove all delta signature information
+			if(!delta_signature || e_file->applying_binary_patch()) // instructed to remove all delta signature information
 			{
 			    if(e_file->has_delta_signature_available())
 				e_file->clear_delta_signature_only();
@@ -4760,5 +4767,21 @@ namespace libdar
 
 	return furtive;
     }
+
+    static bool merge_applying_patch_possible(const cat_entree* in_place, cat_entree* to_be_added)
+    {
+	const cat_file* in_file = dynamic_cast<const cat_file*>(in_place);
+	cat_file* nonconst_in_file = const_cast<cat_file*>(in_file);
+	cat_file* added = dynamic_cast<cat_file*>(to_be_added);
+
+	if(nonconst_in_file == nullptr)
+	    return false;
+
+	if(added == nullptr)
+	    return false;
+
+	return added->set_data_from_binary_patch(nonconst_in_file);
+    }
+
 
 } // end of namespace
