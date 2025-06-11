@@ -2814,7 +2814,10 @@ namespace libdar
 
 		    if(e_file != nullptr)
 		    {
-			if(!delta_signature || e_file->applying_binary_patch()) // instructed to remove all delta signature information
+			if(e_file->applying_binary_patch())
+			    e_file->clear_delta_signature_only();
+
+			if(!delta_signature) // instructed to remove all delta signature information
 			{
 			    if(e_file->has_delta_signature_available())
 				e_file->clear_delta_signature_only();
