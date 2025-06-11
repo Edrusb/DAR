@@ -923,7 +923,7 @@ namespace libdar
 	    if(!get_patch_base_crc(base_crc))
 		return false;
 
-	    if(data_crc != base_crc)
+	    if(*data_crc != *base_crc)
 		return false;
 	}
 
