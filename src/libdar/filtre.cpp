@@ -2771,7 +2771,7 @@ namespace libdar
 		    if(e_file != nullptr)
 		    {
 			if(e_file->applying_binary_patch())
-			    keep_mode = cat_file::plain;
+			    keep_mode = cat_file::normal;
 
 			if(keep_mode != cat_file::keep_compressed)
 			    if(compr_mask.is_covered(e_nom->get_name()) && e_file->get_size() >= min_compr_size)

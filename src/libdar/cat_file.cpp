@@ -569,7 +569,7 @@ namespace libdar
 		if(!in_place)
 		    throw SRC_BUG;
 
-		if(mode != plain)
+		if(mode != normal)
 		    throw SRC_BUG;
 
 		if(delta_ref != nullptr)
@@ -795,6 +795,13 @@ namespace libdar
 			    }
 
 				// considering the case where we have to on-fly apply the patch (merging context)
+				// here too, this hides the copy_to() method of sparse_file (which overwite the default
+				// generic_file::copy_to() one, adding skip() when a hole has to be restored, instead here
+				// the copy_to applied to the object returned by get_data() will be the one of the patcher
+				// in the stack, holes will be hidden and the sequence of zeroed bytes will be generated.
+				// That's OK in this context as we need to apply a patch on this day, and on the other hand
+				// the destination stack copy_to will send its data will probably embbed a sparse_file to
+				// handle holes in the patched resulting file.
 
 			    parent = data->is_empty() ? get_pile() : data->top();
 
