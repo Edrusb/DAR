@@ -88,7 +88,7 @@ namespace libdar
         virtual bool has_changed_since(const cat_inode & ref,
 				       const infinint & hourshift,
 				       comparison_fields what_to_check) const override;
-        infinint get_size() const { return *size; };
+        infinint get_size() const { return status == from_patch ? in_place->get_size() : *size; };
 	void change_size(const infinint & s) const { *size = s; };
         infinint get_storage_size() const { return *storage_size; };
         void set_storage_size(const infinint & s) { *storage_size = s; };
