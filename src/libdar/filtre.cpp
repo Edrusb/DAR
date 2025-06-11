@@ -4762,6 +4762,7 @@ namespace libdar
 
     static bool merge_applying_patch_possible(const cat_entree* in_place, cat_entree* to_be_added)
     {
+/*
 	const cat_file* in_file = dynamic_cast<const cat_file*>(in_place);
 	cat_file* nonconst_in_file = const_cast<cat_file*>(in_file);
 	cat_file* added = dynamic_cast<cat_file*>(to_be_added);
@@ -4773,6 +4774,14 @@ namespace libdar
 	    return false;
 
 	return added->set_data_from_binary_patch(nonconst_in_file);
+*/
+	return false;
+	    // disabling this feature for now, as librsync need to edit the data from the
+	    // source archive to apply a patch (this data is read-only).
+	    // Second issue is the fact librsync seeks forward to different places of the
+	    // file to apply the different parts of the patch, while sparse_file relying under
+	    // does not support skip() operation. Inserting a global_tuyau should address that
+	    // but still read-only data.
     }
 
 
