@@ -71,7 +71,7 @@ namespace libdar
 	delta_sig = nullptr;
 	delta_sig_read = false;
 	read_ver = macro_tools_supported_version;
-	in_place = nullptr;
+	in_place.reset();
 
         try
         {
@@ -125,7 +125,7 @@ namespace libdar
 	delta_sig = nullptr;
 	delta_sig_read = false;
 	read_ver = reading_ver;
-	in_place = nullptr;
+	in_place.reset();
 
 	generic_file *ptr = nullptr;
 
@@ -347,7 +347,10 @@ namespace libdar
 	delta_sig = nullptr;
 	delta_sig_read = ref.delta_sig_read;
 	read_ver = ref.read_ver;
-	in_place = ref.in_place;
+	if(ref.in_place)
+	    in_place.reset(ref.in_place->clone_as_file());
+	else
+	    in_place.reset();
 
         try
         {
@@ -563,7 +566,7 @@ namespace libdar
 
 	    if(status == from_patch)
 	    {
-		if(in_place == nullptr)
+		if(!in_place)
 		    throw SRC_BUG;
 
 		if(mode != plain)
@@ -890,7 +893,7 @@ namespace libdar
 		// warning, cannot change "size", as it is dump() in catalogue later
 	    break;
 	case from_patch:
-	    in_place == nullptr;
+	    in_place.reset();
 	    break;
 	default:
 	    throw SRC_BUG;
@@ -928,7 +931,7 @@ namespace libdar
 	}
 
 	    // record in_place address
-	in_place = in_place_addr;
+	in_place.reset(in_place_addr->clone_as_file());
 
 	    // modify our status
 	status = from_patch;
@@ -1671,6 +1674,16 @@ namespace libdar
 	    delta_sig = nullptr;
 	}
 	clean_patch_base_crc();
+    }
+
+    cat_file* cat_file::clone_as_file() const
+    {
+	cat_file* ret = new (nothrow) cat_file(*this);
+
+	if(ret == nullptr)
+	    throw Ememory("cat_file::clone_as_file");
+
+	return ret;
     }
 
 
