@@ -3298,7 +3298,6 @@ namespace libdar
 				try
 				{
 				    sparse_file *dst_hole = nullptr;
-				    generic_rsync *dst_rsync = nullptr;
 				    infinint crc_size = tools_file_size_to_crc_size(fic->get_size());
 				    crc * val = nullptr;
 				    const crc * original = nullptr;
@@ -3478,14 +3477,6 @@ namespace libdar
 					    val = nullptr;
 					}
 
-					if(dst_rsync != nullptr)
-					{
-					    if(pdesc.stack->pop() != dst_rsync)
-						throw SRC_BUG;
-					    delete dst_rsync;
-					    dst_rsync = nullptr;
-					}
-
 					if(dst_hole != nullptr)
 					{
 					    if(pdesc.stack->pop() != dst_hole)
@@ -3501,14 +3492,6 @@ namespace libdar
 				    {
 					delete val;
 					val = nullptr;
-				    }
-
-				    if(dst_rsync != nullptr)
-				    {
-					if(pdesc.stack->pop() != dst_rsync)
-					    throw SRC_BUG;
-					delete dst_rsync;
-					dst_rsync = nullptr;
 				    }
 
 				    if(dst_hole != nullptr)
