@@ -231,4 +231,4 @@ bell:
 # usage: dar -+ old_full -A recent_fill -@ decr full-from-diff
 
 full-from-diff:
--/ '{!(~I)}[Rr] {~S}[O*] P* ; {~s}[*o] *p'
+-/ '{!(~I)}[Rr] {S&~P}[O*] {~S}[O*] P* ; {~s}[*o] *p'
