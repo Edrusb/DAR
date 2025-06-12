@@ -883,6 +883,9 @@ true only if the 'in place' and 'to be added' entries are of same type (plain fi
 L
 true only if the 'in place' entry has delta signature associated with it.
 .TP 5
+P
+true only if the 'in place' entry is a binary patch.
+.TP 5
 E
 true only if 'in place' and 'to be added' are of the same type and have the same inode data information: uid, gid, permission, modification date are taken into account, atime and ctime are ignored in this comparison. If both are plain files, the file sizes must be the same for this condition to succeed. For char and block devices, both major and minor numbers must match. Last, for symlink, the target (the file path they point to) must be the same.
 .TP 5
