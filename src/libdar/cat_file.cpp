@@ -995,6 +995,7 @@ namespace libdar
 
 	    // modify our status
 	status = from_patch;
+	set_saved_status(saved_status::saved);
 
 	    // return appropriate value
 	return true;
