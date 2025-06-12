@@ -1035,7 +1035,16 @@ namespace libdar
 	if(get_escape_layer() == nullptr)
 	    if(check != nullptr)
 	    {
-		c = check;
+		if(status == from_patch)
+		{
+			// we return the expected CRC of the result
+			// as in this mode we provide the patched file
+			// not the data of the patch itself.
+		    if(!get_patch_result_crc(c))
+			throw SRC_BUG;
+		}
+		else
+		    c = check;
 		return true;
 	    }
 	    else
@@ -1045,6 +1054,17 @@ namespace libdar
 	    if(get_saved_status() == saved_status::saved
 	       || get_saved_status() == saved_status::delta)
 	    {
+		if(status == from_patch)
+		{
+			// we return the expected CRC of the result
+			// as in this mode we provide the patched file
+			// not the data of the patch itself.
+		    if(!get_patch_result_crc(c))
+			throw SRC_BUG;
+
+		    return true;
+		}
+
 		if(check == nullptr)
 		{
 		    try
