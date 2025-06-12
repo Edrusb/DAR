@@ -36,6 +36,9 @@ extern "C"
 #include "compile_time_features.hpp"
 #include "tools.hpp"
 #include "macro_tools.hpp"
+#include "user_interaction_blind.hpp"
+#include "generic_to_global_file.hpp"
+#include "tuyau_global.hpp"
 
 using namespace std;
 
@@ -795,36 +798,86 @@ namespace libdar
 			    }
 
 				// considering the case where we have to on-fly apply the patch (merging context)
-				// here too, this hides the copy_to() method of sparse_file (which overwite the default
-				// generic_file::copy_to() one, adding skip() when a hole has to be restored, instead here
-				// the copy_to applied to the object returned by get_data() will be the one of the patcher
-				// in the stack, holes will be hidden and the sequence of zeroed bytes will be generated.
-				// That's OK in this context as we need to apply a patch on this day, and on the other hand
-				// the destination stack copy_to will send its data will probably embbed a sparse_file to
-				// handle holes in the patched resulting file.
+				// here too, this hides the copy_to() method of sparse_file [which itself overwites the default
+				// generic_file::copy_to(), adding skip() when a hole has to be restored],
+				// instead here the copy_to() method when applied to the object returned by get_data(),
+				// will be the one of the patcher in the stack, holes will be hidden and the sequence of zeroed
+				// bytes will be generated.
+				//
+				// we need to wrap the in_place data for the skip() operation performed on it by generic_rsync
+				// to be possible, as this cat_file may have a sparse_file at the top of the stack returned by
+				// get_data() which does not support skip() method on it.
+				// For that we will add a tuyau_global, and a generic_to_global_file, and keep these objects
+				// in the stack we return (for they can be memory released automatically with the patch data we
+				// provide: The stack view will thus be:
+				//
+				//  - generic_rsync (reads patch data and in_place data to provide patched file)
+			        //  - tuyau_global
+				//  - generic_to_global_file (to adapt tuyau global to the in_place::get_data()
+				//  - in_place->get_data(). This one does not rely on anything below in that stack
+				//  - [generic_rsync] (if deta_sig_mem is true, see just above), provides the patched data to the
+				//     generic_rsync located at the top of the stack
+			        //  -  [sparse_file]  (if sparse_file_detection_read() is true, see above)
+			        //  - compression layer from the archive object
+				//  - [escape layer] from the archive object layers
+			        //  - [encryption or caching] from the archive object layers
+			        //  - sar, trivial sar or zapette from the archive object layers
 
 			    parent = data->is_empty() ? get_pile() : data->top();
 
 			    if(status == from_patch)
 			    {
+				generic_file* to_be_patched;
+				shared_ptr<user_interaction_blind> dialog;
+				generic_to_global_file* ficglob = nullptr;
+				tuyau_global* pipe = nullptr;
 				shared_ptr<memory_file> unused;
-
-				generic_rsync *patcher = new (nothrow) generic_rsync(in_place->get_data(cat_file::plain,
-													unused,
-													0,
-													unused,
-													nullptr),
-										     parent);
-				if(patcher == nullptr)
-				    throw Ememory("cat_file::get_data");
+				generic_rsync *patcher = nullptr;
 
 				try
 				{
+				    to_be_patched = in_place->get_data(cat_file::plain,
+								       unused,
+								       0,
+								       unused,
+								       nullptr);
+				    if(to_be_patched == nullptr)
+					throw Ememory("cat_file::get_data()");
+
+				    dialog.reset(new (nothrow) user_interaction_blind());
+				    if(!dialog)
+					throw Ememory("cat_file::get_data()");
+
+				    ficglob = new (nothrow) generic_to_global_file(dialog,
+										   to_be_patched,
+										   gf_read_only);
+				    if(ficglob == nullptr)
+					throw Ememory("cat_file::get_data()");
+
+				    pipe = new (nothrow) tuyau_global(dialog, ficglob);
+				    if(pipe == nullptr)
+					throw Ememory("cat_file::get_data()");
+
+				    patcher = new (nothrow) generic_rsync(pipe,
+									  parent);
+				    if(patcher == nullptr)
+					throw Ememory("cat_file::get_data");
+
+				    data->push(to_be_patched);
+					// ficglob is under the responsibility of pipe and managed by it
+				    data->push(pipe);
 				    data->push(patcher);
 				}
 				catch(...)
 				{
-				    delete patcher;
+				    if(patcher != nullptr)
+					delete patcher;
+				    if(pipe != nullptr)
+					delete pipe;
+				    if(ficglob != nullptr)
+					delete ficglob;
+				    if(to_be_patched != nullptr)
+					delete to_be_patched;
 				    throw;
 				}
 			    }
