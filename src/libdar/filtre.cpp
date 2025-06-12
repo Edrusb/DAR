@@ -4774,10 +4774,16 @@ namespace libdar
 
     static bool merge_applying_patch_possible(const cat_entree* in_place, cat_entree* to_be_added)
     {
-
+	const cat_mirage* in_mir = dynamic_cast<const cat_mirage*>(in_place);
 	const cat_file* in_file = dynamic_cast<const cat_file*>(in_place);
+	if(in_mir != nullptr)
+	    in_file = dynamic_cast<const cat_file*>(in_mir->get_inode());
 	cat_file* nonconst_in_file = const_cast<cat_file*>(in_file);
+
+	cat_mirage* mir_added = dynamic_cast<cat_mirage*>(to_be_added);
 	cat_file* added = dynamic_cast<cat_file*>(to_be_added);
+	if(mir_added != nullptr)
+	    added = dynamic_cast<cat_file*>(mir_added->get_inode());
 
 	if(nonconst_in_file == nullptr)
 	    return false;
