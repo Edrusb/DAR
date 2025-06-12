@@ -53,6 +53,11 @@ from 2.7.x to 2.8.0
   dar and dar_manager the list of files to restore at each backup step,
   dar directly fetches and precompute the information in the database for
   better efficiency.
+- while merging two backups, when in-place is afile and to-be-added is a
+  binary patch, if the policy decision is to "overwrite", instead of
+  retaining the patch (which is useless alone), the  merging operation
+  now applies the patch to the in-place version and retain the
+  patched/updated version in the resulting backup.
 
 from 2.7.18 to 2.7.19
 - fixed the trailing slash support in path, that was broken by commit
