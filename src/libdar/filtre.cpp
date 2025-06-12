@@ -1995,8 +1995,7 @@ namespace libdar
 					if(dolly_mir != nullptr)
 					    dolly_ino = dolly_mir->get_inode();
 
-					if(cat.read_if_present(& the_name, already_here) // An entry of that name already exists in the resulting catalogue
-					   && ! merge_applying_patch_possible(already_here, dolly)) // and already_here is not a binary patch to apply on the in_place object
+					if(cat.read_if_present(& the_name, already_here)) // An entry of that name already exists in the resulting catalogue
 					{
 
 						// some different types of pointer to the "already_here" object (aka 'inplace" object)
@@ -2264,10 +2263,20 @@ namespace libdar
 						    case data_remove:
 							dialog->message(tools_printf(gettext("Data of file %S taken from the first archive of reference has been removed"), &full_name));
 							break;
+						    case data_overwrite:
+							if(merge_applying_patch_possible(already_here, dolly))
+							{
+							    dialog->message(tools_printf(gettext("Data of file %S taken from the first archive will be patched using the binary delta found in the auxiliary archive"), &full_name));
+							    break;
+							}
+							    /* no break */
 						    default:
 							dialog->message(tools_printf(gettext("Data of file %S taken from the first archive of reference has been overwritten"), &full_name));
 						    }
 						}
+						else
+						    (void) merge_applying_patch_possible(already_here, dolly);
+						    // we still need to check and update dolly for patching when no display is requested by the user
 
 						if(act_data == data_overwrite_mark_already_saved && dolly_ino != nullptr)
 						{
