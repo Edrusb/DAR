@@ -6,6 +6,9 @@ from 2.7.18 to 2.7.19
   details.
 - Adding documentation on dar's man page on the way dar uses stdin, stdout
   and stderr.
+- removing too restrictive control of compression level inside libdar,
+  dar CLI already does that and libzstd/libz/libbz2/... also do that and
+  triggers an error in case of invalid value.
 
 from 2.7.17 to 2.7.18
 - fixed bug that broke the ability to repair an archive through ftp/sftp
