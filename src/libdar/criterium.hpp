@@ -305,6 +305,20 @@ namespace libdar
 	virtual criterium *clone() const override { return new (std::nothrow) crit_in_place_has_delta_sig(*this); };
     };
 
+    class crit_in_place_is_binary_patch : public criterium
+    {
+    public:
+	crit_in_place_is_binary_patch() {};
+	crit_in_place_is_binary_patch(const crit_in_place_is_binary_patch & ref) = default;
+	crit_in_place_is_binary_patch(crit_in_place_is_binary_patch && ref) noexcept = default;
+	crit_in_place_is_binary_patch & operator = (const crit_in_place_is_binary_patch & ref) = default;
+	crit_in_place_is_binary_patch & operator = (crit_in_place_is_binary_patch && ref) noexcept = default;
+	~crit_in_place_is_binary_patch() = default;
+
+	virtual bool evaluate(const cat_nomme &first, const cat_nomme &second) const override;
+	virtual criterium *clone() const override { return new (std::nothrow) crit_in_place_is_binary_patch(*this); };
+    };
+
 	/// returns true if both inputs are inode of the same type (file/pipe/device/...) and share inode information
 
 	/// inode information taken into account is

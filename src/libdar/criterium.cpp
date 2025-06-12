@@ -144,6 +144,17 @@ namespace libdar
 	    return false;
     }
 
+    bool crit_in_place_is_binary_patch::evaluate(const cat_nomme & first, const cat_nomme &second) const
+    {
+	const cat_inode *first_i = get_inode(&first);
+	const cat_file *first_f = dynamic_cast<const cat_file *>(first_i);
+
+	if(first_f != nullptr)
+	    return first_f->get_saved_status() == saved_status::delta;
+	else
+	    return false;
+    }
+
     bool crit_same_inode_data::evaluate(const cat_nomme &first, const cat_nomme &second) const
     {
 	crit_same_type same_type;
