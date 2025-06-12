@@ -2762,7 +2762,8 @@ namespace libdar
 		    {
 			const crc *val = nullptr;
 
-			if(!e_file->get_crc(val)) // this can occur when reading an old archive format
+			if(!e_file->get_crc(val)
+			   || e_file->applying_binary_patch()) // this can occur when reading an old archive format
 			    compute_file_crc = true;
 		    }
 
