@@ -587,8 +587,6 @@ namespace libdar
 		    // sanity checks as much as possible to avoid libdar crashing due to bad arguments
 		    // useless arguments are not reported.
 
-		if(options.get_compression_level() > 9 || options.get_compression_level() < 1)
-		    throw Elibcall("op_merge", gettext("Compression_level must be between 1 and 9 included"));
 		if(options.get_slice_size().is_zero() && !options.get_first_slice_size().is_zero())
 		    throw Elibcall("op_merge", gettext("\"first_file_size\" cannot be different from zero if \"file_size\" is equal to zero"));
 		if(options.get_crypto_size() < 10 && options.get_crypto_algo() != crypto_algo::none)
