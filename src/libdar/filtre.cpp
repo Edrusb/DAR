@@ -2522,9 +2522,11 @@ namespace libdar
 					if(dolly != nullptr)
 					{
 					    const cat_inode *e_ino = dynamic_cast<const cat_inode *>(e);
+					    cat_file *e_file = dynamic_cast<cat_file *>(dolly);
 
 					    cat.add(dolly);
-					    st.incr_treated();
+					    if(e_file == nullptr || ! e_file->applying_binary_patch())
+						st.incr_treated();
 
 					    if(e_mir != nullptr)
 					    {
