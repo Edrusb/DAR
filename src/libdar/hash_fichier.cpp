@@ -248,7 +248,7 @@ namespace libdar
 		case hash_algo::whirlpool:
 #if RHASH_AVAILABLE
 		    digest_size = rhash_get_digest_size(RHASH_WHIRLPOOL);
-		    digest = new unsigned char[digest_size];
+		    digest = new (nothrow) unsigned char[digest_size];
 		    if(digest == nullptr)
 			throw Ememory("hash_fichier::inherited_terminate");
 		    if(rhash_print((char *)digest, rhash_ctxt, RHASH_WHIRLPOOL, RHPR_RAW) != digest_size)
