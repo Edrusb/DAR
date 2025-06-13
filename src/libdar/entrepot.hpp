@@ -193,7 +193,8 @@ namespace libdar
 					       bool force_permission,         ///< set the permission of the file to open
 					       U_I permission,                ///< value of the permission to assign when force_permission is true
 					       bool fail_if_exists,           ///< whether to fail if file exists (write mode)
-					       bool erase) const = 0;         ///< whether to erase file if file already exists (write mode)
+					       bool erase                     ///< whether to erase file if file already exists (write mode)
+	    ) const = 0;
 
 	virtual void inherited_unlink(const std::string & filename) const = 0;
 

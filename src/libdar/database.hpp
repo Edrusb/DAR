@@ -232,6 +232,7 @@ namespace libdar
 	    /// \param[in] fs_root where to restore data
 	    /// \param[in] extract_options options to use to perform archive extraction
 	    /// \param[in] opt dar_manager relative info for this operation
+	    /// \param[in] progressive_report if not nullptr, will fill the progressive_report during the operation
 	    /// \note opt fields that are taken into account here are:
 	    ///  - set_date()
 	    ///  - set_info_details() but only for database specific informations (see archive options else)

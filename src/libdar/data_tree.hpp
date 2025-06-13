@@ -129,7 +129,7 @@ namespace libdar
 	    /// \param[out] ea is a table indexed by archive num providing the number latest EA version per archive
 	    /// \param[out] total_data is a table indexed by archive providing the total number of entries with data, archive per archive (most recent and older)
 	    /// \param[out] total_ea is a table indexed by archive num providing the total number of entries with EA, archive per archive (most recent and older)
-	    /// \param[in] ignore_older_than_that, if not null date, ignore data et EA versions strictly more recent than this date
+	    /// \param[in] ignore_older_than_that if not null date, ignore data et EA versions strictly more recent than this date
 	    /// \note the provided four fields that will receive table of counters per archive should be initialized by the caller
 	    /// as this is a recursive call with data_dir that increment the counter recursively.
 	virtual void compute_most_recent_stats(std::deque<infinint> & data,
@@ -141,7 +141,7 @@ namespace libdar
 
 	    /// provide a summary of the archives that will be required to restore the data in the latest state
 
-	    /// \note if ignore_older_than_that this result concerns the latest state for the provided date and
+	    /// \note if ignore_older_than_that is set, the result concerns the latest state for the provided date and
 	    /// ignores data from a more recent state.
 	virtual void compute_restoration_needed_archives(std::deque<infinint> & data,
 							 std::deque<infinint> & ea,
@@ -234,8 +234,8 @@ namespace libdar
 
 	    /// \param[in] data table giving for each archive the number of latest data entry (considering states from the flag_set provided set argument)
 	    /// \param[in] ea table giving for each archive the number of latest EA entry (considering states from the flag_set provided set argument)
-	    /// \param[in] data table giving for each archive the total number of data entry (considering states from the flag_set provided set argument)
-	    /// \param[in] data table giving for each archive the total number of EA entry (considering states from the flag_set provided set argument)
+	    /// \param[in] total_data table giving for each archive the total number of data entry (considering states from the flag_set provided set argument)
+	    /// \param[in] total_ea table giving for each archive the total number of EA entry (considering states from the flag_set provided set argument)
 	    /// \param[in] ignore_older_than_that focus the computation on version not more recent that this date
 	    /// \param[in] flag_set set of state to consider (other states are not taken into account when looking for the archive number of the latest entry)
 	    /// \param[in] even_when_removed by default, do not count in any archive a entry which latest state is removed or absent, else increment the archive
