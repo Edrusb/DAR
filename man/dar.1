@@ -89,6 +89,9 @@ A set of options that are specific to archive listing operation
 EXPLICIT OPTIONAL ARGUMENTS
 Some system do not allow optional arguments to options, this chapter explain how to overcome this restriction
 .TP 5
+USAGE MADE OF STDIN/STDOUT/STDERR BY DAR
+What message type you get on stdout or stderr, how input are fetched from the terminal
+.TP 5
 EXIT CODES
 List of values
 .B dar
@@ -1375,6 +1378,25 @@ must be replaced by -M I:/
 When using GNU getopt(), optional arguments are available by sticking the argument to the short option: "-z" for example is available as well as "-z9". But "-z 9" is wrong, it will be read as "-z" option and "9", a command line argument (not an argument to the -z option). In the other side, when using a non GNU getopt this time, "-z" becomes an option that always requires an argument, and thus "-z 9" is read as "-z" option with "9" as argument, while "-z9" will be rejected as a unknown option, and "-z" alone will generate an error as no argument is provided. In consequences, you
 .B need
 a space between the option (like "-z") and its argument (like "9"), when dar does not rely on a GNU getopt() call, which also imply you to explicitly use arguments to options listed just above.
+
+
+.SH USAGE MADE OF STDIN/STDOUT/STDERR BY DAR
+Dar as any Unix command-line tool is created by a shell with a standard input (stdin), a standard output (stdout) and a standard error (stderr) to interact with the user.
+.TP 10
+On the other side, Dar has a non-interactive output and a interactive output. The objective is to have in-band messages that show the current process steps (normal messages that goes to the non-interactive output) and out-of-band messages that can influence the global process or give diagnostic on the dar current operation fate (the interactive output and its associated input).
+.TP 10
+At startup
+in the very early phase, before dar has interpreted the argc/argv arguments it has received from the shell (those options and commands you pass to dar), both outputs are bounded to stderr, because dar may be set to read an archive on stdin (--sequential-read option or dar used with dar_slave) or to output an archive on stdout ("-c -" option for example). A very basic lookup in performed on the argv arguments list toward the presence of a -Q option. Right after that, if no controlling terminal is found (and unless -Q option has been found earlier) a warning message is send to the non-interactive output (stderr at that time) and all questions will assume negative answer. Else, a new file-descriptor is open on this controlling terminal and will be used to fetch the future answers from the user when interaction will be needed, preserving stdin this way.
+.TP 10
+During command-line parsing
+Once the command line option parsing has completed, if no archive or backup is expected to be output on stdout (no -i and -o options, as well as no "-c -" "-C -" or  "-+ -" configuration requested, for example), the non-interactive-output is changed from stderr to stdout, else it stays on stderr.
+.TP 10
+Running phase
+Thus, during the archive or backup processing, any information message goes to the non-interactive output (either stderr or stdout as described above) while questions to the user to the interactive output, that's to say on stderr. If a controlling terminal has been found the user answer is fetch from this terminal through the additional file-descriptor opened at startup phase (stdin is kept either for dar_slave or sequential-read mode or is not used at all).
+.TP 10
+Exception phase
+In case an exception (= an error) that could not be handled by dar succeeds, both outputs are set back to stderr and the error message embedded in the exception is displayed before dar terminates.
+
 
 .SH EXIT CODES
 .B dar

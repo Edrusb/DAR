@@ -470,7 +470,8 @@ namespace libdar
                                            const cat_file & existing,
                                            const string & existing_pathname,
                                            const cat_file & patcher,
-                                           const path & cur_directory)
+                                           const path & cur_directory,
+					   bool hard_linked)
     {
         infinint patch_crc_size = tools_file_size_to_crc_size(patcher.get_size());
         infinint base_crc_size = tools_file_size_to_crc_size(existing.get_size());
@@ -486,6 +487,8 @@ namespace libdar
         generic_rsync *rdiffer = nullptr;          ///< interface to rsync to apply the patch
         null_file black_hole = gf_write_only;
 	bool disable_base_check = patcher.get_archive_version() == archive_version(11,2); ///< workaround bug in that format
+	bool mismatch = false; // used to record base crc mismatch when hard_linked is true
+	string patcherror; // used to record error message of the patching operation while hard_linked is true
 
             // sanity checks
 
@@ -516,7 +519,7 @@ namespace libdar
                     // of the crc size to use
 
 
-                    // obtaining current file
+                    // obtaining current file and calculating its CRC
 
                 current = existing.get_data(cat_file::plain, nullptr, 0, nullptr);
                 if(current == nullptr)
@@ -540,7 +543,7 @@ namespace libdar
 		    }
                 }
 
-                    // obtaining patch
+                    // obtaining the patch data
 
                 delta = patcher.get_data(cat_file::plain, nullptr, 0, nullptr);
                 if(delta == nullptr)
@@ -550,7 +553,6 @@ namespace libdar
 
 
                     // creating the patcher object (read-only object)
-                    // and checking the current data matches the expected_base_crc
 
                 rdiffer = new (nothrow) generic_rsync(current,
                                                       delta);
@@ -560,11 +562,26 @@ namespace libdar
 
                     // patching the existing file to the resulting inode (which is a new file)
 
-                rdiffer->copy_to(*resulting);
-                rdiffer->terminate();
-                resulting->terminate();
+		try
+		{
+		    rdiffer->copy_to(*resulting);
+		    rdiffer->terminate();
+		    resulting->terminate();
+		}
+		catch(Ebug & e)
+		{
+		    throw;
+		}
+		catch(Egeneric & e)
+		{
+		    if(!hard_linked)
+			throw;
+		    patcherror = e.get_message();
+			// we record the error message, but lose the exception type (but this is data related, thus Edata)
+		}
 
                     // obtaining the expected CRC of the base file to patch
+		    // CRC must be fetched after the patch has been read for it can be done in a sequential read mode
 
                 if(!patcher.has_patch_base_crc())
                     throw SRC_BUG; // s_delta should have a ref CRC
@@ -576,7 +593,18 @@ namespace libdar
                     // comparing the expected base crc with the calculated one
 
                 if(!disable_base_check && *calculated_base_crc != *expected_base_crc)
-                    throw Erange("filesystem.cpp::make_delta_patch", gettext("File the patch is about to be applied to is not the expected one, aborting the patch operation"));
+		{
+		    if(hard_linked)
+			mismatch = true;
+		    else
+			throw Erange("filesystem.cpp::make_delta_patch", gettext("File the patch is about to be applied to is not the expected one, aborting the patch operation"));
+		}
+		else
+		{
+		    if(! patcherror.empty())
+			throw Edata(tools_printf(gettext("Error trying to binary-patch hard-linked file while its base CRC was correct: %S"),
+						 &patcherror));
+		}
 
 
                     // reading the calculated CRC of the patch data
@@ -584,7 +612,6 @@ namespace libdar
                 calculated_patch_crc = delta->get_crc();
                 if(calculated_patch_crc == nullptr)
                     throw SRC_BUG;
-
 
                     // checking the calculated CRC match the expected CRC for patch data
 
@@ -617,10 +644,17 @@ namespace libdar
                     // original file
                 try
                 {
-                    filesystem_tools_copy_content_from_to(dialog,
-                                                          temporary_pathname,
-                                                          existing_pathname,
-                                                          expected_result_crc);
+		    if(!mismatch)
+			filesystem_tools_copy_content_from_to(dialog,
+							      temporary_pathname,
+							      existing_pathname,
+							      expected_result_crc);
+		    else
+		    {
+			    // checking whether the inode has not already been patched (hard-link context)
+			if(*calculated_base_crc != *expected_result_crc)
+			    throw Erange("filesystem.cpp::make_delta_patch", gettext("File the patch is about to be applied to is not the expected one, aborting the patch operation"));
+		    }
                 }
                 catch(Erange & e)
                 {
