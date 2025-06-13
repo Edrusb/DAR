@@ -102,7 +102,7 @@ namespace libdar
 
     private:
 
-	const std::string fs_racine;        ///< prefix to reach the root where restoration will take place
+	std::string fs_racine;              ///< prefix to reach the root where restoration will take place
 	mutable archive_num zoom;           ///< the archive to focus on
 	std::shared_ptr<restore_tree> tree; ///< contains all info to define archive set to use to restore a given path/file
 
