@@ -2023,7 +2023,7 @@ namespace libdar
 
     U_I tools_pseudo_random(U_I max)
     {
-	return (U_I)(max*((float)(rand())/RAND_MAX));
+	return (U_I)(max*((float)(rand())/(float)(RAND_MAX)));
     }
 
     string tools_unsigned_char_to_hexa(unsigned char x)

@@ -354,7 +354,7 @@ namespace libdar
 		if(! part.empty())
 		{
 		    if(part[part.size() - 1] == ':' // word ending with : thus :/ was read
-		       && ! aggregate[0] != '/'     // not an absolute path
+		       && aggregate[0] != '/'       // not an absolute path
 		       && splitted.empty())         // this is the first word we add so we have
 			                            // something in the form of "<protocol>:/"
 			                            // at the beginning of "aggregate"
