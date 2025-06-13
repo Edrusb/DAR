@@ -2008,7 +2008,8 @@ PYBIND11_MODULE(libdar, mod)
 	.def("set_info_details", &libdar::database_restore_options::set_info_details)
 	.def("set_extra_options_for_dar", &libdar::database_restore_options::set_extra_options_for_dar)
 	.def("set_ignore_dar_options_in_database", &libdar::database_restore_options::set_ignore_dar_options_in_database)
-	.def("set_date", &libdar::database_restore_options::set_date)
+	.def("set_date", (void (libdar::database_restore_options::*)(const libdar::infinint &)) &libdar::database_restore_options::set_date, "Set date with infinint")
+	.def("set_date", (void (libdar::database_restore_options::*)(const libdar::datetime &)) &libdar::database_restore_options::set_date, "Set date with datetime")
 	.def("set_even_when_removed", &libdar::database_restore_options::set_even_when_removed);
 
     pybind11::class_<libdar::database_used_options>(mod, "database_used_options")
@@ -2044,7 +2045,13 @@ PYBIND11_MODULE(libdar, mod)
 	.def("get_files", &libdar::database::get_files)
 	.def("get_version", &libdar::database::get_version)
 	.def("show_most_recent_stats", &libdar::database::show_most_recent_stats)
-	.def("restore", &libdar::database::restore)
+	.def("restore", (void (libdar::database::*)(const std::vector<std::string> &,
+						    const libdar::database_restore_options &)) &libdar::database::restore, "Restore using dar command")
+	.def("restore", (void (libdar::database::*)(const libdar::archive_options_read &,
+						    const libdar::path &,
+						    const libdar::archive_options_extract &,
+						    const libdar::database_restore_options &,
+						    libdar::statistics*)) &libdar::database::restore, "Restore using libdar API")
 	.def("check_order", &libdar::database::check_order);
 
 
