@@ -80,7 +80,8 @@
 	<a href="#win32">I have a 32 bits windows system, which binary package can I to use?</a><br/>
 	<a href="#windows_slash">Path slash and back-slash consideration under Windows</a><br/>
 	<a href="#windows_root">Under Windows, which directory corresponds to /</a><br/>
-	<a href="#windows_home">Under Windows, which directory corresponds to $HOME ?</a><br>
+	<a href="#windows_home">Under Windows, which directory corresponds to $HOME?</a><br>
+	<a href="#windows_scripting">Under Windows, how to have working -E or -F options?</a><br>
 	<a href="#lzop_vs_dar">lzo compression is slower with dar than with lzop, why?</a><br/>
 	<a href="#libthreadar">what is libthreadar and why libdar relies on it?</a><br/>
 	<a href="#sftppubkey">I have sftp pubkey authentication working with ssh/sftp, how to have dar using too this public key authentication for sftp?</a><br/>
@@ -2792,7 +2793,7 @@
 	pointing to the modified path where the <code>darrc</code> is located.
       </p>
 
-      <a name="windows_home"><b>Under Windows, which directory corresponds to $HOME ?</b></a><br/>
+      <a name="windows_home"><b>Under Windows, which directory corresponds to $HOME?</b></a><br/>
       <p>
 	There is no such HOME variable in windows by default, however John Slattery on dar-support mailing-list
 	reported that if you set such variable in the command-line prompt dar will look for its .darrc at the
@@ -2806,6 +2807,37 @@
 	&nbsp; > .\dar.exe ....
       </code>
       <br/>
+
+      <a name="windows_scripting"><b>Under Windows, how to have working -E or -F options?</b></a><br/>
+      <p>
+	When calling a script from dar by mean of -E (same thing with -F or -~ options) you may end with this
+	obscure failure:
+      </p>
+
+      <code class=block>
+	Error during user command line execution: execve() failed. (process table is full ?) . Retry command-line ? [return = YES | Esc = NO]
+      </code>
+
+      <p>
+	RSmain at github has found the following solution:
+      </p>
+
+      <code class=block>
+	In fact, you need at least this folder structure with sh.exe and additional Cygwin libraries to run a simple "echo test" user command without errors:
+
+	&lt;DAR main dir&gt;\bin\&lt;all DAR for Windows files&gt;
+	&lt;DAR main dir&gt;\bin\sh.exe
+	&lt;DAR main dir&gt;\bin\cygreadline7.dll
+	&lt;DAR main dir&gt;\bin\cygncursesw-10.dll
+	&lt;DAR main dir&gt;\tmp
+
+	It appears that e.g. a "sleep" would also require sleep.exe from Cygwin, so I tend to integrate all files from Cygwin's bin directory with my DAR install.
+      </code>
+
+      <p>
+	Starting release 2.7.19 the dar packaging for Windows will integrate this folder structure, but you will still have to add your scripts and all commands they
+	rely on, in this <code>&lt;DAR main dir&gt;\bin</code> directory.
+      </p>
 
       <a name="lzop_vs_dar"><b>lzo compression is slower with dar than with lzop, why?</b></a><br/>
       <p>

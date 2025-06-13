@@ -6,6 +6,18 @@ from 2.7.x to 2.8.0
 from 2.7.18 to 2.7.19
 - fixed the trailing slash support in path, that was broken by commit
   503326bf8735d8eab48d4ff0ab9c000ffa031dec added at version 2.7.17
+- leveraging RSmain@github's feedback to modify dar windows packaging for
+  -E/-F/-~ options to work under Cygwin. See the updated FAQ for more
+  details.
+- Adding documentation on dar's man page on the way dar uses stdin, stdout
+  and stderr.
+- removing too restrictive control of compression level inside libdar,
+  dar CLI already does that and libzstd/libz/libbz2/... also do that and
+  triggers an error in case of invalid value.
+- handling the case where a binary patch is also a hard link: at restoration
+  time, the inode is tried to be patched again when a second hard link is
+  met, which leads dar to report an error and exiting with code 5 (while
+  restoration was fine).
 
 from 2.7.17 to 2.7.18
 - fixed bug that broke the ability to repair an archive through ftp/sftp

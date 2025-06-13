@@ -77,11 +77,24 @@ namespace libdar
 						 bool info_details);
     mode_t filesystem_tools_get_file_permission(const std::string & path);
 
+	/// perform binary patch on filesystem
+
+	/// \note normally if the file is hard-linked, only patching the first hard-link
+	/// encountered is enought and we could avoid trying patching the file again at
+	/// the following hard-link met (also pointing to this same inode). But we also
+	/// want to address the case where the hard-link could not be restored due to
+	/// filesystem boundary (that did not exist at the time of the backup but which
+	/// we have to cope with at restoration time). The approach is to flag when this
+	/// is not the first time this inode is reached by setting hard_linked argument
+	/// to true. In that case, if the base CRC does not match the expected one but
+	/// the resulting one, we do not report any error.
+
     void filesystem_tools_make_delta_patch(const std::shared_ptr<user_interaction> & dialog,
 					   const cat_file & existing,
 					   const std::string & existing_pathname,
 					   const cat_file & patcher,
-					   const path & directory);
+					   const path & directory,
+					   bool hard_linked);
 
 	/// create in dirname a brand-new filename which name derives from filename
 

@@ -491,7 +491,8 @@ namespace libdar
 								  *exists_file,
 								  spot_display,
 								  *x_fil,
-								  *current_dir);
+								  *current_dir,
+								  hard_link);
 				data_restored = done_data_restored;
 			    }
 			    else
