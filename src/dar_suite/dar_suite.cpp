@@ -327,10 +327,12 @@ static void signal_abort_now(int l)
 
 static void signals_abort(int l, bool now)
 {
+#if MUTEX_WORKS
 #if HAVE_SIGNAL_H
     struct sigaction sigact;
     sigact.sa_handler = SIG_DFL;
     sigact.sa_flags = 0;
+#endif
 #endif
 
     general_report(tools_printf(gettext("Received signal: %s"), strsignal(l)));

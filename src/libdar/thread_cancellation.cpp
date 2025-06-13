@@ -144,6 +144,16 @@ namespace libdar
 #endif
     }
 
+    bool thread_cancellation::self_is_under_cancellation() const
+    {
+#if MUTEX_WORKS
+	return status.cancellation;
+#else
+	return false;
+#endif
+    }
+
+
     void thread_cancellation::block_delayed_cancellation(bool mode)
     {
 #if MUTEX_WORKS

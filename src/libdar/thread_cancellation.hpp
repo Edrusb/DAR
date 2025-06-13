@@ -99,7 +99,7 @@ namespace libdar
 	    /// self_is_under_cancellation() return true if cancellation has been request for
 	    /// that thread and false if not. An exception may have already been thrown or not yet
 	    /// thrown by a call to check_self_cancellation(), this is independent.
-	bool self_is_under_cancellation() const { return status.cancellation; };
+	bool self_is_under_cancellation() const;
 
 	    /// by default delayed (non immediate) cancellation generate a specific exception,
 	    /// it is possible for delayed cancellation only, do block such exceptions for a certain time

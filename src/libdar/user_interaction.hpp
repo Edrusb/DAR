@@ -87,9 +87,6 @@ namespace libdar
 
 	bool cancellation_requested() const;
 
-#if MUTEX_WORKS
-#if HAVE_PTHREAD_H
-
 	    /// add a thread to monitor
 
 	    /// when a thread cancellation is requested for a thread
@@ -110,11 +107,6 @@ namespace libdar
 	    /// remove a thread from monitoring
 
 	void remove_thread_from_monitor(pthread_t tid);
-
-#endif
-#endif
-
-
 
 
     protected:
