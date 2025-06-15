@@ -2018,6 +2018,42 @@ AS_IF(       [ test "x$enable_threadar" != "xyes" ],
             ]
      )
 
+AS_IF([ test "$local_threadar" = "yes" ],
+      [
+         AC_MSG_CHECKING([Stack setup methods for libthreadar::thread class])
+         AC_LINK_IFELSE([AC_LANG_PROGRAM(
+				[[
+				extern "C"
+				{
+				}
+
+				#if HAVE_LIBTHREADAR_LIBTHREADAR_HPP
+				#include <libthreadar/libthreadar.hpp>
+				#endif
+				]],
+				[
+				    class my_thread: public libthreadar::thread
+				    {
+				        protected:
+					    virtual void inherited_run() override { sleep(10); };
+			            };
+
+				    my_thread t1;
+
+				    t1.set_stack_size(1024*1024);
+				    t1.run();
+				    t1.join();
+				])
+	      ],
+	      [
+		AC_DEFINE(LIBTHREADAR_STACK_FEATURE, 1, [libthreadar thread class can set the stack size])
+		AC_MSG_RESULT(yes)
+	      ],
+	      [
+	        AC_MSG_RESULT(no)
+              ])
+     ])
+
 AS_IF(
   [ test "$local_threadar" = "yes" ],
   [
