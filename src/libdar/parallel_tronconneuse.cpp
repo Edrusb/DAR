@@ -1310,6 +1310,30 @@ namespace libdar
 	//
 	//
 
+    read_below::read_below(const std::shared_ptr<libthreadar::ratelier_scatter<crypto_segment> > & to_workers,
+			   const std::shared_ptr<libthreadar::barrier> & waiter,
+			   U_I num_workers,
+			   U_I clear_block_size,
+			   generic_file* encrypted_side,
+			   const std::shared_ptr<heap<crypto_segment> > xtas,
+			   infinint init_shift):
+	workers(to_workers),
+	waiting(waiter),
+	num_w(num_workers),
+	clear_buf_size(clear_block_size),
+	encrypted(encrypted_side),
+	tas(xtas),
+	initial_shift(init_shift),
+	reof(false),
+	trailing_clear_data(nullptr)
+    {
+#ifdef LIBTHREADAR_STACK_FEATURE
+	set_stack_size(DEFAULT_STACK_SIZE);
+#endif
+
+	flag = tronco_flags::normal;
+    }
+
     void read_below::inherited_run()
     {
 	try
@@ -1501,6 +1525,26 @@ namespace libdar
 	//
 	//
 
+    write_below::write_below(const std::shared_ptr<libthreadar::ratelier_gather<crypto_segment> > & from_workers,
+			     const std::shared_ptr<libthreadar::barrier> & waiter,
+			     U_I num_workers,
+			     generic_file* encrypted_side,
+			     const std::shared_ptr<heap<crypto_segment> > xtas):
+	workers(from_workers),
+	waiting(waiter),
+	num_w(num_workers),
+	cur_num_w(0),
+	encrypted(encrypted_side),
+	tas(xtas),
+	error(false),
+	error_block(0)
+    {
+#ifdef LIBTHREADAR_STACK_FEATURE
+	set_stack_size(DEFAULT_STACK_SIZE);
+#endif
+
+	if(encrypted == nullptr) throw SRC_BUG;
+    }
 
 
     void write_below::inherited_run()
@@ -1609,6 +1653,26 @@ namespace libdar
 	// crypto_worker implementation
 	//
 	//
+
+    crypto_worker::crypto_worker(std::shared_ptr<libthreadar::ratelier_scatter <crypto_segment> > & read_side,
+				 std::shared_ptr<libthreadar::ratelier_gather <crypto_segment> > & write_side,
+				 std::shared_ptr<libthreadar::barrier> waiter,
+				 std::unique_ptr<crypto_module> && ptr,
+				 bool encrypt):
+	reader(read_side),
+	writer(write_side),
+	waiting(waiter),
+	crypto(std::move(ptr)),
+	do_encrypt(encrypt),
+	abort(status::fine)
+    {
+#ifdef LIBTHREADAR_STACK_FEATURE
+	set_stack_size(DEFAULT_STACK_SIZE);
+#endif
+
+	if(!reader || !writer || !waiting || !crypto)
+	    throw SRC_BUG;
+    }
 
 
     void crypto_worker::inherited_run()

@@ -64,6 +64,10 @@ namespace libdar
 						  synchronize(2),
 						  x_proto(proto)
     {
+#ifdef LIBTHREADAR_STACK_FEATURE
+	set_stack_size(DEFAULT_STACK_SIZE);
+#endif
+
 	try
 	{
 	    if(!ehandle)

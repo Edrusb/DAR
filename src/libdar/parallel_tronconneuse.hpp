@@ -323,17 +323,8 @@ namespace libdar
                    U_I clear_block_size,         ///< clear block size used
                    generic_file* encrypted_side, ///< the encrypted file we fetch data from and slice in chunks for the workers
                    const std::shared_ptr<heap<crypto_segment> > xtas, ///< heap of pre-allocated memory for the chunks
-                   infinint init_shift):         ///< the offset at which the encrypted data is expected to start
-            workers(to_workers),
-            waiting(waiter),
-            num_w(num_workers),
-            clear_buf_size(clear_block_size),
-            encrypted(encrypted_side),
-            tas(xtas),
-            initial_shift(init_shift),
-            reof(false),
-            trailing_clear_data(nullptr)
-        { flag = tronco_flags::normal; };
+                   infinint init_shift           ///< the offset at which the encrypted data is expected to start
+	    );
 
         ~read_below() { if(ptr) tas->put(std::move(ptr)); cancel(); join(); };
 
@@ -442,16 +433,7 @@ namespace libdar
 		    const std::shared_ptr<libthreadar::barrier> & waiter,
 		    U_I num_workers,
 		    generic_file* encrypted_side,
-		    const std::shared_ptr<heap<crypto_segment> > xtas):
-	    workers(from_workers),
-	    waiting(waiter),
-	    num_w(num_workers),
-	    cur_num_w(0),
-	    encrypted(encrypted_side),
-	    tas(xtas),
-	    error(false),
-	    error_block(0)
-	{ if(encrypted == nullptr) throw SRC_BUG; };
+		    const std::shared_ptr<heap<crypto_segment> > xtas);
 
 	~write_below() { cancel(); join(); };
 
@@ -491,14 +473,7 @@ namespace libdar
 		    std::shared_ptr<libthreadar::ratelier_gather <crypto_segment> > & write_side,
 		    std::shared_ptr<libthreadar::barrier> waiter,
 		    std::unique_ptr<crypto_module> && ptr,
-		    bool encrypt):
-	    reader(read_side),
-	    writer(write_side),
-	    waiting(waiter),
-	    crypto(std::move(ptr)),
-	    do_encrypt(encrypt),
-	    abort(status::fine)
-	{ if(!reader || !writer || !waiting || !crypto) throw SRC_BUG; };
+		    bool encrypt);
 
 	virtual ~crypto_worker() { cancel(); join(); };
 
