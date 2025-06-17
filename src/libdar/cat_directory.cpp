@@ -1023,7 +1023,7 @@ namespace libdar
 		continue; // continuing at the while loop begining
 	    }
 
-	    if(tmp_mir == nullptr)
+	    if(tmp_mir != nullptr)
 	    {
 		ret = false;
 		++cur; // skipping this entry
