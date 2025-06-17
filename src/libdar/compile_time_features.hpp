@@ -29,6 +29,8 @@
 
 #include "../my_config.h"
 
+#include "integers.hpp"
+
 namespace libdar
 {
 
@@ -154,6 +156,13 @@ namespace libdar
 
 	    /// returns the libcurl version used or empty string if not available
 	std::string libcurl_version() noexcept;
+
+	    /// return the thread stack size if configured from libdar else 0 for default config
+
+	    /// \note this concerns only threads created by libdar, not threads from which libdar
+	    /// is runnig
+
+	U_I thread_stack_size() noexcept;
 
     } // end of compile_time namespace
 

@@ -362,5 +362,14 @@ namespace libdar
 #endif
 	}
 
+	U_I thread_stack_size() noexcept
+	{
+#ifdef LIBTHREADAR_STACK_FEATURE
+	    return DEFAULT_STACK_SIZE;
+#else
+	    return 0;
+#endif
+	}
+
     } // end of compile_time nested namespace
 } // end of libdar namespace

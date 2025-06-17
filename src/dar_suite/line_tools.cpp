@@ -1422,10 +1422,22 @@ void line_tools_display_features(user_interaction & dialog)
 	dialog.printf(gettext("   Timestamp write accuracy     : %S"), &time_accuracy);
 	dialog.printf(gettext("   Restores dates of symlinks   : %s"), YES_NO(compile_time::symlink_restore_dates()));
 	if(compile_time::libthreadar())
-	    threadar_version = string("(") + compile_time::libthreadar_version() + ")";
+	{
+	    threadar_version = string("(") + compile_time::libthreadar_version() + ", subthread stack size: ";
+	    if(compile_time::thread_stack_size() != 0)
+		threadar_version += tools_display_integer_in_metric_system(infinint(compile_time::thread_stack_size()),
+									 "o",
+									 true);
+	    else
+		threadar_version += "system default";
+
+	    threadar_version += string(")");
+	}
 	else
 	    threadar_version = "";
-	dialog.printf(gettext("   Multiple threads (libthreads): %s %s"), YES_NO(compile_time::libthreadar()), threadar_version.c_str());
+	dialog.printf(gettext("   Multiple threads (libthreads): %s %s"),
+		      YES_NO(compile_time::libthreadar()),
+		      threadar_version.c_str());
 	dialog.printf(gettext("   Delta compression (librsync) : %s"), YES_NO(compile_time::librsync()));
 	if(compile_time::remote_repository())
 	    curl_version = string("(") + compile_time::libcurl_version() + ")";
