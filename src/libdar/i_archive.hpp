@@ -223,7 +223,9 @@ namespace libdar
 	const catalogue & get_cat() const { if(cat == nullptr) throw SRC_BUG; else return *cat; };
 	const header_version & get_header() const { return ver; };
 
-	bool get_sar_param(infinint & sub_file_size, infinint & first_file_size, infinint & last_file_size,
+	bool get_sar_param(infinint & sub_file_size,
+			   infinint & first_file_size,
+			   infinint & last_file_size,
 			   infinint & total_file_number);
 	std::shared_ptr<entrepot> get_entrepot(); ///< this method may return nullptr if no entrepot is used (pipes used for archive building, etc.)
 	infinint get_level2_size();

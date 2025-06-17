@@ -1114,7 +1114,7 @@ namespace libdar
 		    get_ui().printf(gettext("Archive total size is : %i bytes"), &total);
 		}
 	    }
-	    else // not reading from a sar
+	    else // not reading from a sar or in sequential-read mode
 	    {
 		tmp = sum.get_archive_size();
 		if(!tmp.is_zero())
@@ -1123,7 +1123,7 @@ namespace libdar
 		    get_ui().printf(gettext("Previous archive size does not include headers present in each slice"));
 		}
 		else
-		    get_ui().printf(gettext("Archive size is unknown (reading from a pipe)"));
+		    get_ui().printf(gettext("Archive size is unknown (reading from a pipe or in sequential mode)"));
 	    }
 
 	    if(sum.get_data_size() < sum.get_storage_size())
@@ -1205,7 +1205,7 @@ namespace libdar
 
 	    if(get_sar_param(sub_slice_size, first_slice_size, last_slice_size, slice_number))
 	    {
-		if(slice_number == 1)
+		if(slice_number <= 1)
 		{
 		    sub_slice_size = last_slice_size;
 		    first_slice_size = last_slice_size;
@@ -1231,7 +1231,7 @@ namespace libdar
 	    first_slice_size = 0;
 	    last_slice_size = 0;
 	    slice_number = 0;
-	    archive_size = get_level2_size();
+	    archive_size = 0;
 	}
 
 	ret.set_slice_size(sub_slice_size);
@@ -2912,7 +2912,9 @@ namespace libdar
 	    // and this object should be totally exploitable, thus have an available catalogue
     }
 
-    bool archive::i_archive::get_sar_param(infinint & sub_file_size, infinint & first_file_size, infinint & last_file_size,
+    bool archive::i_archive::get_sar_param(infinint & sub_file_size,
+					   infinint & first_file_size,
+					   infinint & last_file_size,
 					   infinint & total_file_number)
     {
         sar *real_decoupe = nullptr;
@@ -2924,11 +2926,11 @@ namespace libdar
 
             sub_file_size = tmp.other_size;
             first_file_size = tmp.first_size;
-            if(real_decoupe->get_total_file_number(total_file_number)
-               && real_decoupe->get_last_file_size(last_file_size))
-                return true;
-            else // could not read size parameters
-                throw Erange("archive::i_archive::get_sar_param", gettext("Sorry, file size is unknown at this step of the program."));
+            if(! real_decoupe->get_total_file_number(total_file_number))
+		total_file_number = 0;
+	    if(! real_decoupe->get_last_file_size(last_file_size))
+		last_file_size = 0;
+	    return true;
         }
         else
             return false;
