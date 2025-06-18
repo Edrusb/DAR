@@ -1860,7 +1860,22 @@ namespace libdar
 		reof = true;
 	    }
 	    else
-		throw SRC_BUG; // more encrypted data than could be read so far!
+	    {
+		nouv_buf_data -= first->crypted_data.get_data_size();
+		if(opt_next)
+		{
+		    if(nouv_buf_data <= opt_next->crypted_data.get_data_size())
+		    {
+			opt_next->crypted_data.set_data_size(nouv_buf_data);
+			opt_next->crypted_data.rewind_read();
+			reof = true;
+		    }
+		    else
+			throw SRC_BUG; // more encrypted data than could be read so far!
+		}
+		else
+		    throw SRC_BUG; // more encrypted data than could be read so far!
+	    }
 	}
     }
 
