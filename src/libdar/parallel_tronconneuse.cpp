@@ -1457,8 +1457,11 @@ namespace libdar
 			ptr->block_index = index_num++;
 			workers->scatter(ptr, static_cast<int>(tronco_flags::normal));
 		    }
-		    else
+		    else // we could not read anything from encrypted (or it has been trailed down to zero)
+		    {
 			tas->put(std::move(ptr));
+			reof = true;
+		    }
 		}
 		else
 		    flag = tronco_flags::eof;
@@ -1807,9 +1810,6 @@ namespace libdar
     {
 	infinint clear_offset = 0;
 	memory_file tmp;
-
-	if(callback == nullptr)
-	    throw SRC_BUG;
 
 	if(!first)
 	    throw SRC_BUG;
