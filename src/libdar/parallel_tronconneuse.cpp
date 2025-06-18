@@ -1818,13 +1818,19 @@ namespace libdar
 	    tmp.write(opt_next->crypted_data.get_addr(), opt_next->crypted_data.get_data_size());
 	if(callback == nullptr)
 	    throw SRC_BUG;
-	clear_offset = (*callback)(tmp, reading_ver);
-
-	if(clear_offset >= initial_shift)
-	    clear_offset -= initial_shift;
-	    // now clear_offset can be compared to read_offset
-	else
-	    return;
+	try
+	{
+	    clear_offset = (*callback)(tmp, reading_ver);
+	    if(clear_offset >= initial_shift)
+		clear_offset -= initial_shift;
+		// now clear_offset can be compared to read_offset
+	    else
+		return;
+	}
+	catch(Egneric_file & e)
+	{
+	    return; // we no nothing
+	}
 
 	if(read_offset >= clear_offset) // all data in encrypted_buf is clear data
 	{

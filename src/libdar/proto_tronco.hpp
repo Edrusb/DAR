@@ -49,6 +49,8 @@ namespace libdar
 	/// class is willing to decipher.
 	/// \param[in] reading_ver is the archive format version of the archive under operation
 	/// \return the callback returns the offset of the first non encrypted data at the end of the provided generic_file.
+	/// \exception if the offset of the first non encrypted data cannot be found in the provided generic_file object, the
+	/// callback should throw an Erange() exception.
 	/// \note this method should be invoked when decryption failed at or near end of file.
 	/// \note the libdar archive format is ended by a clear trailier which is expected
 	/// to be read backward, by the end of the archive. The last part of this trailer (see terminateur class) records the offset of the
