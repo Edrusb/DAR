@@ -1377,7 +1377,7 @@ namespace libdar
 	    {
 
 		    // flag can be modifed anytime by the main thread, we must not assume
-		    // its value in a give case to be equal to the what the switch directive
+		    // its value in a given case to be equal to the what the switch directive
 		    // pointed to
 	    case tronco_flags::die:
 		if(reof) // eof collided with a received order, continuing the eof process
@@ -1424,7 +1424,7 @@ namespace libdar
 		break;
 	    case tronco_flags::normal:
 		if(ptr)
-		    throw SRC_BUG; // show not have a block at this stage
+		    throw SRC_BUG; // we should not have a block at this stage
 
 		if(!reof)
 		{
@@ -1797,12 +1797,12 @@ namespace libdar
 
 
    static void remove_trailing_clear_data_from_encrypted_buf(const infinint & read_offset,    ///< offset of the first byte of the 'first' segment
-							      const archive_version & reading_ver, ///< read archive format version
-							      const infinint & initial_shift,  ///< amount of free bytes before encrypted ones
-							      infinint (*callback)(generic_file & below, const archive_version& reading_version),
-							      unique_ptr<crypto_segment> & first, ///< pointer to a existing segment
-							      unique_ptr<crypto_segment> & opt_next, ///< in option pointer to the segment following the first in the crypted data
-							      bool & reof)
+							     const archive_version & reading_ver, ///< read archive format version
+							     const infinint & initial_shift,  ///< amount of free bytes before encrypted ones
+							     infinint (*callback)(generic_file & below, const archive_version& reading_version),
+							     unique_ptr<crypto_segment> & first, ///< pointer to a existing segment
+							     unique_ptr<crypto_segment> & opt_next, ///< in option pointer to the segment following the first in the crypted data
+							     bool & reof) ///< may be set to true if clear data is found after encrypted one
 
     {
 	infinint clear_offset = 0;
