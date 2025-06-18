@@ -1828,7 +1828,7 @@ namespace libdar
 	    else
 		return;
 	}
-	catch(Egneric_file & e)
+	catch(Egeneric & e)
 	{
 	    return; // we no nothing
 	}
