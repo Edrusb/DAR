@@ -429,13 +429,14 @@ namespace libdar
 
 		    try
 		    {
+			lus_data.pop_front();
+			lus_flags.pop_front();
+
 			infinint crypt_offset = current->block_index * crypto->encrypted_block_size_for(clear_block_size) + initial_shift;
 
 			    // now fetching the next segment following 'current' if any
 			    // in order to append it to current and remove trailing clear data at the tail
 
-			lus_data.pop_front();
-			lus_flags.pop_front();
 			read_refill(); // this is be sure we will have the next available segment
 
 			try
