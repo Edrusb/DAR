@@ -110,7 +110,8 @@ namespace libdar
 
 	    /// read ahead information
 	    ///
-	    /// \param[in] amount is the expected amount of data the caller will read, if zero is given the object shall prepare as much as possible data for reading until a skip request, write request or a new read_ahead request
+	    /// \param[in] amount is the expected amount of data the caller will read, if zero is given the
+	    /// object shall prepare as much as possible data for reading until a skip request, write request or a new read_ahead request
 	    /// \note after sanity checks, the protected inherited_read_ahead() method is called
 	void read_ahead(const infinint & amount);
 
