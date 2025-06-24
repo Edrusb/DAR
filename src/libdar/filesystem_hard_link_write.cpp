@@ -413,9 +413,12 @@ namespace libdar
 		    {
 			if(ou != nullptr)
 			    delete ou;
+			ref_fil->clean_data();
 			throw;
 		    }
-		    delete ou;
+		    if(ou != nullptr)
+			delete ou;
+		    ref_fil->clean_data();
 		    ret = 0; // to report a successful operation at the end of the if/else if chain
 		}
 		else if(ref_lie != nullptr)
