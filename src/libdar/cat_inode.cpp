@@ -768,6 +768,7 @@ namespace libdar
 				const_cast<ea_attributs *&>(ea) = new (nothrow) ea_attributs(*get_pile(), edit);
 				if(ea == nullptr)
 				    throw Ememory("cat_inode::get_ea");
+				get_compressor_layer()->suspend_compression();
 			    }
 			    catch(Euser_abort & e)
 			    {

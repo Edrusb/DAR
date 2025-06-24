@@ -115,7 +115,8 @@ namespace libdar
 				       U_I signature_block_size,
 				       std::shared_ptr<memory_file> delta_ref,
 				       const crc **checksum = nullptr) const;
-        void clean_data(); // partially free memory (but get_data() becomes disabled)
+
+        void clean_data() const; // partially free memory (but get_data() becomes disabled)
 
 	    /// used while merging, chages the behavior of our get_data() to provide the patched version of the provided file data
 

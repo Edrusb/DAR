@@ -1172,8 +1172,10 @@ namespace libdar
 				catch(...)
 				{
 				    delete data;
+				    e_file->clean_data();
 				    throw;
 				}
+				e_file->clean_data();
 				delete data;
 
 				if(checksum != nullptr)

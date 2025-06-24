@@ -989,11 +989,6 @@ namespace libdar
 					    cat.pre_add_fsa_crc(e);
 					}
 
-					    // CLEANING UP MEMORY FOR PLAIN FILES
-
-					if(e_file != nullptr)
-					    e_file->clean_data();
-
 					    // UPDATING HARD LINKS
 
 					if(e_mir != nullptr)
@@ -1552,9 +1547,11 @@ namespace libdar
 					catch(...)
 					{
 					    delete dat;
+					    e_file->clean_data();
 					    throw;
 					}
 					delete dat;
+					e_file->clean_data();
 
 					if(cat.get_escape_layer() != nullptr
 					   && cat.get_escape_layer()->skip_to_next_mark(escape::seqt_changed, false))
@@ -3531,6 +3528,7 @@ namespace libdar
 				catch(...)
 				{
 				    delete source;
+				    fic->clean_data();
 				    source = nullptr;
 
 					// restore atime of source
@@ -3539,6 +3537,7 @@ namespace libdar
 				    throw;
 				}
 				delete source;
+				fic->clean_data();
 				source = nullptr;
 
 				    //////////////////////////////
@@ -4723,10 +4722,12 @@ namespace libdar
 			{
 			    if(data != nullptr)
 				delete data;
+			    e_file->clean_data();
 			    throw;
 			}
 			if(data != nullptr)
 			    delete data;
+			e_file->clean_data();
 		    }
 		    else // no data or delta patch is available
 		    {

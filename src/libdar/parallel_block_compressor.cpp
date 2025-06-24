@@ -139,6 +139,9 @@ namespace libdar
         if(get_mode() != gf_read_only)
             inherited_sync_write();
 
+	if(get_mode() != gf_write_only)
+	    inherited_flush_read();
+
         suspended = true;
     }
 
