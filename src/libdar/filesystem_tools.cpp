@@ -677,6 +677,7 @@ namespace libdar
                     delete delta;
                 if(current != nullptr)
                     delete current;
+		existing.clean_data();
                 if(resulting != nullptr)
                     delete resulting;
                 if(calculated_patch_crc != nullptr)
@@ -692,6 +693,7 @@ namespace libdar
                 delete delta;
             if(current != nullptr)
                 delete current;
+	    existing.clean_data();
             if(resulting != nullptr)
                 delete resulting;
             if(calculated_patch_crc != nullptr)
