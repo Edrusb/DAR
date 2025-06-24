@@ -4677,10 +4677,12 @@ namespace libdar
 			{
 			    if(data != nullptr)
 				delete data;
+			    e_file->clean_data();
 			    throw;
 			}
 			if(data != nullptr)
 			    delete data;
+			e_file->clean_data();
 		    }
 		    else // no data or delta patch is available
 		    {
