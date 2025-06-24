@@ -1501,6 +1501,7 @@ namespace libdar
 					    e_file->get_crc(original);
 					    throw;
 					}
+
 					if(check == nullptr)
 					    throw SRC_BUG;
 
@@ -1528,9 +1529,12 @@ namespace libdar
 				    catch(...)
 				    {
 					delete dat;
+					e_file->clean_data();
 					throw;
 				    }
 				    delete dat;
+				    e_file->clean_data();
+
 
 				    if(cat.get_escape_layer() != nullptr
 				       && cat.get_escape_layer()->skip_to_next_mark(escape::seqt_changed, false))
