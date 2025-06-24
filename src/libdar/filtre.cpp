@@ -369,7 +369,9 @@ namespace libdar
 				    // while being read for backup. The last copy is the one
 				    // to use for restoration.
 			    }
-			    while(cat.get_escape_layer() != nullptr && cat.get_escape_layer()->skip_to_next_mark(escape::seqt_changed, false) && data_restored == filesystem_restore::done_data_restored);
+			    while(cat.get_escape_layer() != nullptr
+				  && cat.get_escape_layer()->skip_to_next_mark(escape::seqt_changed, false)
+				  && data_restored == filesystem_restore::done_data_restored);
 
 			    if(tmp_exc.active)
 				throw Erange(tmp_exc.source, tmp_exc.message);
