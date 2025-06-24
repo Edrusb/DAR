@@ -519,9 +519,6 @@ namespace libdar
 	       && status != from_path)
 		throw Efeature("building an binary difference (rsync) for a file located in an archive");
 
-	    if(status == empty)
-		throw Erange("cat_file::get_data", gettext("data has been cleaned, object is now empty"));
-
 	    if(delta_sig_mem)
 	    {
 		if(delta_sig_mem->get_mode() == gf_read_only)
@@ -583,8 +580,6 @@ namespace libdar
 
 	    switch(status)
 	    {
-	    case empty:
-		throw SRC_BUG;
 	    case from_path:
 		if(mode != normal && mode != plain)
 		    throw SRC_BUG; // keep compressed/keep_hole is not possible on an inode take from a filesystem
@@ -947,23 +942,20 @@ namespace libdar
 
 	switch(status)
 	{
-	case empty:
-		// nothing to do
-	    break;
 	case from_path:
 	    me->chemin = ""; // smallest possible memory allocation
 	    break;
 	case from_cat:
+		// warning, cannot change "size", as it is dump() in catalogue later
 	    if(get_compressor_layer() != nullptr)
 		get_compressor_layer()->suspend_compression();
 	    break;
 	case from_patch:
-	    in_place.reset();
+	    me->in_place.reset();
 	    break;
 	default:
 	    throw SRC_BUG;
 	}
-	me->status = empty;
     }
 
     bool cat_file::set_data_from_binary_patch(cat_file* in_place_addr)
@@ -1260,8 +1252,6 @@ namespace libdar
 	{
 	    switch(status)
 	    {
-	    case empty:
-		throw SRC_BUG;
 	    case from_path:
 		delta_sig = new (nothrow) cat_delta_signature();
 		break;
@@ -1329,8 +1319,6 @@ namespace libdar
 	    {
 		switch(status)
 		{
-		case empty:
-		    throw SRC_BUG;
 		case from_path:
 		    throw SRC_BUG; // signature is calculated while reading the data (get_data()) and kept by the caller
 		case from_cat:

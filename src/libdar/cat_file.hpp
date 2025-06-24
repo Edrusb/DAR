@@ -259,7 +259,7 @@ namespace libdar
         virtual void inherited_dump(const pile_descriptor & pdesc, bool small) const override;
 	virtual void post_constructor(const pile_descriptor & pdesc) override;
 
-        enum { empty, from_path, from_cat, from_patch } status;
+        enum { from_path, from_cat, from_patch } status;
 
     private:
 	std::string chemin;     ///< path to the data (when read from filesystem)
