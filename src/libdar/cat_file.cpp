@@ -833,6 +833,8 @@ namespace libdar
 	    me->chemin = ""; // smallest possible memory allocation
 	    break;
 	case from_cat:
+	    *(me->offset) = 0; // smallest possible memory allocation
+		// warning, cannot change "size", as it is dump() in catalogue later
 	    if(get_compressor_layer() != nullptr)
 		get_compressor_layer()->suspend_compression();
 	    break;
@@ -847,6 +849,8 @@ namespace libdar
 
     void cat_file::set_offset(const infinint & r)
     {
+	if(status == empty)
+	    throw SRC_BUG;
 	*offset = r;
     }
 
