@@ -18,6 +18,11 @@ from 2.7.18 to 2.7.19
   time, the inode is tried to be patched again when a second hard link is
   met, which leads dar to report an error and exiting with code 5 (while
   restoration was fine).
+- fixing dead-lock condition met when dar is about to end due to the fact two
+  threads unexpectely access the same object at the same time (which object
+  is not designed for concurrent accesses). This occured in sequential mode
+  with parallel compression and parallel deciphering after data has been
+  restored, leading dar in dead-lock situation (sleeping forever).
 
 from 2.7.17 to 2.7.18
 - fixed bug that broke the ability to repair an archive through ftp/sftp

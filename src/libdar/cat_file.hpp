@@ -115,7 +115,7 @@ namespace libdar
 				       U_I signature_block_size,
 				       std::shared_ptr<memory_file> delta_ref,
 				       const crc **checksum = nullptr) const;
-        void clean_data(); // partially free memory (but get_data() becomes disabled)
+        void clean_data() const; // partially free memory (but get_data() becomes disabled)
         void set_offset(const infinint & r);
 	const infinint & get_offset() const;
         virtual unsigned char signature() const override { return 'f'; };
@@ -244,7 +244,7 @@ namespace libdar
         virtual void inherited_dump(const pile_descriptor & pdesc, bool small) const override;
 	virtual void post_constructor(const pile_descriptor & pdesc) override;
 
-        enum { empty, from_path, from_cat } status;
+        enum { from_path, from_cat } status;
 
     private:
 	std::string chemin;     ///< path to the data (when read from filesystem)

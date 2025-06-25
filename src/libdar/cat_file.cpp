@@ -510,9 +510,6 @@ namespace libdar
 	       && status != from_path)
 		throw Efeature("building an binary difference (rsync) for a file located in an archive");
 
-	    if(status == empty)
-		throw Erange("cat_file::get_data", gettext("data has been cleaned, object is now empty"));
-
 	    if(delta_sig_mem)
 	    {
 		if(delta_sig_mem->get_mode() == gf_read_only)
@@ -820,30 +817,30 @@ namespace libdar
 	    return ret;
     }
 
-    void cat_file::clean_data()
+    void cat_file::clean_data() const
     {
+	cat_file* me = const_cast<cat_file*>(this);
+
+	if(me == nullptr)
+	    throw SRC_BUG;
+
 	switch(status)
 	{
 	case from_path:
-	    chemin = ""; // smallest possible memory allocation
+	    me->chemin = ""; // smallest possible memory allocation
 	    break;
 	case from_cat:
-	    *offset = 0; // smallest possible memory allocation
 		// warning, cannot change "size", as it is dump() in catalogue later
-	    break;
-	case empty:
-		// nothing to do
+	    if(get_compressor_layer() != nullptr)
+		get_compressor_layer()->suspend_compression();
 	    break;
 	default:
 	    throw SRC_BUG;
 	}
-	status = empty;
     }
 
     void cat_file::set_offset(const infinint & r)
     {
-	if(status == empty)
-	    throw SRC_BUG;
 	*offset = r;
     }
 
@@ -1076,8 +1073,6 @@ namespace libdar
 	{
 	    switch(status)
 	    {
-	    case empty:
-		throw SRC_BUG;
 	    case from_path:
 		delta_sig = new (nothrow) cat_delta_signature();
 		break;
@@ -1145,8 +1140,6 @@ namespace libdar
 	    {
 		switch(status)
 		{
-		case empty:
-		    throw SRC_BUG;
 		case from_path:
 		    throw SRC_BUG; // signature is calculated while reading the data (get_data()) and kept by the caller
 		case from_cat:
