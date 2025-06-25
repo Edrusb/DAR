@@ -23,6 +23,8 @@ from 2.7.18 to 2.7.19
   is not designed for concurrent accesses). This occured in sequential mode
   with parallel compression and parallel deciphering after data has been
   restored, leading dar in dead-lock situation (sleeping forever).
+- fixing bug met in sequential read mode when retrieving archive summary
+  information (dar asked for the last slice and could not find it).
 
 from 2.7.17 to 2.7.18
 - fixed bug that broke the ability to repair an archive through ftp/sftp
