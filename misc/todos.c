@@ -25,6 +25,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <errno.h>
+#include <string.h>
 
 #define TMP ".###tmp_file"
 #define MAX 10240
@@ -51,12 +54,12 @@ int main(int argc,char *argv[])
         if(open(file,O_RDONLY) != 0)
         {
             fprintf(stderr,"%s : fichier %s inaccessible\n",argv[0],file);
-            exit(2);
+            return 2;
         }
         if(open(TMP,O_WRONLY|O_CREAT,0600) != 1)
         {
             fprintf(stderr,"%s : ouverture du fichier temporaire %s impossible\n",argv[0],TMP);
-            exit(3);
+            return 3;
         }
 
         for(;;)
@@ -76,8 +79,25 @@ int main(int argc,char *argv[])
             write(1,sortie,lu+d);
         }
         close(1);close(0);
-        snprintf(buffer,MAX,"rm %s ; mv %s %s",file,TMP,file);
-        system(buffer);
+	if(unlink(file) == 0)
+	{
+	    if(rename(TMP, file) != 0)
+	    {
+		fprintf(stderr, "%s : failed moving tmp file to %s: %s",
+			argv[0],
+			file,
+			strerror(errno));
+		return 4;
+	    }
+	}
+	else
+	{
+	    fprintf(stderr, "%s : failed deleting %s to remplace it by updated content: %s",
+		    argv[0],
+		    file,
+		    strerror(errno));
+	    return 4;
+	}
     }
     return 0;
 }
