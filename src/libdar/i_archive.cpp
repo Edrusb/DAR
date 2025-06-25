@@ -1208,7 +1208,7 @@ namespace libdar
 	    first_slice_size = 0;
 	    last_slice_size = 0;
 	    slice_number = 0;
-	    archive_size = get_level2_size();
+	    archive_size = 0;
 	}
 
 	ret.set_slice_size(sub_slice_size);
