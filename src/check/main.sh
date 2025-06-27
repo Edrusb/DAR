@@ -232,6 +232,7 @@ all:
  $min_digits
  $crypto_K
  $multi_thread
+ -w
 
 reference:
  $crypto_J

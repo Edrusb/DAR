@@ -121,30 +121,124 @@ function my_diff
   return `[ $ret1 -eq 0 -a $ret2 -eq 0 ]`
 }
 
+function RETRIER
+{
+    # run the command given in argument and restart it if it failed
+    # while the value of the $search_pattern variable below is found
+    # on stdout (this function cannot be used when dar use stdout to
+    # produce an archive).
+
+    if [ "$1" != "normal" -a "$1" != "piped-in" -a "$1" != "piped-out" ] ; then
+	echo "usage: RETRIER { normal | piped-in | piped-out } command and arguments to run" >&2
+	exit 1
+    fi
+
+    local tmp_out_file=./retrier_tmp_out
+    local tmp_err_file=./retrier_tmp_err
+    local total_out=./retrier_total_out
+    local total_err=./retrier_total_err
+    local total_in=./retrier_total_in
+    local search_pattern="Unexpected error reported by GPGME"
+    local ret=0
+    local looping=1
+    local mode="$1"
+
+    shift 1
+
+    rm -f "$total_out" "$total_err"
+
+    # copying stdin to be able to retry the call if needed
+
+    if [ "$mode" = "piped-in" ] ; then
+	echo "RETRIER copying stdin... " >&2
+	cat > "$total_in"
+	echo "RETRIER stdin copied: $(stat $total_in)" >&2
+    fi
+
+    echo "RETRIER: mode=[$mode]   command=[$*]" >&2
+
+    while [ $looping -ge 1 ] ; do
+
+	#---
+	# runinng the requested command catching stdout, stderr and exit status
+	#---
+
+	if [ "$mode" = "piped-in" ] ; then
+	    $* < "$total_in" 1> "$tmp_out_file" 2> "$tmp_err_file"
+	else
+	    if [ "$mode" = "piped-out" ] ; then
+		echo "now running $*" >&2 "$tmp_err_file"
+	    fi
+	    $* 1> "$tmp_out_file" 2> "$tmp_err_file"
+	fi
+	ret=$?
+
+	if [ "$mode" != "piped-out" ] ; then
+	    cat < "$tmp_out_file" >> "$total_out"
+	else
+	    cat < "$tmp_out_file" > "$total_out"
+	fi
+	cat < "$tmp_err_file" >> "$total_err"
+
+	#---
+	# analysing stdout and stderr for the search_pattern and deciding whether to loop or not
+	#---
+
+	if [ "$mode" != "piped-out" ] ; then
+	    looping=$(grep "$search_pattern" "$tmp_out_file" | wc -l)
+	else
+	    looping=$(grep "$search_pattern" "$tmp_err_file" | wc -l)
+	fi
+
+	if [ $looping -ge 1 ] ; then
+	    if [ "$mode" != "piped-out" ] ; then
+		echo "Looping due to: $search_pattern" >> "$total_out"
+	    else
+		echo "Looping due to: $search_pattern" >> "$total_err"
+	    fi
+	    sleep 1
+	fi
+    done
+
+    #---
+    # providing transparent stdout, stderr and exit status
+    #---
+
+    cat "$total_out"
+    cat "$total_err" >&2
+    rm -f "$tmp_out_file" "$tmp_err_file" "$total_out" "$total_err" "$total_in" 2> /dev/null
+    return $ret
+}
+
 function GO
 {
   if [ "$1" == "" ] ; then
-     echo "usage: $0 <label> validexitcode[,validexitcode,...] [debug|disable|piped] command"
+     echo "usage: $0 <label> validexitcode[,validexitcode,...] [debug|disable|piped-in|piped-out] command" >&2
      exit 1
   fi
 
   local label="$1"
   local exit_codes=`echo "$2"| sed -re 's/,+/ /g'`
   if [ "$3" = "debug" ]; then
-     local debug=yes
-     local disable=no
+     local disable="no"
+     local debug="yes"
+     local piped="normal"
+     # yes, because we cannot debug piped-in or piped-out mode
      shift 3
   else
     if [ "$3" = "disable" ] ; then
-       local disable=yes
+       local disable="yes"
     else
-       if [ "$3" = "piped" ] ; then
-	   local piped=yes
-	   local disable=no
-	   shift 3
-       else
-           local disable=no
-           shift 2
+	if [ "$3" = "piped-in" -o "$3" = "piped-out" ] ; then
+	    local disable="no"
+	    local debug="no"
+	    local piped="$3"
+	    shift 3
+	else
+            local disable="no"
+	    local debug="no"
+	    local piped="normal"
+            shift 2
        fi
     fi
   fi
@@ -152,37 +246,41 @@ function GO
   if [ "$disable" = "yes" ] ; then
     echo "$label = DISABLED"
   else
-    if [ "$piped" != "yes" ] ; then
+    if [ "$piped" != "piped-out" ] ; then
 	printf "$label = "
-    fi
-    if [ "$debug" != "yes" -a "$piped" != "yes" ] ;  then
-	$* 1>/dev/null 2> /dev/null
     else
-	if [ "$piped" != "yes" ] ; then
-	    echo "--- debug -----"
-	    echo $*
-	    $*
-	else
-	    $* 2> /dev/null
-	fi
+	printf "$label = " >&2
     fi
 
+    if [ "$debug" != "yes" ] ; then
+	echo "About to run [RETRIER $piped $*]" >&2
+	RETRIER "$piped" $*
+    else
+	# never piped-in nor piped-out in debug mode
+
+	echo "--- debug -----"
+	echo $*
+	RETRIER "$piped" $*
+    fi
     local ret=$?
+
     local is_valid="no"
     for valid in $exit_codes ; do
 	if [ $ret = $valid ] ; then is_valid="yes" ; fi
     done
 
     if [ $is_valid = "yes" ] ; then
-	if [ "$piped" != "yes" ] ; then
+	if [ "$piped" != "piped-out" ] ; then
 	    echo "OK"
-        fi
+        else
+	    echo "OK" >&2
+	fi
     else
-	if [ "$piped" != "yes" ] ; then
+	if [ "$piped" != "piped-out" ] ; then
 	    echo "$label FAILED"
 	    echo "--------> $1 FAILED : $*"
 	else
-	    echo "--------> $1 FAILED : $*" > /dev/stderr
+	    echo "--------> $1 FAILED : $*" >&2
 	fi
 	exit 1
     fi
@@ -585,9 +683,7 @@ fi
 rm -rf $src
 ../build_tree.sh $src "W"
 if echo $* | grep "G1" > /dev/null ; then
-printf "G1-1 = "
-GO "G1-1" 0 piped $DAR -N -Q -c - -R $src "-@" $piped_fly -B $OPT > $piped.$padded_one.dar
-printf "OK\n"
+GO "G1-1" 0 piped-out $DAR -N -Q -c - -R $src "-@" $piped_fly -B $OPT > $piped.$padded_one.dar
 GO "G1-2" 0 $ROUTINE_DEBUG $DAR -N -Q -d $piped -R $src -B $OPT
 GO "G1-3" 0 $ROUTINE_DEBUG $DAR -N -Q -d $piped -R $src -A $piped_fly -B $OPT
 mkdir $dst
@@ -603,17 +699,15 @@ fi
 if echo $* | grep "G2" > /dev/null ; then
 mkfifo $todar
 mkfifo $toslave
-$DAR_SLAVE -Q -i $toslave -o $todar $slave_digits $piped &
-GO "G2-1" 0 $ROUTINE_DEBUG $DAR -N -Q -d - -R $src -B $OPT -i $todar -o $toslave
+GO "G2-1(a)" 0 $ROUTINE_DEBUG $DAR_SLAVE -Q -i $toslave -o $todar $slave_digits $piped &
+GO "G2-1(b)" 0 $ROUTINE_DEBUG $DAR -N -Q -d - -R $src -B $OPT -i $todar -o $toslave
 fi
 
 #
 # G3 - using pipe to read the archive
 #
 if echo $* | grep "G3" > /dev/null ; then
-printf "G3-1 = "
-GO "G3-1" 0 piped $DAR -N -Q -d - -R $src -B $OPT < $piped.$padded_one.dar
-printf "OK\n"
+GO "G3-1" 0 piped-in $DAR -N -Q -d - -R $src -B $OPT < $piped.$padded_one.dar
 fi
 
 #
