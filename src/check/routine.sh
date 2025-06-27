@@ -101,7 +101,8 @@ if [ "$hash" = "" ] ; then
    hash_xform=""
 fi
 
-function my_diff {
+function my_diff
+{
   if [ "$1" = "" -o "$2" = "" ] ; then
     echo "usage: $0 <dir> <dir>"
     return 1
@@ -120,7 +121,8 @@ function my_diff {
   return `[ $ret1 -eq 0 -a $ret2 -eq 0 ]`
 }
 
-function GO {
+function GO
+{
   if [ "$1" == "" ] ; then
      echo "usage: $0 <label> validexitcode[,validexitcode,...] [debug|disable|piped] command"
      exit 1
@@ -191,7 +193,8 @@ function GO {
   fi
 }
 
-function check_hash {
+function check_hash
+{
   if [ "$1" == "" ] ; then
     echo "usage: $0 <hash> <file> <file> ..."
     exit 1
@@ -231,41 +234,42 @@ function check_hash {
 }
 
 
-function clean {
-local verbose=""
-rm -rf $verbose $src $dst $src2 $dst2
-rm -f $verbose *.md5 *.sha1
-rm -f $verbose $full*.dar
-rm -f $verbose $catf*.dar
-rm -f $verbose $catf_fly*.dar
-rm -f $verbose $full_delta*.dar
-rm -f $verbose $cat_full_delta*.dar
-rm -f $verbose $catf_delta*.dar
-rm -f $verbose $double_catf*.dar
-rm -f $verbose $double_catf_fly*.dar
-rm -f $verbose $diff*.dar
-rm -f $verbose $diff_delta*.dar
-rm -f $verbose $diff_delta2*.dar
-rm -f $verbose $catd*.dar
-rm -f $verbose $catd_fly*.dar
-rm -f $verbose $double_catd*.dar
-rm -f $verbose $double_catd_fly*.dar
-rm -f $verbose $diff_fly*.dar
-rm -f $verbose $diff_double*.dar
-rm -f $verbose $diff_double_fly*.dar
-rm -f $verbose $merge_full*.dar
-rm -f $verbose $merge_diff*.dar
-rm -f $verbose $merge_delta*.dar
-rm -f $verbose $full2*.dar
-rm -f $verbose $diff2*.dar
-rm -f $verbose $full3*.dar
-rm -f $verbose $decr*.dar
-rm -f $verbose $piped*.dar
-rm -f $verbose $piped_fly*.dar
-rm -f $verbose $xformed1*.dar
-rm -f $verbose $xformed2*.dar
-rm -f $verbose $xformed3*.dar
-rm -f $todar $toslave
+function clean
+{
+    local verbose=""
+    rm -rf $verbose $src $dst $src2 $dst2
+    rm -f $verbose *.md5 *.sha1
+    rm -f $verbose $full*.dar
+    rm -f $verbose $catf*.dar
+    rm -f $verbose $catf_fly*.dar
+    rm -f $verbose $full_delta*.dar
+    rm -f $verbose $cat_full_delta*.dar
+    rm -f $verbose $catf_delta*.dar
+    rm -f $verbose $double_catf*.dar
+    rm -f $verbose $double_catf_fly*.dar
+    rm -f $verbose $diff*.dar
+    rm -f $verbose $diff_delta*.dar
+    rm -f $verbose $diff_delta2*.dar
+    rm -f $verbose $catd*.dar
+    rm -f $verbose $catd_fly*.dar
+    rm -f $verbose $double_catd*.dar
+    rm -f $verbose $double_catd_fly*.dar
+    rm -f $verbose $diff_fly*.dar
+    rm -f $verbose $diff_double*.dar
+    rm -f $verbose $diff_double_fly*.dar
+    rm -f $verbose $merge_full*.dar
+    rm -f $verbose $merge_diff*.dar
+    rm -f $verbose $merge_delta*.dar
+    rm -f $verbose $full2*.dar
+    rm -f $verbose $diff2*.dar
+    rm -f $verbose $full3*.dar
+    rm -f $verbose $decr*.dar
+    rm -f $verbose $piped*.dar
+    rm -f $verbose $piped_fly*.dar
+    rm -f $verbose $xformed1*.dar
+    rm -f $verbose $xformed2*.dar
+    rm -f $verbose $xformed3*.dar
+    rm -f $todar $toslave
 }
 
 clean
