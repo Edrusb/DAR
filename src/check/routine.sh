@@ -132,7 +132,7 @@ function GO
   local exit_codes=`echo "$2"| sed -re 's/,+/ /g'`
   if [ "$3" = "debug" ]; then
      local debug=yes
-     local disable=false
+     local disable=no
      shift 3
   else
     if [ "$3" = "disable" ] ; then
@@ -140,7 +140,7 @@ function GO
     else
        if [ "$3" = "piped" ] ; then
 	   local piped=yes
-	   local disabled=false
+	   local disable=no
 	   shift 3
        else
            local disable=no
