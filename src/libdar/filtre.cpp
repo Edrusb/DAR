@@ -3221,7 +3221,7 @@ namespace libdar
 		    {
 			if(delta_sig_ref)
 			    dialog->message(string(gettext("Delta saving file to archive: ")) + info_quoi);
-			else if(fic->applying_binary_patch())
+			else if(fic != nullptr && fic->applying_binary_patch())
 			    dialog->message(tools_printf(gettext("Merging by applying binary patch to %S"), &info_quoi));
 			else
 			{
