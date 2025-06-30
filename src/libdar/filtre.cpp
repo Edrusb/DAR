@@ -3528,7 +3528,6 @@ namespace libdar
 				catch(...)
 				{
 				    delete source;
-				    fic->clean_data();
 				    source = nullptr;
 
 					// restore atime of source
@@ -3537,7 +3536,6 @@ namespace libdar
 				    throw;
 				}
 				delete source;
-				fic->clean_data();
 				source = nullptr;
 
 				    //////////////////////////////
@@ -3867,10 +3865,14 @@ namespace libdar
 	{
 	    if(ref_fic != nullptr)
 		ref_fic->drop_delta_signature_data();
+	    if(fic != nullptr)
+	       fic->clean_data();
 	    throw;
 	}
 	if(ref_fic != nullptr)
 	    ref_fic->drop_delta_signature_data();
+	if(fic != nullptr)
+	    fic->clean_data();
 
 	return ret;
     }

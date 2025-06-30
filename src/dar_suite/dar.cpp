@@ -1226,10 +1226,15 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
                 throw SRC_BUG;
             }
 	}
+	catch(Egeneric & e)
+	{
+	    dialog->message(tools_printf(gettext("Aborting due to exception: %s\nFinal memory cleanup"), e.get_message().c_str()));
+	    throw;
+	}
 	catch(...)
 	{
 	    if(!param.quiet)
-		dialog->message(gettext("Final memory cleanup..."));
+		dialog->message(gettext("Aborting due to unknown execption\nFinal memory cleanup..."));
 	    throw;
 	}
 
