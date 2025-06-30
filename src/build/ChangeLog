@@ -25,6 +25,9 @@ from 2.7.18 to 2.7.19
   restored, leading dar in dead-lock situation (sleeping forever).
 - fixing bug met in sequential read mode when retrieving archive summary
   information (dar asked for the last slice and could not find it).
+- In some rare conditions gpgme fails upon memory allocation failure, leading
+  dar to abort but without displaying the root cause. Error message now
+  shows.
 
 from 2.7.17 to 2.7.18
 - fixed bug that broke the ability to repair an archive through ftp/sftp
