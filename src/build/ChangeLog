@@ -83,7 +83,13 @@ from 2.7.18 to 2.7.19
   information (dar asked for the last slice and could not find it).
 - In some rare conditions gpgme fails upon memory allocation failure, leading
   dar to abort but without displaying the root cause. Error message now
-  shows.
+- fixed bug in sar::truncate() which lead dar to create a hole in the slice
+  numbering when one of the last file to backup was so badly compressed that
+  resaving it uncompressed lead to remove enough slices for the rest of the
+  backup to need less slices that reached at that time (bug detected with
+  slices of 1024 bytes). Such archive are still readable in sequential
+  read mode but end with dar asking for the missing slices at the end of
+  the process.
 
 from 2.7.17 to 2.7.18
 - fixed bug that broke the ability to repair an archive through ftp/sftp
