@@ -201,7 +201,7 @@ namespace libdar
     class Elimitint : public Egeneric
     {
     public :
-        Elimitint() : Egeneric("", dar_gettext("Cannot handle such a too large integer. Use a full version of libdar (compiled to rely on the \"infinint\" integer type) to solve this problem")) {};
+        Elimitint() : Egeneric("", dar_gettext("Cannot handle such a large integer. Use a full version of libdar (compiled to rely on the \"infinint\" integer type) to solve this problem")) {};
 	Elimitint(const Elimitint & ref) = default;
 	Elimitint(Elimitint && ref) = default;
 	Elimitint & operator = (const Elimitint & ref) = default;
