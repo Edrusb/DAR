@@ -611,8 +611,8 @@ namespace libdar
 	tas(xtas),
 	num_w(num_workers)
     {
-#ifdef LIBTHREADAR_STACK_FEATURE
-	set_stack_size(DEFAULT_STACK_SIZE);
+#ifdef LIBTHREADAR_STACK_FEATURE_AVAILABLE
+	set_stack_size(LIBDAR_DEFAULT_STACK_SIZE);
 #endif
 
 	if(!src)
@@ -765,8 +765,8 @@ namespace libdar
 	tas(xtas),
 	num_w(num_workers)
     {
-#ifdef LIBTHREADAR_STACK_FEATURE
-	set_stack_size(DEFAULT_STACK_SIZE);
+#ifdef LIBTHREADAR_STACK_FEATURE_AVAILABLE
+	set_stack_size(LIBDAR_DEFAULT_STACK_SIZE);
 #endif
 
 	if(src == nullptr)
@@ -910,8 +910,8 @@ namespace libdar
 	compr(std::move(ptr)),
 	do_compress(compress)
     {
-#ifdef LIBTHREADAR_STACK_FEATURE
-	set_stack_size(DEFAULT_STACK_SIZE);
+#ifdef LIBTHREADAR_STACK_FEATURE_AVAILABLE
+	set_stack_size(LIBDAR_DEFAULT_STACK_SIZE);
 #endif
 
 	if(!reader)

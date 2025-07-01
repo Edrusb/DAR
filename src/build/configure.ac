@@ -2046,8 +2046,8 @@ AS_IF([ test "$local_threadar" = "yes" ],
 				])
 	      ],
 	      [
-		AC_DEFINE(LIBTHREADAR_STACK_FEATURE, 1, [libthreadar thread class can set the stack size])
-		AC_DEFINE(DEFAULT_STACK_SIZE, 8*1024*1024, [macro to set the stack size of class inheriting from libthreadar::thread])
+		AC_DEFINE(LIBTHREADAR_STACK_FEATURE_AVAILABLE, 1, [libthreadar thread class can set the stack size])
+		AC_DEFINE(LIBDAR_DEFAULT_STACK_SIZE, 8*1024*1024, [macro to set the stack size of class inheriting from libthreadar::thread])
 		AC_MSG_RESULT(yes)
 	      ],
 	      [

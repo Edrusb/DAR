@@ -364,8 +364,8 @@ namespace libdar
 
 	U_I thread_stack_size() noexcept
 	{
-#ifdef LIBTHREADAR_STACK_FEATURE
-	    return DEFAULT_STACK_SIZE;
+#ifdef LIBTHREADAR_STACK_FEATURE_AVAILABLE
+	    return LIBDAR_DEFAULT_STACK_SIZE;
 #else
 	    return 0;
 #endif

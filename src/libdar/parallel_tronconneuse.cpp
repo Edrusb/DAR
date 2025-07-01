@@ -1328,8 +1328,8 @@ namespace libdar
 	reof(false),
 	trailing_clear_data(nullptr)
     {
-#ifdef LIBTHREADAR_STACK_FEATURE
-	set_stack_size(DEFAULT_STACK_SIZE);
+#ifdef LIBTHREADAR_STACK_FEATURE_AVAILABLE
+	set_stack_size(LIBDAR_DEFAULT_STACK_SIZE);
 #endif
 
 	flag = tronco_flags::normal;
@@ -1543,8 +1543,8 @@ namespace libdar
 	error(false),
 	error_block(0)
     {
-#ifdef LIBTHREADAR_STACK_FEATURE
-	set_stack_size(DEFAULT_STACK_SIZE);
+#ifdef LIBTHREADAR_STACK_FEATURE_AVAILABLE
+	set_stack_size(LIBDAR_DEFAULT_STACK_SIZE);
 #endif
 
 	if(encrypted == nullptr) throw SRC_BUG;
@@ -1670,8 +1670,8 @@ namespace libdar
 	do_encrypt(encrypt),
 	abort(status::fine)
     {
-#ifdef LIBTHREADAR_STACK_FEATURE
-	set_stack_size(DEFAULT_STACK_SIZE);
+#ifdef LIBTHREADAR_STACK_FEATURE_AVAILABLE
+	set_stack_size(LIBDAR_DEFAULT_STACK_SIZE);
 #endif
 
 	if(!reader || !writer || !waiting || !crypto)
