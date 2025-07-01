@@ -678,6 +678,14 @@ namespace libdar
 
 	of_fd->truncate(offset);
 
+	    // updating max slice fields with truncated value
+	of_max_seen = dest_file;
+	if(of_last_file_known)
+	{
+	    of_last_file_known = false;
+	    of_last_file_num = 0;
+	}
+
 	    // removing slices after the current slice
 
 	sar_tools_remove_higher_slices_than(*entr,
