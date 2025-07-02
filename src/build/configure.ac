@@ -2025,8 +2025,10 @@ AS_IF([ test "$local_threadar" = "yes" ],
 				[[
 				extern "C"
 				{
+				#if HAVE_UNISTD_H
+				#include <unistd.h>
+				#endif
 				}
-
 				#if HAVE_LIBTHREADAR_LIBTHREADAR_HPP
 				#include <libthreadar/libthreadar.hpp>
 				#endif

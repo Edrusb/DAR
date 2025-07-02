@@ -124,7 +124,7 @@ requirements()
 {
     if [ "$ROOT_PERM" = "yes" ] ; then
 	#updating xbps db
-	xbps-install -SU -y  || return 1
+	xbps-install -SUy || (xbps-install -uy xbps && xbps-install -SUy) || return 1
 
 	# tools used to build the different packages involved here
 	xbps-install -y gcc make wget pkg-config cmake xz || return 1
@@ -270,7 +270,7 @@ libcurl()
     if [ ! -e "${REPO}/${LIBCURL_PKG}" ] ; then wget "https://curl.se/download/${LIBCURL_PKG}" && mv "${LIBCURL_PKG}" "${REPO}" || return 1 ; fi
     tar -xf "${REPO}/${LIBCURL_PKG}" || return 1
     cd curl-${LIBCURL_VERSION} || return 1
-    ./configure --with-gnutls ${SSH_CURL_OPT} --disable-shared --prefix="$LOCAL_PREFIX" || (cd .. : return 1)
+    ./configure --with-gnutls ${SSH_CURL_OPT} --enable-shared --enable-static --prefix="$LOCAL_PREFIX" || (cd .. : return 1)
     make ${MAKE_FLAGS} || (cd .. ; return 1)
     make install || (cd . ; return 1)
     cd ..
