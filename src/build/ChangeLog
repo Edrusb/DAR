@@ -21,7 +21,7 @@ from 2.7.18 to 2.7.19
 - fixing bug met in sequential read mode when retrieving archive summary
   information (dar asked for the last slice and could not find it).
 - In some rare conditions gpgme fails upon memory allocation failure, leading
-  dar to abort but without displaying the root cause. Error message now
+  dar to abort but without displaying the root cause. Error message now shows
 - fixed bug in sar::truncate() which lead dar to create a hole in the slice
   numbering when one of the last file to backup was so badly compressed that
   resaving it uncompressed lead to remove enough slices for the rest of the
