@@ -1183,7 +1183,7 @@ At creation time or when re-compressing data at merging time (thus when option -
 .PP
 .TP 20
 -arep, --alter=repair
-For isolation operation only, this option make dar able to isolate a catalog from a truncated backup. This option transparently implies --sequential-read and --alter=force-firs-slice to be able to read the content of the truncated archive to isolate.
+For isolation operation only, this option make dar able to isolate a catalog from a truncated backup. This option transparently implies --sequential-read and --alter=force-first-slice to be able to read the content of the truncated archive. The isolated catalog can then be used to read the archive in direct mode for better efficienty (see -A option used with -x/-l/-t commands) which avoids repairing which saves time (and non-rewritable media) if the volume of data is huge.
 .PP
 .B RESTORATION SPECIFIC OPTIONS (to use with -x)
 .TP 20

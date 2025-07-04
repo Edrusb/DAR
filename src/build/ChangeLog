@@ -1,63 +1,70 @@
 from 2.7.x to 2.8.0
 - added whirlpool hash algorithm (requires librhash library)
-- new feature: -anru option leads dar to Never Re-save Uncompressed a file
-  which compression ratio was bad (compressed data taking more space than
-  the corresponding uncompressed one.
-- extended the syntax of --include-from-file and --exclude-from-file options
-  to let the user define what are the possible sequences of chars that can
-  define the end of a line (by default it stays "\n" and "\r\n" for backward
-  compatibility)
-- adding early_memory_release parameter in class archive, this reduces the
-  memory footprint in many cases, but avoids reusing an open archive to
-  another operation (like in-fly isolation done by dar)
-- using early_memory_release from dar CLI when sequential-read mode is used
-- adding -qcrypto option
-- extended entrepot classes (entrepot_local and entrepot_libcurl) to provide
-  directory/non-directory info while listing a directory content
-- extended entrepot classes to be able to create a subdirectory upon user
-  request.
-- added implementation of fichier_libcurl::sync_write and using it at object
-  destruction for sanity (libdar call make use of terminate() first, so
-  this does solve any problem).
+- new feature: -anru option leads dar to Never Re-save Uncompressed a
+  file which compression ratio was bad (compressed data taking more
+  space than the corresponding uncompressed one).
+- extended the syntax of --include-from-file and --exclude-from-file
+  options to let the user define what are the possible sequences of
+  chars that can define the end of a line (by default it stays "\n" and
+  "\r\n" for backward compatibility)
+- adding early_memory_release parameter in class archive, this reduces
+  the memory footprint in many cases, but avoids reusing an opened
+  archive to perform more than one operation (dar CLI make use of
+  this feature whenever possible, for example it does not use it for
+  in-fly isolation),
+- using early_memory_release from dar CLI when sequential-read mode is
+  used
+- adding -qcrypto option to disable the warning telling a wrong pass
+  is not possible to detect...
+- extended entrepot classes (entrepot_local and entrepot_libcurl) to
+  provide directory/non-directory info while listing a directory content
+- extended entrepot classes to be able to create a subdirectory upon
+  user request.
+- added implementation of fichier_libcurl::sync_write and using it at
+  object destruction for sanity purpose.
 - adding option -affs option to drive dar to read the first slice rather
-  than the last slice to fetch archive format when reading an archive with
-  the help of an external catalog in direct access mode.
-- adding -x option to dar_manager (displaying subsecond date informations)
-- adding option -afdd to dar and dar_manager to show the subsecond part of
-  dates while listing a backup content (dar) or a database file information
-  (dar_manager).
-- exposing build_regex_for_exclude_mask() routine in tools module (was cli
-  specific in line_tools module).
-- updating code to work with autoconf tool to 2.71
+  than the last slice to fetch archive format when reading an archive
+  with the help of an external catalog in direct access mode.
+- adding -x option to dar_manager (displaying subsecond date
+  informations)
+- adding option -afdd to dar to show the subsecond part of dates while
+  listing a backup content
+- exposing build_regex_for_exclude_mask() routine in tools module (was
+  cli specific in line_tools module).
+- updating code to work with autoconf tool version 2.71
 - replaced the deprecated use of sys_siglist by strsignal()
-- for pertience, changed the name of function square2 to root2 and function
-  square3 to root3 when using extended syntax of "--delta sig" option.
-- added support for -az option to comparison operation
-- enhanced display of dar_cp with the ratio of lost data beside the ratio of
-  read data.
-- changed default number of thread used for ciphering from 1 to 2 at libdar
-  API level (in coherence with CLI defaults).
+- for pertinence, changed the name of function square2 to root2 and
+  function square3 to root3 when using extended syntax of "--delta sig"
+  option.
+- added the support for -az option into comparison operation
+- enhanced display of dar_cp with the ratio of lost data beside the
+  ratio of read data.
+- changed default number of thread used for ciphering, from 1 to 2 at
+  libdar API level (in coherence with CLI defaults).
 - added opton -arep to allow catalog isolation of a truncated backup
-- signal (like CTRL-C) can now interrupt status where libdar is pending for
-  a user answer, allowing automatic clean termination of the backup/archive.
-- added a new get_version() to let the caller specify the amount of secured
-  memory to reserve while initializing libgcrypt form libdar. Libgcrypt can
-  still also be initialized outside libdar in that case secured memory size
-  will have to be defined outside libdar.
-- adding the ability to dar to restore from a dar_manager database (-aefd
-  option) making possible and efficient to restore all files of a backup
-  set from a single dar command (instead of calling dar manually for the
-  full then differential and/or incremental backups, which may lead to data
-  overwriting and restoring old data then more recent one). The behavoir
-  is the same as dar_manager but there is not need to transfer between
-  dar and dar_manager the list of files to restore at each backup step,
-  dar directly fetches and precompute the information in the database for
-  better efficiency.
-- while merging two backups, when in-place is afile and to-be-added is a
-  binary patch, if the policy decision is to "overwrite", instead of
-  retaining the patch (which is useless alone), the  merging operation
-  now applies the patch to the in-place version and retain the
-  patched/updated version in the resulting backup.
+- signal (like CTRL-C) can now interrupt status where libdar is pending
+  for a user answer, allowing automatic clean termination of the
+  backup/archive, in case of UPS signaled power supply failure without
+  presence of the user.
+- added a new get_version() to let the caller specify the amount of
+  secured memory to reserve while initializing libgcrypt form libdar.
+  Libgcrypt can still also be initialized outside libdar, in that case
+  secured memory size will have to be defined outside libdar too.
+- adding the ability for dar to restore from a dar_manager database
+  (-aefd option) making possible and efficient to restore all files of a
+  backup set from a single dar command, instead of calling dar manually
+  for the full then differential and/or incremental backups, which may
+  lead to restoring old data first then overwritten it by more recent one.
+  The behavior is the same as dar_manager but there is not need to
+  transfer between dar and dar_manager the list of files to restore at
+  each backup step, dar directly fetches and pre-compute the information
+  in the database for better efficiency. Also note that all mask
+  features of dar stay available (-G/-P/-X/-I/-u/-U/...)
+- while merging two backups, when in-place is a file and to-be-added is
+  a binary patch, if the policy decision is to "overwrite", instead of
+  retaining the patch (which is useless alone, as it done so far), the
+  merging operation now applies the patch to the in-place version and
+  retain the patched/updated version in the resulting backup.
 
 from 2.7.18 to 2.7.19
 - fixed the trailing slash support in path, that was broken by commit
