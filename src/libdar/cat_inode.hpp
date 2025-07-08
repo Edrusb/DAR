@@ -90,14 +90,16 @@ namespace libdar
             // signature() left as an abstract method
             // clone is abstract too
 	    // used for INCREMENTAL BACKUP
+
         void compare(const cat_inode &other,
 		     const mask & ea_mask,
 		     comparison_fields what_to_check,
 		     const infinint & hourshift,
 		     bool symlink_date,
 		     const fsa_scope & scope,
-		     bool isolated_mode) const; ///< do not try to compare pointed to data, EA of FSA (suitable for isolated catalogue)
-
+		     bool isolated_mode,  ///< do not try to compare pointed to data, EA of FSA (suitable for isolated catalogue)
+		     bool seq_read_mode   ///< *this* is read in seq mode => do not try to fetch delta sig when both isolated and seq_read mode are used
+	    ) const;
             // throw Erange exception if a difference has been detected
             // this is not a symetrical comparison, but all what is present
             // in the current object is compared against the argument
@@ -166,7 +168,9 @@ namespace libdar
 	bool fsa_get_crc_size(infinint & val) const;
 
     protected:
-        virtual void sub_compare(const cat_inode & other, bool isolated_mode) const {};
+        virtual void sub_compare(const cat_inode & other,
+				 bool isolated_mode,
+				 bool seq_read_mode) const {};
 	bool get_small_read() const { return small_read; }; ///< true if object has been created by sequential reading of an archive
 
 	    // inherited from cat_entree

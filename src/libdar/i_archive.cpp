@@ -1489,6 +1489,7 @@ namespace libdar
 				  options.get_compare_symlink_date(),
 				  options.get_fsa_scope(),
 				  isolated_mode,
+				  sequential_read,
 				  options.get_auto_zeroing_neg_dates());
             }
             catch(Euser_abort & e)
@@ -2579,7 +2580,8 @@ namespace libdar
 					      ignored_symlinks,
 					      mod_data_detect,
 					      sig_block_len,
-					      never_resave_uncompressed);
+					      never_resave_uncompressed,
+					      sequential_read);
 				// build_delta_sig is not used for archive creation it is always implied when delta_signature is set
 			}
 			catch(...)

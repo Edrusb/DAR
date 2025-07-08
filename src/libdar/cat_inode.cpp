@@ -386,7 +386,8 @@ namespace libdar
 			    const infinint & hourshift,
 			    bool symlink_date,
 			    const fsa_scope & scope,
-			    bool isolated_mode) const
+			    bool isolated_mode,
+			    bool seq_read_mode) const
     {
 	bool do_mtime_test = dynamic_cast<const cat_lien *>(&other) == nullptr || symlink_date;
 
@@ -419,7 +420,7 @@ namespace libdar
             throw Erange("cat_inode.compare", tools_printf(gettext("difference of last modification date: %S <--> %S"), &s1, &s2));
 	}
 
-        sub_compare(other, isolated_mode);
+        sub_compare(other, isolated_mode, seq_read_mode);
 
         switch(ea_get_saved_status())
         {

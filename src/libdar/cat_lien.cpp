@@ -87,7 +87,9 @@ namespace libdar
 	points_to = x;
     }
 
-    void cat_lien::sub_compare(const cat_inode & other, bool isolated_mode) const
+    void cat_lien::sub_compare(const cat_inode & other,
+			       bool isolated_mode,
+			       bool seq_read_mode) const
     {
 	const cat_lien *l_other = dynamic_cast<const cat_lien *>(&other);
 	if(l_other == nullptr)

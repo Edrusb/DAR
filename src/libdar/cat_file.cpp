@@ -1438,12 +1438,19 @@ namespace libdar
 	clean_patch_base_crc();
     }
 
-    bool cat_file::same_data_as(const cat_file & other, bool check_data, const infinint & hourshift)
+    bool cat_file::same_data_as(const cat_file & other,
+				bool check_data,
+				const infinint & hourshift,
+				bool me_or_other_read_in_seq_mode)
     {
 	bool ret = true;
 	try
 	{
-	    sub_compare_internal(other, false, check_data, hourshift);
+	    sub_compare_internal(other,
+				 false,
+				 check_data,
+				 hourshift,
+				 me_or_other_read_in_seq_mode);
 	}
 	catch(Erange & e)
 	{
@@ -1452,15 +1459,18 @@ namespace libdar
 	return ret;
     }
 
-    void cat_file::sub_compare(const cat_inode & other, bool isolated_mode) const
+    void cat_file::sub_compare(const cat_inode & other,
+			       bool isolated_mode,
+			       bool seq_read_mode) const
     {
-	sub_compare_internal(other, !isolated_mode, true, 0);
+	sub_compare_internal(other, !isolated_mode, true, 0, seq_read_mode && isolated_mode);
     }
 
     void cat_file::sub_compare_internal(const cat_inode & other,
 					bool can_read_my_data,
 					bool can_read_other_data,
-					const infinint & hourshift) const
+					const infinint & hourshift,
+					bool seq_read_mode_and_isolated) const
     {
 	const cat_file *f_other = dynamic_cast<const cat_file *>(&other);
 	if(f_other == nullptr)
@@ -1578,7 +1588,7 @@ namespace libdar
 	    delete me;
 
 	}
-	else if(has_delta_signature_available()
+	else if(has_delta_signature_available() && ! seq_read_mode_and_isolated
 		&& (compile_time::librsync() || f_other->has_delta_signature_available()))
 	{
 		// calculate delta signature of file and comparing them
@@ -1643,7 +1653,7 @@ namespace libdar
 		drop_delta_signature_data();
 	    }
 	}
-	else // isolated_mode and no signature or no data
+	else // isolated_mode and no signature or no data or isolated_mode + seq_read_mode + signature
 	{
 	    const crc *my_crc = nullptr;
 

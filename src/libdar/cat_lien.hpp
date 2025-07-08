@@ -82,7 +82,9 @@ namespace libdar
         virtual cat_entree *clone() const override { return new (std::nothrow) cat_lien(*this); };
 
     protected :
-        virtual void sub_compare(const cat_inode & other, bool isolated_mode) const override;
+        virtual void sub_compare(const cat_inode & other,
+				 bool isolated_mode,
+				 bool seq_read_mode) const override;
         virtual void inherited_dump(const pile_descriptor & pdesc, bool small) const override;
 
     private :
