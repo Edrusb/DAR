@@ -137,7 +137,9 @@ namespace libdar
 	}
     }
 
-    void cat_device::sub_compare(const cat_inode & other, bool isolated_mode) const
+    void cat_device::sub_compare(const cat_inode & other,
+				 bool isolated_mode,
+				 bool seq_read_mode) const
     {
 	const cat_device *d_other = dynamic_cast<const cat_device *>(&other);
 	if(d_other == nullptr)

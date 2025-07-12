@@ -77,7 +77,9 @@ namespace libdar
             // signature is left pure abstract
 
     protected :
-        virtual void sub_compare(const cat_inode & other, bool isolated_mode) const override;
+        virtual void sub_compare(const cat_inode & other,
+				 bool isolated_mode,
+				 bool seq_read_mode) const override;
         virtual void inherited_dump(const pile_descriptor & pdesc, bool small) const override;
 
     private :

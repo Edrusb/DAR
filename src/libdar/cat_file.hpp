@@ -249,13 +249,18 @@ namespace libdar
 	virtual bool operator == (const cat_entree & ref) const override { return true; };
 
 	    /// compare just data not inode information EA nor FSA
-	bool same_data_as(const cat_file & other, bool check_data, const infinint & hourshift);
+	bool same_data_as(const cat_file & other,
+			  bool check_data,
+			  const infinint & hourshift,
+			  bool me_or_other_read_in_seq_mode);
 
 	    /// expose the archive format the object of the backup this object comes from
 	const archive_version & get_archive_version() const { return read_ver; };
 
     protected:
-        virtual void sub_compare(const cat_inode & other, bool isolated_mode) const override;
+        virtual void sub_compare(const cat_inode & other,
+				 bool isolated_mode,
+				 bool seq_read_mode) const override;
         virtual void inherited_dump(const pile_descriptor & pdesc, bool small) const override;
 	virtual void post_constructor(const pile_descriptor & pdesc) override;
 
@@ -282,7 +287,8 @@ namespace libdar
 	void sub_compare_internal(const cat_inode & other,
 				  bool can_read_my_data,
 				  bool can_read_other_data,
-				  const infinint & hourshift) const;
+				  const infinint & hourshift,
+				  bool seq_read_mode) const;
 
 	void clean_patch_base_crc();
 

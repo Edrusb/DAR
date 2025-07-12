@@ -110,7 +110,8 @@ namespace libdar
 				  const std::set<std::string> & ignored_symlinks,
 				  modified_data_detection mod_data_detect,
 				  const delta_sig_block_size & delta_sig_block_len,
-				  bool never_resave_uncompressed);
+				  bool never_resave_uncompressed,
+				  bool ref_read_in_seq_mode);
 
     extern void filtre_difference(const std::shared_ptr<user_interaction> & dialog,
 				  const mask &filtre,
@@ -130,6 +131,7 @@ namespace libdar
 				  bool compare_symlink_date,
 				  const fsa_scope & scope,
 				  bool isolated_mode,
+				  bool seq_read_mode,
 				  bool auto_zeroing_neg_dates);
 
     extern void filtre_test(const std::shared_ptr<user_interaction> & dialog,

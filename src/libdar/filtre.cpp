@@ -586,7 +586,8 @@ namespace libdar
 			   const set<string> & ignored_symlinks,
 			   modified_data_detection mod_data_detect,
 			   const delta_sig_block_size & delta_sig_block_len,
-			   bool never_resave_uncompressed)
+			   bool never_resave_uncompressed,
+			   bool ref_read_in_seq_mode)
     {
 	if(!dialog)
 	    throw SRC_BUG; // dialog points to nothing
@@ -856,7 +857,10 @@ namespace libdar
 						case modified_data_detection::any_inode_change:
 						    break;
 						case modified_data_detection::mtime_size:
-						    same_data = e_file->same_data_as(*f_file, false, hourshift);
+						    same_data = e_file->same_data_as(*f_file,
+										     false,
+										     hourshift,
+										     ref_read_in_seq_mode);
 						    break;
 						default:
 						    throw SRC_BUG;
@@ -1212,6 +1216,7 @@ namespace libdar
 			   bool compare_symlink_date,
 			   const fsa_scope & scope,
 			   bool isolated_mode,
+			   bool seq_read_mode,
 			   bool auto_zeroing_neg_dates)
     {
 	if(!dialog)
@@ -1296,7 +1301,7 @@ namespace libdar
 				    {
 					try
 					{
-					    e_ino->compare(*exists, ea_mask, what_to_check, hourshift, compare_symlink_date, scope, isolated_mode);
+					    e_ino->compare(*exists, ea_mask, what_to_check, hourshift, compare_symlink_date, scope, isolated_mode, seq_read_mode);
 					    if(display_treated)
 						dialog->message(string(gettext("OK   "))+juillet.get_string());
 					    if(e_dir == nullptr || !cat.read_second_time_dir())
