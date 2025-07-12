@@ -196,7 +196,7 @@ namespace libdar
 	if(pos == current_position)
 	    return true;
 
-	    // looking in lus_data for the offset
+	    // looking in the pipe for data
 	    // before sending the stop order
 
 	if(!find_offset_in_lus_data(pos))
@@ -214,7 +214,7 @@ namespace libdar
 		    // if the offset was found in lus_data
 		    // but a stop ack order are pending in
 		    // the ratelier_gather, for that reason
-		    // ignore_stop_acks field has been set the number
+		    // ignore_stop_acks field has been set to the number of
 		    // workers which is the number of expected pending stop orders
 		    // by send_read_order() to ignore these acks
 		    // during further readings
@@ -854,7 +854,7 @@ namespace libdar
 	{
 	    read_refill();
 
-		// only if no order block has been found, if pos is given
+		// only if no order block has been found and if pos is given
 
 	    if(!pos.is_zero() && ret == tronco_flags::normal)
 	    {
@@ -862,11 +862,12 @@ namespace libdar
 		{
 		    ignore_stop_acks = num;
 		    num = 0; // current method will return tronco_flags::normal
-			// when reading further
-			// data we will met the order acks we were
-			// cleaning here, but doing that we've found
-			// the data we were looking for too, so the
-			// order has not been purged from the ratelier
+
+			// when reading further data later on the order acks
+			// we were here to purge and we have not yet reached
+			// because we first found the data, will be hit.
+			// however the ignore_stop_acks set above will let
+			// further operation ot skip over and ignore them.
 		}
 	    }
 
@@ -887,10 +888,10 @@ namespace libdar
 			   && ignore_stop_acks > 0)
 			{
 			    ignore_stop_acks = 0;
-				// this situation occurs when skip triggered
+				// this situation occurs when skip() triggered
 				// a stop order which was not purged because
 				// the requested data was found in the pipe
-				// from subthreads while the subthreads reached
+				// from subthreads, while the subthreads reached
 				// eof and were thus suspended. In that case
 				// the stop order did not triggered any ack
 				// we just have to consider that the subthreads
@@ -917,7 +918,7 @@ namespace libdar
 				{
 				    go_read();
 					// yes we trigger the sub thread to push their data
-					// to the ratelier up to the current order acknolegment
+					// to the ratelier up to the current order acknowledgment
 
 				    ret = tronco_flags::normal;
 					// getting ready to read the "first" order
@@ -1149,7 +1150,7 @@ namespace libdar
 		    // requested offset is further before
 		    // the earliest data we have in lus_data
 	    }
-	    else // pos > current_position (the case pos == current_position has alread been seen)
+	    else // pos > current_position (the case pos == current_position has already been seen)
 	    {
 		infinint alire = lus_data.front()->clear_data.get_data_size()
 		    - lus_data.front()->clear_data.get_read_offset();

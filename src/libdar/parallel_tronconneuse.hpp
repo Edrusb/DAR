@@ -272,10 +272,13 @@ namespace libdar
             /// pos offset before all stop acks could get read, the call stops
             /// and return false. Else true is returned meaning all stop acks
             /// has been read and removed from the pipe
-            /// \note this method acts the same pas purge_ratelier_from_next_order but fetch
-            /// from ratelier up to data offset met of the pending ack to be all read
-            /// but it then stops, it does not look for a real order after
-            /// the pending stop acks of an aborted stop order
+            /// \note this method acts the same pas purge_ratelier_from_next_order()
+	    /// only if a pending order was tried to be purged by this call but aborted
+	    /// because the data at the expected offset has been found before.
+            /// If data at given offset is found in local thread data buffer
+	    /// or if no order is pending for ack, the call does not try purging
+	    /// anothing from the pipe. Else, it completes the purging process
+	    /// (for stop orders) as started by purge_ratelier_from_next_order()
         bool purge_unack_stop_order(const infinint & pos = 0);
 
             /// flush lus_data/lus_flags up to requested pos offset to be found or all data has been removed
@@ -285,9 +288,8 @@ namespace libdar
             /// ready for next inherited_read() call, false else
             /// and lus_data/lus_flags have been empties of
             /// the first non-order blocks found (data blocks)
-            /// \note current_position is set upon success else
-            /// it is unchanged but will not match what may still
-            /// remain in the pipe
+            /// \note current_position is set updated by the amount of
+	    /// of data that has been read from the workers
         bool find_offset_in_lus_data(const infinint & pos);
 
             /// reset the interthread datastructure and launch the threads
@@ -373,7 +375,8 @@ namespace libdar
 	    /// \note this is the difference between the argument provided
 	    /// to set_pos() and the value returned by get_clear_flow_start()
 	    /// in other words this is the amount of bytes to skip in the
-	    /// new flow, in order to
+	    /// new flow, in order to reach the clear expected clear data.
+	    /// (clear data is not located at the beginning of a ciphered block)
 	const infinint & get_pos_in_flow() const { return pos_in_flow; };
 
 
