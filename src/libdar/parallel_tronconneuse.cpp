@@ -1036,24 +1036,26 @@ namespace libdar
 			    //   in the pipe (but for an non data block is hit), same situation as if
 			    //   find_offset_in_lus_data() has not been executed (pos == 0)
 			    // - the front() block in lus_data is now a non-data block
-			if( ! lus_flags.empty()
-			   && static_cast<tronco_flags>(lus_flags.front()) != tronco_flags::data_error
-			   && static_cast<tronco_flags>(lus_flags.front()) != tronco_flags::normal)
-			    continue;
-			    // find_offset_in_lus_data has purged all the data entry before a non-data
-			    // one, we must not purge this block before inspecting it (code below) but
-			    // have to restart the while loop from the beginning (so we "continue")
-			    // ELSE we exit the switch construct (break) and execute the purge code
-			    // after it (leading data block has to be removed)
-			else
-			    lookup = false;
-			    // the code aftet this switch construct will "manually" remove the
-			    // leading data block without current_offset update,
-			    // which will make the current offset info wrong
-			    // se must not more look for an offset (it has no use,
-			    // because find_offset_in_lus_data()) would have remove all data block
-			    // eventually hitting a non-data block if there was chance to find the
-			    // requested offset looking forward.
+			if( ! lus_flags.empty())
+			{
+			    if(static_cast<tronco_flags>(lus_flags.front()) != tronco_flags::data_error
+			       && static_cast<tronco_flags>(lus_flags.front()) != tronco_flags::normal)
+				continue;
+				// find_offset_in_lus_data has purged all the data entry before a non-data
+				// one, we must not purge this block before inspecting it (code below) but
+				// have to restart the while loop from the beginning (so we "continue")
+				// ELSE we exit the switch construct (break) and execute the purge code
+				// after it (leading data block has to be removed)
+			    else
+				lookup = false;
+				// the code aftet this switch construct will "manually" remove the
+				// leading data block without current_offset update,
+				// which will make the current offset info wrong
+				// se must not more look for an offset (it has no use,
+				// because find_offset_in_lus_data()) would have remove all data block
+				// eventually hitting a non-data block if there was chance to find the
+				// requested offset looking forward.
+			}
 		    }
 		    break;
 		case tronco_flags::exception_below:
