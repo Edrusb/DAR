@@ -848,7 +848,7 @@ namespace libdar
 	    else
 	    {
 		    // we always ignore read ahead as encryption layer above sar/zapette/triial_sar has no slave thread below
-		tmp->ignore_read_ahead(!libcurl_repo);
+		tmp->ignore_read_ahead(!libcurl_repo && (crypto == crypto_algo::none || multi_threaded_crypto == 1));
 		stack.push(tmp);
 		tmp = nullptr;
 	    }
@@ -904,7 +904,7 @@ namespace libdar
 		tmp = new (nothrow) escape(stack.top(), unjump);
 		if(tmp == nullptr)
 		    throw Ememory("open_archive");
-		tmp->ignore_read_ahead(!libcurl_repo);
+		tmp->ignore_read_ahead(!libcurl_repo && (crypto == crypto_algo::none || multi_threaded_crypto == 1));
 		stack.push(tmp);
 		tmp = nullptr;
 	    }
@@ -957,12 +957,6 @@ namespace libdar
 		throw Ememory("open_archive");
 	    else
 	    {
-#ifdef LIBTHREADAR_AVAILABLE
-		if(multi_threaded_crypto > 1)
-		    tmp->ignore_read_ahead(!libcurl_repo);
-#else
-		tmp->ignore_read_ahead(!libcurl_repo);
-#endif
 		stack.push(tmp, LIBDAR_STACK_LABEL_UNCOMPRESSED);
 		tmp = nullptr;
 	    }
