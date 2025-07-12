@@ -289,7 +289,7 @@ namespace libdar
             /// and lus_data/lus_flags have been empties of
             /// the first non-order blocks found (data blocks)
             /// \note current_position is set updated by the amount of
-	    /// of data that has been read from the workers
+	    /// of data that has been read/skipped over, from the workers
         bool find_offset_in_lus_data(const infinint & pos);
 
             /// reset the interthread datastructure and launch the threads
