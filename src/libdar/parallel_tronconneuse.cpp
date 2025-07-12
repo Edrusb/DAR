@@ -817,24 +817,6 @@ namespace libdar
 			lus_data.front()->clear_data.rewind_read(to_skip);
 		    else
 			throw SRC_BUG; // offset to skip should be within the segment
-		    switch(static_cast<tronco_flags>(lus_flags.front()))
-		    {
-		    case tronco_flags::normal:
-			break;
-		    case tronco_flags::stop:
-			throw SRC_BUG;
-		    case tronco_flags::eof:
-			throw SRC_BUG;
-		    case tronco_flags::die:
-			throw SRC_BUG;
-		    case tronco_flags::data_error:
-			break;
-		    case tronco_flags::exception_below:
-			throw SRC_BUG;
-		    case tronco_flags::exception_worker:
-			throw SRC_BUG;
-		    default:
-			throw SRC_BUG;
 		    }
 		}
 	    }
