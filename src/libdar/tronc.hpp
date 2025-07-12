@@ -86,7 +86,7 @@ namespace libdar
 
 	    /// when a tronc is used over a compressor, it becomes necessary to disable position check
 	    ///
-	    /// \note by default, before each read or write, the tronc object check that the underlying
+	    /// \note by default, before each read or write, the tronc object checks that the underlying
 	    /// object is at adhoc position in regard to where the cursor is currently in the tronc. Disabling
 	    /// that check let ignore possible position mismatch (which are normal when a compressor is found below)
 	    /// while reading or writing but keep seeking the underlying object to the requested position upon any call

@@ -124,7 +124,7 @@ namespace libdar
 	if(is_terminated())
 	    throw SRC_BUG;
 
-        if(current == pos && check_pos) // we skip anyway when check_pos is false
+        if(current == pos && check_pos) // we propagate skip() anyway when check_pos is false
             return true;
 
         if(limited && pos > sz)
