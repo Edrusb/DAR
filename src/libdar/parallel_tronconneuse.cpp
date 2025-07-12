@@ -817,7 +817,6 @@ namespace libdar
 			lus_data.front()->clear_data.rewind_read(to_skip);
 		    else
 			throw SRC_BUG; // offset to skip should be within the segment
-		    }
 		}
 	    }
 	}
