@@ -1,6 +1,6 @@
 #!/bin/bash
 
-total=$(grep target < my_makefile | wc -l)
+total=$(grep -E '^target' < my_makefile | wc -l)
 echo "total = $total"
 done=$(ls -l | grep -E 'target.*[yn]$' | wc -l)
 echo "done = $done"
