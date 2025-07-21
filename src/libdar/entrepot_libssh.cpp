@@ -53,19 +53,6 @@ namespace libdar
 				     const string & sftp_known_hosts,
 				     U_I waiting_time,
 				     bool verbose):
-	mem_ui(dialog),
-	x_login(login),
-	x_password(password),
-	x_host(host),
-	x_port(port),
-	x_auth_from_file(auth_from_file),
-	x_sftp_pub_keyfile(sftp_pub_keyfile),
-	x_sftp_prv_keyfile(sftp_prv_keyfile),
-	x_sftp_known_hosts(sftp_known_hosts),
-	x_waiting_time(x_waiting_time),
-	x_verbose(verbose),
-	sess(nullptr),
-	sftp_sess(nullptr),
 	sdir(nullptr)
     {
 	set_root(path("/"));
@@ -73,43 +60,39 @@ namespace libdar
 	set_user_ownership(""); // not used for this type of entrepot //// <<< A REVOIR
 	set_group_ownership(""); // not used for this type of entrepot /// <<<< A REVOIR
 
-	init();
+	connect.reset(new (nothrow) libssh_connection(dialog,
+						      login,
+						      password,
+						      host,
+						      port,
+						      auth_from_file,
+						      sftp_pub_keyfile,
+						      sftp_prv_keyfile,
+						      sftp_known_hosts,
+						      waiting_time,
+						      verbose));
+	if(!connect)
+	    throw Ememory("entrepot_libssh::entrepot_libssh");
+
+	server_url = "sftp://" + login + "@" + host;
+	if(!port.empty())
+	    server_url += ":" + port;
     }
 
     entrepot_libssh::entrepot_libssh(const entrepot_libssh & ref):
-	mem_ui(ref),
-	x_login(ref.x_login),
-	x_password(ref.x_password),
-	x_host(ref.x_host),
-	x_port(ref.x_port),
-	x_auth_from_file(ref.x_auth_from_file),
-	x_sftp_pub_keyfile(ref.x_sftp_pub_keyfile),
-	x_sftp_prv_keyfile(ref.x_sftp_prv_keyfile),
-	x_sftp_known_hosts(ref.x_sftp_known_hosts),
-	x_waiting_time(ref.x_waiting_time),
-	x_verbose(ref.x_verbose),
-	sess(nullptr),
-	sftp_sess(nullptr),
-	sdir(nullptr)
+	server_url(ref.server_url),
+	sdir(nullptr),
+	connect(ref.connect)
     {
 	set_root(ref.get_root());
 	set_location(ref.get_location());
 	set_user_ownership(ref.get_user_ownership());
 	set_group_ownership(ref.get_group_ownership());
-
-    	init();
     }
 
     string entrepot_libssh::get_url() const
     {
-	string ret = string("sftp://") + x_login + "@" + x_host;
-
-	if(!x_port.empty())
-	    ret += ":" + x_port;
-
-	ret += get_full_path().display();
-
-	return ret;
+	return server_url + get_full_path().display();
     }
 
     void entrepot_libssh::read_dir_reset() const
@@ -134,12 +117,15 @@ namespace libdar
 		throw SRC_BUG;
 	}
 
-	sdir = sftp_opendir(sftp_sess, where.c_str());
+	if(!connect)
+	    throw SRC_BUG;
+
+	sdir = sftp_opendir(connect->get_sftp_session(), where.c_str());
 	if(sdir == nullptr)
 	    throw Erange("entrepot_libssh::read_dir_reset_dirinfo",
 			 tools_printf(gettext("Could not open directory %s: %s"),
 				      where.c_str(),
-				      ssh_get_error(sess)));
+				      ssh_get_error(connect->get_ssh_session())));
     }
 
     bool entrepot_libssh::read_dir_next_dirinfo(std::string & filename, inode_type & tp) const
@@ -150,7 +136,10 @@ namespace libdar
 	    throw Erange("entrepot_libssh::read_dir_next_dirinfo",
 			 gettext("No directory has been openned, cannot read a directory content"));
 
-	attrib = sftp_readdir(sftp_sess, sdir);
+	if(!connect)
+	    throw SRC_BUG;
+
+	attrib = sftp_readdir(connect->get_sftp_session(), sdir);
 	if(attrib != nullptr)
 	{
 	    filename = attrib->name;
@@ -174,7 +163,7 @@ namespace libdar
 		throw Erange("Entrepot_libssh::read_dir_next_dirinfo",
 			     tools_printf(gettext("Failed getting next entry of directory %s: %s"),
 					  get_full_path().display().c_str(),
-					  get_sftp_error_msg(sftp_get_error(sftp_sess))));
+					  connect->get_sftp_error_msg(sftp_get_error(connect->get_sftp_session()))));
 	    read_dir_flush();
 	    return false;
 	}
@@ -183,13 +172,18 @@ namespace libdar
     void entrepot_libssh::create_dir(const std::string & dirname, U_I permission)
     {
 	path where = get_full_path().append(dirname);
-	int code = sftp_mkdir(sftp_sess, where.display().c_str(), permission);
+	int code;
+
+	if(!connect)
+	    throw SRC_BUG;
+
+	code = sftp_mkdir(connect->get_sftp_session(), where.display().c_str(), permission);
 
 	if(code != SSH_OK)
 	    throw Erange("entrepot_libss::create_dir",
 			 tools_printf(gettext("Failed creating directory %s: %s"),
 				      where.display().c_str(),
-				      get_sftp_error_msg(sftp_get_error(sftp_sess))));
+				      connect->get_sftp_error_msg(sftp_get_error(connect->get_sftp_session()))));
 
     }
 
@@ -208,13 +202,18 @@ namespace libdar
     void entrepot_libssh::inherited_unlink(const std::string & filename) const
     {
 	path where = get_full_path().append(filename);
-	int code = sftp_unlink(sftp_sess, where.display().c_str());
+	int code;
+
+	if(!connect)
+	    throw SRC_BUG;
+
+	code = sftp_unlink(connect->get_sftp_session(), where.display().c_str());
 
 	if(code != SSH_OK)
 	    throw Erange("entrepot_libss::create_dir",
 			 tools_printf(gettext("Failed delete entry %s: %s"),
 				      where.display().c_str(),
-				      get_sftp_error_msg(sftp_get_error(sftp_sess))));
+				      connect->get_sftp_error_msg(sftp_get_error(connect->get_sftp_session()))));
     }
 
     void entrepot_libssh::read_dir_flush() const
@@ -226,307 +225,5 @@ namespace libdar
 	}
     }
 
-
-    void entrepot_libssh::init()
-    {
-	bool loop = true;
-
-	do
-	{
-	    try
-	    {
-		create_session();
-
-		try
-		{
-		    server_authentication();
-		    user_authentication();
-		    create_sftp_session();
-		    loop = false; // no exception thrown si far, thus "this" object is fully constructed
-		}
-		catch(...)
-		{
-		    cleanup_session();
-		    throw;
-		}
-	    }
-	    catch(Egeneric & e)
-	    {
-		Erange* e_r = dynamic_cast<Erange*>(&e);
-		Ememory* e_m = dynamic_cast<Ememory*>(&e);
-
-		if(e_r != nullptr
-		   || e_m != nullptr)
-		{
-		    get_ui().message(tools_printf(gettext("Waiting %d seconds and retring connection due to: %S"),
-						  x_waiting_time,
-						  e.get_message()));
-		    sleep(x_waiting_time);
-		}
-		else
-		    throw;
-	    }
-	}
-	while(loop); // loop only ends upon success or exception thrown
-    }
-
-    void entrepot_libssh::create_session()
-    {
-	int conn_status = SSH_ERROR;
-
-	sess = ssh_new();
-	if(sess == nullptr)
-	    throw Ememory("entrepot_libssh::entrepot_libssh");
-
-	try
-	{
-	    int ssh_verbosity;
-
-	    ssh_options_set(sess, SSH_OPTIONS_HOST, x_host.c_str());
-	    ssh_options_set(sess, SSH_OPTIONS_PORT_STR, x_port.c_str());
-	    ssh_options_set(sess, SSH_OPTIONS_USER, x_login.c_str());
-	    if(! x_sftp_known_hosts.empty())
-		ssh_options_set(sess, SSH_OPTIONS_KNOWNHOSTS, x_sftp_known_hosts.c_str());
-	    if(x_verbose)
-		ssh_verbosity = SSH_LOG_PROTOCOL;
-	    else
-		ssh_verbosity = SSH_LOG_WARNING;
-	    ssh_options_set(sess, SSH_OPTIONS_LOG_VERBOSITY, &ssh_verbosity);
-
-	    ssh_verbosity = 1; // recycling ssh_verbosity assuming it is no more access by previou ssh_option_set call
-	    ssh_options_set(sess, SSH_OPTIONS_STRICTHOSTKEYCHECK, &ssh_verbosity);
-	    if(! x_sftp_pub_keyfile.empty() && ! x_sftp_prv_keyfile.empty())
-		ssh_options_set(sess, SSH_OPTIONS_PUBKEY_AUTH, &ssh_verbosity);
-
-	    conn_status = ssh_connect(sess);
-	    if(conn_status != SSH_OK)
-		throw Erange("entrepot_libssh::entrepot_libssh",
-			     tools_printf(gettext("Error initializing sftp connexion: %s"),
-					  ssh_get_error(sess)));
-		    }
-	catch(...)
-	{
-	    if(conn_status == SSH_OK)
-		ssh_disconnect(sess);
-	    ssh_free(sess);
-	    throw;
-	}
-    }
-
-
-    void entrepot_libssh::server_authentication()
-    {
-	switch(ssh_session_is_known_server(sess))
-	{
-	case SSH_KNOWN_HOSTS_OK:
-		// ok
-	    break;
-	case SSH_KNOWN_HOSTS_CHANGED:
-	    throw Erange("entrepot_libssh::server_authentication",
-			 gettext("Server key has changed, first update the knownhosts file with server authority provided information, then retry"));
-	case SSH_KNOWN_HOSTS_OTHER:
-	    throw Erange("entrepot_libssh::server_authentication",
-			 gettext("Server provided key type is new from this server, first update the knownhosts file with server authority provided information, then retry"));
-	case SSH_KNOWN_HOSTS_UNKNOWN:
-	    throw Erange("entrepot_libssh::server_authentication",
-			 gettext("This is the first time we connect to this server, first update the knownhosts file with server authority provided information, then retry"));
-	case SSH_KNOWN_HOSTS_NOT_FOUND:
-	    throw Erange("entrepot_libssh::server_authentication",
-			 gettext("the knownhosts file is not accessible, cannot check the authenticity of the received server key; double check you provided correct parameters for the knownhosts file"));
-	case SSH_KNOWN_HOSTS_ERROR:
-	    throw Erange("entrepot_libssh::server_authentication",
-			 gettext("There had been an error checking the host"));
-	default:
-	    throw SRC_BUG; // unexpected returned value from libssh
-	}
-    }
-
-    void entrepot_libssh::user_authentication()
-    {
-	secu_string real_pass = x_password;
-	ssh_key prvkey = nullptr;
-	ssh_key pubkey = nullptr;
-	int code;
-
-	if(! x_auth_from_file) // password authentication
-	{
-	    if(x_password.empty())
-	    {
-		real_pass = get_ui().get_secu_string(tools_printf(gettext("Please provide the password for login %S at host %S: "),
-								  &x_login,
-								  &x_host),
-						     false);
-	    }
-
-	    if(ssh_userauth_password(sess, NULL, x_password.c_str()) != SSH_OK)
-		throw Enet_auth(tools_printf(gettext("Authentication failure: %s"),
-					     ssh_get_error(sess)));
-	}
-	else // public/private key pair authentication (password field if not empty is used as key passphrase)
-	{
-
-		// loading the public key from file
-
-	    code = ssh_pki_import_pubkey_file(x_sftp_pub_keyfile.c_str(), &pubkey);
-	    if(code != SSH_OK)
-		throw Erange("entrepot_libssh::user_authentication",
-			     tools_printf(gettext("Failed loading the public key: %s"),
-					  get_key_error_msg(code)));
-
-	    try
-	    {
-		string msg;
-
-		    // checking if this public key would be an acceptable authentication method
-
-		code = ssh_userauth_try_publickey(sess, NULL, pubkey);
-		if(code != SSH_AUTH_SUCCESS)
-		    throw Erange("entrepot_ssh::user_authentication",
-				 tools_printf(gettext("Failed public key authentication: %s"),
-					      get_auth_error_msg(code)));
-
-		    // loading the private key (eventually using the password as pass for the key
-
-		code = ssh_pki_import_privkey_file(x_sftp_prv_keyfile.c_str(),
-						   x_password.empty() ? NULL : x_password.c_str(),
-						   NULL,
-						   NULL,
-						   &prvkey);
-
-		if(code != SSH_OK)
-		    throw Erange("entrepot_libssh::user_authentication",
-				 tools_printf(gettext("Failed loading the private key: %s"),
-					      get_key_error_msg(code)));
-		try
-		{
-		    code = ssh_userauth_publickey(sess,
-						  x_login.c_str(),
-						  prvkey);
-		    if(code != SSH_AUTH_SUCCESS)
-			throw Erange("entrepot_ssh::user_authentication",
-				     tools_printf(gettext("Failed public/private key authentication: %s"),
-						  get_auth_error_msg(code)));
-		}
-		catch(...)
-		{
-		    ssh_key_free(prvkey);
-		    throw;
-		}
-		ssh_key_free(prvkey);
-	    }
-	    catch(...)
-	    {
-		ssh_key_free(pubkey);
-		throw;
-	    }
-	    ssh_key_free(pubkey);
-	}
-    }
-
-
-    void entrepot_libssh::create_sftp_session()
-    {
-	sftp_sess = sftp_new(sess);
-	int code;
-
-	if(sftp_sess == nullptr)
-	    throw Erange("entrepot_libcurl::create_sftp_session",
-			 tools_printf(gettext("Error allocating SFTP session: %s"),
-				      ssh_get_error(sess)));
-
-	code = sftp_init(sftp_sess);
-	if(code != SSH_OK)
-	    throw Erange("entrepot_libcurl::create_sftp_session",
-			 tools_printf(gettext("Error initializing SFTP session: %s"),
-				      get_sftp_error_msg(sftp_get_error(sftp_sess))));
-    }
-
-    void entrepot_libssh::cleanup_session()
-    {
-	read_dir_flush();
-
-	if(sftp_sess != nullptr)
-	{
-	    sftp_free(sftp_sess);
-	    sftp_sess = nullptr;
-	}
-
-	if(sess != nullptr)
-	{
-	    ssh_disconnect(sess);
-	    ssh_free(sess);
-	    sess = nullptr;
-	}
-    }
-
-
-    const char* entrepot_libssh::get_key_error_msg(int code)
-    {
-	switch(code)
-	{
-	case SSH_OK:
-	    return "";
-	case SSH_EOF:
-	    return "file does not exist or permission denied";
-	case SSH_ERROR:
-	    return "undefined error from libssh library";
-	default:
-	    throw SRC_BUG;
-	}
-    }
-
-    const char* entrepot_libssh::get_auth_error_msg(int code)
-    {
-	switch(code)
-	{
-	case SSH_AUTH_ERROR:
-	    return "A serious error happened";
-	case SSH_AUTH_DENIED:
-	    return "The server doesn't accept that public key as an authentication token. Try another key or another method.";
-	case SSH_AUTH_PARTIAL:
-	    return "You've been partially authenticated, you still have to use another method.";
-	case SSH_AUTH_AGAIN:
-	    return "In nonblocking mode, you've got to call this again later.";
-	default:
-	    throw SRC_BUG; // unexpected error code from libssh
-	}
-    }
-
-    const char* entrepot_libssh::get_sftp_error_msg(int code)
-    {
-	switch(code)
-	{
-	case SSH_FX_OK:
-	    return "no error";
-	case SSH_FX_EOF:
-	    return "end-of-file encountered";
-	case SSH_FX_NO_SUCH_FILE:
-	    return "file does not exist";
-	case SSH_FX_PERMISSION_DENIED:
-	    return "permission denied";
-	case SSH_FX_FAILURE:
-	    return "generic failure";
-	case SSH_FX_BAD_MESSAGE:
-	    return "garbage received from server";
-	case SSH_FX_NO_CONNECTION:
-	    return "no connection has been set up";
-	case SSH_FX_CONNECTION_LOST:
-	    return "there was a connection, but we lost it";
-	case SSH_FX_OP_UNSUPPORTED:
-	    return "operation not supported by libssh yet";
-	case SSH_FX_INVALID_HANDLE:
-	    return "invalid file handle";
-	case SSH_FX_NO_SUCH_PATH:
-	    return "no such file or directory path exists";
-	case SSH_FX_FILE_ALREADY_EXISTS:
-	    return "an attempt to create an already existing file or directory has been made";
-	case SSH_FX_WRITE_PROTECT:
-	    return "write-protected filesystem";
-	case SSH_FX_NO_MEDIA:
-	    return "no media was in remote drive";
-	default:
-	    throw SRC_BUG; // unknown error code from libssh
-	}
-    }
 
 } // end of namespace

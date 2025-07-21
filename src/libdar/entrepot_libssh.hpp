@@ -38,9 +38,12 @@ extern "C"
 }
 
 #include <string>
+#include <memory>
+
 #include "user_interaction.hpp"
 #include "entrepot.hpp"
 #include "fichier_global.hpp"
+#include "libssh_connection.hpp"
 
 namespace libdar
 {
@@ -51,7 +54,7 @@ namespace libdar
 	///
 	/// entrepot_libssh generates objects of class "fichier_libssh" inherited class of fichier_global
 
-    class entrepot_libssh : public entrepot, public mem_ui
+    class entrepot_libssh : public entrepot
     {
     public:
 
@@ -74,7 +77,7 @@ namespace libdar
 	entrepot_libssh(entrepot_libssh && ref) noexcept = delete;
 	entrepot_libssh & operator = (const entrepot_libssh & ref) = delete;
 	entrepot_libssh & operator = (entrepot_libssh && ref) noexcept = delete;
-	~entrepot_libssh() noexcept { cleanup_session(); };
+	~entrepot_libssh() noexcept { read_dir_flush(); };
 
 	virtual std::string get_url() const override;
 
@@ -103,36 +106,13 @@ namespace libdar
 
     private:
 	    // constructor received parameters
-	std::string x_login;
-	secu_string x_password;
-	std::string x_host;
-	std::string x_port;
-	bool x_auth_from_file;
-	std::string x_sftp_pub_keyfile;
-	std::string x_sftp_prv_keyfile;
-	std::string x_sftp_known_hosts;
-	U_I x_waiting_time;
-	bool x_verbose;
+	std::string server_url;
 
 	    // libssh structures
-	ssh_session sess;
-	sftp_session sftp_sess; // this is sftp subsystem handle inside the ssh "sess" session
 	mutable sftp_dir sdir;    // using for read_dir/read_next[_dirinfo]() paradygm
 
-	void init();
-	void create_session();
-	void server_authentication();
-	void user_authentication();
-	void create_sftp_session();
-	void cleanup_session();
-
-
-	static const char* get_key_error_msg(int code);
-	static const char* get_auth_error_msg(int code);
-	static const char* get_sftp_error_msg(int code);
-
-
-
+	    // shared libssh structures
+	std::shared_ptr<libssh_connection> connect;
     };
 
 	/// @}
