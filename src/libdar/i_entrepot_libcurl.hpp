@@ -107,7 +107,7 @@ namespace libdar
 					       bool erase) const override;
 
 	virtual void inherited_unlink(const std::string & filename) const override;
-	virtual void read_dir_flush() override;
+	virtual void read_dir_flush() const override;
 
     private:
 	mycurl_protocol x_proto;

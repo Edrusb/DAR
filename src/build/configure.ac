@@ -115,7 +115,7 @@ AC_DEFINE(_DARWIN_C_SOURCE, 1, [Define on Darwin to activate all library feature
 AC_CHECK_LIB(socket, [socket], [], [])
 AC_CHECK_LIB(nsl, [endnetconfig], [], [])
 AC_CHECK_LIB(cap, [cap_get_proc], [], [])
-
+AC_CHECK_LIB(ssh, [ssh_new], [], [])
 
 AC_ARG_ENABLE( [libdl-linking],
                AS_HELP_STRING(--disable-libdl-linking, [ignore any libdl and avoid linking against it]),

@@ -85,16 +85,16 @@ namespace libdar
 					       bool erase) const override;
 
 	virtual void inherited_unlink(const std::string & filename) const override;
-	virtual void read_dir_flush() override { detruit(); };
+	virtual void read_dir_flush() const override { detruit(); };
 
     private:
 	bool furtive_mode;
-	etage *contents;
+	mutable etage *contents;
 
 	void nullifyptr() noexcept { contents = nullptr; };
 	void copy_from(const entrepot_local & ref) { furtive_mode = ref.furtive_mode; contents = nullptr; };
 	void move_from(entrepot_local && ref) noexcept { std::swap(contents, ref.contents), std::swap(furtive_mode, ref.furtive_mode); };
-	void detruit() { if(contents != nullptr) { delete contents; contents = nullptr; } };
+	void detruit() const { if(contents != nullptr) { delete contents; contents = nullptr; } };
     };
 
 	/// @}

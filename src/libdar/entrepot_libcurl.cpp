@@ -352,7 +352,7 @@ namespace libdar
 #endif
     }
 
-    void entrepot_libcurl::read_dir_flush()
+    void entrepot_libcurl::read_dir_flush() const
     {
 #if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
 	NLS_SWAP_IN;

@@ -305,7 +305,7 @@ namespace libdar
 	}
     }
 
-    void entrepot_libcurl::i_entrepot_libcurl::read_dir_flush()
+    void entrepot_libcurl::i_entrepot_libcurl::read_dir_flush() const
     {
 	current_dir.clear();
 	cur_dir_cursor = current_dir.end();
