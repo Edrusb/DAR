@@ -42,7 +42,8 @@ extern "C"
 #include <string>
 
 #include "integers.hpp"
-#include "mem_ui.hpp"
+#include "user_interaction.hpp"
+#include "secu_string.hpp"
 
 namespace libdar
 {
@@ -53,7 +54,7 @@ namespace libdar
 
 	/// class used to share libssh constructs between entrepot_libssh and fichier_libssh by mean of std::shared_ptr
 
-    class libssh_connection: public mem_ui
+    class libssh_connection
     {
     public:
 
@@ -77,14 +78,14 @@ namespace libdar
 
 	ssh_session & get_ssh_session() { return sess; };
 	sftp_session & get_sftp_session() { return sftp_sess; };
+	U_I get_retry_delay() const { return waiting; };
 
-	static const char* get_key_error_msg(int code);
-	static const char* get_auth_error_msg(int code);
-	static const char* get_sftp_error_msg(int code);
+	const char* get_sftp_error_msg() const;
 
     private:
 	ssh_session sess;
 	sftp_session sftp_sess; // this is sftp subsystem handle inside the ssh "sess" session
+	U_I waiting;
 
 	void create_session(const std::string & host,
 			    const std::string & port,
@@ -95,7 +96,8 @@ namespace libdar
 			    const std::string & sftp_prv_keyfile);
 
 	void server_authentication();
-	void user_authentication(const secu_string & password,
+	void user_authentication(user_interaction & dialog,
+				 const secu_string & password,
 				 bool auth_from_file,
 				 const std::string & login,
 				 const std::string & host,
@@ -104,7 +106,8 @@ namespace libdar
 	void create_sftp_session();
 	void cleanup_session();
 
-
+	static const char* get_key_error_msg(int code);
+	static const char* get_auth_error_msg(int code);
     };
 
 	/// @}

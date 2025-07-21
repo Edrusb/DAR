@@ -40,7 +40,7 @@ extern "C"
 #include <string>
 #include <memory>
 
-#include "user_interaction.hpp"
+#include "mem_ui.hpp"
 #include "entrepot.hpp"
 #include "fichier_global.hpp"
 #include "libssh_connection.hpp"
@@ -54,7 +54,7 @@ namespace libdar
 	///
 	/// entrepot_libssh generates objects of class "fichier_libssh" inherited class of fichier_global
 
-    class entrepot_libssh : public entrepot
+    class entrepot_libssh : public entrepot, public mem_ui
     {
     public:
 
@@ -89,7 +89,6 @@ namespace libdar
 	virtual void create_dir(const std::string & dirname, U_I permission) override;
 
 	virtual entrepot *clone() const override { return new (std::nothrow) entrepot_libssh(*this); };
-
 
 
     protected:

@@ -33,7 +33,7 @@ extern "C"
 }
 
 #include "tools.hpp"
-// #include "fichier_libssh.hpp"
+#include "fichier_libssh.hpp"
 #include "nls_swap.hpp"
 #include "entrepot_libssh.hpp"
 
@@ -53,6 +53,7 @@ namespace libdar
 				     const string & sftp_known_hosts,
 				     U_I waiting_time,
 				     bool verbose):
+	mem_ui(dialog),
 	sdir(nullptr)
     {
 	set_root(path("/"));
@@ -80,6 +81,7 @@ namespace libdar
     }
 
     entrepot_libssh::entrepot_libssh(const entrepot_libssh & ref):
+	mem_ui(ref),
 	server_url(ref.server_url),
 	sdir(nullptr),
 	connect(ref.connect)
@@ -163,7 +165,7 @@ namespace libdar
 		throw Erange("Entrepot_libssh::read_dir_next_dirinfo",
 			     tools_printf(gettext("Failed getting next entry of directory %s: %s"),
 					  get_full_path().display().c_str(),
-					  connect->get_sftp_error_msg(sftp_get_error(connect->get_sftp_session()))));
+					  connect->get_sftp_error_msg()));
 	    read_dir_flush();
 	    return false;
 	}
@@ -183,7 +185,7 @@ namespace libdar
 	    throw Erange("entrepot_libss::create_dir",
 			 tools_printf(gettext("Failed creating directory %s: %s"),
 				      where.display().c_str(),
-				      connect->get_sftp_error_msg(sftp_get_error(connect->get_sftp_session()))));
+				      connect->get_sftp_error_msg()));
 
     }
 
@@ -195,8 +197,50 @@ namespace libdar
 						    bool fail_if_exists,
 						    bool erase) const
     {
+	U_I perm = force_permission ? permission : 0666;
+	string fullname = (get_full_path().append(filename)).display();
+	fichier_libssh* ptr = new (nothrow) fichier_libssh(dialog,
+							   connect,
+							   fullname,
+							   mode,
+							   perm,
+							   fail_if_exists,
+							   erase);
 
-	return nullptr;
+	if(ptr == nullptr)
+	    throw Ememory("entrepot_libssh::inherited_open");
+
+	try
+	{
+	    if(force_permission)
+		ptr->change_permission(permission);
+
+	    if(get_user_ownership() != "" || get_group_ownership() != "")
+	    {
+		try
+		{
+		    ptr->change_ownership(get_user_ownership(),
+					  get_group_ownership());
+		}
+		catch(Ebug & e)
+		{
+		    throw;
+		}
+		catch(Egeneric & e)
+		{
+		    e.prepend_message("Failed setting user and/or group ownership: ");
+		    throw Edata(e.get_message());
+		}
+	    }
+	}
+	catch(...)
+	{
+	    delete ptr;
+	    ptr = nullptr;
+	    throw;
+	}
+
+	return ptr;
     }
 
     void entrepot_libssh::inherited_unlink(const std::string & filename) const
@@ -213,7 +257,7 @@ namespace libdar
 	    throw Erange("entrepot_libss::create_dir",
 			 tools_printf(gettext("Failed delete entry %s: %s"),
 				      where.display().c_str(),
-				      connect->get_sftp_error_msg(sftp_get_error(connect->get_sftp_session()))));
+				      connect->get_sftp_error_msg()));
     }
 
     void entrepot_libssh::read_dir_flush() const

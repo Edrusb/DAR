@@ -57,11 +57,14 @@ namespace libdar
 					 const string & sftp_known_hosts,
 					 U_I waiting_time,
 					 bool verbose):
-	mem_ui(dialog),
 	sess(nullptr),
-	sftp_sess(nullptr)
+	sftp_sess(nullptr),
+	waiting(waiting_time)
     {
 	bool loop = true;
+
+	if(!dialog)
+	    throw SRC_BUG;
 
 	do
 	{
@@ -78,7 +81,8 @@ namespace libdar
 		try
 		{
 		    server_authentication();
-		    user_authentication(password,
+		    user_authentication(*dialog,
+					password,
 					auth_from_file,
 					login,
 					host,
@@ -101,9 +105,9 @@ namespace libdar
 		if(e_r != nullptr
 		   || e_m != nullptr)
 		{
-		    get_ui().message(tools_printf(gettext("Waiting %d seconds and retring connection due to: %S"),
-						  waiting_time,
-						  e.get_message()));
+		    dialog->message(tools_printf(gettext("Waiting %d seconds and retring connection due to: %S"),
+						 waiting_time,
+						 e.get_message()));
 		    sleep(waiting_time);
 		}
 		else
@@ -111,6 +115,43 @@ namespace libdar
 	    }
 	}
 	while(loop); // loop only ends upon success or exception thrown
+    }
+
+    const char* libssh_connection::get_sftp_error_msg() const
+    {
+	switch(sftp_get_error(sftp_sess))
+	{
+	case SSH_FX_OK:
+	    return "no error";
+	case SSH_FX_EOF:
+	    return "end-of-file encountered";
+	case SSH_FX_NO_SUCH_FILE:
+	    return "file does not exist";
+	case SSH_FX_PERMISSION_DENIED:
+	    return "permission denied";
+	case SSH_FX_FAILURE:
+	    return "generic failure";
+	case SSH_FX_BAD_MESSAGE:
+	    return "garbage received from server";
+	case SSH_FX_NO_CONNECTION:
+	    return "no connection has been set up";
+	case SSH_FX_CONNECTION_LOST:
+	    return "there was a connection, but we lost it";
+	case SSH_FX_OP_UNSUPPORTED:
+	    return "operation not supported by libssh yet";
+	case SSH_FX_INVALID_HANDLE:
+	    return "invalid file handle";
+	case SSH_FX_NO_SUCH_PATH:
+	    return "no such file or directory path exists";
+	case SSH_FX_FILE_ALREADY_EXISTS:
+	    return "an attempt to create an already existing file or directory has been made";
+	case SSH_FX_WRITE_PROTECT:
+	    return "write-protected filesystem";
+	case SSH_FX_NO_MEDIA:
+	    return "no media was in remote drive";
+	default:
+	    throw SRC_BUG; // unknown error code from libssh
+	}
     }
 
     void libssh_connection::create_session(const string & host,
@@ -190,7 +231,8 @@ namespace libdar
 	}
     }
 
-    void libssh_connection::user_authentication(const secu_string & password,
+    void libssh_connection::user_authentication(user_interaction & dialog,
+						const secu_string & password,
 						bool auth_from_file,
 						const string & login,
 						const string & host,
@@ -206,7 +248,7 @@ namespace libdar
 	{
 	    if(password.empty())
 	    {
-		real_pass = get_ui().get_secu_string(tools_printf(gettext("Please provide the password for login %S at host %S: "),
+		real_pass = dialog.get_secu_string(tools_printf(gettext("Please provide the password for login %S at host %S: "),
 								  & login,
 								  & host),
 						     false);
@@ -292,7 +334,7 @@ namespace libdar
 	if(code != SSH_OK)
 	    throw Erange("libssh_connection::create_sftp_session",
 			 tools_printf(gettext("Error initializing SFTP session: %s"),
-				      get_sftp_error_msg(sftp_get_error(sftp_sess))));
+				      get_sftp_error_msg()));
     }
 
     void libssh_connection::cleanup_session()
@@ -343,42 +385,6 @@ namespace libdar
 	}
     }
 
-    const char* libssh_connection::get_sftp_error_msg(int code)
-    {
-	switch(code)
-	{
-	case SSH_FX_OK:
-	    return "no error";
-	case SSH_FX_EOF:
-	    return "end-of-file encountered";
-	case SSH_FX_NO_SUCH_FILE:
-	    return "file does not exist";
-	case SSH_FX_PERMISSION_DENIED:
-	    return "permission denied";
-	case SSH_FX_FAILURE:
-	    return "generic failure";
-	case SSH_FX_BAD_MESSAGE:
-	    return "garbage received from server";
-	case SSH_FX_NO_CONNECTION:
-	    return "no connection has been set up";
-	case SSH_FX_CONNECTION_LOST:
-	    return "there was a connection, but we lost it";
-	case SSH_FX_OP_UNSUPPORTED:
-	    return "operation not supported by libssh yet";
-	case SSH_FX_INVALID_HANDLE:
-	    return "invalid file handle";
-	case SSH_FX_NO_SUCH_PATH:
-	    return "no such file or directory path exists";
-	case SSH_FX_FILE_ALREADY_EXISTS:
-	    return "an attempt to create an already existing file or directory has been made";
-	case SSH_FX_WRITE_PROTECT:
-	    return "write-protected filesystem";
-	case SSH_FX_NO_MEDIA:
-	    return "no media was in remote drive";
-	default:
-	    throw SRC_BUG; // unknown error code from libssh
-	}
-    }
 
 
 } // end of namespace
