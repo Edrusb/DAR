@@ -79,8 +79,6 @@ namespace libdar
 	ssh_session & get_ssh_session() { return sess; };
 	sftp_session & get_sftp_session() { return sftp_sess; };
 	U_I get_retry_delay() const { return waiting; };
-	U_I get_max_read() const { return max_read; };
-	U_I get_max_write() const { return max_write; };
 
 	const char* get_sftp_error_msg() const;
 
@@ -88,9 +86,6 @@ namespace libdar
 	ssh_session sess;
 	sftp_session sftp_sess; // this is sftp subsystem handle inside the ssh "sess" session
 	U_I waiting;
-	uint64_t max_read;
-	uint64_t max_write;
-
 
 	void create_session(const std::string & host,
 			    const std::string & port,
@@ -109,7 +104,6 @@ namespace libdar
 				 const std::string & sftp_pub_keyfile,
 				 const std::string & sftp_prv_keyfile);
 	void create_sftp_session();
-	void set_max_limits();
 	void cleanup_session();
 
 	static const char* get_key_error_msg(int code);
