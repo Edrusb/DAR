@@ -89,6 +89,7 @@ namespace libdar
 					sftp_pub_keyfile,
 					sftp_prv_keyfile);
 		    create_sftp_session();
+		    set_max_limits();
 		    loop = false; // no exception thrown si far, thus "this" object is fully constructed
 		}
 		catch(...)
@@ -335,6 +336,19 @@ namespace libdar
 	    throw Erange("libssh_connection::create_sftp_session",
 			 tools_printf(gettext("Error initializing SFTP session: %s"),
 				      get_sftp_error_msg()));
+    }
+
+    void lissb_connection::set_max_limits()
+    {
+	sftp_limits_t lim = sftp_limits(sftp_sess);
+
+	max_read = lim.max_read_length;
+	max_write = lim.max_write_length;
+
+	if(max_read != lim.max_read_length)
+	    throw SRC_BUG;
+	if(max_write != lim.max_write_length)
+	    throw SRC_BUG;
     }
 
     void libssh_connection::cleanup_session()
