@@ -172,11 +172,20 @@ namespace libdar
 	{
 	    int ssh_verbosity;
 
+	    if(host.empty())
+		throw Erange("libssh_connection", gettext("An empty string is not a valid hostname or IP to connect to"));
 	    ssh_options_set(sess, SSH_OPTIONS_HOST, host.c_str());
-	    ssh_options_set(sess, SSH_OPTIONS_PORT_STR, port.c_str());
+
+	    if(! port.empty())
+		ssh_options_set(sess, SSH_OPTIONS_PORT_STR, port.c_str());
+
+	    if(login.empty())
+		throw Erange("libssh_connection", gettext("An empty string is not a valid login name for an sftp connection"));
 	    ssh_options_set(sess, SSH_OPTIONS_USER, login.c_str());
+
 	    if(! sftp_known_hosts.empty())
 		ssh_options_set(sess, SSH_OPTIONS_KNOWNHOSTS, sftp_known_hosts.c_str());
+
 	    if(verbose)
 		ssh_verbosity = SSH_LOG_PROTOCOL;
 	    else

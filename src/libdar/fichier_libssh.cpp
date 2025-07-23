@@ -48,21 +48,22 @@ namespace libdar
 	my_path(chemin),
 	sfd(nullptr)
     {
-	int access_type = O_BINARY;
+	int access_type = 0;
 
 	if(! connect)
 	    throw SRC_BUG;
 
 	switch(mode)
 	{
-	gf_read_only:
+	case gf_read_only:
 	    access_type |= O_RDONLY;
 	    break;
-	gf_read_write:
+	case gf_read_write:
 	    access_type |= O_RDWR;
 	    break;
-	gf_write_only:
+	case gf_write_only:
 	    access_type |= O_WRONLY;
+	    break;
 	default:
 	    throw SRC_BUG;
 	}
@@ -241,11 +242,6 @@ namespace libdar
 	{
 	    message = tools_printf(gettext("Libssh error while reading file's data: %s"),
 				   connect->get_sftp_error_msg());
-	    return false;
-	}
-	else if(step == 0)
-	{
-	    message = gettext("Zero bytes read, though for libssh this is not an error");
 	    return false;
 	}
 	else

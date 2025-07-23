@@ -145,12 +145,12 @@ namespace libdar
 	if(attrib != nullptr)
 	{
 	    filename = attrib->name;
-	    switch(attrib->type & S_IFMT)
+	    switch(attrib->type)
 	    {
-	    case S_IFDIR:
+	    case SSH_FILEXFER_TYPE_DIRECTORY:
 		tp = inode_type::isdir;
 		break;
-	    case S_IFLNK:
+	    case SSH_FILEXFER_TYPE_SYMLINK:
 		tp = inode_type::symlink;
 		break;
 	    default:
