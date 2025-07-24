@@ -165,17 +165,25 @@ namespace libdar
 
     bool fichier_libssh::skip_to_eof()
     {
-	return false;
+	return skip(get_size());
     }
 
     bool fichier_libssh::skip_relative(S_I x)
     {
-	return false;
+	infinint cur = get_position();
+
+	if(x >= 0)
+	    return skip(cur + infinint(x));
+	else
+	    if(cur >= -x) // x is negative, -x is positive
+		return skip(cur - infinint(-x));
+	    else
+		return false;
     }
 
     bool fichier_libssh::truncatable(const infinint & pos) const
     {
-	return pos == get_position();
+	return false;
     }
 
     infinint fichier_libssh::get_position() const
@@ -185,8 +193,7 @@ namespace libdar
 
     void fichier_libssh::inherited_truncate(const infinint & pos)
     {
-	if(pos != get_position())
-	    throw Erange("fichier_libssh::inherited_truncate", string(gettext("libcurl does not allow truncating at a given position while uploading files")));
+	throw Erange("fichier_libssh::inherited_truncate", string(gettext("libcurl does not allow truncating at a given position while uploading files")));
     }
 
     void fichier_libssh::inherited_read_ahead(const infinint & amount)
