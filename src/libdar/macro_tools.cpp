@@ -70,6 +70,7 @@ extern "C"
 #include "lzo_module.hpp"
 #include "zstd_module.hpp"
 #include "block_compressor.hpp"
+#include "entrepot_libssh.hpp"
 
 #ifdef LIBTHREADAR_AVAILABLE
 #include "parallel_block_compressor.hpp"
@@ -458,7 +459,8 @@ namespace libdar
 	contextual *tmp_ctxt = nullptr;
 	cache *tmp_cache = nullptr;
 #ifdef LIBCURL_AVAILABLE
-	bool libcurl_repo = dynamic_cast<const entrepot_libcurl *>(where.get()) != nullptr;
+	bool libcurl_repo = dynamic_cast<const entrepot_libcurl *>(where.get()) != nullptr
+	    || dynamic_cast<const entrepot_libssh *>(where.get()) != nullptr;
 #else
 	bool libcurl_repo = false;
 #endif
