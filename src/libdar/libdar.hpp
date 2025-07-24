@@ -89,6 +89,9 @@
     // for remote reposity you will need to create such object and pass it where needed
 #include "entrepot_libcurl.hpp"
 
+    // for sftp remote repository bypassing libcurl and directly using libssh
+#include "entrepot_libssh.hpp"
+
     // for local filesystem, you should not need to create such object to call libdar as it is the default repo used
 #include "entrepot_local.hpp"
 
