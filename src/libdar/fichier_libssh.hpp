@@ -122,7 +122,31 @@ namespace libdar
 	std::string my_path;
 	sftp_file sfd;
 
+	    // read ahead structures
+
+	struct rahead
+	{
+	    sftp_aio handle;
+
+	    rahead(): handle(nullptr) {};
+	    rahead(const rahead & ref) = delete;
+	    rahead(rahead && ref) noexcept { handle = nullptr; std::swap(handle, ref.handle); };
+	    rahead & operator = (const rahead & ref) = delete;
+	    rahead & operator = (rahead && ref) noexcept { std::swap(handle, ref.handle); return *this; };
+	    ~rahead() { if(handle != nullptr) sftp_aio_free(handle); };
+	};
+
+	std::deque<rahead> rareq; // background running requests not yet fetched
+
+	char* rabuffer; ///< holds data retreived from the last sftp_aio_wait_read()
+	U_I rallocated; ///< allocated size of rabuffer
+	U_I rasize;     ///< amount of bytes in rabuffer available for reading (rasize <= rallocated)
+	U_I ralu;       ///< bytes of rabuffer already allocaed
+
+	    // private methods
+
 	void myclose();
+	void clear_readahead() { rareq.clear(); };
 
     };
 

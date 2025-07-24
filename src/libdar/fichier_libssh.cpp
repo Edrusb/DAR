@@ -46,7 +46,11 @@ namespace libdar
 	fichier_global(dialog, mode),
 	connect(ptr),
 	my_path(chemin),
-	sfd(nullptr)
+	sfd(nullptr),
+	rabuffer(nullptr),
+	rallocated(0),
+	rasize(0),
+	ralu(0)
     {
 	int access_type = 0;
 
@@ -89,6 +93,11 @@ namespace libdar
 			 tools_printf(gettext("Failed openning SFTP file %s: %s"),
 				      chemin.c_str(),
 				      connect->get_sftp_error_msg()));
+
+	rallocated = connect->get_max_read();
+	rabuffer = new char[rallocated];
+	if(rabuffer == nullptr)
+	    throw Ememory("fichier_libssh::fichier_libsssh");
     }
 
 
@@ -153,6 +162,7 @@ namespace libdar
 	infinint q = pos;
 	int ret = 0;
 
+	clear_readahead();
 	q.unstack(libpos);
 	if(!q.is_zero())
 	    throw Elimitint();
@@ -198,7 +208,40 @@ namespace libdar
 
     void fichier_libssh::inherited_read_ahead(const infinint & amount)
     {
-	    // see with aio calls
+	infinint remains = amount;
+	size_t step = 0;
+	size_t microstep = 0;
+	ssize_t ret;
+
+	clear_readahead();
+
+	while(remains > 0 || step > 0)
+	{
+	    rahead tmp;
+
+	    if(step < rallocated)
+		remains.unstack(step);
+		// this decrements remains
+		// possibly down to zero
+
+	    if(step > rallocated)
+		microstep = rallocated;
+	    else
+		microstep = step;
+
+	    ret = sftp_aio_begin_read(sfd, microstep, & tmp.handle);
+	    if(ret == SSH_ERROR)
+		throw Erange("fichier_libssh::inherited_read_ahead",
+			     tools_printf(gettext("SFTP read-ahead failed: %s"),
+					  connect->get_sftp_error_msg()));
+	    if(ret != microstep)
+		throw SRC_BUG;
+		// libssh should not request less than microstep
+		// as microstep <= rallocated < limit->max_read_length
+
+	    step -= ret;
+	    rareq.push_back(std::move(tmp));
+	}
     }
 
     U_I fichier_libssh::fichier_global_inherited_write(const char *a, U_I size)
@@ -209,6 +252,7 @@ namespace libdar
 	if(!connect)
 	    throw SRC_BUG;
 
+	clear_readahead();
 	do
 	{
 	    step = sftp_write(sfd,
@@ -235,6 +279,49 @@ namespace libdar
 
 	do
 	{
+
+		//////
+		// 1 - fetch from rabuffer if available
+		//
+
+	    if(ralu < rasize)
+	    {
+		U_I avail = rasize - ralu;
+		U_I to_read = size - read;
+		U_I min = to_read > avail ? avail : to_read;
+
+		(void)memcpy(a + read, rabuffer + ralu, min);
+		ralu += min;
+		read += min;
+		step = 1; // to not break the loop if some data are yet to be read
+		continue;
+	    }
+
+		//////
+		// 2 - fetching the iao requests if any
+		//
+
+	    if(!rareq.empty())
+	    {
+		ssize_t ret = sftp_aio_wait_read(&(rareq.front().handle), rabuffer, rallocated);
+		if(ret == SSH_AGAIN)
+		    throw SRC_BUG;
+		if(ret == SSH_ERROR)
+		    throw Erange("fichier_libssh::fichier_global_inherited_read",
+				 tools_printf(gettext("Error while fetching SFTP read-ahead data: %s"),
+					      connect->get_sftp_error_msg()));
+
+		rasize = ret;
+		ralu = 0;
+		rareq.pop_front();
+		step = 1; // to not break the loop if some data are yet to be read
+		continue;
+	    }
+
+		//////
+		// 3 - fetching data in synchronous mode
+		//
+
 	    step = sftp_read(sfd,
 			     a + read,
 			     size - read);
@@ -257,6 +344,12 @@ namespace libdar
 
     void fichier_libssh::myclose()
     {
+	clear_readahead();
+	if(rabuffer != nullptr)
+	{
+	    delete [] rabuffer;
+	    rabuffer = nullptr;
+	}
 	if(sfd != nullptr)
 	{
 	    sftp_close(sfd);
