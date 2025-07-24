@@ -352,16 +352,16 @@ namespace libdar
 				      get_sftp_error_msg()));
     }
 
-    void lissb_connection::set_max_limits()
+    void libssh_connection::set_max_limits()
     {
 	sftp_limits_t lim = sftp_limits(sftp_sess);
 
-	max_read = lim.max_read_length;
-	max_write = lim.max_write_length;
+	max_read = lim->max_read_length;
+	max_write = lim->max_write_length;
 
-	if(max_read != lim.max_read_length)
+	if(max_read != lim->max_read_length)
 	    throw SRC_BUG;
-	if(max_write != lim.max_write_length)
+	if(max_write != lim->max_write_length)
 	    throw SRC_BUG;
     }
 
