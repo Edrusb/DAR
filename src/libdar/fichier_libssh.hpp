@@ -130,7 +130,7 @@ namespace libdar
 
 	    rahead(): handle(nullptr) {};
 	    rahead(const rahead & ref) = delete;
-	    rahead(rahead && ref) noexcept { handle = nullptr; std::swap(handle, ref.handle); };
+	    rahead(rahead && ref) noexcept { handle = ref.handle; ref.handle = nullptr; };
 	    rahead & operator = (const rahead & ref) = delete;
 	    rahead & operator = (rahead && ref) noexcept { std::swap(handle, ref.handle); return *this; };
 	    ~rahead() { if(handle != nullptr) sftp_aio_free(handle); };
