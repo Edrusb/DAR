@@ -263,7 +263,12 @@ namespace libdar
 						     false);
 	    }
 
-	    if(ssh_userauth_password(sess, NULL, password.c_str()) != SSH_OK)
+	    if(real_pass.empty())
+		code = ssh_userauth_password(sess, NULL, "");
+	    else
+		code = ssh_userauth_password(sess, NULL, real_pass.c_str());
+
+	    if(code != SSH_OK)
 		throw Enet_auth(tools_printf(gettext("Authentication failure: %s"),
 					     ssh_get_error(sess)));
 	}
