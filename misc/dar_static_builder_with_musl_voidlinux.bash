@@ -234,7 +234,7 @@ libssh()
     cd libssh-${LIBSSH_VERSION} || return 1
     mkdir ${builddir} || (echo "Failed creating build dir for libssh" ; cd .. ; return 1)
     cd ${builddir} || (cd .. ; return 1)
-    cmake -DUNIT_TESTING=OFF -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=OFF -DWITH_GCRYPT=ON --install-prefix "$LOCAL_PREFIX" ..  || (cd ../.. ; return 1)
+    cmake -DUNIT_TESTING=OFF -DCMAKE_INSTALL_PREFIX="$LOCAL_PREFIX" -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=OFF -DWITH_GCRYPT=ON  ..  || (cd ../.. ; return 1)
     make ${MAKE_FLAGS} || (cd ../.. ; return 1)
     make install || (cd ../.. ; return 1)
     cd ../.. || return 1
