@@ -343,10 +343,10 @@ namespace libdar
 	if(get_mode() != gf_read_only)
 	    throw SRC_BUG;
 
-	    // nothing special to do, the below thread
-	    // will read as much as possible until it
-	    // reaches eof or is interrupted by the
-	    // master thread
+	if(crypto_reader)
+	    crypto_reader->read_ahead_up_to(current_position + amount);
+	else
+	    throw SRC_BUG;
 
 	if(is_terminated())
 	    throw SRC_BUG;
@@ -1310,13 +1310,35 @@ namespace libdar
 	tas(xtas),
 	initial_shift(init_shift),
 	reof(false),
-	trailing_clear_data(nullptr)
+	trailing_clear_data(nullptr),
+	read_ahead_set(false)
     {
 #ifdef LIBTHREADAR_STACK_FEATURE_AVAILABLE
 	set_stack_size(LIBDAR_DEFAULT_STACK_SIZE);
 #endif
 
 	flag = tronco_flags::normal;
+    }
+
+    void read_below::read_ahead_up_to(const infinint & offset)
+    {
+	ra_cntrl.lock();
+
+	try
+	{
+		// we ignore previously set read-ahead because
+		// if we ask for another one this means we could
+		// get the data to read before this previous
+		// read-ahead request could be taken into account
+	    read_ahead_set = true;
+	    read_ahead_offset = offset;
+	}
+	catch(...)
+	{
+	    ra_cntrl.unlock();
+	    throw;
+	}
+	ra_cntrl.unlock();
     }
 
     void read_below::inherited_run()
@@ -1410,9 +1432,12 @@ namespace libdar
 		if(ptr)
 		    throw SRC_BUG; // we should not have a block at this stage
 
+		check_read_ahead();
+
 		if(!reof)
 		{
 		    infinint local_crypt_offset = encrypted->get_position();
+
 		    ptr = tas->get(); // obtaining a new segment from the heap
 		    ptr->reset();
 
@@ -1506,6 +1531,33 @@ namespace libdar
 	clear_buf_start = block_num * infinint(clear_buf_size);
     }
 
+
+    void read_below::check_read_ahead()
+    {
+	if(read_ahead_set)
+	{
+	    ra_cntrl.lock();
+
+	    try
+	    {
+		read_ahead_set = false;
+
+		if(!reof)
+		{
+		    infinint current = encrypted->get_position();
+
+		    if(current < read_ahead_offset)
+			encrypted->read_ahead(read_ahead_offset - current);
+		}
+	    }
+	    catch(...)
+	    {
+		ra_cntrl.unlock();
+		throw;
+	    }
+	    ra_cntrl.unlock();
+	}
+    }
 
 	/////////////////////////////////////////////////////
 	//

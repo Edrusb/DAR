@@ -379,6 +379,9 @@ namespace libdar
 	    /// (clear data is not located at the beginning of a ciphered block)
 	const infinint & get_pos_in_flow() const { return pos_in_flow; };
 
+	    /// propagate read-ahead on the below layer
+	void read_ahead_up_to(const infinint & offset);
+
 
     protected:
 	virtual void inherited_run() override;
@@ -396,6 +399,9 @@ namespace libdar
 	trailing_clear_data_callback trailing_clear_data;                         ///< callback function that gives the amount of clear data found at the end of the given file
 	std::unique_ptr<crypto_segment> ptr;                                      ///< current segment we are setting up
 	infinint index_num;                                                       ///< current crypto block index
+	bool read_ahead_set;                                                      ///< whether we have received a read_ahead request
+	infinint read_ahead_offset;                                               ///< offset up to which to read ahead (if read_ahead_set)
+	libthreadar::mutex ra_cntrl;                                              ///< needed to be acquired to modify read_ahead_offset and read_ahead_set
 
 
 	    // initialized by inherited_run() / get_ready_for_new_offset()
@@ -420,6 +426,8 @@ namespace libdar
 				  infinint & pos_in_buf,
 				  infinint & block_num);
 
+	    // propagate read_ahead request if necessary
+	void check_read_ahead();
     };
 
 
