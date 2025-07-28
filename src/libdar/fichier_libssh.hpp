@@ -136,7 +136,13 @@ namespace libdar
 	    ~rahead() { if(handle != nullptr) sftp_aio_free(handle); };
 	};
 
-	std::deque<rahead> rareq; // background running requests not yet fetched
+	static const U_I read_ahead_window_size = 100*1024*1024;
+	    /// capping the AIO to memory footprint to 100 Mio
+
+	infinint tora; ///< amount of data to read ahead and not yet pushed to libssh using rareq deque
+
+	std::deque<rahead> rareq; ///< background running requests not yet fetched
+	U_I rareq_maxsize;
 
 	char* rabuffer; ///< holds data retreived from the last sftp_aio_wait_read()
 	U_I rallocated; ///< allocated size of rabuffer
@@ -147,6 +153,7 @@ namespace libdar
 
 	void myclose();
 	void clear_readahead() { rareq.clear(); };
+	void update_aio_reqs();
 
     };
 
