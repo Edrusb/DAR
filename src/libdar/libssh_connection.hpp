@@ -102,7 +102,7 @@ namespace libdar
 			    const std::string sftp_pub_keyfile,
 			    const std::string & sftp_prv_keyfile);
 
-	void server_authentication();
+	void server_authentication(user_interaction & dialog);
 	void user_authentication(user_interaction & dialog,
 				 const secu_string & password,
 				 bool auth_from_file,

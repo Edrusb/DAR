@@ -81,7 +81,7 @@ namespace libdar
 
 		try
 		{
-		    server_authentication();
+		    server_authentication(*dialog);
 		    user_authentication(*dialog,
 					password,
 					auth_from_file,
@@ -215,31 +215,78 @@ namespace libdar
     }
 
 
-    void libssh_connection::server_authentication()
+    void libssh_connection::server_authentication(user_interaction & dialog)
     {
-	switch(ssh_session_is_known_server(sess))
+	ssh_key srv_pubkey = nullptr;
+	unsigned char* hash = nullptr;
+	size_t hlen = 0;
+	char* finger = nullptr;
+	int code;
+
+	try
 	{
-	case SSH_KNOWN_HOSTS_OK:
-		// ok
-	    break;
-	case SSH_KNOWN_HOSTS_CHANGED:
-	    throw Erange("libssh_connection::server_authentication",
-			 gettext("Server key has changed, first update the knownhosts file with server authority provided information, then retry"));
-	case SSH_KNOWN_HOSTS_OTHER:
-	    throw Erange("libssh_connection::server_authentication",
-			 gettext("Server provided key type is new from this server, first update the knownhosts file with server authority provided information, then retry"));
-	case SSH_KNOWN_HOSTS_UNKNOWN:
-	    throw Erange("libssh_connection::server_authentication",
-			 gettext("This is the first time we connect to this server, first update the knownhosts file with server authority provided information, then retry"));
-	case SSH_KNOWN_HOSTS_NOT_FOUND:
-	    throw Erange("libssh_connection::server_authentication",
-			 gettext("the knownhosts file is not accessible, cannot check the authenticity of the received server key; double check you provided correct parameters for the knownhosts file"));
-	case SSH_KNOWN_HOSTS_ERROR:
-	    throw Erange("libssh_connection::server_authentication",
-			 gettext("There had been an error checking the host"));
-	default:
-	    throw SRC_BUG; // unexpected returned value from libssh
+	    code = ssh_get_server_publickey(sess, &srv_pubkey);
+	    if(code != SSH_OK)
+		throw Erange("libssh_connection::server_authentication",
+			     tools_printf(gettext("Cannot obtain the ssh/sftp server public key: %s"),
+					  ssh_get_error(sess)));
+
+	    code = ssh_get_publickey_hash(srv_pubkey,
+					  SSH_PUBLICKEY_HASH_SHA256, // ssh_publickey_hash_type
+					  &hash,
+					  &hlen);
+	    if(code != SSH_OK)
+		throw Erange("libssh_connection::server_authentication",
+			     tools_printf(gettext("Could not obtain a hash from the ssh/sftp server public key: %s"),
+					  ssh_get_error(sess)));
+
+
+	    switch(ssh_session_is_known_server(sess))
+	    {
+	    case SSH_KNOWN_HOSTS_OK:
+		    // ok
+		break;
+	    case SSH_KNOWN_HOSTS_CHANGED:
+		throw Erange("libssh_connection::server_authentication",
+			     gettext("Server key has changed, first update the knownhosts file with server authority provided information, then retry"));
+	    case SSH_KNOWN_HOSTS_OTHER:
+		throw Erange("libssh_connection::server_authentication",
+			     gettext("Server provided key type is new from this server, first update the knownhosts file with server authority provided information, then retry"));
+	    case SSH_KNOWN_HOSTS_UNKNOWN:   // host not found in knownhosts file
+	    case SSH_KNOWN_HOSTS_NOT_FOUND: // no knownhosts file found
+		finger = ssh_get_fingerprint_hash(SSH_PUBLICKEY_HASH_SHA256, hash, hlen);
+		if(finger == nullptr)
+		throw Erange("libssh_connection::server_authentication",
+			     tools_printf(gettext("Could not obtain hash representation of the server public key hash: %s"),
+					  ssh_get_error(sess)));
+
+		dialog.message(gettext("Unauthenticated server, please ask the ssh/sftp server admin for the server key hashs [ for x in /etc/ssh/*.pub ; do ssh-keygen -l -f \"$x\" ; done ]"));
+		dialog.pause(tools_printf(gettext("Does one of these key hashs matches the following one: %s"), finger));
+		code = ssh_session_update_known_hosts(sess);
+		break;
+	    case SSH_KNOWN_HOSTS_ERROR:
+		throw Erange("libssh_connection::server_authentication",
+			     gettext("There had been an error checking the host"));
+	    default:
+		throw SRC_BUG; // unexpected returned value from libssh
+	    }
 	}
+	catch(...)
+	{
+	    if(finger != nullptr)
+		ssh_string_free_char(finger);
+	    if(hash != nullptr)
+		ssh_clean_pubkey_hash(&hash);
+	    if(srv_pubkey != nullptr)
+		ssh_key_free(srv_pubkey);
+	    throw;
+	}
+	if(finger != nullptr)
+	    ssh_string_free_char(finger);
+	if(hash != nullptr)
+	    ssh_clean_pubkey_hash(&hash);
+	if(srv_pubkey != nullptr)
+	    ssh_key_free(srv_pubkey);
     }
 
     void libssh_connection::user_authentication(user_interaction & dialog,
