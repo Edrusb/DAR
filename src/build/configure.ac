@@ -115,7 +115,6 @@ AC_DEFINE(_DARWIN_C_SOURCE, 1, [Define on Darwin to activate all library feature
 AC_CHECK_LIB(socket, [socket], [], [])
 AC_CHECK_LIB(nsl, [endnetconfig], [], [])
 AC_CHECK_LIB(cap, [cap_get_proc], [], [])
-AC_CHECK_LIB(ssh, [ssh_new], [], [])
 
 AC_ARG_ENABLE( [libdl-linking],
                AS_HELP_STRING(--disable-libdl-linking, [ignore any libdl and avoid linking against it]),
@@ -136,7 +135,7 @@ AC_PROG_EGREP
 
 AC_HEADER_SYS_WAIT
 
-AC_CHECK_HEADERS([fcntl.h netinet/in.h arpa/inet.h stdint.h stdlib.h string.h sys/ioctl.h sys/socket.h termios.h unistd.h utime.h sys/types.h signal.h errno.h sys/un.h sys/stat.h time.h fnmatch.h regex.h pwd.h grp.h stdio.h pthread.h ctype.h getopt.h limits.h stddef.h sys/utsname.h libintl.h sys/capability.h linux/capability.h utimes.h sys/time.h wchar.h wctype.h stddef.h ext2fs/ext2_fs.h linux/ext2_fs.h libssh/libssh.h])
+AC_CHECK_HEADERS([fcntl.h netinet/in.h arpa/inet.h stdint.h stdlib.h string.h sys/ioctl.h sys/socket.h termios.h unistd.h utime.h sys/types.h signal.h errno.h sys/un.h sys/stat.h time.h fnmatch.h regex.h pwd.h grp.h stdio.h pthread.h ctype.h getopt.h limits.h stddef.h sys/utsname.h libintl.h sys/capability.h linux/capability.h utimes.h sys/time.h wchar.h wctype.h stddef.h ext2fs/ext2_fs.h linux/ext2_fs.h])
 
 AC_SYS_LARGEFILE
 
