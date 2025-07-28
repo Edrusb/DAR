@@ -148,8 +148,14 @@ namespace libdar
 	    /// returns whether delta compression is available and delta diff stuff with it
 	bool librsync() noexcept;
 
-	    /// returns whether remote repository feature is available (implemented using libcurl)
+	    /// returns whether remote SFTP and FTP repository are both available
 	bool remote_repository() noexcept;
+
+	    /// returns whether FTP repository support is available
+	bool ftp_repository() noexcept;
+
+	    /// returns whether FTP repository support is available
+	bool sftp_repository() noexcept;
 
 	    /// returns whether whirlpool hash algorithm is available
 	bool whirlpool_hash() noexcept;

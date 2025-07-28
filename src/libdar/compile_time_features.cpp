@@ -337,7 +337,25 @@ namespace libdar
 
 	bool remote_repository() noexcept
 	{
+#if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE ) && defined ( LIBSSH_AVAILABLE )
+	    return true;
+#else
+	    return false;
+#endif
+	}
+
+	bool ftp_repository() noexcept
+	{
 #if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
+	    return true;
+#else
+	    return false;
+#endif
+	}
+
+	bool sftp_repository() noexcept
+	{
+#if LIBSSH_AVAILABLE
 	    return true;
 #else
 	    return false;

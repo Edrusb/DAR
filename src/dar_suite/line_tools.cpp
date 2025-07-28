@@ -1439,11 +1439,14 @@ void line_tools_display_features(user_interaction & dialog)
 		      YES_NO(compile_time::libthreadar()),
 		      threadar_version.c_str());
 	dialog.printf(gettext("   Delta compression (librsync) : %s"), YES_NO(compile_time::librsync()));
-	if(compile_time::remote_repository())
+	if(compile_time::ftp_repository()) // libcurl is now only used for ftp repositories
 	    curl_version = string("(") + compile_time::libcurl_version() + ")";
 	else
 	    curl_version = "";
-	dialog.printf(gettext("   Remote repository (libcurl)  : %s %s"), YES_NO(compile_time::remote_repository()), curl_version.c_str());
+	dialog.printf(gettext("   FTP repositories (libcurl)   : %s %s"),
+		      YES_NO(compile_time::ftp_repository()),
+		      curl_version.c_str());
+	dialog.printf(gettext("   SFTP repositories (libssh)   : %s"), YES_NO(compile_time::sftp_repository()));
 	dialog.printf(gettext("   argon2 hashing (libargon2)   : %s"), YES_NO(compile_time::libargon2()));
 	dialog.printf(gettext("   Whirlpool hashing (librhash) : %s"), YES_NO(compile_time::whirlpool_hash()));
     }
