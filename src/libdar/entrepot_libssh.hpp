@@ -104,6 +104,7 @@ namespace libdar
 	virtual void read_dir_flush() const override;
 
     private:
+#if LIBSSH_AVAILABLE
 	    // constructor received parameters
 	std::string server_url;
 
@@ -112,6 +113,8 @@ namespace libdar
 
 	    // shared libssh structures
 	std::shared_ptr<libssh_connection> connect;
+#endif
+
     };
 
 	/// @}

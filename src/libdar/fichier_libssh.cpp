@@ -36,6 +36,8 @@ using namespace std;
 namespace libdar
 {
 
+#if LIBSSH_AVAILABLE
+
     fichier_libssh::fichier_libssh(const shared_ptr<user_interaction> & dialog,
 				   const shared_ptr<libssh_connection> & ptr,
 				   const string & chemin,
@@ -391,5 +393,7 @@ namespace libdar
 	    // pushing back the amount of byte that was outside
 	    // the read-ahead window
     }
+
+#endif
 
 } // end of namespace

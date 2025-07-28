@@ -54,6 +54,8 @@ namespace libdar
 
 	/// filesystem libssh files
 
+#if LIBSSH_AVAILABLE
+
     class fichier_libssh : public fichier_global
     {
     public:
@@ -156,6 +158,8 @@ namespace libdar
 	void update_aio_reqs();
 
     };
+
+#endif
 
 	/// @}
 

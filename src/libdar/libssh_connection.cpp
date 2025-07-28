@@ -45,6 +45,7 @@ using namespace std;
 
 namespace libdar
 {
+#if LIBSSH_AVAILABLE
 
     libssh_connection::libssh_connection(const shared_ptr<user_interaction> & dialog,
 					 const string & login,
@@ -413,6 +414,6 @@ namespace libdar
 	}
     }
 
-
+#endif
 
 } // end of namespace

@@ -53,9 +53,13 @@ namespace libdar
 				     const string & sftp_known_hosts,
 				     U_I waiting_time,
 				     bool verbose):
-	mem_ui(dialog),
+	mem_ui(dialog)
+#if LIBSSH_AVAILABLE
+	,
 	sdir(nullptr)
+#endif
     {
+#if LIBSSH_AVAILABLE
 	set_root(path("/"));
 	set_location(path("/"));
 	set_user_ownership(""); // not used for this type of entrepot //// <<< A REVOIR
@@ -78,13 +82,19 @@ namespace libdar
 	server_url = "sftp://" + login + "@" + host;
 	if(!port.empty())
 	    server_url += ":" + port;
+#else
+	throw Efeature("SFTP repository (requires libssh)");
+#endif
     }
 
     entrepot_libssh::entrepot_libssh(const entrepot_libssh & ref):
-	mem_ui(ref),
+	mem_ui(ref)
+#if LIBSSH_AVAILABLE
+	,
 	server_url(ref.server_url),
 	sdir(nullptr),
 	connect(ref.connect)
+#endif
     {
 	set_root(ref.get_root());
 	set_location(ref.get_location());
@@ -94,7 +104,11 @@ namespace libdar
 
     string entrepot_libssh::get_url() const
     {
+#if LIBSSH_AVAILABLE
 	return server_url + get_full_path().display();
+#else
+	throw Efeature("SFTP repository (requires libssh)");
+#endif
     }
 
     void entrepot_libssh::read_dir_reset() const
@@ -110,6 +124,7 @@ namespace libdar
 
     void entrepot_libssh::read_dir_reset_dirinfo() const
     {
+#if LIBSSH_AVAILABLE
 	string where = get_full_path().display();
 
 	if(sdir != nullptr)
@@ -128,10 +143,14 @@ namespace libdar
 			 tools_printf(gettext("Could not open directory %s: %s"),
 				      where.c_str(),
 				      ssh_get_error(connect->get_ssh_session())));
+#else
+	throw Efeature("SFTP repository (requires libssh)");
+#endif
     }
 
     bool entrepot_libssh::read_dir_next_dirinfo(std::string & filename, inode_type & tp) const
     {
+#if LIBSSH_AVAILABLE
 	sftp_attributes attrib;
 
 	if(sdir == nullptr)
@@ -169,10 +188,14 @@ namespace libdar
 	    read_dir_flush();
 	    return false;
 	}
+#else
+	throw Efeature("SFTP repository (requires libssh)");
+#endif
     }
 
     void entrepot_libssh::create_dir(const std::string & dirname, U_I permission)
     {
+#if LIBSSH_AVAILABLE
 	path where = get_full_path().append(dirname);
 	int code;
 
@@ -186,7 +209,9 @@ namespace libdar
 			 tools_printf(gettext("Failed creating directory %s: %s"),
 				      where.display().c_str(),
 				      connect->get_sftp_error_msg()));
-
+#else
+	throw Efeature("SFTP repository (requires libssh)");
+#endif
     }
 
     fichier_global* entrepot_libssh::inherited_open(const std::shared_ptr<user_interaction> & dialog,
@@ -197,6 +222,7 @@ namespace libdar
 						    bool fail_if_exists,
 						    bool erase) const
     {
+#if LIBSSH_AVAILABLE
 	U_I perm = force_permission ? permission : 0666;
 	string fullname = (get_full_path().append(filename)).display();
 	fichier_libssh* ptr = new (nothrow) fichier_libssh(dialog,
@@ -241,10 +267,14 @@ namespace libdar
 	}
 
 	return ptr;
+#else
+	throw Efeature("SFTP repository (requires libssh)");
+#endif
     }
 
     void entrepot_libssh::inherited_unlink(const std::string & filename) const
     {
+#if LIBSSH_AVAILABLE
 	path where = get_full_path().append(filename);
 	int code;
 
@@ -258,15 +288,20 @@ namespace libdar
 			 tools_printf(gettext("Failed delete entry %s: %s"),
 				      where.display().c_str(),
 				      connect->get_sftp_error_msg()));
+#else
+	throw Efeature("SFTP repository (requires libssh)");
+#endif
     }
 
     void entrepot_libssh::read_dir_flush() const
     {
+#if LIBSSH_AVAILABLE
 	if(sdir != nullptr)
 	{
 	    sftp_closedir(sdir);
 	    sdir = nullptr;
 	}
+#endif
     }
 
 

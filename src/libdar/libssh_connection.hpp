@@ -54,6 +54,8 @@ namespace libdar
 
 	/// class used to share libssh constructs between entrepot_libssh and fichier_libssh by mean of std::shared_ptr
 
+#if LIBSSH_AVAILABLE
+
     class libssh_connection
     {
     public:
@@ -115,6 +117,8 @@ namespace libdar
 	static const char* get_key_error_msg(int code);
 	static const char* get_auth_error_msg(int code);
     };
+
+#endif
 
 	/// @}
 
