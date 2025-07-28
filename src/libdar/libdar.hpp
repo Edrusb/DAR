@@ -86,14 +86,11 @@
     // if you want to know which feature has been activated at compilation time
 #include "compile_time_features.hpp"
 
-    // for remote reposity you will need to create such object and pass it where needed
-#include "entrepot_libcurl.hpp"
-
-    // for sftp remote repository bypassing libcurl and directly using libssh
-#include "entrepot_libssh.hpp"
-
     // for local filesystem, you should not need to create such object to call libdar as it is the default repo used
 #include "entrepot_local.hpp"
+
+    // to use remote filesystems in place of the default entrepot_local used
+#include "remote_entrepot_api.hpp"
 
     // the options class to give non default parameter to the archive class
 #include "archive_options_listing_shell.hpp"

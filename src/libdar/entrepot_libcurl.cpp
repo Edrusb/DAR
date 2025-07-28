@@ -40,7 +40,7 @@ namespace libdar
 {
 
     entrepot_libcurl::entrepot_libcurl(const shared_ptr<user_interaction> & dialog,         ///< for user interaction
-				       mycurl_protocol proto,             ///< network protocol to use
+				       remote_entrepot_type proto,        ///< network protocol to use
 				       const string & login,              ///< user login on remote host
 				       const secu_string & password,      ///< user password on remote host (empty for file auth or user interaction)
 				       const string & host,               ///< the remote server to connect to

@@ -59,7 +59,7 @@ namespace libdar
     {
     public:
 	i_entrepot_libcurl(const std::shared_ptr<user_interaction> & dialog,         ///< for user interaction
-			   mycurl_protocol proto,             ///< network protocol to use
+			   remote_entrepot_type proto,             ///< network protocol to use
 			   const std::string & login,              ///< user login on remote host
 			   const secu_string & password,      ///< user password on remote host (empty for file auth or user interaction)
 			   const std::string & host,               ///< the remote server to connect to
@@ -110,7 +110,7 @@ namespace libdar
 	virtual void read_dir_flush() const override;
 
     private:
-	mycurl_protocol x_proto;
+	remote_entrepot_type x_proto;
 	std::string base_URL; ///< URL of the repository with only minimum path (login/password is given outside the URL)
 	mutable mycurl_easyhandle_sharing easyh;
 	mutable std::map<std::string, inode_type> current_dir; ///< map current directory entries to their property of being themselves a directory
@@ -137,11 +137,11 @@ namespace libdar
 	void set_current_dir(bool details) const;  ///< fill current_dir with the content of the directory pointed to by get_location()
 
 
-	static std::string mycurl_protocol2string(mycurl_protocol proto);
-	static std::string build_url_from(mycurl_protocol proto, const std::string & host, const std::string & port);
+	static std::string mycurl_protocol2string(remote_entrepot_type proto);
+	static std::string build_url_from(remote_entrepot_type proto, const std::string & host, const std::string & port);
 	static size_t get_ftp_listing_callback(void *buffer, size_t size, size_t nmemb, void *userp);
 	static size_t null_callback(void *buffer, size_t size, size_t nmemb, void *userp) { return size*nmemb; };
-	static bool mycurl_is_protocol_available(mycurl_protocol proto);
+	static bool mycurl_is_protocol_available(remote_entrepot_type proto);
 
 	    // needed to access the entrepot inherited protected methods
 	friend class entrepot_libcurl;

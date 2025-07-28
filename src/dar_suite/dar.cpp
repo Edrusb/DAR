@@ -45,18 +45,6 @@ static void display_diff_stat(user_interaction & dialog, const statistics &st);
 static void display_test_stat(user_interaction & dialog, const statistics & st);
 static void display_merge_stat(user_interaction & dialog, const statistics & st);
 static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * const argv[], const char **env);
-static shared_ptr<entrepot> create_repo(shared_ptr<user_interaction> & dialog,
-					mycurl_protocol proto,
-					const string & login,
-					const secu_string & pass,
-					const string & host,
-					const string & port,
-					bool auth_from_file,
-					const string & sftp_pub_filekey,
-					const string & sftp_prv_filekey,
-					const string & sftp_known_hosts,
-					U_I network_retry,
-					bool remote_verbose);
 
 int main(S_I argc, char * const argv[], const char **env)
 {
@@ -218,50 +206,50 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 
 	    if(param.remote.ent_host.size() != 0)
 	    {
-		repo = create_repo(dialog,
-				   string_to_mycurl_protocol(param.remote.ent_proto),
-				   param.remote.ent_login,
-				   param.remote.ent_pass,
-				   param.remote.ent_host,
-				   param.remote.ent_port,
-				   param.remote.auth_from_file,
-				   sftp_pub_filekey,
-				   sftp_prv_filekey,
-				   sftp_known_hosts,
-				   param.remote.network_retry,
-				   param.remote_verbose);
+		repo = create_remote_entrepot(dialog,
+					      string_to_remote_entrepot_type(param.remote.ent_proto),
+					      param.remote.ent_login,
+					      param.remote.ent_pass,
+					      param.remote.ent_host,
+					      param.remote.ent_port,
+					      param.remote.auth_from_file,
+					      sftp_pub_filekey,
+					      sftp_prv_filekey,
+					      sftp_known_hosts,
+					      param.remote.network_retry,
+					      param.remote_verbose);
 	    }
 
 	    if(param.ref_remote.ent_host.size() != 0)
 	    {
-		ref_repo = create_repo(dialog,
-				       string_to_mycurl_protocol(param.ref_remote.ent_proto),
-				       param.ref_remote.ent_login,
-				       param.ref_remote.ent_pass,
-				       param.ref_remote.ent_host,
-				       param.ref_remote.ent_port,
-				       param.ref_remote.auth_from_file,
-				       sftp_pub_filekey,
-				       sftp_prv_filekey,
-				       sftp_known_hosts,
-				       param.ref_remote.network_retry,
-				       param.remote_verbose);
+		ref_repo = create_remote_entrepot(dialog,
+						  string_to_remote_entrepot_type(param.ref_remote.ent_proto),
+						  param.ref_remote.ent_login,
+						  param.ref_remote.ent_pass,
+						  param.ref_remote.ent_host,
+						  param.ref_remote.ent_port,
+						  param.ref_remote.auth_from_file,
+						  sftp_pub_filekey,
+						  sftp_prv_filekey,
+						  sftp_known_hosts,
+						  param.ref_remote.network_retry,
+						  param.remote_verbose);
 	    }
 
 	    if(param.aux_remote.ent_host.size() != 0)
 	    {
-		aux_repo = create_repo(dialog,
-				       string_to_mycurl_protocol(param.aux_remote.ent_proto),
-				       param.aux_remote.ent_login,
-				       param.aux_remote.ent_pass,
-				       param.aux_remote.ent_host,
-				       param.aux_remote.ent_port,
-				       param.aux_remote.auth_from_file,
-				       sftp_pub_filekey,
-				       sftp_prv_filekey,
-				       sftp_known_hosts,
-				       param.aux_remote.network_retry,
-				       param.remote_verbose);
+		aux_repo = create_remote_entrepot(dialog,
+						  string_to_remote_entrepot_type(param.aux_remote.ent_proto),
+						  param.aux_remote.ent_login,
+						  param.aux_remote.ent_pass,
+						  param.aux_remote.ent_host,
+						  param.aux_remote.ent_port,
+						  param.aux_remote.auth_from_file,
+						  sftp_pub_filekey,
+						  sftp_prv_filekey,
+						  sftp_known_hosts,
+						  param.aux_remote.network_retry,
+						  param.remote_verbose);
 	    }
 
             switch(param.op)
@@ -1379,58 +1367,4 @@ static void display_merge_stat(user_interaction & dialog, const statistics & st)
 const char *dar_version()
 {
     return DAR_VERSION;
-}
-
-static shared_ptr<entrepot> create_repo(shared_ptr<user_interaction> & dialog,
-					mycurl_protocol proto,
-					const string & login,
-					const secu_string & pass,
-					const string & host,
-					const string & port,
-					bool auth_from_file,
-					const string & sftp_pub_filekey,
-					const string & sftp_prv_filekey,
-					const string & sftp_known_hosts,
-					U_I network_retry,
-					bool remote_verbose)
-{
-    shared_ptr<entrepot> ret;
-
-    switch(proto)
-    {
-    case proto_ftp:
-	ret.reset(new (nothrow) entrepot_libcurl(dialog,
-						 proto,
-						 login,
-						 pass,
-						 host,
-						 port,
-						 auth_from_file,
-						 sftp_pub_filekey,
-						 sftp_prv_filekey,
-						 sftp_known_hosts,
-						 network_retry,
-						 remote_verbose));
-	break;
-    case proto_sftp:
-	ret.reset(new (nothrow) entrepot_libssh(dialog,
-						login,
-						pass,
-						host,
-						port,
-						auth_from_file,
-						sftp_pub_filekey,
-						sftp_prv_filekey,
-						sftp_known_hosts,
-						network_retry,
-						remote_verbose));
-	break;
-    default:
-	throw SRC_BUG;
-    }
-
-    if(! ret)
-	throw Ememory("create_repo");
-
-    return ret;
 }

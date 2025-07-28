@@ -41,7 +41,7 @@ namespace libdar
 
     fichier_libcurl::fichier_libcurl(const shared_ptr<user_interaction> & dialog,
 				     const std::string & chemin,
-				     mycurl_protocol proto,
+				     remote_entrepot_type proto,
 				     const shared_ptr<mycurl_easyhandle_node> & handle,
 				     gf_mode m,
 				     U_I waiting,
@@ -731,7 +731,7 @@ namespace libdar
     {
 	if(metadatamode)
 	{
-	    if(x_proto == proto_ftp)
+	    if(x_proto == remote_entrepot_type::ftp)
 		network_block = 0;
 	    else
 		network_block = block_size;
@@ -742,7 +742,7 @@ namespace libdar
 	    if(sub_is_dying)
 	    {
 		stop_thread();
-		if(x_proto == proto_ftp)
+		if(x_proto == remote_entrepot_type::ftp)
 		    network_block = 0;
 		else
 		    network_block = block_size;
@@ -902,7 +902,7 @@ namespace libdar
 		// wrongly positionned in the requested to libcurl
 	    if(metadatamode)
 	    {
-		if(x_proto == proto_ftp)
+		if(x_proto == remote_entrepot_type::ftp)
 		    network_block = 0;
 		    // because reading by block leads control session to
 		    // be reset when ftp is used, this makes a huge amount

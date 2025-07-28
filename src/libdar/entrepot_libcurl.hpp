@@ -36,7 +36,7 @@ extern "C"
 #include <deque>
 #include "entrepot.hpp"
 #include "secu_string.hpp"
-#include "mycurl_protocol.hpp"
+#include "remote_entrepot_api.hpp"
 
 namespace libdar
 {
@@ -50,7 +50,7 @@ namespace libdar
     {
     public:
 	entrepot_libcurl(const std::shared_ptr<user_interaction> & dialog, ///< for user interaction
-			 mycurl_protocol proto,                  ///< network protocol to use
+			 remote_entrepot_type proto,             ///< network protocol to use
 			 const std::string & login,              ///< user login on remote host
 			 const secu_string & password,           ///< user password on remote host (empty for file auth or user interaction)
 			 const std::string & host,               ///< the remote server to connect to

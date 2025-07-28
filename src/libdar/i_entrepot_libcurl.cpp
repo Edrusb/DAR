@@ -38,7 +38,7 @@ namespace libdar
 #if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
 
     entrepot_libcurl::i_entrepot_libcurl::i_entrepot_libcurl(const shared_ptr<user_interaction> & dialog,         ///< for user interaction
-							     mycurl_protocol proto,             ///< network protocol to use
+							     remote_entrepot_type proto,        ///< network protocol to use
 							     const string & login,              ///< user login on remote host
 							     const secu_string & password,      ///< user password on remote host (empty for file auth or user interaction)
 							     const string & host,               ///< the remote server to connect to
@@ -132,7 +132,7 @@ namespace libdar
 	{
 	    switch(x_proto)
 	    {
-	    case proto_ftp:
+	    case remote_entrepot_type::ftp:
 		set_location((cwd + dirname));
 		try
 		{
@@ -149,7 +149,7 @@ namespace libdar
 		}
 		set_location(cwd);
 		break;
-	    case proto_sftp:
+	    case remote_entrepot_type::sftp:
 		node->setopt(CURLOPT_NEW_DIRECTORY_PERMS, long(permission));
 		order = "mkdir " + dirname;
 		headers.append(order);
@@ -288,9 +288,9 @@ namespace libdar
 
 	switch(x_proto)
 	{
-	case proto_ftp:
-	case proto_sftp:
-	    if(x_proto == proto_ftp)
+	case remote_entrepot_type::ftp:
+	case remote_entrepot_type::sftp:
+	    if(x_proto == remote_entrepot_type::ftp)
 		order = "DELE " + filename;
 	    else
 		order = "rm " + filename;
@@ -341,9 +341,9 @@ namespace libdar
 
 	switch(x_proto)
 	{
-	case proto_ftp:
+	case remote_entrepot_type::ftp:
 	    break;
-	case proto_sftp:
+	case remote_entrepot_type::sftp:
 	    if(!sftp_known_hosts.empty())
 		easyh.setopt_global(CURLOPT_SSH_KNOWNHOSTS, sftp_known_hosts);
 	    else
@@ -569,8 +569,8 @@ namespace libdar
 
 	switch(x_proto)
 	{
-	case proto_ftp:
-	case proto_sftp:
+	case remote_entrepot_type::ftp:
+	case remote_entrepot_type::sftp:
 	    node->setopt(CURLOPT_URL, get_libcurl_URL());
 	    if(!details)
 	    {
@@ -605,16 +605,16 @@ namespace libdar
 	cur_dir_cursor = current_dir.begin();
     }
 
-    string entrepot_libcurl::i_entrepot_libcurl::mycurl_protocol2string(mycurl_protocol proto)
+    string entrepot_libcurl::i_entrepot_libcurl::mycurl_protocol2string(remote_entrepot_type proto)
     {
 	string ret;
 
 	switch(proto)
 	{
-	case proto_ftp:
+	case remote_entrepot_type::ftp:
 	    ret = "ftp";
 	    break;
-	case proto_sftp:
+	case remote_entrepot_type::sftp:
 	    ret = "sftp";
 	    break;
 	default:
@@ -624,7 +624,7 @@ namespace libdar
 	return ret;
     }
 
-    string entrepot_libcurl::i_entrepot_libcurl::build_url_from(mycurl_protocol proto, const string & host, const string & port)
+    string entrepot_libcurl::i_entrepot_libcurl::build_url_from(remote_entrepot_type proto, const string & host, const string & port)
     {
 	string ret = mycurl_protocol2string(proto) + "://" + host;
 
@@ -669,7 +669,7 @@ namespace libdar
 	return size*nmemb;
     }
 
-    bool entrepot_libcurl::i_entrepot_libcurl::mycurl_is_protocol_available(mycurl_protocol proto)
+    bool entrepot_libcurl::i_entrepot_libcurl::mycurl_is_protocol_available(remote_entrepot_type proto)
     {
 	curl_version_info_data *data = curl_version_info(CURLVERSION_NOW);
 	const char **ptr = nullptr;
