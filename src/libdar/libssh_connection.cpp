@@ -191,7 +191,7 @@ namespace libdar
 	    if(verbose)
 		ssh_verbosity = SSH_LOG_PROTOCOL;
 	    else
-		ssh_verbosity = SSH_LOG_WARNING;
+		ssh_verbosity = SSH_LOG_NOLOG;
 	    ssh_options_set(sess, SSH_OPTIONS_LOG_VERBOSITY, &ssh_verbosity);
 
 	    ssh_verbosity = 1; // recycling ssh_verbosity assuming it is no more access by previou ssh_option_set call
