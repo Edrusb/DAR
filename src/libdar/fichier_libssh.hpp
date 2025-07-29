@@ -123,6 +123,7 @@ namespace libdar
 	std::shared_ptr<libssh_connection> connect;
 	std::string my_path;
 	sftp_file sfd;
+	infinint current_pos; ///< we cannot rely in libssh to provide the read offset as we also use Async I/O
 
 	    // read ahead structures
 
@@ -156,6 +157,13 @@ namespace libdar
 	void myclose();
 	void clear_readahead() { rareq.clear(); ralu = rasize = 0; };
 	void update_aio_reqs();
+
+	    /// checks libssh is in sync of our current_pos
+
+	    /// \note libssh is not expected to be in sync when we have
+	    /// data in rabuffer, pending for reading. It is not expected
+	    /// to be neither when we have on-fly async read in rareq queue
+	void check_pos_from_libssh();
 
     };
 

@@ -49,6 +49,7 @@ namespace libdar
 	connect(ptr),
 	my_path(chemin),
 	sfd(nullptr),
+	current_pos(0),
 	rabuffer(nullptr),
 	rallocated(0),
 	rasize(0),
@@ -111,6 +112,8 @@ namespace libdar
 	    // the queueing of several aio would be useless if we
 	    // only had one item in the queue. So we set rareq_maxsize
 	    // to at least rareq_minsize
+
+	check_pos_from_libssh();
     }
 
 
@@ -161,7 +164,7 @@ namespace libdar
 	switch(direction)
 	{
 	case skip_backward:
-	    return amount <= get_position();
+	    return amount <= current_pos;
 	case skip_forward:
 	    return true;
 	default:
@@ -182,6 +185,8 @@ namespace libdar
 
 	ret = sftp_seek64(sfd,
 			  libpos);
+	current_pos = pos;
+	check_pos_from_libssh();
 
 	return ret >= 0;
     }
@@ -211,7 +216,7 @@ namespace libdar
 
     infinint fichier_libssh::get_position() const
     {
-	return infinint(sftp_tell(sfd));
+	return current_pos;
     }
 
     void fichier_libssh::inherited_truncate(const infinint & pos)
@@ -244,6 +249,7 @@ namespace libdar
 		wrote += step;
 	}
 	while(wrote < size && step > 0);
+	current_pos += wrote;
 
 	return wrote;
     }
@@ -329,6 +335,8 @@ namespace libdar
 					  connect->get_sftp_error_msg()));
 	}
 
+	current_pos += read;
+
 	if(step < 0)
 	{
 	    message = tools_printf(gettext("Libssh error while reading file's data: %s"),
@@ -392,6 +400,12 @@ namespace libdar
 	    tora += infinint(step);
 	    // pushing back the amount of byte that was outside
 	    // the read-ahead window
+    }
+
+    void fichier_libssh::check_pos_from_libssh()
+    {
+	if(infinint(sftp_tell(sfd)) != current_pos)
+	   throw SRC_BUG;
     }
 
 #endif
