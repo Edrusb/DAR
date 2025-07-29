@@ -154,7 +154,7 @@ namespace libdar
 	    // private methods
 
 	void myclose();
-	void clear_readahead() { rareq.clear(); };
+	void clear_readahead() { rareq.clear(); ralu = rasize = 0; };
 	void update_aio_reqs();
 
     };
