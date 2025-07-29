@@ -139,7 +139,7 @@ int main()
 	if(!compile_time::remote_repository())
 	{
 	    cerr << "MISSING LIBCURL SUPPORT TO BE ABLE TO PERFORM ALL TESTS, ABORTING" << endl;
-	    throw Efeature("libcurl");
+	    throw Efeature("remote repositories");
 	}
 
 	if(!compile_time::ea())
