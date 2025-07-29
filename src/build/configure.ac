@@ -1377,6 +1377,7 @@ AS_IF(         [test "x$enable_libcurl_linking" != "xyes"],
                         [ AC_MSG_ERROR([libcurl linking failed]) ],
 			[
 			  CPPFLAGS="$LIBCURL_CFLAGS $CPPFLAGS"
+			  CXXFLAGS="$LIBCURL_CFLAGS $CXXFLAGS"
                           LIBS="$LIBCURL_LIBS $LIBS"
 			]
                       )
@@ -1445,6 +1446,7 @@ AS_IF(         [test "x$enable_libssh_linking" != "xyes"],
                         [ AC_MSG_ERROR([libssh linking failed]) ],
 			[
 			  CPPFLAGS="$LIBSSH_CFLAGS $CPPFLAGS"
+			  CXXFLAGS="$LIBSSH_CFLAGS $CXXFLAGS"
                           LIBS="$LIBSSH_LIBS $LIBS"
 			]
                       )
@@ -1779,6 +1781,7 @@ AS_IF(          [ test "x$enable_gpgme_linking" != "xyes" ],
                         [ AC_MSG_ERROR([gpgme linking failed]) ],
 			[
 			  CPPFLAGS="$GPGME_CFLAGS $CPPFLAGS"
+			  CXXFLAGS="$GPGME_CFLAGS $CXXFLAGS"
                           LIBS="$GPGME_LIBS $LIBS"
 			]
                       )
@@ -2320,6 +2323,11 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                                                 #include <curl/curl.h>
                                                 #endif
 
+                                                #if HAVE_LIBSSH_LIBSSH_H
+                                                #include <libssh/libssh.h>
+                                                #include <libssh/sftp.h>
+                                                #endif
+
                                                 #if HAVE_GPGME_H
                                                 #include <gpgme.h>
                                                 #endif
@@ -2456,6 +2464,20 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                                   printf("testing librsync availability in static linked mode...");
                                   (void) curl_global_init(CURL_GLOBAL_ALL);
                                #endif
+
+			       #if LIBSSH_AVAILABLE
+			         ssh_session sess = ssh_new();
+			         sftp_session sessftp = sftp_new(sess);
+
+			         if(sessftp != 0)
+			            sftp_free(sessftp);
+
+			         if(sess != 0)
+			         {
+			            ssh_disconnect(sess);
+				    ssh_free(sess);
+			         }
+			       #endif
 
                                #if GPGME_SUPPORT
                                if(1)
