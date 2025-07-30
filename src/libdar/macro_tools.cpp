@@ -458,14 +458,17 @@ namespace libdar
 	generic_file *tmp = nullptr;
 	contextual *tmp_ctxt = nullptr;
 	cache *tmp_cache = nullptr;
-#ifdef LIBCURL_AVAILABLE
-	bool libcurl_repo = dynamic_cast<const entrepot_libcurl *>(where.get()) != nullptr
-	    || dynamic_cast<const entrepot_libssh *>(where.get()) != nullptr;
-#else
-	bool libcurl_repo = false;
-#endif
 	string salt;
 	bool by_the_end = ! sequential_read;
+	bool remote_repo = false;
+
+#ifdef LIBCURL_AVAILABLE
+	remote_repo |= dynamic_cast<const entrepot_libcurl *>(where.get()) != nullptr;
+#endif
+
+#if LIBSSH_AVAILABLE
+	remote_repo |= dynamic_cast<const entrepot_libssh *>(where.get()) != nullptr;
+#endif
 
 	if(! sequential_read && has_external_cat && force_read_first_slice)
 	    by_the_end = false; // avoiding loading the last slice as we have the catalogue from the isolated catalogue
@@ -475,7 +478,7 @@ namespace libdar
 
 	stack.clear();
 #ifdef LIBTHREADAR_AVAILABLE
-	if(multi_threaded_crypto < 2 && multi_threaded_compress < 2 && !libcurl_repo)
+	if(multi_threaded_crypto < 2 && multi_threaded_compress < 2 && !remote_repo)
 	    stack.ignore_read_ahead(true);
 	else
 	    stack.ignore_read_ahead(false);
@@ -565,7 +568,7 @@ namespace libdar
 	    {
 		    // we always ignore read_ahead as no slave thread will exist for LEVEL1 layer
 		    // except for libcurl which can leverage it
-		tmp->ignore_read_ahead(!libcurl_repo);
+		tmp->ignore_read_ahead(!remote_repo);
 		stack.push(tmp, LIBDAR_STACK_LABEL_LEVEL1);
 		tmp = nullptr;
 	    }
@@ -635,7 +638,7 @@ namespace libdar
 		    throw Ememory("macro_tools_open_archive");
 		else
 		{
-		    tmp->ignore_read_ahead(!libcurl_repo);
+		    tmp->ignore_read_ahead(!remote_repo);
 			// no slave thread used below in the stack
 		    stack.clear_label(LIBDAR_STACK_LABEL_LEVEL1);
 		    stack.push(tmp, LIBDAR_STACK_LABEL_LEVEL1);
@@ -850,7 +853,7 @@ namespace libdar
 	    else
 	    {
 		    // we always ignore read ahead as encryption layer above sar/zapette/triial_sar has no slave thread below
-		tmp->ignore_read_ahead(!libcurl_repo && (crypto == crypto_algo::none || multi_threaded_crypto == 1));
+		tmp->ignore_read_ahead(!remote_repo && (crypto == crypto_algo::none || multi_threaded_crypto == 1));
 		stack.push(tmp);
 		tmp = nullptr;
 	    }
@@ -906,7 +909,7 @@ namespace libdar
 		tmp = new (nothrow) escape(stack.top(), unjump);
 		if(tmp == nullptr)
 		    throw Ememory("open_archive");
-		tmp->ignore_read_ahead(!libcurl_repo && (crypto == crypto_algo::none || multi_threaded_crypto == 1));
+		tmp->ignore_read_ahead(!remote_repo && (crypto == crypto_algo::none || multi_threaded_crypto == 1));
 		stack.push(tmp);
 		tmp = nullptr;
 	    }
