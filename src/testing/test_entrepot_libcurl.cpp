@@ -36,7 +36,6 @@ extern "C"
 #include "user_interaction.hpp"
 #include "entrepot_libcurl.hpp"
 #include "fichier_local.hpp"
-#include "mycurl_protocol.hpp"
 
 using namespace libdar;
 
@@ -96,7 +95,7 @@ void get_args(int argc,
 	exit(1);
     }
 
-    proto = string_to_mycurl_protocol(argv[1]);
+    proto = string_to_remote_entrepot_type(argv[1]);
     login = argv[2];
     tmp = argv[3];
     pass = secu_string(tmp.c_str(), tmp.size());
