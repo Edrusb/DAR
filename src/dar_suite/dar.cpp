@@ -206,56 +206,50 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 
 	    if(param.remote.ent_host.size() != 0)
 	    {
-		repo.reset(new (nothrow) entrepot_libcurl(dialog,
-							  string_to_mycurl_protocol(param.remote.ent_proto),
-							  param.remote.ent_login,
-							  param.remote.ent_pass,
-							  param.remote.ent_host,
-							  param.remote.ent_port,
-							  param.remote.auth_from_file,
-							  sftp_pub_filekey,
-							  sftp_prv_filekey,
-							  sftp_known_hosts,
-							  param.remote.network_retry,
-							  param.remote_verbose));
-		if(!repo)
-		    throw Ememory("little_main");
+		repo = create_remote_entrepot(dialog,
+					      string_to_remote_entrepot_type(param.remote.ent_proto),
+					      param.remote.ent_login,
+					      param.remote.ent_pass,
+					      param.remote.ent_host,
+					      param.remote.ent_port,
+					      param.remote.auth_from_file,
+					      sftp_pub_filekey,
+					      sftp_prv_filekey,
+					      sftp_known_hosts,
+					      param.remote.network_retry,
+					      param.remote_verbose);
 	    }
 
 	    if(param.ref_remote.ent_host.size() != 0)
 	    {
-		ref_repo.reset(new (nothrow) entrepot_libcurl(dialog,
-							      string_to_mycurl_protocol(param.ref_remote.ent_proto),
-							      param.ref_remote.ent_login,
-							      param.ref_remote.ent_pass,
-							      param.ref_remote.ent_host,
-							      param.ref_remote.ent_port,
-							      param.ref_remote.auth_from_file,
-							      sftp_pub_filekey,
-							      sftp_prv_filekey,
-							      sftp_known_hosts,
-							      param.ref_remote.network_retry,
-							      param.remote_verbose));
-		if(!ref_repo)
-		    throw Ememory("little_main");
+		ref_repo = create_remote_entrepot(dialog,
+						  string_to_remote_entrepot_type(param.ref_remote.ent_proto),
+						  param.ref_remote.ent_login,
+						  param.ref_remote.ent_pass,
+						  param.ref_remote.ent_host,
+						  param.ref_remote.ent_port,
+						  param.ref_remote.auth_from_file,
+						  sftp_pub_filekey,
+						  sftp_prv_filekey,
+						  sftp_known_hosts,
+						  param.ref_remote.network_retry,
+						  param.remote_verbose);
 	    }
 
 	    if(param.aux_remote.ent_host.size() != 0)
 	    {
-		aux_repo.reset(new (nothrow) entrepot_libcurl(dialog,
-							      string_to_mycurl_protocol(param.aux_remote.ent_proto),
-							      param.aux_remote.ent_login,
-							      param.aux_remote.ent_pass,
-							      param.aux_remote.ent_host,
-							      param.aux_remote.ent_port,
-							      param.aux_remote.auth_from_file,
-							      sftp_pub_filekey,
-							      sftp_prv_filekey,
-							      sftp_known_hosts,
-							      param.aux_remote.network_retry,
-							      param.remote_verbose));
-		if(!aux_repo)
-		    throw Ememory("little_main");
+		aux_repo = create_remote_entrepot(dialog,
+						  string_to_remote_entrepot_type(param.aux_remote.ent_proto),
+						  param.aux_remote.ent_login,
+						  param.aux_remote.ent_pass,
+						  param.aux_remote.ent_host,
+						  param.aux_remote.ent_port,
+						  param.aux_remote.auth_from_file,
+						  sftp_pub_filekey,
+						  sftp_prv_filekey,
+						  sftp_known_hosts,
+						  param.aux_remote.network_retry,
+						  param.remote_verbose);
 	    }
 
             switch(param.op)

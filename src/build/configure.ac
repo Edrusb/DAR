@@ -116,7 +116,6 @@ AC_CHECK_LIB(socket, [socket], [], [])
 AC_CHECK_LIB(nsl, [endnetconfig], [], [])
 AC_CHECK_LIB(cap, [cap_get_proc], [], [])
 
-
 AC_ARG_ENABLE( [libdl-linking],
                AS_HELP_STRING(--disable-libdl-linking, [ignore any libdl and avoid linking against it]),
                [
@@ -1326,7 +1325,7 @@ AC_ARG_ENABLE( [libcurl-linking],
 
 AS_IF(         [test "x$enable_libcurl_linking" != "xyes"],
                [
-                 AC_MSG_WARN([libcurl and thus remote repository support has been disabled by user])
+                 AC_MSG_WARN([libcurl and thus remote FTP repository support has been disabled by user])
                  local_libcurl="no"
                ],
                [
@@ -1368,7 +1367,7 @@ AS_IF(         [test "x$enable_libcurl_linking" != "xyes"],
                                         [AC_DEFINE(LIBCURL_AVAILABLE, 1, [libcurl is usable])],
                                         [ local_libcurl="no" ])
                  else
-                        AC_MSG_WARN([remote repository support not available])
+                        AC_MSG_WARN([remote FTP repository support not available])
                  fi
                  CPPFLAGS="$CPPFLAGS___cache"
                  LIBS="$LIBS___cache"
@@ -1378,11 +1377,82 @@ AS_IF(         [test "x$enable_libcurl_linking" != "xyes"],
                         [ AC_MSG_ERROR([libcurl linking failed]) ],
 			[
 			  CPPFLAGS="$LIBCURL_CFLAGS $CPPFLAGS"
+			  CXXFLAGS="$LIBCURL_CFLAGS $CXXFLAGS"
                           LIBS="$LIBCURL_LIBS $LIBS"
 			]
                       )
                 ]
      )
+
+
+AC_ARG_ENABLE( [libssh-linking],
+               AS_HELP_STRING(--disable-libssh-linking, [ignore libssh and avoid linking against it]),
+               [explicit_libssh_linking=yes],
+               [enable_libssh_linking=yes])
+
+AS_IF(         [test "x$enable_libssh_linking" != "xyes"],
+               [
+                 AC_MSG_WARN([libssh and thus remote SFTP repository support has been disabled by user])
+                 local_libssh="no"
+               ],
+               [
+                  PKG_CHECK_EXISTS(libssh,
+                        [
+			  PKG_CHECK_MODULES(LIBSSH, libssh > 0.11.0, [], [AC_MSG_ERROR([libssh not found, but reported to exist !?!])])
+                          AC_DEFINE(HAVE_LIBSSH, 1, [Libssh library availability])
+                        ],
+                        [
+                          AC_CHECK_LIB(ssh, [ssh_new], [], [AC_MSG_WARN([libssh library not found])])
+                          AC_DEFINE(HAVE_LIBSSH, 1, [Libssh library availability])
+                        ])
+
+                  CPPFLAGS__cache="$CPPFLAGS"
+                  CPPFLAGS="$LIBSSH_CFLAGS $CPPFLAGS"
+                  LIBS___cache="$LIBS"
+                  LIBS="$LIBSSH_LIBS $LIBS"
+                  AC_CHECK_HEADER(libssh/libssh.h,
+                        [
+                                local_libssh="yes"
+                                AC_DEFINE(HAVE_LIBSSH_LIBSSH_H, 1, [libssh.h header file is available])
+                        ],
+                        [
+                                AC_MSG_WARN([Cannot find libssh.h header file])
+                                local_libssh="no"
+                        ])
+
+                 if test "$local_libssh" = "yes" ; then
+                        AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
+                                                                  #if HAVE_LIBSSH_LIBSSH_H
+                                                                  #include <libssh/libssh.h>
+                                                                  #endif
+                                                           }
+                                                        ]],
+                                                        [[
+                                                           ssh_session sess = ssh_new();
+							   if(sess != nullptr)
+                                                              ssh_free(sess);
+                                                        ]])
+                                        ],
+                                        [AC_DEFINE(LIBSSH_AVAILABLE, 1, [libssh is usable])],
+                                        [ local_libssh="no" ])
+                 else
+                        AC_MSG_WARN([remote SFTP repository support not available])
+                 fi
+                 CPPFLAGS="$CPPFLAGS___cache"
+                 LIBS="$LIBS___cache"
+                 unset CPPFLAGS___cache
+                 unset LIBS___cache
+                 AS_IF( [ test "x$explicit_libssh_linking" = "xyes" -a "$local_libssh" != "yes" ],
+                        [ AC_MSG_ERROR([libssh linking failed]) ],
+			[
+			  CPPFLAGS="$LIBSSH_CFLAGS $CPPFLAGS"
+			  CXXFLAGS="$LIBSSH_CFLAGS $CXXFLAGS"
+                          LIBS="$LIBSSH_LIBS $LIBS"
+			]
+                      )
+                ]
+     )
+
 
 AC_ARG_ENABLE(  [fadvise],
                 AS_HELP_STRING(--disable-fadvise, [avoid using fadvise(2) system call]),
@@ -1711,6 +1781,7 @@ AS_IF(          [ test "x$enable_gpgme_linking" != "xyes" ],
                         [ AC_MSG_ERROR([gpgme linking failed]) ],
 			[
 			  CPPFLAGS="$GPGME_CFLAGS $CPPFLAGS"
+			  CXXFLAGS="$GPGME_CFLAGS $CXXFLAGS"
                           LIBS="$GPGME_LIBS $LIBS"
 			]
                       )
@@ -2252,6 +2323,11 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                                                 #include <curl/curl.h>
                                                 #endif
 
+                                                #if HAVE_LIBSSH_LIBSSH_H
+                                                #include <libssh/libssh.h>
+                                                #include <libssh/sftp.h>
+                                                #endif
+
                                                 #if HAVE_GPGME_H
                                                 #include <gpgme.h>
                                                 #endif
@@ -2388,6 +2464,20 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                                   printf("testing librsync availability in static linked mode...");
                                   (void) curl_global_init(CURL_GLOBAL_ALL);
                                #endif
+
+			       #if LIBSSH_AVAILABLE
+			         ssh_session sess = ssh_new();
+			         sftp_session sessftp = sftp_new(sess);
+
+			         if(sessftp != 0)
+			            sftp_free(sessftp);
+
+			         if(sess != 0)
+			         {
+			            ssh_disconnect(sess);
+				    ssh_free(sess);
+			         }
+			       #endif
 
                                #if GPGME_SUPPORT
                                if(1)
@@ -2714,8 +2804,15 @@ else
   echo "NO"
 fi
 
-printf "   Remote repository support  : "
+printf "   FTP repository support     : "
 if [ "$local_libcurl" = "yes" -a "$local_threadar" = "yes" ] ; then
+  echo "YES"
+else
+  echo "NO"
+fi
+
+printf "   SFTP repository support    : "
+if [ "$local_libssh" = "yes" ] ; then
   echo "YES"
 else
   echo "NO"

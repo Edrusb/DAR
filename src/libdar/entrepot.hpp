@@ -198,7 +198,7 @@ namespace libdar
 
 	virtual void inherited_unlink(const std::string & filename) const = 0;
 
-	virtual void read_dir_flush() = 0; ///< ends the read_dir_next, (no more entry available)
+	virtual void read_dir_flush() const = 0; ///< ends the read_dir_next, (no more entry available)
 
     private:
 	path where;

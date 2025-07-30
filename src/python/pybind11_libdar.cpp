@@ -1121,7 +1121,7 @@ PYBIND11_MODULE(libdar, mod)
 		filename);
 	};
 
-	virtual void read_dir_flush() override
+	virtual void read_dir_flush() const override
 	{
 	    PYBIND11_OVERRIDE_PURE(
 		void,
@@ -1149,9 +1149,15 @@ PYBIND11_MODULE(libdar, mod)
 	.def("get_location", &libdar::entrepot_local::get_location)
 	.def("get_root", &libdar::entrepot_local::get_root);
 
-    pybind11::enum_<libdar::mycurl_protocol>(mod, "mycurl_protocol")
-	.value("proto_ftp", libdar::mycurl_protocol::proto_ftp)
-	.value("proto_sftp", libdar::mycurl_protocol::proto_sftp);
+    pybind11::enum_<libdar::remote_entrepot_type>(mod, "remote_entrepot_type")
+	.value("remote_entrepot_type_ftp", libdar::remote_entrepot_type::ftp)
+	.value("remote_entrepot_type_sftp", libdar::remote_entrepot_type::sftp);
+
+    mod.attr("proto_ftp") = libdar::remote_entrepot_type::ftp;
+    mod.attr("proto_sftp") = libdar::remote_entrepot_type::sftp;
+
+    mod.def("string_to_remote_entrepot_type", &libdar::string_to_remote_entrepot_type);
+    mod.def("create_remote_entrepot", &libdar::create_remote_entrepot);
 
     pybind11::class_<libdar::entrepot_libcurl, libdar::entrepot, std::shared_ptr<libdar::entrepot_libcurl> >(mod, "entrepot_libcurl")
 	.def(pybind11::init<

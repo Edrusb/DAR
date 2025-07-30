@@ -218,6 +218,25 @@ namespace libdar
         return compressed->get_position();
     }
 
+    void parallel_block_compressor::inherited_read_ahead(const infinint & amount)
+    {
+	if(!suspended)
+	{
+	    if(!running_threads)
+	    {
+		compressed->read_ahead(amount);
+		run_read_threads();
+	    }
+	}
+	else // compression is disabled
+	{
+	    if(running_threads)
+		throw SRC_BUG;
+		// no thread should be running as
+		// compression is disabled for now
+	    compressed->read_ahead(amount);
+	}
+    }
 
     U_I parallel_block_compressor::inherited_read(char *a, U_I size)
     {

@@ -65,6 +65,8 @@ from 2.7.x to 2.8.0
   retaining the patch (which is useless alone, as it done so far), the
   merging operation now applies the patch to the in-place version and
   retain the patched/updated version in the resulting backup.
+- replaced libcurl by libssh for SFTP repositories. Libcurl is still
+  used for FTP repositories for now, this may change in the future.
 
 from 2.7.18 to 2.7.19
 - fixed the trailing slash support in path, that was broken by commit

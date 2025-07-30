@@ -40,7 +40,7 @@ namespace libdar
 {
 
     entrepot_libcurl::entrepot_libcurl(const shared_ptr<user_interaction> & dialog,         ///< for user interaction
-				       mycurl_protocol proto,             ///< network protocol to use
+				       remote_entrepot_type proto,        ///< network protocol to use
 				       const string & login,              ///< user login on remote host
 				       const secu_string & password,      ///< user password on remote host (empty for file auth or user interaction)
 				       const string & host,               ///< the remote server to connect to
@@ -352,7 +352,7 @@ namespace libdar
 #endif
     }
 
-    void entrepot_libcurl::read_dir_flush()
+    void entrepot_libcurl::read_dir_flush() const
     {
 #if defined ( LIBCURL_AVAILABLE ) && defined ( LIBTHREADAR_AVAILABLE )
 	NLS_SWAP_IN;

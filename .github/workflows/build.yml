@@ -14,7 +14,7 @@ jobs:
     - name: prepare
       run: |
         sudo apt-get update
-        sudo apt-get install make gcc g++ libtool intltool libattr1-dev libbz2-1.0 libbz2-dev libbz2-ocaml libbz2-ocaml-dev liblzo2-dev libgpgme-dev libargon2-dev
+        sudo apt-get install make gcc g++ libtool intltool libattr1-dev libbz2-1.0 libbz2-dev libbz2-ocaml libbz2-ocaml-dev liblzo2-dev libgpgme-dev libargon2-dev liblzma-dev libzstd-dev liblz4-dev libcrypt-dev libgpgme-dev upx groff libext2fs-dev librsync-dev python3-pybind11 python3-dev
     - name: init
       run: misc/init
     - name: configure --disable-upx

@@ -151,16 +151,20 @@
 	  <li>
 	    <a href="http://libthreadar.sourceforge.net/">libthreadar</a> (version
 	    1.3.0 or more recent, for MAC OS use version 1.4.0 or more recent)
-	    for libdar to use several threads and remote
-	    repository feature (the later needs libcurl in addition see below)
+	    for libdar to use several threads compression/decompression, ciphering/deciphering
+	    as well as support for FTP repository feature (the later also needs libcurl
+	    in addition see below)
 	  </li>
 	  <li>
 	    <a href="https://github.com/librsync/librsync/releases">librsync</a> for delta
 	    binary
 	  </li>
 	  <li>
-	    <a href="https://curl.haxx.se/libcurl/">libcurl</a> for remote
-	    repository access using ftp or sftp protocols
+	    <a href="https://curl.haxx.se/libcurl/">libcurl</a> for FTP repository access
+	  </li>
+	  <li>
+	    <a href="https://www.libssh.org/">libssh</a> (at least version 0.11.x) for SFTP
+	    repository access
 	  </li>
 	  <li>
 	    <a href="https://www.python.org/">python3</a> (python3-dev) and
@@ -297,11 +301,19 @@
 	  </tr>
 	  <tr>
 	    <th>
-	      remote repositories support (ftp, sftp)
+	      FTP remote repositories support
 	    </th>
 	    <td>
-	      libthreadar library headers and library<br>
-	      libcurl library headers and library
+	      libthreadar library annd headers<br>
+	      libcurl library and headers
+	    </td>
+	  </tr>
+	  <tr>
+	    <th>
+	      SFTP remote repositories support
+	    </th>
+	    <td>
+	      libssh library and headers
 	    </td>
 	  </tr>
 	  <tr>
@@ -502,6 +514,14 @@
 	    </th>
 	    <td>
 	      libcurl-dev
+	    </td>
+	  </tr>
+	  <tr>
+	    <th>
+	      libssh library
+	    </th>
+	    <td>
+	      libssh-dev
 	    </td>
 	  </tr>
 	  <tr>
@@ -866,7 +886,14 @@
 	      <td class=desc>--disable-libcurl-linking
 	      </td>
 	      <td>
-		Disable linking with libcurl, thus remote repository support using ftp or sftp will not be available
+		Disable linking with libcurl, thus remote repository support using ftp will not be available
+	      </td>
+	    </tr>
+	    <tr>
+	      <td class=desc>--disable-libssh-linking
+	      </td>
+	      <td>
+		Disable linking with libssh, thus remote repository support using sftp will not be available
 	      </td>
 	    </tr>
 	    <tr>
