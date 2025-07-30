@@ -37,41 +37,41 @@ extern "C"
 namespace libdar
 {
         /// \addtogroup API
-	/// @{
+        /// @{
 
-	/// type of entrepot to create
+        /// type of entrepot to create
     enum class remote_entrepot_type
     {
-	ftp,   ///< filesystem accessed through FTP protocol
-	sftp   ///< filesystem accessed through SFTP protocol
+        ftp,   ///< filesystem accessed through FTP protocol
+        sftp   ///< filesystem accessed through SFTP protocol
     };
 
 
-	// for backward compatibility with API found in release 2.7.x and before
+        // for backward compatibility with API found in release 2.7.x and before
     typedef remote_entrepot_type mycurl_protocol;
     const remote_entrepot_type proto_ftp = remote_entrepot_type::ftp;
     const remote_entrepot_type proto_sftp = remote_entrepot_type::sftp;
 
-	/// extract entrepot type from a given URL
+        /// extract entrepot type from a given URL
     extern remote_entrepot_type string_to_remote_entrepot_type(const std::string & arg);
 
 
-	/// create a remote entrepot of given type
+        /// create a remote entrepot of given type
     std::shared_ptr<entrepot> create_remote_entrepot(std::shared_ptr<user_interaction> & dialog,
-						     remote_entrepot_type proto,
-						     const std::string & login,
-						     const secu_string & pass,
-						     const std::string & host,
-						     const std::string & port,
-						     bool auth_from_file,
-						     const std::string & sftp_pub_filekey,
-						     const std::string & sftp_prv_filekey,
-						     const std::string & sftp_known_hosts,
-						     U_I network_retry,
-						     bool remote_verbose);
+                                                     remote_entrepot_type proto,
+                                                     const std::string & login,
+                                                     const secu_string & pass,
+                                                     const std::string & host,
+                                                     const std::string & port,
+                                                     bool auth_from_file,
+                                                     const std::string & sftp_pub_filekey,
+                                                     const std::string & sftp_prv_filekey,
+                                                     const std::string & sftp_known_hosts,
+                                                     U_I network_retry,
+                                                     bool remote_verbose);
 
 
-   	/// @}
+        /// @}
 
 } // end of namespace
 
