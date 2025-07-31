@@ -138,7 +138,7 @@ int main()
 
 	if(!compile_time::remote_repository())
 	{
-	    cerr << "MISSING LIBCURL SUPPORT TO BE ABLE TO PERFORM ALL TESTS, ABORTING" << endl;
+	    cerr << "MISSING LIBCURL or LIBSSH SUPPORT TO BE ABLE TO PERFORM ALL TESTS, ABORTING" << endl;
 	    throw Efeature("remote repositories");
 	}
 
