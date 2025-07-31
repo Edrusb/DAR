@@ -22,7 +22,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.69)
-AC_INIT([DAR], [2.7.19.RC5_no_last_slice], [[https://github.com/Edrusb/DAR/issues]])
+AC_INIT([DAR], [2.7.19_no_last_slice], [[https://github.com/Edrusb/DAR/issues]])
 AC_CONFIG_HEADERS([config.h])
 AC_LANG([C++])
 AC_CONFIG_SRCDIR([src/libdar/catalogue.cpp])

@@ -1,7 +1,8 @@
 version 2.7.19
 --------------
 Thanks to RSmain at github for findings and feedback about script launching
-(-E/-F/-~ options) under Cygwin.
+(-E/-F/-~ options) under Cygwin and thanks to logging-synchronous@github for
+bug report.
 
 version 2.7.18
 --------------

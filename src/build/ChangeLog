@@ -19,8 +19,8 @@ from 2.7.18 to 2.7.19
   met, which leads dar to report an error and exiting with code 5 (while
   restoration was fine).
 - fixing dead-lock condition met when dar is about to end due to the fact two
-  threads unexpectely access the same object at the same time (which object
-  is not designed for concurrent accesses). This occured in sequential mode
+  threads unexpectedly access the same object at the same time (which object
+  is not designed for concurrent accesses). This occurred in sequential mode
   with parallel compression and parallel deciphering after data has been
   restored, leading dar in dead-lock situation (sleeping forever).
 - fixing bug met in sequential read mode when retrieving archive summary
@@ -29,11 +29,15 @@ from 2.7.18 to 2.7.19
   dar to abort but without displaying the root cause. Error message now shows
 - fixed bug in sar::truncate() which lead dar to create a hole in the slice
   numbering when one of the last file to backup was so badly compressed that
-  resaving it uncompressed lead to remove enough slices for the rest of the
+  re-saving it uncompressed lead to remove enough slices for the rest of the
   backup to need less slices that reached at that time (bug detected with
   slices of 1024 bytes). Such archive are still readable in sequential
   read mode but end with dar asking for the missing slices at the end of
   the process.
+- fixing bug met in sequential-read mode lead dar to try restoring file a
+  second time from differential backup having entries marked as deleted,
+  which fails (reporting CRC mismatch) as the data of the file is no more
+  accessible due to the sequential reading mode.
 
 from 2.7.17 to 2.7.18
 - fixed bug that broke the ability to repair an archive through ftp/sftp
