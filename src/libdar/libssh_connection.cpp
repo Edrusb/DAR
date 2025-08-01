@@ -313,9 +313,9 @@ namespace libdar
 	    }
 
 	    if(real_pass.empty())
-		code = ssh_userauth_password(sess, NULL, "");
+		code = ssh_userauth_password(sess, nullptr, "");
 	    else
-		code = ssh_userauth_password(sess, NULL, real_pass.c_str());
+		code = ssh_userauth_password(sess, nullptr, real_pass.c_str());
 
 	    if(code != SSH_OK)
 		throw Enet_auth(tools_printf(gettext("Authentication failure: %s"),
@@ -338,7 +338,7 @@ namespace libdar
 
 		    // checking if this public key would be an acceptable authentication method
 
-		code = ssh_userauth_try_publickey(sess, NULL, pubkey);
+		code = ssh_userauth_try_publickey(sess, nullptr, pubkey);
 		if(code != SSH_AUTH_SUCCESS)
 		    throw Erange("entrepot_ssh::user_authentication",
 				 tools_printf(gettext("Failed public key authentication: %s"),
@@ -347,9 +347,9 @@ namespace libdar
 		    // loading the private key (eventually using the password as pass for the key
 
 		code = ssh_pki_import_privkey_file(sftp_prv_keyfile.c_str(),
-						   password.empty() ? NULL : password.c_str(),
-						   NULL,
-						   NULL,
+						   password.empty() ? nullptr : password.c_str(),
+						   nullptr,
+						   nullptr,
 						   &prvkey);
 
 		if(code != SSH_OK)
