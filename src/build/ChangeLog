@@ -72,6 +72,10 @@ from 2.7.x to 2.8.0
   --enable-dar-static to the configure script. This will last until
   libcurl can be replaced by an alternative method to provide FTP
   support.
+- increasing major version of libdar API to version 7, even if the change
+  from version 6 is little: It mainly concerns the abstraction of
+  remote sftp/ftp repositories from their implementation (libcurl,
+  libssh)[see remote_entrepot_api.hpp module part if libdar API].
 
 from 2.7.18 to 2.7.19
 - fixed the trailing slash support in path, that was broken by commit
