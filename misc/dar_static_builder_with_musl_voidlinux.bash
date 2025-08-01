@@ -308,6 +308,7 @@ dar_static()
 		--enable-libargon2-linking\
 		--disable-python-binding\
 		--enable-librhash-linkling\
+                --enable-dar-static\
 		--prefix="$LOCAL_PREFIX" || return 1
     make ${MAKE_FLAGS} || return 1
     make install-strip || return 1
