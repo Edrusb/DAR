@@ -67,6 +67,10 @@ from 2.7.x to 2.8.0
   retain the patched/updated version in the resulting backup.
 - replaced libcurl by libssh for SFTP repositories. Libcurl is still
   used for FTP repositories for now, this may change in the future.
+- by default dar_static is no more built, you need to specify
+  --enable-dar-static to the configure script. This will last until
+  libcurl can be replaced by an alternative method to provide FTP
+  support.
 
 from 2.7.18 to 2.7.19
 - fixed the trailing slash support in path, that was broken by commit
