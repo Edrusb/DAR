@@ -727,10 +727,18 @@
 	      </td>
 	    </tr>
 	    <tr>
-	      <td class=desc>--disable-dar-static
+	      <td class=desc>--enable-dar-static
 	      </td>
 	      <td>
-		dar_static binary (statically linked version of dar) will not be built
+		dar_static binary (statically linked version of dar) will be built. It may fail if a library
+		is missing under its statically linkable version. That's up to you be sure that for each
+		dynamically linked library detected by the configure script, a static version of that library
+		exists. If this was not the case you have to options:
+		<ul>
+		  <li>Either have the configure script ignore this liibrary by mean of <code>--disable-...-linking</code> option</li>
+		  <li>Or add the static library beside the dynamic version (same directory)</li>
+		</ul>
+		one.
 	      </td>
 	    </tr>
 	    <tr>
