@@ -1,7 +1,11 @@
 #!/bin/bash
 
-if [ ! -z "$1" ] && [ "$1" -gt 1 ] ; then
-    export MAKE_FLAGS="-j $1"
+if [ ! -z "$1" ] ; then
+   if [ "$1" -gt 1 ] ; then
+       export MAKE_FLAGS="-j $1"
+   else
+       export MAKE_FLAGS=""
+   fi
 else
     echo "usage: $0 <num CPU cores to use> [root]"
     exit 1
