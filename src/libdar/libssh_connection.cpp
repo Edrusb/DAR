@@ -352,6 +352,18 @@ namespace libdar
 						   nullptr,
 						   &prvkey);
 
+		if(code != SSH_OK && password.empty())
+		{
+		    real_pass = dialog.get_secu_string(gettext("Failed to load the key pair without passphrase. Please provide the passphrase for this key: "),
+						      false);
+
+		    code = ssh_pki_import_privkey_file(sftp_prv_keyfile.c_str(),
+						       real_pass.empty() ? nullptr : real_pass.c_str(),
+						       nullptr,
+						       nullptr,
+						       &prvkey);
+		}
+
 		if(code != SSH_OK)
 		    throw Erange("libssh_connection::user_authentication",
 				 tools_printf(gettext("Failed loading the private key: %s"),
