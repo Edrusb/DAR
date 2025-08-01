@@ -371,7 +371,7 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[extern "C" {
                                         a[0].tv_sec = 0;
                                         a[1].tv_nsec = 1;
                                         (void)utimensat(0, "/tmp/testfile", a,  0);
-                                        /* not that this test program is only compiled+lined not executed */
+                                        /* not that this test program is only compiled+linked not executed */
                                    ]])
                   ],
                   [
@@ -2368,7 +2368,6 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
 
                                   if(symbols != 0)
                                     free(symbols);
-                                  printf("testing execinfo info in static linked mode...");
                                #endif
 
                                #if MUTEX_WORKS
@@ -2381,7 +2380,6 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                                        pthread_mutex_unlock(&test);
                                  }
                                  pthread_mutex_destroy(&test);
-                                 printf("testing mutex availability in static linked mode...");
                                }
                                #endif
 
@@ -2390,7 +2388,6 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                                {
                                  rs_result err = RS_DONE;
                                  (void) rs_strerror(err);
-                                 printf("testing librsync availability in static linked mode...");
                                }
                                #endif
 
@@ -2399,7 +2396,6 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                                {
                                   z_stream *ptr = (z_stream *)0;
                                   deflate(ptr, 0);
-                                  printf("testing libz availability in static linked mode...");
                                }
                                #endif
 
@@ -2408,7 +2404,6 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                                {
                                   bz_stream *ptr = (bz_stream *)0;
                                   BZ2_bzCompress(ptr, 0);
-                                  printf("testing libbz2 availability in static linked mode...");
                                }
                                #endif
 
@@ -2416,7 +2411,6 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                                if(1)
                                {
                                   int x;
-                                  printf("testing liblzo2 availability in static linked mode...");
                                   x = lzo1x_1_compress(0, 0, 0, 0, 0);
                                }
                                #endif
@@ -2428,7 +2422,6 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                                   lzma_ret tmp = lzma_easy_encoder(&ptr,
                                                                    2,
                                                                    LZMA_CHECK_CRC32);
-                                  printf("testing libxz/lzma availability in static linked mode...");
                                }
                                #endif
 
@@ -2437,7 +2430,6 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
 			       {
 			          ZSTD_CStream *compr;
 				  unsigned int vers = ZSTD_versionNumber();
-                                  printf("testing zstd availability in static linked mode... version found: %d", vers);
 			       }
 			       #endif
 
@@ -2445,12 +2437,10 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
 			       if(1)
 			       {
 				  unsigned int size = LZ4_sizeofState();
-                                  printf("testing lz4 availability in static linked mode...");
 			       }
 			       #endif
 
                                #if CRYPTO_AVAILABLE
-                                  printf("testing gcrypt availability in static linked mode...");
                                   if(!gcry_check_version(MIN_VERSION_GCRYPT))
                                   {
                                     printf("ligcrypt version too low");
@@ -2461,7 +2451,6 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                                #endif
 
                                #if LIBCURL_AVAILABLE
-                                  printf("testing librsync availability in static linked mode...");
                                   (void) curl_global_init(CURL_GLOBAL_ALL);
                                #endif
 
@@ -2502,7 +2491,6 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
 			         signed int f;
 				 signed int ret = ioctl(0, EXT2_IOC_GETFLAGS, &f);
 				 bool flag = f & EXT2_NODUMP_FL;
-				 printf("testing ext2fs availability in static linked mode...");
 			       }
 			       #endif
 
@@ -2511,7 +2499,6 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
 			       {
 			          unsigned int maj, med, min;
 				  libthreadar::get_version(maj, med, min);
-				  printf("testing libthreadar availability in static linked mode...");
 			       }
 			       #endif
 
@@ -2519,7 +2506,6 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
 			       if(1)
 			       {
 			          signed int err = argon2id_hash_raw(100, 100, 1, "", 0, "", 0, (void*)"", 0);
-				  printf("testing libargon2 availability in static linked mode...");
 			       }
 			       #endif
 
@@ -2527,7 +2513,6 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
 			       if(1)
 			       {
 			          rhash rhash_ctxt = rhash_init(RHASH_WHIRLPOOL);
-				  printf("testing librhash availability in static linked mode...");
 			       }
 			       #endif
 
