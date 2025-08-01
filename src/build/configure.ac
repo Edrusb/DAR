@@ -1929,14 +1929,14 @@ AC_ARG_ENABLE( [debug-memory],
                ])])
 
 AC_ARG_ENABLE( [dar-static],
-               AS_HELP_STRING(--disable-dar-static, [avoids building dar_static, a dar statically linked version]),
+               AS_HELP_STRING(--enable-dar-static, [avoids building dar_static, a dar statically linked version]),
                [
                  explicit_dar_static=yes
                  AS_IF([ test "x$enable_dar_static" != "xyes" ],
                        [ build_static="no" ],
                        [ build_static="yes" ])
                ],
-               [build_static="yes"])
+               [build_static="no"])
 
 
 AC_ARG_ENABLE( [threadar],
@@ -2263,274 +2263,346 @@ AS_IF(
                 ]
      )
 
-AC_MSG_CHECKING([static linking])
-LDFLAGS__cache="$LDFLAGS"
-LDFLAGS="$LDFLAGS --static"
-AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
-                                                #if HAVE_STDIO_H
-                                                #include <stdio.h>
-                                                #endif
-
-                                                #if HAVE_EXECINFO_H
-                                                #include <execinfo.h>
-                                                #endif
-
-                                                #if HAVE_STDLIB_H
-                                                #include <stdlib.h>
-                                                #endif
-
-                                                #if HAVE_PTHREAD_H
-                                                #include <pthread.h>
-                                                #endif
-
-                                                #if HAVE_LIBRSYNC_H
-                                                #include <librsync.h>
-                                                #endif
-
-                                                #if HAVE_PTHREAD_H
-                                                #include <pthread.h>
-                                                #endif
-
-                                                #if HAVE_ZLIB_H
-                                                #include <zlib.h>
-                                                #endif
-
-                                                #if HAVE_BZLIB_H
-                                                #include <bzlib.h>
-                                                #endif
-
-                                                #if HAVE_LZO_LZO1X_H
-                                                #include <lzo/lzo1x.h>
-                                                #endif
-
-                                                #if HAVE_LZMA_H
-                                                #include <lzma.h>
-                                                #endif
-
-						#if HAVE_ZSTD_H
-						#include <zstd.h>
-						#endif
-
-						#if HAVE_LZ4_H
-						#include <lz4.h>
-						#endif
-
-                                                #if HAVE_GCRYPT_H
-                                                #include <gcrypt.h>
-                                                #endif
-
-                                                #if HAVE_CURL_CURL_H
-                                                #include <curl/curl.h>
-                                                #endif
-
-                                                #if HAVE_LIBSSH_LIBSSH_H
-                                                #include <libssh/libssh.h>
-                                                #include <libssh/sftp.h>
-                                                #endif
-
-                                                #if HAVE_GPGME_H
-                                                #include <gpgme.h>
-                                                #endif
-
-						#ifdef LIBDAR_NODUMP_FEATURE
-						#if HAVE_SYS_IOCTL_H
-						#include <sys/ioctl.h>
-						#endif
-						#if HAVE_LINUX_EXT2_FS_H
-						#include <linux/ext2_fs.h>
-						#endif
-						#if HAVE_EXT2FS_EXT2_FS_H
-						#include <ext2fs/ext2_fs.h>
-						#endif
-						#endif
-
-						#if HAVE_ARGON2_H
-						#include <argon2.h>
-						#endif
-
-						#if HAVE_RHASH_H
-						#include <rhash.h>
-						#endif
-                                             }
-
-					      /* C++ included files */
-
-					     #if HAVE_LIBTHREADAR_LIBTHREADAR_HPP
-					     #include <libthreadar/libthreadar.hpp>
-					     #endif
-                               ]],
-                               [[
-                               #if BACKTRACE_AVAILABLE
-                                  const int buf_size = 20;
-                                  void *buffer[buf_size];
-                                  int size = backtrace(buffer, buf_size);
-                                  char **symbols = backtrace_symbols(buffer, size);
-
-                                  if(symbols != 0)
-                                    free(symbols);
-                               #endif
-
-                               #if MUTEX_WORKS
-                               if(1)
-                               {
-                                 pthread_mutex_t test;
-                                 if(pthread_mutex_init(&test, NULL) == 0)
-                                 {
-                                    if(pthread_mutex_lock(&test) == 0)
-                                       pthread_mutex_unlock(&test);
-                                 }
-                                 pthread_mutex_destroy(&test);
-                               }
-                               #endif
-
-                               #if LIBRSYNC_AVAILABLE
-                               if(1)
-                               {
-                                 rs_result err = RS_DONE;
-                                 (void) rs_strerror(err);
-                               }
-                               #endif
-
-                               #if LIBZ_AVAILABLE
-                               if(1)
-                               {
-                                  z_stream *ptr = (z_stream *)0;
-                                  deflate(ptr, 0);
-                               }
-                               #endif
-
-                               #if LIBBZ2_AVAILABLE
-                               if(1)
-                               {
-                                  bz_stream *ptr = (bz_stream *)0;
-                                  BZ2_bzCompress(ptr, 0);
-                               }
-                               #endif
-
-                               #if LIBLZO2_AVAILABLE
-                               if(1)
-                               {
-                                  int x;
-                                  x = lzo1x_1_compress(0, 0, 0, 0, 0);
-                               }
-                               #endif
-
-                               #if LIBLZMA_AVAILABLE
-                               if(1)
-                               {
-                                  lzma_stream ptr = LZMA_STREAM_INIT;
-                                  lzma_ret tmp = lzma_easy_encoder(&ptr,
-                                                                   2,
-                                                                   LZMA_CHECK_CRC32);
-                               }
-                               #endif
-
-			       #if LIBZSTD_AVAILABLE
-			       if(1)
-			       {
-			          ZSTD_CStream *compr;
-				  unsigned int vers = ZSTD_versionNumber();
-			       }
-			       #endif
-
-			       #if LIBLZ4_AVAILABLE
-			       if(1)
-			       {
-				  unsigned int size = LZ4_sizeofState();
-			       }
-			       #endif
-
-                               #if CRYPTO_AVAILABLE
-                                  if(!gcry_check_version(MIN_VERSION_GCRYPT))
-                                  {
-                                    printf("ligcrypt version too low");
-                                    exit(1);
-                                  }
-                                  else
-                                    exit(0);
-                               #endif
-
-                               #if LIBCURL_AVAILABLE
-                                  (void) curl_global_init(CURL_GLOBAL_ALL);
-                               #endif
-
-			       #if LIBSSH_AVAILABLE
-			         ssh_session sess = ssh_new();
-			         sftp_session sessftp = sftp_new(sess);
-
-			         if(sessftp != 0)
-			            sftp_free(sessftp);
-
-			         if(sess != 0)
-			         {
-			            ssh_disconnect(sess);
-				    ssh_free(sess);
-			         }
-			       #endif
-
-                               #if GPGME_SUPPORT
-                               if(1)
-                               {
-                                 gpgme_ctx_t context;
-				 gpgme_encrypt_flags_t flag;
-                                 gpgme_error_t err = gpgme_new(&context);
-				 err = gpgme_set_protocol(context, GPGME_PROTOCOL_OpenPGP);
-				 gpgme_set_passphrase_cb(context, nullptr, nullptr);
-				 err = gpgme_signers_add(context, nullptr); // just for testing linking availability
-				 err = gpgme_op_encrypt(context, nullptr, flag, nullptr, nullptr);
-				 err = gpgme_op_encrypt_sign(context, nullptr, flag, nullptr, nullptr);
-				 err = gpgme_op_decrypt_verify(context, nullptr, nullptr);
-
-                                 gpgme_release(context);
-                               }
-                               #endif
-
-			       #ifdef LIBDAR_NODUMP_FEATURE
-			       if(1)
-			       {
-			         signed int f;
-				 signed int ret = ioctl(0, EXT2_IOC_GETFLAGS, &f);
-				 bool flag = f & EXT2_NODUMP_FL;
-			       }
-			       #endif
-
-			       #if LIBTHREADAR_AVAILABLE
-			       if(1)
-			       {
-			          unsigned int maj, med, min;
-				  libthreadar::get_version(maj, med, min);
-			       }
-			       #endif
-
-			       #if LIBARGON2_AVAILABLE
-			       if(1)
-			       {
-			          signed int err = argon2id_hash_raw(100, 100, 1, "", 0, "", 0, (void*)"", 0);
-			       }
-			       #endif
-
-			       #if RHASH_AVAILABLE
-			       if(1)
-			       {
-			          rhash rhash_ctxt = rhash_init(RHASH_WHIRLPOOL);
-			       }
-			       #endif
-
-			       return 0;
-                               ]])
-               ],
-               [
-                 AC_MSG_RESULT([yes, perfect!])
-                 static_pb="no"
-               ],
-               [
-                 AC_MSG_RESULT([failed])
-                 static_pb="yes"
-                 AS_IF( [ test "x$explicit_dar_static" = "xyes" -a "$build_static" = "yes" ],
-                        [ AC_MSG_ERROR([Cannot build dar-static on this system, check config.log]) ]
-                      )
-               ])
-LDFLAGS="$LDFLAGS__cache"
+## Note of release 2.8.0
+##
+## the following check is disabled as libcurl is not designed to provide a proper pkg-config information.
+## While this is not crutial for dynamic linking as the dynamic linker will find the missing symbols from the libraries
+## available in the paths provided in /etc/ld.so.conf or LD_LIBRARY_PATH, static linking need explictely the
+## all libraries necessary to define the symbols needed by other libraries. libcurl has many flavors and possible
+## compilations options (like libdar) but at the difference from libdar which dynamically generates an libdar.pc file
+## for pkg-config tool to provide all its value, libcurl does not and it is thus not possible to known in advance the
+## exact list of required libraries for static linking. You have to analyse the linking error messages and complete the
+## library flags (-L and -l options) with the missingh library.
+##
+## For that reason the --disable-dar-static which was broken since 2.7.0 has its default inverted to --enable-dar-static
+## and no check is performed about the feasibility of such static compilation regarding the current operation system
+## environment. This may change in the future if libdar can avoid relying on libcurl for FTP remote repositories
+##
+#  AC_MSG_CHECKING([static linking])
+#  LDFLAGS__cache="$LDFLAGS"
+#  LDFLAGS="--static $LDFLAGS"
+#  AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
+#                                                  #if HAVE_STDIO_H
+#                                                  #include <stdio.h>
+#                                                  #endif
+#
+#                                                  #if HAVE_EXECINFO_H
+#                                                  #include <execinfo.h>
+#                                                  #endif
+#
+#                                                  #if HAVE_STDLIB_H
+#                                                  #include <stdlib.h>
+#                                                  #endif
+#
+#                                                  #if HAVE_PTHREAD_H
+#                                                  #include <pthread.h>
+#                                                  #endif
+#
+#                                                  #if HAVE_LIBRSYNC_H
+#                                                  #include <librsync.h>
+#                                                  #endif
+#
+#                                                  #if HAVE_ZLIB_H
+#                                                  #include <zlib.h>
+#                                                  #endif
+#
+#                                                  #if HAVE_BZLIB_H
+#                                                  #include <bzlib.h>
+#                                                  #endif
+#
+#                                                  #if HAVE_LZO_LZO1X_H
+#                                                  #include <lzo/lzo1x.h>
+#                                                  #endif
+#
+#                                                  #if HAVE_LZMA_H
+#                                                  #include <lzma.h>
+#                                                  #endif
+#
+#  						#if HAVE_ZSTD_H
+#  						#include <zstd.h>
+#  						#endif
+#
+#  						#if HAVE_LZ4_H
+#  						#include <lz4.h>
+#  						#endif
+#
+#                                                  #if HAVE_GCRYPT_H
+#                                                  #include <gcrypt.h>
+#                                                  #endif
+#
+#  						#if HAVE_SYS_TYPES_H
+#                                                  #include <sys/types.h>
+#                                                  #endif
+#                                                  #if HAVE_ATTR_XATTR_H && ! HAVE_SYS_XATTR_H
+#                                                  #include <attr/xattr.h>
+#                                                  #endif
+#                                                  #if HAVE_SYS_XATTR_H
+#                                                  #include <sys/xattr.h>
+#                                                  #endif
+#
+#                                                  #if HAVE_SYS_STAT_H
+#                                                  #include <sys/stat.h>
+#                                                  #endif
+#                                                  #if HAVE_UNISTD_H
+#                                                  #include <unistd.h>
+#                                                  #endif
+#
+#                                                  #if HAVE_CURL_CURL_H
+#                                                  #include <curl/curl.h>
+#                                                  #endif
+#
+#                                                  #if HAVE_LIBSSH_LIBSSH_H
+#                                                  #include <libssh/libssh.h>
+#                                                  #include <libssh/sftp.h>
+#                                                  #endif
+#
+#                                                  #if HAVE_FCNTL_H
+#                                                  #include <fcntl.h>
+#                                                  #endif
+#
+#                                                  #if HAVE_GETOPT_H
+#                                                  #include <getopt.h>
+#                                                  #endif
+#
+#                                                  #if HAVE_GPGME_H
+#                                                  #include <gpgme.h>
+#                                                  #endif
+#
+#  						#ifdef LIBDAR_NODUMP_FEATURE
+#  						#if HAVE_SYS_IOCTL_H
+#  						#include <sys/ioctl.h>
+#  						#endif
+#  						#if HAVE_LINUX_EXT2_FS_H
+#  						#include <linux/ext2_fs.h>
+#  						#endif
+#  						#if HAVE_EXT2FS_EXT2_FS_H
+#  						#include <ext2fs/ext2_fs.h>
+#  						#endif
+#  						#endif
+#
+#  						#if HAVE_ARGON2_H
+#  						#include <argon2.h>
+#  						#endif
+#
+#  						#if HAVE_RHASH_H
+#  						#include <rhash.h>
+#  						#endif
+#                                               }
+#
+#  					      /* C++ included files */
+#
+#  					     #if HAVE_LIBTHREADAR_LIBTHREADAR_HPP
+#  					     #include <libthreadar/libthreadar.hpp>
+#  					     #endif
+#                                 ]],
+#                                 [[
+#  			       bool retval = 0;
+#
+#                                 #if BACKTRACE_AVAILABLE
+#                                    const int buf_size = 20;
+#                                    void *buffer[buf_size];
+#                                    int size = backtrace(buffer, buf_size);
+#                                    char **symbols = backtrace_symbols(buffer, size);
+#
+#                                    if(symbols != 0)
+#                                      free(symbols);
+#                                 #endif
+#
+#                                 #if MUTEX_WORKS
+#                                 if(1)
+#                                 {
+#                                   pthread_mutex_t test;
+#                                   if(pthread_mutex_init(&test, NULL) == 0)
+#                                   {
+#                                      if(pthread_mutex_lock(&test) == 0)
+#                                         pthread_mutex_unlock(&test);
+#                                   }
+#                                   pthread_mutex_destroy(&test);
+#                                 }
+#                                 #endif
+#
+#                                 #if LIBRSYNC_AVAILABLE
+#                                 if(1)
+#                                 {
+#                                   rs_result err = RS_DONE;
+#                                   (void) rs_strerror(err);
+#                                 }
+#                                 #endif
+#
+#                                 #if LIBZ_AVAILABLE
+#                                 if(1)
+#                                 {
+#                                    z_stream *ptr = (z_stream *)0;
+#                                    deflate(ptr, 0);
+#                                 }
+#                                 #endif
+#
+#                                 #if LIBBZ2_AVAILABLE
+#                                 if(1)
+#                                 {
+#                                    bz_stream *ptr = (bz_stream *)0;
+#                                    BZ2_bzCompress(ptr, 0);
+#                                 }
+#                                 #endif
+#
+#                                 #if LIBLZO2_AVAILABLE
+#                                 if(1)
+#                                 {
+#                                    int x;
+#                                    x = lzo1x_1_compress(0, 0, 0, 0, 0);
+#                                 }
+#                                 #endif
+#
+#                                 #if LIBLZMA_AVAILABLE
+#                                 if(1)
+#                                 {
+#                                    lzma_stream ptr = LZMA_STREAM_INIT;
+#                                    lzma_ret tmp = lzma_easy_encoder(&ptr,
+#                                                                     2,
+#                                                                     LZMA_CHECK_CRC32);
+#                                 }
+#                                 #endif
+#
+#  			       #if LIBZSTD_AVAILABLE
+#  			       if(1)
+#  			       {
+#  			          ZSTD_CStream *compr;
+#  				  unsigned int vers = ZSTD_versionNumber();
+#  			       }
+#  			       #endif
+#
+#  			       #if LIBLZ4_AVAILABLE
+#  			       if(1)
+#  			       {
+#  				  unsigned int size = LZ4_sizeofState();
+#  			       }
+#  			       #endif
+#
+#                                 #if CRYPTO_AVAILABLE
+#                                    if(!gcry_check_version(MIN_VERSION_GCRYPT))
+#                                    {
+#                                      retval = -1;
+#                                    }
+#                                    else
+#  				  {
+#  				    gcry_cipher_hd_t main_clef;
+#  				    gcry_error_t err = gcry_cipher_setkey(main_clef, (const void *)"hello", 5);
+#
+#                                      if(err != GPG_ERR_NO_ERROR)
+#  				       gcry_cipher_close(main_clef);
+#  				  }
+#                                 #endif
+#
+#                                 #ifdef EA_SUPPORT
+#  			         lgetxattr((char *)0, (char *)0, (void *)0, 0);
+#  			       #endif
+#  			       #ifdef OSX_EA_SUPPORT
+#  			         getxattr((char *)0, (char *)0, (void *)0, 0, 0, XATTR_NOFOLLOW);
+#  			       #endif
+#
+#  			       #if LIBDAR_BIRTHTIME
+#  			       if(1)
+#  			       {
+#  			         struct stat tmp;
+#  				 time_t birth = tmp.st_birthtime
+#                                 }
+#  			       #endif
+#
+#
+#                                 #if LIBCURL_AVAILABLE
+#                                    (void) curl_global_init(CURL_GLOBAL_ALL);
+#  				  CURL *handle = curl_easy_init();
+#  				  CURLcode err = curl_easy_perform(handle);
+#  				  curl_easy_cleanup(handle);
+#                                 #endif
+#
+#  			       #if LIBSSH_AVAILABLE
+#  			         ssh_session sess = ssh_new();
+#  			         sftp_session sessftp = sftp_new(sess);
+#
+#  			         if(sessftp != 0)
+#  			            sftp_free(sessftp);
+#
+#  			         if(sess != 0)
+#  			         {
+#  			            ssh_disconnect(sess);
+#  				    ssh_free(sess);
+#  			         }
+#  			       #endif
+#
+#                                 #if HAVE_POSIX_FADVISE
+#  			       (void)posix_fadvise(0,0,1,POSIX_FADV_NORMAL);
+#  			       #endif
+#
+#  			       #if HAVE_GETOPT_LONG
+#  			         getopt_long(0, 0, 0, 0, 0);
+#  			       #endif
+#
+#                                 #if GPGME_SUPPORT
+#                                 if(1)
+#                                 {
+#                                   gpgme_ctx_t context;
+#  				 gpgme_encrypt_flags_t flag;
+#                                   gpgme_error_t err = gpgme_new(&context);
+#  				 err = gpgme_set_protocol(context, GPGME_PROTOCOL_OpenPGP);
+#  				 gpgme_set_passphrase_cb(context, nullptr, nullptr);
+#  				 err = gpgme_signers_add(context, nullptr); // just for testing linking availability
+#  				 err = gpgme_op_encrypt(context, nullptr, flag, nullptr, nullptr);
+#  				 err = gpgme_op_encrypt_sign(context, nullptr, flag, nullptr, nullptr);
+#  				 err = gpgme_op_decrypt_verify(context, nullptr, nullptr);
+#
+#                                   gpgme_release(context);
+#                                 }
+#                                 #endif
+#
+#  			       #ifdef LIBDAR_NODUMP_FEATURE
+#  			       if(1)
+#  			       {
+#  			         signed int f;
+#  				 signed int ret = ioctl(0, EXT2_IOC_GETFLAGS, &f);
+#  				 bool flag = f & EXT2_NODUMP_FL;
+#  			       }
+#  			       #endif
+#
+#  			       #if LIBTHREADAR_AVAILABLE
+#  			       if(1)
+#  			       {
+#  			          unsigned int maj, med, min;
+#  				  libthreadar::get_version(maj, med, min);
+#  			       }
+#  			       #endif
+#
+#  			       #if LIBARGON2_AVAILABLE
+#  			       if(1)
+#  			       {
+#  			          signed int err = argon2id_hash_raw(100, 100, 1, "", 0, "", 0, (void*)"", 0);
+#  			       }
+#  			       #endif
+#
+#  			       #if RHASH_AVAILABLE
+#  			       if(1)
+#  			       {
+#  			          rhash rhash_ctxt = rhash_init(RHASH_WHIRLPOOL);
+#  			       }
+#  			       #endif
+#
+#  			       return 0;
+#                                 ]])
+#                 ],
+#                 [
+#                   AC_MSG_RESULT([yes, perfect!])
+#                   static_pb="no"
+#                 ],
+#                 [
+#                   AC_MSG_RESULT([failed])
+#                   static_pb="yes"
+#                   AS_IF( [ test "x$explicit_dar_static" = "xyes" -a "$build_static" = "yes" ],
+#                          [ AC_MSG_ERROR([Cannot build dar-static on this system, check config.log]) ]
+#                        )
+#                 ])
+#  LDFLAGS="$LDFLAGS__cache"
+static_pb="no"
+#
 
 
 AC_ARG_ENABLE( [python-binding],
