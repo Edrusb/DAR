@@ -416,7 +416,12 @@
       </p>
 
       <h2><a name="ssh">Dar and ssh</a></h2>
-
+      <p>
+	<b>The following is old, still valid but superseded by the handling of sftp protocol directly by dar. You can create and do
+	  any operation (listing, testing, merging,...) using compression, encryption, slicing or not, by specifying the name
+	  of a backup this way: <code>dar -c sftp://login@host[:port]/path/to/backup -A sftp://login@host[:port]/path/to/reference... </code>
+	</b>
+      </p>
       <h3>Creating full backup</h3>
       <p>
 	we assume you have a sshd daemon on flower. We can
@@ -1150,9 +1155,9 @@
       <h3><a name="DBP">Before and after saving a file</a></h3>
 
       <p>
-	This concerns the -=, -&lt; and -&gt; options. The -&lt; (include)
-	and -&gt; (exclude) options, let you define which file will need a
-	command to be run before and after their backup. While the -= option,
+	This concerns the <code>-=</code>, <code>-&lt;</code> and <code>-&gt;</code> options. The <code>-&lt;</code> (include)
+	and <code>-&gt;</code> (exclude) options, let you define which file will need a
+	command to be run before and after their backup. While the <code>-=</code> option,
 	let you define which command to run for those files.
       </p>
       <p>
@@ -2370,14 +2375,16 @@
 	warning will be issued and the file will not be modified at all.
       </p>
       <p>
-	The point with restoration is to *always* restore all previous backups
-	in order, from the full backup down to all incremental one (or the
-	full backup and just the latest differential one), for dar be able
+	The point with restoration is to *always* restore all backups
+	in the order they have been created, from the latest full backup down to all
+	differential/incremental ones, for dar be able
 	to apply the stored patches. Else restoration can fail for some or
-	all files. <b>Dar_manager</b> can be of great help here as it will
-	know which archive to skip and which not to skip in order to restore
-	a particular set of files. But for a restoration a whole filesystem
-	it is advised to just use dar and restore backup in order.
+	all files. <b>Dar_manager databases</b> can be of great help here as they will
+	let <b>dar</b> know which archive to skip and which not to skip in order to restore
+	a particular set of files or a whole backup content with many full,
+	differential and incremental backups.For more, see <b>dar_manager</b> command to setup
+	a dar_manager database and <b>dar</b> <code>-aefd</code> option to
+	restore data using a dar_manager database.
       </p>
 
       <h4>Performing binary delta only for some files</h4>
@@ -2434,12 +2441,12 @@
 
       <p>
 	<i>dar</i> uses <i>binary delta</i> to reduce the volume of data to
-	store (and thus transfer over the network) when performing a differential
+	store and thus also to transfer over the network, when performing a differential
 	or incremental backup. At the opposite of <i>rsync</i> the data stays
 	compressed and it thus not ready for use (backup/archiving context), and
 	the binary delta can be used incrementally to record a long history of
-	modification, while <i>rsync</i> looses past modifications at each new
-	remote synchronization
+	modifications, while <i>rsync</i> looses past modifications at each new
+	remote synchronization.
       </p>
       <p>
 	In conclusion <i>rsync</i> and <i>dar</i> to not address the same

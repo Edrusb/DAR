@@ -915,14 +915,23 @@
 
     <h2>Dar_manager tutorial</h2>
 
+    <h3>Setting up a Database</h3>
+
     <p>
       <i>dar_manager</i>
       builds a database of all
-      your archive contents, to automatically restore the latest versions of
-      a given set of files. Dar_manager is not targeted to the restoration a
-      whole filesystem, the best ways to restore a whole filesystem has been
-      described above and does not rely on dar_manager. So let's use dar_manager to
-      restore a set of files or a whole directory. First, we have to create a "database" file:
+      your backup contents (full, incremental or differential, but not decremental ones),
+      to automatically restore the latest versions of
+      a given set of files or directories.
+    </p>
+    <p> Since release 2.8.0 you can use dar_manager databases directly with dar to restore
+      efficiently a whole filesystem (or just some files), in either the latest saved state, or the
+      state before a given date. Note also that dar_mananger database supports binary delta,
+      which else may be complicated to restore as you have to restore the latest full version, then
+      all subsequent patches for they update the file on filesystem.
+    </p>
+    <p>
+      But first let's create a database:
     </p>
     <code class=block>
       dar_manager -C my_base.dmd
@@ -934,8 +943,8 @@
     </p>
     <p>
       This database is created empty. Each time you make a backup, may it be
-      full or differential, you will have to add its table of contents (aka "catalogue") to this
-      database using the&nbsp; following command:
+      full, differential or incremental, with or without binary deltas, you will have to add its
+      table of contents (aka "catalogue") to this database using the&nbsp; following command:
     </p>
 
     <code class=block>
@@ -970,8 +979,11 @@
     </p>
 
     <code class=block>
-      dar path    :
-      dar options :
+      dar path         :
+      dar options      :
+      database version : 6
+      compression used : gzip
+      compression level: 9
 
       archive #   |    path      |    basename
       ------------+--------------+---------------
@@ -1001,9 +1013,11 @@
     <code class=block>
       dar_manager -B my_base.dmd -l
 
-
-      dar path    :
-      dar options :
+      dar path         :
+      dar options      :
+      database version : 6
+      compression used : gzip
+      compression level: 9
 
       archive #   |    path      |    basename
       ------------+--------------+---------------
@@ -1029,65 +1043,94 @@
       You can add up to 65534 archives to a given database, and have as much
       base as you want.
     </p>
-    <p>
-      Note that we did not yet gave important options in the database to be
-      passed to dar. For example, you will likely restore from the root of
-      your filesystem, therefore when called from dar_manager, dar must get the
-      "-R /" option. This is done with:
-    </p>
-
     <code class=block>
-      dar_manager -B my_base.dmd -o -R /
+      dar_manager -B my_base.dmd -A ~/Catalogues/linux_fullA
+      dar_manager -B my_base.dmd -A ~/Catalogues/linux diffA1
+      dar_manager -B my_base.dmd -A ~/Catalogues/linux_incrA1_1
+      dar_manager -B my_base.dmd -A ~/Catalogues/linux_incrA1_2
+      dar_manager -B my_base.dmd -A ~/Catalogues/linux_incrA1_3
+      dar_manager -B my_base.dmd -A ~/Catalogues/linux_diffA2
+      dar_manager -B my_base.dmd -A ~/Catalogues/linux_incrA2_1
+      dar_manager -B my_base.dmd -A ~/Catalogues/linux_incrA1_2
+      dar_manager -B my_base.dmd -A ~/Catalogues/linux_fullB
+      dar_manager -B my_base.dmd -A ~/Catalogues/linux_diffB1
+      ...
     </code>
-
+    <h3>using a database for efficient restoration</h3>
     <p>
-      All that follows -o is passed to dar as-is. You can see the options
-      passed to dar when listing the database contents (-l option).
+      When you have many full backups interleaved with differential and incremental ones, it may become
+      a nightmare (and I like to sleep well, where from dar_manager) to find the archive where is located
+      the latest version. This is worse if you plan to restore a directory (or even worse the whole
+      backup content), as not all files may have changed at the same time and their latest version may end
+      in different backups... And the nightmare turns to horror when considering binary delta where the latest
+      status of a file is spread between several backups!
     </p>
     <p>
-      Let's now suppose that after each backup you took the time to update your database,
-      and you now just have removed an important file by mistake.
+      Before release 2.8.0, only dar_manager program was able to leverage a dar_manager
+      database. When came the time to restore something through it, the user had to call
+      dar_manager with its <code>-r</code> option, which drove dar_manager to select the proper
+      archive/backup set from the database with for each backup the correct set of file to restore and
+      each time spawning a new dar process to proceed to this restoration step.
+      This explains why you could see the <code>dar options</code> and <code>dar path</code> above
+      in header of a database content listing. But this method is over now
+      and will tend to be deprecated in the future.
     </p>
-
     <p>
-      We can restore our /home/denis/my/precious/file using dar_manager that way:
+      Today, if you want to restore a file, a directory, a directory tree or even the whole
+      backup content, just call <b>dar</b> (an not dar_manager!) but give it the dar_manager database
+      instead of a backup. But for <em>dar</em> to know this is a database, add the <code>-aefd</code>
+      option, which long version is <code>--alter=extract-from-database</code>.
     </p>
-
+    <p>
+      Let's suppose we want to restore our /home/denis/my/precious/file:
+    </p>
     <code class=block>
-      <e>dar_manager -B my_base.dmd -r home/denis/my/precious/file</e>
+      dar -aefd -x my_base.dmd -R / -g home/denis/my/precious/file
     </code>
     <p>
-      <i>dar_manager</i> will find the proper archive to use, and call dar with the
-      following options: <code> dar -x archive -R / -g home/denis/my/precious/file</code>
-      which in turn will ask you the corresponding slices. If you want to restore
-      more files at a time or even a directory tree, you can add several
-      arguments after -r option of dar_manager:
+      <i>dar</i> will find the proper archive(s) to restore this file. As you can see, you can use
+      any of the filtering mechanism we say previously with dar <code>-X/-I/-P/-g/-[/-]....</code>.
+      But of course you can also avoid any filtering option, in that case the whole backup set will
+      be restored.
+    </p>
+    <p>
+      OK, but what if I do not want to restore my files/directories/filesystems in the latest availabe
+      state (for example the filesystem/disk corrupted some files and I only noticed that 3 months after)?
+    <p>
+      For that we use the <code>-A</code> option with <code>-x</code> option. We already saw -A option
+      at creation time to give the archive of reference. This option can receive not only a dar backup
+      (the reference), but also a date, a '+' to create a snapshot, and more. To use a date we have to
+      add the <code>-af</code> option (which long version is <code>--alter=fixed-date</code>). When used with a
+      dar_manager database, this instructs <u>dar</u> to ignore any information more recent than this date.
+      The result leads dar to restore files and directories to the most recent known state they have
+      at the specified time:
     </p>
     <code class=block>
-      dar_manager -B my_base.dmd -r home/denis/my/precious/file etc/fstab <b>home/joe</b>
+      dar -aefd -x my_base.dmd -R / -g home/denis/my/precious/file -af -A 2025/08/01-20:43:48
     </code>
+    <p>
+      The restoration is the only operation where you use <em>dar</em> instead of <em>dar_manager</em> with
+      a dar_manager database. What is described below relies on <b>dar_manager</b>.
 
+    </p>
+
+    <h3>Managing a database over time</h3>
     <p>
       Once an archive become obsolete you can delete it from the database
-      thanks to the -D option, you can also change archive order (-m option),
-      get a list in which is located a given file (-f option), get the list
-      of most recent files in a given archive (-u option), and get overall
-      statistics per archive (-s option). Lastly you can specify which dar
-      command to use given its path (-d option), by default, dar_manager uses
-      the PATH shell variable to choose the dar command.
+      thanks to the <code>-D</code> option, you can also change archive order (<code>-m</code> option),
+      get a list in which is located a given file (<code>-f</code> option), get the list
+      of most recent files in a given archive (<code>-u</code> option), and get overall
+      statistics per archive (<code>-s</code> option).
     </p>
     <p>
       A new feature for those that are really very lazy (still as I am myself):
-      dar_manager has an <b>interactive mode</b>,
-      so you don't have to remeber all these command-line switches except one:
+      dar_manager has an <b>interactive mode</b>, it gives you access to all dar_manager features,
+      just remember to prefer <em>dar</em> for restoration, it is much more efficient.
+      So you don't have to remeber all these command-line switches except one: <code><e>-i</e></code>
     </p>
     <code class=block>
       dar_manager -B my_base.dmd <e>-i</e>
     </code>
-    <p>
-      Interactive mode allow you to do all operation except restoration which
-      can be done as previously explained.
-    </p>
 
     <h2>To go further with dar/libdar</h2>
     <p>

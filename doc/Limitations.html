@@ -202,24 +202,6 @@
       reason, without lutimes() support, dar is avoids restoring mtime of symlink.
     </p>
 
-
-    <h3>SFTP protocol</h3>
-    <p>
-      dar/libdar cannot read an
-      .ssh/known_hosts containing "ecdsa-sha2-nistp256" lines, even if the
-      host you are connected to known by an "ssh-rsa" key, as soon as one
-      host in the known_hosts file is not "ssh-rsa" dar/libdar will fail the
-      host validation and abort. This is restriction comes from libssh that
-      seems used by libcurl which libdar relies on for network related
-      features. There is some workaround decribed in the man page about the
-      DAR_SFTP_KNOWNHOSTS_FILE environment variable.
-    </p>
-    <p>
-      As of January 2021, libssh 1.9.0 seems to have fixed this issue, so the
-      problem should be fixed shortly once libcurl will have integrated this
-      new feature.
-    </p>
-
     <h3>Multi-threading performance and memory requirement</h3>
     <p>
       Don't expect the execution time to be exactly divided by the number of
@@ -247,13 +229,14 @@
       each new file. The gain is very interesting for large files and you
       have better not to select a too small block size for compression,
       like having several tens of kilobytes or even a megabyte. Large compression
-      block (which are used scattered between different threads) is
+      block (which are scattered between different threads) is
       interesting as small files will be handeled
       by a single thread with little overhead and large files will
       leverage multiple threads.
-      Last, your disk access may become the bottleneck that drives the
-      total execution time of the operation, adding more thread will not
-      provide any improvement in that condition.
+      Last, your disk access or the network is using remote SFTP or FTP repository
+      within dar, may become the bottleneck that drives the
+      total execution time of the operation. In such context, adding more thread will
+      most probably not bring any improvement.
     </p>
     <p>
       The drawback of the multi-threading used within libbdar is the
@@ -264,6 +247,9 @@
       one to dispatch the data blocks to the workers threads, the other
       to gather resulting blocks. These two are not CPU intensive but may
       hold memory blocks for treatment while the worker threads do also.
+      To summarize, the memory footprint of multi-threading grows linearly
+      by two factors: the number of workers <em>and (times)</em> the size
+      of the blocks used.
     </p>
   </body>
 </html>

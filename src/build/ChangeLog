@@ -18,16 +18,16 @@ from 2.7.x to 2.8.0
   is not possible to detect...
 - extended entrepot classes (entrepot_local and entrepot_libcurl) to
   provide directory/non-directory info while listing a directory content
-- extended entrepot classes to be able to create a subdirectory upon
+- extended entrepot classes to be able to create a sub-directory upon
   user request.
 - added implementation of fichier_libcurl::sync_write and using it at
   object destruction for sanity purpose.
 - adding option -affs option to drive dar to read the first slice rather
   than the last slice to fetch archive format when reading an archive
   with the help of an external catalog in direct access mode.
-- adding -x option to dar_manager (displaying subsecond date
-  informations)
-- adding option -afdd to dar to show the subsecond part of dates while
+- adding -x option to dar_manager (displaying sub-second date
+  information)
+- adding option -afdd to dar to show the sub-second part of dates while
   listing a backup content
 - exposing build_regex_for_exclude_mask() routine in tools module (was
   cli specific in line_tools module).
@@ -41,7 +41,7 @@ from 2.7.x to 2.8.0
   ratio of read data.
 - changed default number of thread used for ciphering, from 1 to 2 at
   libdar API level (in coherence with CLI defaults).
-- added opton -arep to allow catalog isolation of a truncated backup
+- added option -arep to allow catalog isolation of a truncated backup
 - signal (like CTRL-C) can now interrupt status where libdar is pending
   for a user answer, allowing automatic clean termination of the
   backup/archive, in case of UPS signaled power supply failure without
@@ -57,12 +57,13 @@ from 2.7.x to 2.8.0
   lead to restoring old data first then overwritten it by more recent one.
   The behavior is the same as dar_manager but there is not need to
   transfer between dar and dar_manager the list of files to restore at
-  each backup step, dar directly fetches and pre-compute the information
+  each backup step, dar directly fetches and pre-computes the information
   in the database for better efficiency. Also note that all mask
-  features of dar stay available (-G/-P/-X/-I/-u/-U/...)
+  features of dar stay available (-G/-P/-X/-I/-u/-U/...) something which
+  lacks when using dar_manager instead.
 - while merging two backups, when in-place is a file and to-be-added is
   a binary patch, if the policy decision is to "overwrite", instead of
-  retaining the patch (which is useless alone, as it done so far), the
+  retaining the patch (which is useless alone as was done so far), the
   merging operation now applies the patch to the in-place version and
   retain the patched/updated version in the resulting backup.
 - replaced libcurl by libssh for SFTP repositories. Libcurl is still
