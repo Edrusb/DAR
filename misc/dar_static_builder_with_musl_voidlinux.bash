@@ -7,25 +7,13 @@ if [ ! -z "$1" ] ; then
        export MAKE_FLAGS=""
    fi
 else
-    echo "usage: $0 <num CPU cores to use> [root]"
+    echo "usage: $0 <num CPU cores to use>"
     exit 1
 fi
 
-if [ -z "$2" ] ; then
-    export ROOT_PERM=no
-else
-    export ROOT_PERM=yes
-fi
-
-echo "ROOT_PERM = $ROOT_PERM"
-
 # config/compilation/linking related variables
 
-if [ "$ROOT_PERM" = "no" ] ; then
-    export LOCAL_PREFIX="$HOME/usr"
-else
-    export LOCAL_PREFIX="/usr/local"
-fi
+export LOCAL_PREFIX="/usr/local"
 
 export LOCAL_PKG_CONFIG_DIR1="$LOCAL_PREFIX/lib/pkgconfig"
 export LOCAL_PKG_CONFIG_DIR2="$LOCAL_PREFIX/lib64/pkgconfig"
@@ -75,20 +63,16 @@ check()
     fi
 
     # checking for xbps-install
-    if [ "$ROOT_PERM" = "yes" ] ; then
-	if [ "$(which xbps-install | wc -l)" -eq 0 ] ; then
-	    echo "Missing xbps-install command"
-	    exit 1
-	fi
+    if [ "$(which xbps-install | wc -l)" -eq 0 ] ; then
+	echo "Missing xbps-install command"
+	exit 1
     fi
 
     # checking musl libc is the system standard C library
-    if [ "$ROOT_PERM" = "yes" ] ; then
-	if [ $(xbps-query -l | grep musl | wc -l) -le 0 ] ; then
-	    echo "Cannot find musl standard C library"
-	    echo "static linking with glibc is broken, musl is needed"
-	    exit 1
-	fi
+    if [ $(xbps-query -l | grep musl | wc -l) -le 0 ] ; then
+	echo "Cannot find musl standard C library"
+	echo "static linking with glibc is broken, musl is needed"
+	exit 1
     fi
 
     if [ ! -f configure -o ! -f configure.ac ] || [ $(grep DAR_VERSION configure.ac | wc -l) -ne 1 ] ; then
@@ -126,30 +110,28 @@ check()
 
 requirements()
 {
-    if [ "$ROOT_PERM" = "yes" ] ; then
-	#updating xbps db
-	xbps-install -SUy || (xbps-install -uy xbps && xbps-install -SUy) || return 1
+    #updating xbps db
+    xbps-install -SUy || (xbps-install -uy xbps && xbps-install -SUy) || return 1
 
-	# tools used to build the different packages involved here
-	xbps-install -y gcc make wget pkg-config cmake xz || return 1
+    # tools used to build the different packages involved here
+    xbps-install -y gcc make wget pkg-config cmake xz || return 1
 
-	#direct dependencies of libdar
-	xbps-install -y bzip2-devel e2fsprogs-devel libargon2-devel libgcc-devel libgcrypt-devel liblz4-devel \
-		     liblzma-devel libstdc++-devel libzstd-devel lz4-devel \
-		     lzo-devel musl-devel zlib-devel || return 1
+    #direct dependencies of libdar
+    xbps-install -y bzip2-devel e2fsprogs-devel libargon2-devel libgcc-devel libgcrypt-devel liblz4-devel \
+		 liblzma-devel libstdc++-devel libzstd-devel lz4-devel \
+		 lzo-devel musl-devel zlib-devel || return 1
 
-	# needed to build static flavor of librsync
-	xbps-install -y libb2-devel || return 1
+    # needed to build static flavor of librsync
+    xbps-install -y libb2-devel || return 1
 
-	# needed to build static flavor of gnutls
-	xbps-install -y  nettle-devel libtasn1-devel libunistring-devel unbound-devel unbound || return 1
+    # needed to build static flavor of gnutls
+    xbps-install -y  nettle-devel libtasn1-devel libunistring-devel unbound-devel unbound || return 1
 
-	#needed for static flavor of libcurl
-	xbps-install -y libpsl-devel libidn2-devel || return 1
+    #needed for static flavor of libcurl
+    xbps-install -y libpsl-devel libidn2-devel || return 1
 
-	# optional but interesting to get a smaller dar_static binary
-	xbps-install -y upx || return 1
-    fi
+    # optional but interesting to get a smaller dar_static binary
+    xbps-install -y upx || return 1
 
     # need to tweak the hogweed.pc file provided by the system, we do not modify the system but shadow it by a local version located in higher priority dir
     HOGWEED_PC=/usr/lib/pkgconfig/hogweed.pc
@@ -299,15 +281,13 @@ librhash()
 
 dar_static()
 {
-    if [ "$ROOT_PERM" = "yes" ] ; then
-	#libpsl does not mention -lunistring which it relies on updating pkgconfig file
-	local pkg_file=/usr/lib/pkgconfig/libpsl.pc
-	if [ -e "$pkg_file" ] ; then
-	    cp "$pkg_file" "${pkg_file}.bak"
-	    sed -r -e 's/-lpsl$/-lpsl -lunistring/' < "${pkg_file}.bak" > "$pkg_file"
-	else
-	    echo "could not find pkg-config file for libpsl, and thus cannot patch it"
-	fi
+    #libpsl does not mention -lunistring which it relies on updating pkgconfig file
+    local pkg_file=/usr/lib/pkgconfig/libpsl.pc
+    if [ -e "$pkg_file" ] ; then
+	cp "$pkg_file" "${pkg_file}.bak"
+	sed -r -e 's/-lpsl$/-lpsl -lunistring/' < "${pkg_file}.bak" > "$pkg_file"
+    else
+	echo "could not find pkg-config file for libpsl, and thus cannot patch it"
     fi
 
     make clean || /bin/true
