@@ -107,9 +107,9 @@ namespace libdar
 		if(e_r != nullptr
 		   || e_m != nullptr)
 		{
-		    dialog->message(tools_printf(gettext("Waiting %d seconds and retring connection due to: %S"),
+		    dialog->message(tools_printf(gettext("Waiting %d seconds and retring connection due to: %s"),
 						 waiting_time,
-						 e.get_message()));
+						 e.get_message().c_str()));
 		    sleep(waiting_time);
 		}
 		else
