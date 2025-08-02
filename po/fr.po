@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: DAR 2.7.0\n"
 "Report-Msgid-Bugs-To: https://github.com/Edrusb/DAR/issues\n"
-"POT-Creation-Date: 2025-08-02 15:22+0200\n"
+"POT-Creation-Date: 2025-08-02 16:38+0200\n"
 "PO-Revision-Date: 2025-08-02 14:41+0200\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
@@ -5246,8 +5246,9 @@ msgstr ""
 "hash inutiles ?"
 
 #: src/libdar/libssh_connection.cpp:110
-#, c-format
-msgid "Waiting %d seconds and retring connection due to: %S"
+#, fuzzy, c-format
+#| msgid "Waiting %d seconds and retring connection due to: %S"
+msgid "Waiting %d seconds and retring connection due to: %s"
 msgstr "Attente de %d secondes puis re-rentative due à : %S"
 
 #: src/libdar/libssh_connection.cpp:178

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dar 2.8.0\n"
 "Report-Msgid-Bugs-To: https://github.com/Edrusb/DAR/issues\n"
-"POT-Creation-Date: 2025-08-02 15:22+0200\n"
+"POT-Creation-Date: 2025-08-02 16:38+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4617,7 +4617,7 @@ msgstr ""
 
 #: src/libdar/libssh_connection.cpp:110
 #, c-format
-msgid "Waiting %d seconds and retring connection due to: %S"
+msgid "Waiting %d seconds and retring connection due to: %s"
 msgstr ""
 
 #: src/libdar/libssh_connection.cpp:178
