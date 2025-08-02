@@ -266,7 +266,7 @@ namespace libdar
 		break;
 	    case SSH_KNOWN_HOSTS_ERROR:
 		throw Erange("libssh_connection::server_authentication",
-			     gettext("There had been an error checking the host"));
+			     gettext("An error occurred while checking the host presence in the knownhosts file"));
 	    default:
 		throw SRC_BUG; // unexpected returned value from libssh
 	    }

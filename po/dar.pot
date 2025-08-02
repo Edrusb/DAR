@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: dar 2.8.0-pre3\n"
 "Report-Msgid-Bugs-To: https://github.com/Edrusb/DAR/issues\n"
-"POT-Creation-Date: 2025-07-31 17:10+0200\n"
+"POT-Creation-Date: 2025-08-02 13:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -64,9 +64,9 @@ msgstr ""
 #: src/dar_suite/dar_xform.cpp:425 src/dar_suite/dar_xform.cpp:427
 #: src/dar_suite/dar_xform.cpp:442 src/dar_suite/command_line.cpp:2208
 #: src/dar_suite/command_line.cpp:2218 src/dar_suite/command_line.cpp:2221
-#: src/dar_suite/command_line.cpp:2251 src/dar_suite/command_line.cpp:2274
-#: src/dar_suite/command_line.cpp:2298 src/dar_suite/command_line.cpp:2303
-#: src/dar_suite/command_line.cpp:2307
+#: src/dar_suite/command_line.cpp:2251 src/dar_suite/command_line.cpp:2273
+#: src/dar_suite/command_line.cpp:2297 src/dar_suite/command_line.cpp:2302
+#: src/dar_suite/command_line.cpp:2306
 #, c-format
 msgid "\n"
 msgstr ""
@@ -114,14 +114,14 @@ msgid " Using libdar %u.%u built with compilation time options:\n"
 msgstr ""
 
 #: src/dar_suite/dar_slave.cpp:272 src/dar_suite/dar_manager.cpp:1009
-#: src/dar_suite/dar_xform.cpp:462 src/dar_suite/command_line.cpp:2696
+#: src/dar_suite/dar_xform.cpp:462 src/dar_suite/command_line.cpp:2695
 #: src/dar_suite/dar_cp.cpp:154
 #, c-format
 msgid " compiled the %s with %s version %s\n"
 msgstr ""
 
 #: src/dar_suite/dar_slave.cpp:273 src/dar_suite/dar_manager.cpp:1010
-#: src/dar_suite/dar_xform.cpp:463 src/dar_suite/command_line.cpp:2697
+#: src/dar_suite/dar_xform.cpp:463 src/dar_suite/command_line.cpp:2696
 #: src/dar_suite/dar_cp.cpp:155
 #, c-format
 msgid " %s is part of the Disk ARchive suite (Release %s)\n"
@@ -139,7 +139,7 @@ msgid ""
 msgstr ""
 
 #: src/dar_suite/dar_slave.cpp:276 src/dar_suite/dar_manager.cpp:1012
-#: src/dar_suite/dar_xform.cpp:465 src/dar_suite/command_line.cpp:2699
+#: src/dar_suite/dar_xform.cpp:465 src/dar_suite/command_line.cpp:2698
 msgid ""
 " This is free software, and you are welcome\n"
 " to redistribute it under certain conditions;"
@@ -759,7 +759,7 @@ msgid "   -v\t\t   display more information about what is going on\n"
 msgstr ""
 
 #: src/dar_suite/dar_manager.cpp:1011 src/dar_suite/dar_xform.cpp:464
-#: src/dar_suite/command_line.cpp:2698
+#: src/dar_suite/command_line.cpp:2697
 #, c-format
 msgid ""
 " %s comes with ABSOLUTELY NO WARRANTY; for details\n"
@@ -767,7 +767,7 @@ msgid ""
 msgstr ""
 
 #: src/dar_suite/dar_manager.cpp:1013 src/dar_suite/dar_xform.cpp:466
-#: src/dar_suite/command_line.cpp:2700
+#: src/dar_suite/command_line.cpp:2699
 #, c-format
 msgid ""
 " type `%s -L | more'\n"
@@ -1954,8 +1954,8 @@ msgstr ""
 msgid "Error in included file (%s): "
 msgstr ""
 
-#: src/dar_suite/command_line.cpp:1507 src/dar_suite/command_line.cpp:3004
-#: src/dar_suite/command_line.cpp:3086
+#: src/dar_suite/command_line.cpp:1507 src/dar_suite/command_line.cpp:3003
+#: src/dar_suite/command_line.cpp:3085
 #, c-format
 msgid "In included file %S: "
 msgstr ""
@@ -2390,263 +2390,259 @@ msgstr ""
 #: src/dar_suite/command_line.cpp:2271
 #, c-format
 msgid ""
-"      without -MI/-MX the backup scope is defined by the path given to -R "
-"option\n"
+"      with or without -MI/-MX the backup scope stays inside the path given "
+"to -R option\n"
 msgstr ""
 
 #: src/dar_suite/command_line.cpp:2272
 #, c-format
 msgid ""
-"      with -MI or -MX the backup scope always contains the filesystem given\n"
+"      with -MI or -MX the backup scope always contains the filesystem where\n"
+"      the path given to -R option is located\n"
 msgstr ""
 
-#: src/dar_suite/command_line.cpp:2273
-#, c-format
-msgid ""
-"      to -R option and the backup scope stays inside the path given to -R "
-"option\n"
-msgstr ""
-
-#: src/dar_suite/command_line.cpp:2275
+#: src/dar_suite/command_line.cpp:2274
 #, c-format
 msgid ""
 "Saving/Isolation/merging/repairing options (to use with -c, -C, -+ or -y):\n"
 msgstr ""
 
-#: src/dar_suite/command_line.cpp:2276
+#: src/dar_suite/command_line.cpp:2275
 #, c-format
 msgid "   -A [path/]<basename>  archive to take as reference\n"
 msgstr ""
 
-#: src/dar_suite/command_line.cpp:2277
+#: src/dar_suite/command_line.cpp:2276
 #, c-format
 msgid "   -@ [path/]<basename>  auxiliary archive of reference for merging\n"
 msgstr ""
 
-#: src/dar_suite/command_line.cpp:2278
+#: src/dar_suite/command_line.cpp:2277
 #, c-format
 msgid ""
-"   -z [[algo:]level:[blocksize]]   compress data in archive. -z = -z9 = -"
+"   -z [[algo:]level[:blocksize]]   compress data in archive. -z = -z9 = -"
 "zgzip:9\n"
 msgstr ""
 
-#: src/dar_suite/command_line.cpp:2279
+#: src/dar_suite/command_line.cpp:2278
 #, c-format
 msgid ""
 "      Available algo: gzip,bzip2,lzo,xz,zstd,lz4. Exemples: -zlzo -zxz:5 -z1 "
 "-z\n"
 msgstr ""
 
-#: src/dar_suite/command_line.cpp:2281
+#: src/dar_suite/command_line.cpp:2280
 #, c-format
 msgid ""
-"      \"blocksize\" defaults to 240 Kio, see -G option for multi-threading\n"
+"      \"blocksize\" defaults to 240 kio, see -G option for multi-threading\n"
+msgstr ""
+
+#: src/dar_suite/command_line.cpp:2282
+#, c-format
+msgid "      \"blocksize\" defaults to 240 kio\n"
 msgstr ""
 
 #: src/dar_suite/command_line.cpp:2283
 #, c-format
-msgid "      \"blocksize\" defaults to 240 Kio\n"
-msgstr ""
-
-#: src/dar_suite/command_line.cpp:2284
-#, c-format
 msgid "   -s <integer>  split the archive slices of the given size\n"
 msgstr ""
 
-#: src/dar_suite/command_line.cpp:2285
+#: src/dar_suite/command_line.cpp:2284
 #, c-format
 msgid ""
 "                 optional suffixes for sizes of any opt.: k,M,G,T,P,E,Z,Y,R,"
 "Q\n"
 msgstr ""
 
-#: src/dar_suite/command_line.cpp:2286
+#: src/dar_suite/command_line.cpp:2285
 #, c-format
 msgid "   -S <integer>  specific size for the first slice (optional)\n"
+msgstr ""
+
+#: src/dar_suite/command_line.cpp:2286
+#, c-format
+msgid ""
+"   -aSI          slice size suffixes k, M, G, T, etc. are powers of 10\n"
 msgstr ""
 
 #: src/dar_suite/command_line.cpp:2287
 #, c-format
 msgid ""
-"   -aSI          slice size suffixes k, M, T, G, etc. are powers of 10\n"
+"   -abinary      slice size suffixes k, M, G, T, etc. are powers of 2 (ki,Mi,"
+"Gi,...)\n"
 msgstr ""
 
 #: src/dar_suite/command_line.cpp:2288
 #, c-format
-msgid "   -abinary      slice size suffixes k, M, T, G, etc. are powers of 2\n"
+msgid "   -p            pauses before writing to a new file\n"
 msgstr ""
 
 #: src/dar_suite/command_line.cpp:2289
 #, c-format
-msgid "   -p            pauses before writing to a new file\n"
+msgid "   -D            excluded directories are stored as empty directories\n"
 msgstr ""
 
 #: src/dar_suite/command_line.cpp:2290
 #, c-format
-msgid "   -D            excluded directories are stored as empty directories\n"
+msgid "   -Z <mask>     do not compress the matching filenames\n"
 msgstr ""
 
 #: src/dar_suite/command_line.cpp:2291
 #, c-format
-msgid "   -Z <mask>     do not compress the matching filenames\n"
+msgid "   -Y <mask>     do only compress the matching filenames\n"
 msgstr ""
 
 #: src/dar_suite/command_line.cpp:2292
 #, c-format
-msgid "   -Y <mask>     do only compress the matching filenames\n"
-msgstr ""
-
-#: src/dar_suite/command_line.cpp:2293
-#, c-format
 msgid "   -m <number>   do not compress file smaller than <number>\n"
 msgstr ""
 
-#: src/dar_suite/command_line.cpp:2294
+#: src/dar_suite/command_line.cpp:2293
 #, c-format
 msgid ""
 "   -@ [path/]<basename> Do on-fly catalogue isolation of the resulting "
 "archive\n"
 msgstr ""
 
-#: src/dar_suite/command_line.cpp:2295
+#: src/dar_suite/command_line.cpp:2294
 #, c-format
 msgid ""
 "   -,            ignore directories that follow the Directory Tagging\n"
 "          Standard\n"
 msgstr ""
 
-#: src/dar_suite/command_line.cpp:2296
+#: src/dar_suite/command_line.cpp:2295
 #, c-format
 msgid "   -^ <string>   permission[:user[:group]] of created slices\n"
 msgstr ""
 
-#: src/dar_suite/command_line.cpp:2297
+#: src/dar_suite/command_line.cpp:2296
 #, c-format
 msgid ""
 "   -8 sig        add delta signature to perform binary delta if used as ref."
 msgstr ""
 
-#: src/dar_suite/command_line.cpp:2299
+#: src/dar_suite/command_line.cpp:2298
 #, c-format
 msgid "Restoring options (to use with -x) :\n"
 msgstr ""
 
-#: src/dar_suite/command_line.cpp:2300
+#: src/dar_suite/command_line.cpp:2299
 #, c-format
 msgid ""
 "   -k            do not remove files destroyed since the reference backup\n"
 msgstr ""
 
-#: src/dar_suite/command_line.cpp:2301
+#: src/dar_suite/command_line.cpp:2300
 #, c-format
 msgid "   -r            do not restore file older than those on filesystem\n"
 msgstr ""
 
-#: src/dar_suite/command_line.cpp:2302
+#: src/dar_suite/command_line.cpp:2301
 #, c-format
 msgid "   -f            do not restore directory structure\n"
 msgstr ""
 
-#: src/dar_suite/command_line.cpp:2304
+#: src/dar_suite/command_line.cpp:2303
 #, c-format
 msgid "Reading options (to use with -x, -d, -t, -l, -A)\n"
 msgstr ""
 
-#: src/dar_suite/command_line.cpp:2305
+#: src/dar_suite/command_line.cpp:2304
 #, c-format
 msgid ""
 "   -i <named pipe> pipe to use instead of std input to read data from "
 "dar_slave\n"
 msgstr ""
 
-#: src/dar_suite/command_line.cpp:2306
+#: src/dar_suite/command_line.cpp:2305
 #, c-format
 msgid ""
 "   -o <named pipe> pipe to use instead of std output to orders dar_slave\n"
 msgstr ""
 
-#: src/dar_suite/command_line.cpp:2308
+#: src/dar_suite/command_line.cpp:2307
 #, c-format
 msgid "Listing options (to use with -l):\n"
 msgstr ""
 
-#: src/dar_suite/command_line.cpp:2309
+#: src/dar_suite/command_line.cpp:2308
 #, c-format
 msgid ""
 "   -T[option]   output format, option are \"normal\", \"tree\", \"xml\", "
 "\"slicing\"\n"
 msgstr ""
 
-#: src/dar_suite/command_line.cpp:2310
+#: src/dar_suite/command_line.cpp:2309
 #, c-format
 msgid "                option -T without argument is equivalent to -Ttree\n"
 msgstr ""
 
-#: src/dar_suite/command_line.cpp:2311
+#: src/dar_suite/command_line.cpp:2310
 #, c-format
 msgid "   -as          only list files saved in the archive\n"
 msgstr ""
 
-#: src/dar_suite/command_line.cpp:2312
+#: src/dar_suite/command_line.cpp:2311
 #, c-format
-msgid "   -alist-ea    ist the saved Extended Attributed of each file\n"
+msgid "   -alist-ea    list the saved Extended Attributed of each file\n"
 msgstr ""
 
-#: src/dar_suite/command_line.cpp:2313
+#: src/dar_suite/command_line.cpp:2312
 #, c-format
 msgid ""
 "   -aheader     only list the archive header info, which is never ciphered\n"
 msgstr ""
 
-#: src/dar_suite/command_line.cpp:2314
+#: src/dar_suite/command_line.cpp:2313
 #, c-format
 msgid ""
 "   -afdd        display Fully Detailed Dates (including subsecond fraction)\n"
 msgstr ""
 
-#: src/dar_suite/command_line.cpp:2315
+#: src/dar_suite/command_line.cpp:2314
 #, c-format
 msgid ""
 "\n"
 "\n"
 msgstr ""
 
-#: src/dar_suite/command_line.cpp:2316
+#: src/dar_suite/command_line.cpp:2315
 #, c-format
 msgid ""
 "Type \"man dar\" for more details and for all other available options.\n"
 msgstr ""
 
-#: src/dar_suite/command_line.cpp:2692
+#: src/dar_suite/command_line.cpp:2691
 #, c-format
 msgid " Using libdar %u.%u.%u built with compilation time options:"
 msgstr ""
 
-#: src/dar_suite/command_line.cpp:2693
+#: src/dar_suite/command_line.cpp:2692
 #, c-format
 msgid " Using libdar %u.%u built with compilation time options:"
 msgstr ""
 
-#: src/dar_suite/command_line.cpp:2916
+#: src/dar_suite/command_line.cpp:2915
 #, c-format
 msgid "Arguments read from %S :"
 msgstr ""
 
-#: src/dar_suite/command_line.cpp:3038
+#: src/dar_suite/command_line.cpp:3037
 #, c-format
 msgid "Failed reading %S: "
 msgstr ""
 
-#: src/dar_suite/command_line.cpp:3119
+#: src/dar_suite/command_line.cpp:3118
 #, c-format
 msgid "Warning: Failed reading %S: "
 msgstr ""
 
-#: src/dar_suite/command_line.cpp:3422
+#: src/dar_suite/command_line.cpp:3421
 msgid "unknown FSA family: "
 msgstr ""
 
-#: src/dar_suite/command_line.cpp:3454
+#: src/dar_suite/command_line.cpp:3453
 #, c-format
 msgid ""
 "User target named \"%s\" is not allowed (reserved word for conditional "
@@ -4676,7 +4672,8 @@ msgid "Does one of these key hashs matches the following one: %s"
 msgstr ""
 
 #: src/libdar/libssh_connection.cpp:269
-msgid "There had been an error checking the host"
+msgid ""
+"An error occurred while checking the host presence in the knownhosts file"
 msgstr ""
 
 #: src/libdar/libssh_connection.cpp:309 src/libdar/i_entrepot_libcurl.cpp:374
@@ -4700,21 +4697,27 @@ msgid "Failed public key authentication: %s"
 msgstr ""
 
 #: src/libdar/libssh_connection.cpp:357
+msgid ""
+"Failed to load the key pair without passphrase. Please provide the "
+"passphrase for this key: "
+msgstr ""
+
+#: src/libdar/libssh_connection.cpp:369
 #, c-format
 msgid "Failed loading the private key: %s"
 msgstr ""
 
-#: src/libdar/libssh_connection.cpp:366
+#: src/libdar/libssh_connection.cpp:378
 #, c-format
 msgid "Failed public/private key authentication: %s"
 msgstr ""
 
-#: src/libdar/libssh_connection.cpp:393
+#: src/libdar/libssh_connection.cpp:405
 #, c-format
 msgid "Error allocating SFTP session: %s"
 msgstr ""
 
-#: src/libdar/libssh_connection.cpp:399
+#: src/libdar/libssh_connection.cpp:411
 #, c-format
 msgid "Error initializing SFTP session: %s"
 msgstr ""
@@ -5169,13 +5172,13 @@ msgstr ""
 #: src/libdar/hash_fichier.cpp:84
 #, c-format
 msgid ""
-"Missing %s hash algorithm support (which is provided with strong encryption "
-"support, using libgcrypt)"
+"Missing %s hash algorithm support (provided with strong encryption support, "
+"using libgcrypt)"
 msgstr ""
 
 #: src/libdar/hash_fichier.cpp:97
 #, c-format
-msgid "Error while initializing hash using librhash: %s"
+msgid "Error while initializing hash structure using librhash: %s"
 msgstr ""
 
 #: src/libdar/hash_fichier.cpp:100
@@ -5183,7 +5186,12 @@ msgstr ""
 msgid "Missing %s hash algorithm support (which is provided using librhash)"
 msgstr ""
 
-#: src/libdar/hash_fichier.cpp:157 src/libdar/hash_fichier.cpp:201
+#: src/libdar/hash_fichier.cpp:157
+#, c-format
+msgid "Error updating %s hash with new data: %s"
+msgstr ""
+
+#: src/libdar/hash_fichier.cpp:201
 #, c-format
 msgid "Error adding updating %s hash with new data: %s"
 msgstr ""

@@ -81,7 +81,7 @@ namespace libdar
 					  gcry_strsource(err),
 					  gcry_strerror(err)));
 #else
-	    throw Ecompilation(tools_printf(gettext("Missing %s hash algorithm support (which is provided with strong encryption support, using libgcrypt)"),
+	    throw Ecompilation(tools_printf(gettext("Missing %s hash algorithm support (provided with strong encryption support, using libgcrypt)"),
 					    hash_algo_to_string(algo).c_str()));
 #endif
 	    break;
@@ -94,7 +94,7 @@ namespace libdar
 	    rhash_ctxt = rhash_init(RHASH_WHIRLPOOL);
 	    if(rhash_ctxt == nullptr)
 		throw Erange("hash_fichier::hash_fichier",
-			     tools_printf(gettext("Error while initializing hash using librhash: %s"),
+			     tools_printf(gettext("Error while initializing hash structure using librhash: %s"),
 					  tools_strerror_r(errno).c_str()));
 #else
 	    throw Ecompilation(tools_printf(gettext("Missing %s hash algorithm support (which is provided using librhash)"),
@@ -154,7 +154,7 @@ namespace libdar
 #if RHASH_AVAILABLE
 	    if(rhash_update(rhash_ctxt, (const void *)a, size) != 0)
 		throw Erange("hash_fichier::fichier_global_inherited_write",
-			     tools_printf(gettext("Error adding updating %s hash with new data: %s"),
+			     tools_printf(gettext("Error updating %s hash with new data: %s"),
 					  hash_algo_to_string(algor).c_str(),
 					  tools_strerror_r(errno).c_str()));
 #else

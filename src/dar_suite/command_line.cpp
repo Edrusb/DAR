@@ -2268,24 +2268,23 @@ static void usage(user_interaction & dialog, const char *command_name)
     dialog.printf(gettext("   --nodump   do not backup, files having the nodump 'd' flag set\n"));
     dialog.printf(gettext("   -MI<path>  only include the pointed to mounted filesystem for backup\n"));
     dialog.printf(gettext("   -MX<path>  exclude the pointed to mounted filesystem from backup\n"));
-    dialog.printf(gettext("      without -MI/-MX the backup scope is defined by the path given to -R option\n"));
-    dialog.printf(gettext("      with -MI or -MX the backup scope always contains the filesystem given\n"));
-    dialog.printf(gettext("      to -R option and the backup scope stays inside the path given to -R option\n"));
+    dialog.printf(gettext("      with or without -MI/-MX the backup scope stays inside the path given to -R option\n"));
+    dialog.printf(gettext("      with -MI or -MX the backup scope always contains the filesystem where\n      the path given to -R option is located\n"));
     dialog.printf(gettext("\n"));
     dialog.printf(gettext("Saving/Isolation/merging/repairing options (to use with -c, -C, -+ or -y):\n"));
     dialog.printf(gettext("   -A [path/]<basename>  archive to take as reference\n"));
     dialog.printf(gettext("   -@ [path/]<basename>  auxiliary archive of reference for merging\n"));
-    dialog.printf(gettext("   -z [[algo:]level:[blocksize]]   compress data in archive. -z = -z9 = -zgzip:9\n"));
+    dialog.printf(gettext("   -z [[algo:]level[:blocksize]]   compress data in archive. -z = -z9 = -zgzip:9\n"));
     dialog.printf(gettext("      Available algo: gzip,bzip2,lzo,xz,zstd,lz4. Exemples: -zlzo -zxz:5 -z1 -z\n"));
     if(compile_time::libthreadar())
-    dialog.printf(gettext("      \"blocksize\" defaults to 240 Kio, see -G option for multi-threading\n"));
+    dialog.printf(gettext("      \"blocksize\" defaults to 240 kio, see -G option for multi-threading\n"));
     else
-    dialog.printf(gettext("      \"blocksize\" defaults to 240 Kio\n"));
+    dialog.printf(gettext("      \"blocksize\" defaults to 240 kio\n"));
     dialog.printf(gettext("   -s <integer>  split the archive slices of the given size\n"));
     dialog.printf(gettext("                 optional suffixes for sizes of any opt.: k,M,G,T,P,E,Z,Y,R,Q\n"));
     dialog.printf(gettext("   -S <integer>  specific size for the first slice (optional)\n"));
-    dialog.printf(gettext("   -aSI          slice size suffixes k, M, T, G, etc. are powers of 10\n"));
-    dialog.printf(gettext("   -abinary      slice size suffixes k, M, T, G, etc. are powers of 2\n"));
+    dialog.printf(gettext("   -aSI          slice size suffixes k, M, G, T, etc. are powers of 10\n"));
+    dialog.printf(gettext("   -abinary      slice size suffixes k, M, G, T, etc. are powers of 2 (ki,Mi,Gi,...)\n"));
     dialog.printf(gettext("   -p            pauses before writing to a new file\n"));
     dialog.printf(gettext("   -D            excluded directories are stored as empty directories\n"));
     dialog.printf(gettext("   -Z <mask>     do not compress the matching filenames\n"));
@@ -2309,7 +2308,7 @@ static void usage(user_interaction & dialog, const char *command_name)
     dialog.printf(gettext("   -T[option]   output format, option are \"normal\", \"tree\", \"xml\", \"slicing\"\n"));
     dialog.printf(gettext("                option -T without argument is equivalent to -Ttree\n"));
     dialog.printf(gettext("   -as          only list files saved in the archive\n"));
-    dialog.printf(gettext("   -alist-ea    ist the saved Extended Attributed of each file\n"));
+    dialog.printf(gettext("   -alist-ea    list the saved Extended Attributed of each file\n"));
     dialog.printf(gettext("   -aheader     only list the archive header info, which is never ciphered\n"));
     dialog.printf(gettext("   -afdd        display Fully Detailed Dates (including subsecond fraction)\n"));
     dialog.printf(gettext("\n\n"));
