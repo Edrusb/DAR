@@ -91,12 +91,12 @@ namespace libdar
             // clone is abstract too
 	    // used for INCREMENTAL BACKUP
 
-        void compare(const cat_inode &other,
-		     const mask & ea_mask,
-		     comparison_fields what_to_check,
-		     const infinint & hourshift,
-		     bool symlink_date,
-		     const fsa_scope & scope,
+        void compare(const cat_inode &other, ///< the inode to compare with
+		     const mask & ea_mask,   ///< EA mask to take into account for comparison
+		     comparison_fields what_to_check, ///< inode metadata to take into account for comparison
+		     const infinint & hourshift, ///< number of interger number of date to ignode and assume identical
+		     bool symlink_date,      ///< whether to compare symlink dates
+		     const fsa_scope & scope, ///< FSA to take into account for comparison
 		     bool isolated_mode,  ///< do not try to compare pointed to data, EA of FSA (suitable for isolated catalogue)
 		     bool seq_read_mode   ///< *this* is read in seq mode => do not try to fetch delta sig when both isolated and seq_read mode are used
 	    ) const;
