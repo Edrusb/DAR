@@ -54,7 +54,7 @@ AM_LDFLAGS = -shared -Wl,--no-as-needed ../libdar/.libs/$(MYLIB)
 all-local: $(TARGET)
 
 .cpp.o:
-	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(CPPFLAGS) $(AM_CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c $< -o $@
+	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(CPPFLAGS) $(AM_CPPFLAGS) $(AM_CFLAGS) $(CXXFLAGS) -c $< -o $@
 
 libdar$(PYEXT): pybind11_libdar.o
 	$(CXX) $(AM_LDFLAGS) $<  -o $@
