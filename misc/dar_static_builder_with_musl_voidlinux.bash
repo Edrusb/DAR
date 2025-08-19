@@ -262,6 +262,7 @@ libcurl()
     cd ..
     ldconfig
     rm -rf curl-${LIBCURL_VERSION}
+    misc/fix_libcurl_pc
 }
 
 librhash()
