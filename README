@@ -16,7 +16,6 @@ http://dar.linux.free.fr/doc/presentation.html#external_tools
 
 FEATURES
 ================
-
 The libdar library features include *in particular*:
 - *full*, *differential*, *incremental* and *decremental* backups
 - *binary delta* (including recursive binary delta with incremental backups)
@@ -68,7 +67,6 @@ with in addition:
 
 LICENSING
 ================
-
 The whole Dar project, including thus the libdar library is licensed
 under the terms of the GNU General Public License (GPL in the following).
 This means you can link libdar to your programs at
@@ -79,7 +77,6 @@ COPYING file for details.
 
 SUPPORTED OS
 ================
-
 The libdar library is a fully featured backup engine available under
  - Linux,
  - Windows (95, 2000, NT, XP, 7, 8, 10...),
