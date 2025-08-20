@@ -50,7 +50,7 @@ for the main features...
 
 On the command-line side, dar is the main command to handle 90% of
 libdar features. But some features are better handled from separated
-command (though still relying on libdar):
+commands (though still relying on libdar):
 Actually the Dar project include a set of six command-line programs beside the
 libdar library:
         dar
@@ -58,34 +58,35 @@ libdar library:
         dar_slave
         dar_manager
         dar_cp
-	dar_split
+        dar_split
 
 with in addition:
         dar_static (statically linked version of dar, not all system
 	            support static linking)
+        dar_cp_static (statically linked version of dar_cp)
 
 
 LICENSING
 ================
 The whole Dar project, including thus the libdar library is licensed
 under the terms of the GNU General Public License (GPL in the following).
-This means you can link libdar to your programs at
-the condition your programs are also covered by the GPL, which says
-in particular that you must provide source code of your programs. See
-COPYING file for details.
+This means you can link libdar to your programs at the condition your
+programs are also covered by the GPL, which says in particular that
+you must provide source code of your programs. See COPYING file for details.
 
 
 SUPPORTED OS
 ================
-The libdar library is a fully featured backup engine available under
- - Linux,
+Dar and libdar are available under:
+ - Linux (almost all distros do provide packages of dar and libdar)
  - Windows (95, 2000, NT, XP, 7, 8, 10...),
  - OpenSolaris,
  - FreeBSD
  - NetBSD,
- - Mac OS X
+ - Mac OS X,
  - Rasperry Pi
-for the known platform+OS it has been tested or reported to be working.
+...for the known platform+OS it has been tested against or reported
+to be working on.
 
 
 DOCUMENTATION
