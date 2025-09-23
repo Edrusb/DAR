@@ -2089,6 +2089,21 @@ AS_IF(       [ test "x$enable_threadar" != "xyes" ],
             ]
      )
 
+AC_ARG_ENABLE( [thread-stack-size],
+	       AS_HELP_STRING(--enable-thread-stack-size="size in bytes", [defines the stack size of the non-default threads, which by default is set to 8*1024*1024 bytes]),
+	       [
+		 stack_size=$enableval
+		 stack_size_valid=`echo "$stack_size" | grep -E ['^[0-9]([0-9]|\*[0-9])*$']`
+		 if test "$stack_size" != "$stack_size_valid" ; then
+		    AC_MSG_ERROR([Invalid stack size argument provided: $stack_size])
+		 fi
+	       ],
+	       [
+	         stack_size=8*1024*1024
+	       ]
+	     )
+
+
 AS_IF([ test "$local_threadar" = "yes" ],
       [
          AC_MSG_CHECKING([Stack setup methods for libthreadar::thread class])
@@ -2120,7 +2135,7 @@ AS_IF([ test "$local_threadar" = "yes" ],
 	      ],
 	      [
 		AC_DEFINE(LIBTHREADAR_STACK_FEATURE_AVAILABLE, 1, [libthreadar thread class can set the stack size])
-		AC_DEFINE(LIBDAR_DEFAULT_STACK_SIZE, 8*1024*1024, [macro to set the stack size of class inheriting from libthreadar::thread])
+		AC_DEFINE_UNQUOTED(LIBDAR_DEFAULT_STACK_SIZE, $stack_size, [macro to set the stack size of class inheriting from libthreadar::thread])
 		AC_MSG_RESULT(yes)
 	      ],
 	      [
@@ -2844,10 +2859,11 @@ fi
 
 printf "   can uses multiple threads  : "
 if [ "$local_threadar" = "yes" ] ; then
+  stack_msg="subthread stack size is $stack_size"
   if [ "$local_threadar_barrier_mac" = "yes" ] ; then
-    echo "YES (+ barrier implementations for MAC OS)"
+    echo "YES (+ barrier implementations for MAC OS): $stack_msg"
   else
-    echo "YES"
+    echo "YES : $stack_msg"
   fi
 
 else

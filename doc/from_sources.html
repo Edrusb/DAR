@@ -681,6 +681,30 @@
 	      </td>
 	    </tr>
 	    <tr>
+	      <td class=desc>
+		--enable-thread-stack-size="size"
+	      </td>
+	      <td>
+		<p>
+		  set the subthreads stack size to the given integer argument (in byte).
+		</p>
+		<p>Expression combining numbers and multiplication operator are accepted. Without this option
+		  the default value is 8*1024*1024 (8 Mio).
+		</p>
+		<p>
+		  The main thread stack size is set by the system and is usually fine (some system
+		  even have it increasing when needed). But for threads created from libdar (for
+		  parallel compression and parallel ciphering) this depends on the Posix thread
+		  implementation. When using musl C standard library, by default new threads receive
+		  a 128 kio stack size, which does not allow libgcrypt to work, leading libdar to abort
+		  with the following error message: <i>Error while opening libgcrypt key handle: gcrypt/Out of memory</i>.
+		  A stack size of 8 Mio is fine with glibc library, but 16 Mio is required to have libgcrypt working with
+		  musl library when parallel (= multi-threaded, see -G option) ciphering is used, in
+		  particular when using the twofish algorithm.
+		</p>
+	      </td>
+	    </tr>
+	    <tr>
 	      <th>
 		Deactivation options:
 	      </th>
