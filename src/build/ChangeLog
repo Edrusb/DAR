@@ -5,6 +5,7 @@ from 2.8.0 to 2.8.1
   typos, spelling and English syntax)
 - adding webdar in the list of existing external application relying on
   libdar
+- adding --enable-thread-stack-size option to the configure script
 
 from 2.7.x to 2.8.0
 - added whirlpool hash algorithm (requires librhash library)
