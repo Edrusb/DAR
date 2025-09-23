@@ -1,6 +1,10 @@
 from 2.8.0 to 2.8.1
-- fixed src/python/Makefile.am where CFLAGS was used in C++ compilation command
-  and should be replaced by CXXFLAGS.
+- fixed src/python/Makefile.am where CFLAGS was used in C++ compilation
+  command and should be replaced by CXXFLAGS.
+- fixing documentation (remove reference to non-existent option, fixed
+  typos, spelling and English syntax)
+- adding webdar in the list of existing external application relying on
+  libdar
 
 from 2.7.x to 2.8.0
 - added whirlpool hash algorithm (requires librhash library)
