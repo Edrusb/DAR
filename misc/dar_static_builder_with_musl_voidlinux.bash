@@ -29,6 +29,7 @@ export PATH="$LOCAL_PREFIX/bin:/usr/local/bin:$PATH"
 # packages version
 
 LIBTHREADAR_VERSION=1.6.0
+LIBGCRYPT_VERSION=1.11.2
 LIBRSYNC_VERSION=2.3.4
 LIBGPG_ERROR_VERSION=1.55
 GNUTLS_VERSION=3.8.9
@@ -117,7 +118,7 @@ requirements()
     xbps-install -y gcc make wget pkg-config cmake xz || return 1
 
     #direct dependencies of libdar
-    xbps-install -y bzip2-devel e2fsprogs-devel libargon2-devel libgcc-devel libgcrypt-devel liblz4-devel \
+    xbps-install -y bzip2-devel e2fsprogs-devel libargon2-devel libgcc-devel liblz4-devel \
 		 liblzma-devel libstdc++-devel libzstd-devel lz4-devel \
 		 lzo-devel musl-devel zlib-devel || return 1
 
@@ -155,6 +156,23 @@ libthreadar()
     cd ..
     ldconfig
     rm -rf libthreadar-${LIBTHREADAR_VERSION}
+}
+
+libgcrypt()
+{
+    local LIBGCRYPT_PKG=libgcrypt-${LIBGCRYPT_VERSION}.tar.bz2
+
+    if [ ! -e "${REPO}/${LIBGCRYPT_PKG}" ] ; then wget https://www.gnupg.org/ftp/gcrypt/libgcrypt/${LIBGCRYPT_PKG} && mv "${LIBGCRYPT_PKG}" "${REPO}" || return 1 ; fi
+
+    tar -xf "${REPO}/${LIBGCRYPT_PKG}" || return 1
+    cd libgcrypt-${LIBGCRYPT_VERSION}
+    ./configure --enable-static --prefix="$LOCAL_PREFIX" || (cd .. : return 1)
+    make ${MAKE_FLAGS} || (cd .. : return 1)
+    make check || (cd .. : return 1)
+    make install || (cd .. : return 1)
+    cd ..
+    ldconfig
+    rm -rf libgcrypt-${LIBGCRYPT_VERSION}
 }
 
 libgpg-error()
@@ -282,7 +300,7 @@ librhash()
 
 dar_static()
 {
-    #libpsl does not mention -lunistring which it relies on updating pkgconfig file
+    #libpsl does not mention -lunistring which it relies on: updating pkgconfig file
     local pkg_file=/usr/lib/pkgconfig/libpsl.pc
     if [ -e "$pkg_file" ] ; then
 	cp "$pkg_file" "${pkg_file}.bak"
@@ -320,6 +338,7 @@ check
 
 requirements || (echo "Failed setting up requirements" ; exit 1)
 libthreadar || (echo "Failed building libthreadar" ; exit 1)
+libgcrypt || (echo "Failed building libgcrypt" ; exit 1)
 libgpg-error || (echo "Failed building libgpg-error static version" ; exit 1)
 librsync || (echo "Failed building librsync" ; exit 1)
 gnutls || (echo "Failed building gnutls" ; exit 1)
