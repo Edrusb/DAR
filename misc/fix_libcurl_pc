@@ -4,7 +4,7 @@
 ## THIS SIMPLE SCRIPT IS CALLED FROM dar_static_builder_with_musl_voidlinux.bash
 ## TO FIX BUG IN LIBCURL PROVIDED PKG-CONFIG CONFIGURATION FILE
 ## WHICH IS BROKEN FOR STATICAL LINKING (MISSING DEPENDENT LIBRARY TO ADD FOR
-## THE LINKING TO SUCCEED.
+## THE LINKING TO SUCCEED).
 
 ## This scripts expects the libcurl library to be installed in /usr/local and
 ## built with the minimal options set from the dar_static_builder_with_musl_voidlinux.bash
