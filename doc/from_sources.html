@@ -698,9 +698,15 @@
 		  implementation. When using musl C standard library, by default new threads receive
 		  a 128 kio stack size, which does not allow libgcrypt to work, leading libdar to abort
 		  with the following error message: <i>Error while opening libgcrypt key handle: gcrypt/Out of memory</i>.
-		  A stack size of 8 Mio is fine with glibc library, but 16 Mio is required to have libgcrypt working with
-		  musl library when parallel (= multi-threaded, see -G option) ciphering is used, in
-		  particular when using the twofish algorithm.
+		  A stack size of 8 Mio seems fine with glibc and musl standard C library (with the exception of the
+		  twofish algorithm with musl which still does not work when using parallel ciphering --- see -G option).
+		</p>
+		<p>
+		  If for some reason you want subthreads receiving a smaller or larger stack size, use this option with the
+		  expected stack size. Pay attention to the fact that choosing a too small stack size may lead to stack overflow, error,
+		  crash or other unexpected behavior, depending on the options passed to the compiler when building dar/libdar.
+		  This affects all threads created from libdar: in particular parallel compression, parallel ciphering and
+		  FTP (due to libcurl) client implementation.
 		</p>
 	      </td>
 	    </tr>
