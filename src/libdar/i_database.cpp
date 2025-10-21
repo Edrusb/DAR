@@ -59,6 +59,9 @@ namespace libdar
 
 	dat.chemin = "";
 	dat.basename = "";
+	dat.root_last_mod.nullify();
+	dat.crypto = crypto_algo::none;
+	dat.pass.clear();
 	coordinate.clear();
 	coordinate.push_back(dat); // coordinate[0] is never used, but must exist
 	options_to_dar.clear();
@@ -71,6 +74,8 @@ namespace libdar
 	cur_db_version = database_header_get_supported_version();
 	algo = compression::gzip;   // stays the default algorithm for new databases
 	compr_level = 9; // stays the default compression level for new databases
+	db_cryptalgo = crypto_algo::none;
+	db_cryptpass.clear();
     }
 
     database::i_database::i_database(const shared_ptr<user_interaction> & dialog, const string & base, const database_open_options & opt): mem_ui(dialog)
@@ -80,6 +85,8 @@ namespace libdar
 					       cur_db_version,
 					       algo,
 					       compr_level);
+	db_cryptalgo = crypto_algo::none; // for now the value is not written to nor fetched from disk
+	db_cryptpass.clear();
 
 	if(f == nullptr)
 	    throw Ememory("database::i_database::database");
@@ -108,16 +115,48 @@ namespace libdar
 
 	    if(db_version > database_header_get_supported_version())
 		throw SRC_BUG; // we should not get there if the database is more recent than what that software can handle. this is necessary if we do not want to destroy the database or loose data.
+
 	    coordinate.clear();
 	    infinint tmp = infinint(f); // number of archive to read
 	    while(!tmp.is_zero())
 	    {
+		    // reading a new archive entry of the database:
+
 		tools_read_string(f, dat.chemin);
 		tools_read_string(f, dat.basename);
 		if(db_version >= 3)
 		    dat.root_last_mod.read(f, db2archive_version(db_version));
 		else
 		    dat.root_last_mod = datetime(0);
+
+		if(db_cryptalgo != crypto_algo::none)
+		{
+			// crypto credentials info for archives are only written to file
+			// if the database is itself encrypted
+
+		    char a;
+		    infinint keysize;
+		    U_I i_keysize = 0;
+
+		    f.read(&a, 1);
+		    dat.crypto = char_2_crypto_algo(a);
+
+		    keysize.read(f);
+		    keysize.unstack(i_keysize);
+		    if(!keysize.is_zero())
+			throw Erange("database::i_database::build",
+				     gettext("integer type unable to handle such too large value for archive key size in database"));
+
+		    dat.pass.clear();
+		    dat.pass.resize(i_keysize);
+		    f.read(dat.pass.c_str(), i_keysize);
+		}
+		else
+		{
+		    dat.crypto = crypto_algo::none;
+		    dat.pass.clear();
+		}
+
 		coordinate.push_back(dat);
 		--tmp;
 	    }
@@ -188,9 +227,27 @@ namespace libdar
  	    infinint(tmp).dump(*f);
 	    for(archive_num i = 0; i < tmp; ++i)
 	    {
+
+		    // writing down the next archive entry of the database:
+
 		tools_write_string(*f, coordinate[i].chemin);
 		tools_write_string(*f, coordinate[i].basename);
 		coordinate[i].root_last_mod.dump(*f);
+		if(db_cryptalgo != crypto_algo::none)
+		{
+			// we do not write down cipher information of archives
+			// if the database is not encrypted
+
+		    char a = crypto_algo_2_char(coordinate[i].crypto);
+		    infinint keysize = coordinate[i].pass.get_size();
+
+		    f->write(&a, 1);
+		    keysize.dump(*f);
+		    f->write(coordinate[i].pass.c_str(), coordinate[i].pass.get_size());
+		}
+		    // else we do not write any algo/pass
+		    // to avoid exposing encrypted credentials and data
+		    // through an non-encrypted database
 	    }
 	    tools_write_vector(*f, options_to_dar);
 	    tools_write_string(*f, dar_path);
@@ -237,6 +294,7 @@ namespace libdar
 	    dat.chemin = chemin;
 	    dat.basename = basename;
 	    dat.root_last_mod = arch.pimpl->get_catalogue().get_root_dir_last_modif();
+	    dat.crypto = crypto_algo::none;
 	    coordinate.push_back(dat);
 	    files->data_tree_update_with(arch.pimpl->get_catalogue().get_contenu(), number);
 	    if(number > 1)

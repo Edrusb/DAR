@@ -42,6 +42,8 @@
 #include "tools.hpp"
 #include "datetime.hpp"
 #include "archive_options.hpp"
+#include "crypto.hpp"
+#include "secu_string.hpp"
 
 namespace libdar
 {
@@ -108,6 +110,12 @@ namespace libdar
 
 	    /// change the compression level to use when storing base in file
 	void set_compression_level(U_I level) const { compr_level = level; };
+
+	    /// change crypto algo to use
+	void set_database_crypto_algo(crypto_algo algo) const { db_cryptalgo = algo; };
+
+	    /// change crypto key to use
+	void set_database_crypto_pass(const secu_string & key) const { db_cryptpass = key; };
 
 	    ////////////////////////
 	    //
@@ -183,6 +191,8 @@ namespace libdar
             std::string chemin;      ///< path to the archive
             std::string basename;    ///< basename of the archive
             datetime root_last_mod;  ///< last modification date of the root directory
+	    crypto_algo crypto;      ///< the encryption algo to use for the archive
+	    secu_string pass;        ///< the encryption key to use for the archive
         };
 
         std::deque<struct archive_data> coordinate;  ///< list of archive used to build the database
@@ -194,6 +204,8 @@ namespace libdar
 	unsigned char cur_db_version;                ///< current db version (for informational purposes)
 	mutable compression algo;                    ///< compression used/to use when writing down the base to file
 	mutable U_I compr_level;                     ///< the compression level to use
+	mutable crypto_algo db_cryptalgo;            ///< the crypto algo used to cipher the whole database
+	mutable secu_string db_cryptpass;            ///< the symmetric key to use to cipher the whole database
 
 	void build(generic_file & f, bool partial, bool read_only, unsigned char db_version);  ///< used by constructors
 	archive_num get_real_archive_num(archive_num num, bool revert) const;
