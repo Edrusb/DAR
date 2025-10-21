@@ -1,3 +1,6 @@
+from 2.8.1 to 2.8.2
+- fixed compilation warning about signed and unsigned int comparison
+
 from 2.8.0 to 2.8.1
 - fixed src/python/Makefile.am where CFLAGS was used in C++ compilation
   command and should be replaced by CXXFLAGS.
