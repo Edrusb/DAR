@@ -139,7 +139,17 @@ namespace libdar
 	database_add_options & operator = (database_add_options && ref) noexcept = default;
 	~database_add_options() = default;
 
-	void clear() {};
+	void set_crypto_algo(crypto_algo val) { algo = val; };
+	void set_crypto_pass(const secu_string & val) { pass = val; };
+
+	crypto_algo get_crypto_algo() const { return algo; };
+	const secu_string & get_crypto_pass() const { return pass; };
+
+	void clear() { algo = crypto_algo::none; pass.clear(); };
+
+    private:
+	crypto_algo algo;
+	secu_string pass;
     };
 
 	/// options to remove an archive from the base

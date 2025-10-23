@@ -269,7 +269,10 @@ namespace libdar
 	    delete f;
     }
 
-    void database::i_database::add_archive(const archive & arch, const string & chemin, const string & basename, const database_add_options & opt)
+    void database::i_database::add_archive(const archive & arch,
+					   const string & chemin,
+					   const string & basename,
+					   const database_add_options & opt)
     {
 	    // note: this methode could now leverage the use of
 	    // list_entry provided by op_listing to a callback function, but

@@ -85,7 +85,10 @@ namespace libdar
             // SETTINGS
 
             /// add an archive to the database
-        void add_archive(const archive & arch, const std::string & chemin, const std::string & basename, const database_add_options & opt);
+        void add_archive(const archive & arch,
+			 const std::string & chemin,
+			 const std::string & basename,
+			 const database_add_options & opt);
 
             /// remove an archive from a database
         void remove_archive(archive_num min, archive_num max, const database_remove_options & opt);
