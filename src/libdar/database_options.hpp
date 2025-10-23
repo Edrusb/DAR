@@ -237,15 +237,19 @@ namespace libdar
 	database_change_crypto_options & operator = (database_change_crypto_options && ref) noexcept = default;
 	~database_change_crypto_options() = default;
 
-	void clear() { x_revert_archive_numbering = false; };
+	void clear() { x_revert_archive_numbering = false; crypto_size = 0; };
 
 	    /// defines whether the archive number is counted from the beginning or from the end of the database
 	void set_revert_archive_numbering(bool revert) { x_revert_archive_numbering = revert; };
+	void set_crypto_size(U_32 val) { crypto_size = val; };
+	void unset_crypto_size() { crypto_size = 0; }; ///< will use the libdar default value
 
 	bool get_revert_archive_numbering() const { return x_revert_archive_numbering; };
+	U_32 get_crypto_size() const { return crypto_size; };
 
     private:
 	bool x_revert_archive_numbering;
+	U_32 crypto_size;
 
     };
 
