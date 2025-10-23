@@ -197,6 +197,27 @@ namespace libdar
 	NLS_SWAP_OUT;
     }
 
+    void database::change_crypto_algo_pass(archive_num num,
+					   crypto_algo algo,
+					   const secu_string & pass,
+					   const database_change_crypto_options & opt)
+    {
+	NLS_SWAP_IN;
+	try
+	{
+	    pimpl->change_crypto_algo_pass(num,
+					   algo,
+					   pass,
+					   opt);
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
+    }
+
     void database::set_options(const vector<string> & opt)
     {
 	NLS_SWAP_IN;

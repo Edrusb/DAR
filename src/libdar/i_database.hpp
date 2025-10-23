@@ -102,6 +102,12 @@ namespace libdar
             /// change one's archive path recorded in the database
         void set_path(archive_num num, const std::string & chemin, const database_change_path_options & opt);
 
+	    /// change encryption algo recorded for an archive in the database
+	void change_crypto_algo_pass(archive_num num,
+				     crypto_algo algo,
+				     const secu_string & pass,
+				     const database_change_crypto_options & opt);
+
             /// change the default options given to dar when performing restoration
         void set_options(const std::vector<std::string> &opt) { options_to_dar = opt; };
 

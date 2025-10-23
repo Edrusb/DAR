@@ -225,6 +225,30 @@ namespace libdar
 
     };
 
+	/// options for changing a given archive's encryption params
+
+    class database_change_crypto_options
+    {
+    public:
+	database_change_crypto_options() { clear(); };
+	database_change_crypto_options(const database_change_crypto_options & ref) = default;
+	database_change_crypto_options(database_change_crypto_options && ref) noexcept = default;
+	database_change_crypto_options & operator = (const database_change_crypto_options & ref) = default;
+	database_change_crypto_options & operator = (database_change_crypto_options && ref) noexcept = default;
+	~database_change_crypto_options() = default;
+
+	void clear() { x_revert_archive_numbering = false; };
+
+	    /// defines whether the archive number is counted from the beginning or from the end of the database
+	void set_revert_archive_numbering(bool revert) { x_revert_archive_numbering = revert; };
+
+	bool get_revert_archive_numbering() const { return x_revert_archive_numbering; };
+
+    private:
+	bool x_revert_archive_numbering;
+
+    };
+
 	/// options for restoration from database
 
     class database_restore_options

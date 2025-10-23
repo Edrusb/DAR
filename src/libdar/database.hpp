@@ -139,6 +139,19 @@ namespace libdar
 		      const std::string & chemin,
 		      const database_change_path_options & opt);
 
+
+	    /// change one's archive crypto parameters recorded in the database
+
+	    /// \param[in] num is the archive index who's parameters to change
+	    /// \param[in] algo is the crypto algo to record in order to open this archive
+	    /// \param[in] pass is the symmetrical key to use in order to open this archive
+	    /// \param[in] opt optional parameters for this operation
+	    /// \note this method *is* available with partially extracted databases, but with partial_read_only ones
+	void change_crypto_algo_pass(archive_num num,
+				     crypto_algo algo,
+				     const secu_string & pass,
+				     const database_change_crypto_options & opt);
+
 	    /// change the default options given to dar when performing restoration
 
 	    /// \param[in] opt is a vector a arguments.

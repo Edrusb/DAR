@@ -378,6 +378,34 @@ namespace libdar
 	NLS_SWAP_OUT;
     }
 
+    void database::i_database::change_crypto_algo_pass(archive_num num,
+						       crypto_algo algo,
+						       const secu_string & pass,
+						       const database_change_crypto_options & opt)
+    {
+	NLS_SWAP_IN;
+	try
+	{
+	    num = get_real_archive_num(num, opt.get_revert_archive_numbering());
+	    if(num < coordinate.size() && num != 0)
+	    {
+		coordinate[num].crypto = algo;
+		if(algo != crypto_algo::none)
+		    coordinate[num].pass = pass;
+		else
+		    coordinate[num].pass.clear();
+	    }
+	    else
+		throw Erange("database::i_database::change_name", gettext("Non existent archive in database"));
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
+    }
+
     void database::i_database::set_permutation(archive_num src, archive_num dst)
     {
 	NLS_SWAP_IN;
