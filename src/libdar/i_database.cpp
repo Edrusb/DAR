@@ -912,6 +912,9 @@ namespace libdar
 		throw SRC_BUG;
 
 	    mask_base->set_focus(*it);
+		// note: mask_base points to the first member of the wrapper_mask
+		// passed as set_subtree() of the arhive_option_extract object used
+		// below:
 
 		// - extract the archive with the provided/modified extraction options
 
