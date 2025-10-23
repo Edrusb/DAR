@@ -741,7 +741,6 @@ namespace libdar
 	    {
 		string dar_cmd = dar_path != "" ? dar_path : "dar";
 		map<archive_num, vector<string> >::iterator ut = command_line.begin();
-		vector<string> argvector_init = vector<string>(1, dar_cmd);
 
 		while(ut != command_line.end())
 		{
