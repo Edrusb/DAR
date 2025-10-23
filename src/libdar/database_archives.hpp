@@ -33,6 +33,8 @@
 #include <deque>
 #include <string>
 
+#include "crypto.hpp"
+
 namespace libdar
 {
 
@@ -44,11 +46,12 @@ namespace libdar
 	/// only two methods are useful from API point of view
 	/// - get_path()
         /// - get_basename()
+	/// - get_crypto_algo()
 
     class database_archives
     {
     public:
-	database_archives() {}; // fields "chemin" and "base" are objects and get initialized by the std::string default constructor
+	database_archives(): algo(crypto_algo::none) {}; // fields "chemin" and "base" are objects and get initialized by the std::string default constructor
 	database_archives(const database_archives & ref) = default;
 	database_archives(database_archives && ref) noexcept = default;
 	database_archives & operator = (const database_archives & ref) = default;
@@ -57,6 +60,7 @@ namespace libdar
 
 	void set_path(const std::string & val) { chemin = val; };
 	void set_basename(const std::string & val) { base = val; };
+	void set_crypto_algo(crypto_algo val) { algo = val; };
 
 	    /// this provides the path where is located this archive
 	const std::string & get_path() const { return chemin; };
@@ -64,9 +68,13 @@ namespace libdar
 	    /// this provides the basename of the archive
 	const std::string & get_basename() const { return base; };
 
+	    /// this provides the crypto algo of the archive
+	crypto_algo get_crypto_algo() const { return algo; };
+
     private:
 	std::string chemin;
 	std::string base;
+	crypto_algo algo;
     };
 
 	/// list of archives found in a database
