@@ -57,6 +57,30 @@ namespace libdar
 	}
     }
 
+    string crypto_algo_2_dar_cmdline_string(crypto_algo a)
+    {
+	    // this revers the line_tools.cpp:line_tools_crypto_split_algo_pass() routine
+	switch(a)
+	{
+	case crypto_algo::none:
+	    return "none";
+	case crypto_algo::scrambling:
+	    return "scram";
+	case crypto_algo::blowfish:
+	    return "bf";
+	case crypto_algo::aes256:
+	    return "aes";
+	case crypto_algo::twofish256:
+	    return "twofish";
+	case crypto_algo::serpent256:
+	    return "serpent";
+	case crypto_algo::camellia256:
+	    return "camellia";
+	default:
+	    throw SRC_BUG;
+	}
+    }
+
     char crypto_algo_2_char(crypto_algo a)
     {
 	switch(a)

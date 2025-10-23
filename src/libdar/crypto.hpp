@@ -86,6 +86,9 @@ namespace libdar
 	/// convert crypto algo to readable std::string
     extern std::string crypto_algo_2_string(crypto_algo algo);
 
+	/// rebuild the dar command-line expected (short) string for the given algo
+    std::string crypto_algo_2_dar_cmdline_string(crypto_algo a);
+
 	/// convert crypto algo to char
     extern char crypto_algo_2_char(crypto_algo a);
 
