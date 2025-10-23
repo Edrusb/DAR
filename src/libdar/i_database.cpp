@@ -477,6 +477,7 @@ namespace libdar
 	{
 	    tmp.set_path(coordinate[i].chemin);
 	    tmp.set_basename(coordinate[i].basename);
+	    tmp.set_crypto_algo(coordinate[i].crypto);
 	    ret.push_back(tmp);
 	}
 
