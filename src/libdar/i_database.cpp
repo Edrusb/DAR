@@ -759,6 +759,19 @@ namespace libdar
 			argvpipe.push_back(dar_cmd); // just to fill the argv[0] by the command even when transmitted through anonymous pipe
 			argvpipe.push_back("-x");
 			argvpipe.push_back(archive_name);
+			if(coordinate[ut->first].crypto != crypto_algo::none)
+			{
+			    argvpipe.push_back("-K");
+			    argvpipe.push_back(crypto_algo_2_dar_cmdline_string(coordinate[ut->first].crypto)
+					       + string(":")
+					       + string(coordinate[ut->first].pass.c_str()));
+				// note: the password/passphrase is sent through an
+				// anonymous pipe between dar_manager and dar, the
+				// only two processes having access to this pipe
+				// thus the pass is not exposed to tier party and
+				// cannot be accessed by any other process even those
+				// of the user/group.
+			}
 			if(!opt.get_ignore_dar_options_in_database())
 			    argvpipe += options_to_dar;
 			argvpipe += opt.get_extra_options_for_dar();
@@ -855,6 +868,7 @@ namespace libdar
 	for(set<archive_num>::iterator it = to_consider.begin(); it != to_consider.end(); ++it)
 	{
 	    unique_ptr<archive> arch;
+	    archive_options_read tmp_read = read_options;
 
 		// - open the archive with the provided read options
 
@@ -863,12 +877,23 @@ namespace libdar
 
 	    path chem(coordinate[*it].chemin);
 	    string basename = coordinate[*it].basename;
+	    if(coordinate[*it].crypto != crypto_algo::none)
+	    {
+		tmp_read.set_crypto_algo(coordinate[*it].crypto);
+		tmp_read.set_crypto_pass(coordinate[*it].pass);
+		    // note that the user may specify crypto options
+		    // to read all archive of referred byt the database,
+		    // these will be used unless the database defines
+		    // specific crypto params for a given archive, in
+		    // which case, those parameter will override the
+		    // global crypto params when reading such archive.
+	    }
 
 	    arch.reset(new (nothrow) archive(get_pointer(),
 					     chem,
 					     basename,
 					     dar_extension,
-					     read_options));
+					     tmp_read));
 
 	    if(!arch)
 		throw Ememory("database::i_database::restore");
