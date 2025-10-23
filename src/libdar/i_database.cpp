@@ -297,7 +297,8 @@ namespace libdar
 	    dat.chemin = chemin;
 	    dat.basename = basename;
 	    dat.root_last_mod = arch.pimpl->get_catalogue().get_root_dir_last_modif();
-	    dat.crypto = crypto_algo::none;
+	    dat.crypto = opt.get_crypto_algo();
+	    dat.pass = opt.get_crypto_pass();
 	    coordinate.push_back(dat);
 	    files->data_tree_update_with(arch.pimpl->get_catalogue().get_contenu(), number);
 	    if(number > 1)
