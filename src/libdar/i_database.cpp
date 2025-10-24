@@ -55,13 +55,8 @@ namespace libdar
 
     database::i_database::i_database(const shared_ptr<user_interaction> & dialog): mem_ui(dialog)
     {
-	archive_data dat;
+	archive_data dat; // initialized by mean of the default constructor
 
-	dat.chemin = "";
-	dat.basename = "";
-	dat.root_last_mod.nullify();
-	dat.crypto = crypto_algo::none;
-	dat.pass.clear();
 	coordinate.clear();
 	coordinate.push_back(dat); // coordinate[0] is never used, but must exist
 	options_to_dar.clear();
@@ -150,11 +145,16 @@ namespace libdar
 		    dat.pass.clear();
 		    dat.pass.resize(i_keysize);
 		    f.read(dat.pass.c_str(), i_keysize);
+
+		    keysize.read(f); // recycling keysize temporary variable to fetch crypto_size as an infinint
+		    dat.crypto_size = 0;
+		    keysize.unstack(dat.crypto_size);
 		}
 		else
 		{
 		    dat.crypto = crypto_algo::none;
 		    dat.pass.clear();
+		    dat.crypto_size = 0; // we will use the default value archive_options
 		}
 
 		coordinate.push_back(dat);
@@ -244,6 +244,9 @@ namespace libdar
 		    f->write(&a, 1);
 		    keysize.dump(*f);
 		    f->write(coordinate[i].pass.c_str(), coordinate[i].pass.get_size());
+			// recycling keysize to store crypto_size as an infinint:
+		    keysize = coordinate[i].crypto_size;
+		    keysize.dump(*f);
 		}
 		    // else we do not write any algo/pass
 		    // to avoid exposing encrypted credentials and data
@@ -299,6 +302,7 @@ namespace libdar
 	    dat.root_last_mod = arch.pimpl->get_catalogue().get_root_dir_last_modif();
 	    dat.crypto = opt.get_crypto_algo();
 	    dat.pass = opt.get_crypto_pass();
+	    dat.crypto_size = opt.get_crypto_size();
 	    coordinate.push_back(dat);
 	    files->data_tree_update_with(arch.pimpl->get_catalogue().get_contenu(), number);
 	    if(number > 1)
@@ -391,9 +395,15 @@ namespace libdar
 	    {
 		coordinate[num].crypto = algo;
 		if(algo != crypto_algo::none)
+		{
 		    coordinate[num].pass = pass;
+		    coordinate[num].crypto_size = opt.get_crypto_size();
+		}
 		else
+		{
 		    coordinate[num].pass.clear();
+		    coordinate[num].crypto_size = 0;
+		}
 	    }
 	    else
 		throw Erange("database::i_database::change_name", gettext("Non existent archive in database"));
@@ -478,6 +488,7 @@ namespace libdar
 	    tmp.set_path(coordinate[i].chemin);
 	    tmp.set_basename(coordinate[i].basename);
 	    tmp.set_crypto_algo(coordinate[i].crypto);
+	    tmp.set_crypto_size(coordinate[i].crypto_size);
 	    ret.push_back(tmp);
 	}
 
@@ -771,6 +782,16 @@ namespace libdar
 				// thus the pass is not exposed to tier party and
 				// cannot be accessed by any other process even those
 				// of the user/group.
+
+			    if(coordinate[ut->first].crypto_size != 0)
+			    {
+				argvpipe.push_back("-#");
+				argvpipe.push_back(tools_printf("%u",
+								coordinate[ut->first].crypto_size));
+			    }
+				// else zero means to use the default value, so
+				// we don't add any -# option at all
+
 			}
 			if(!opt.get_ignore_dar_options_in_database())
 			    argvpipe += options_to_dar;
@@ -887,6 +908,12 @@ namespace libdar
 		    // specific crypto params for a given archive, in
 		    // which case, those parameter will override the
 		    // global crypto params when reading such archive.
+		if(coordinate[*it].crypto_size != 0)
+		    tmp_read.set_crypto_size(coordinate[*it].crypto_size);
+		    // same thing here, crypto_size can be defined
+		    // globally when restoring from a database, but this
+		    // parameter will be overriden for each archive that
+		    // are stored with a non-null crypto_size value
 	    }
 
 	    arch.reset(new (nothrow) archive(get_pointer(),

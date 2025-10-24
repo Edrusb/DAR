@@ -202,6 +202,8 @@ namespace libdar
             datetime root_last_mod;  ///< last modification date of the root directory
 	    crypto_algo crypto;      ///< the encryption algo to use for the archive
 	    secu_string pass;        ///< the encryption key to use for the archive
+	    U_32 crypto_size;        ///< the crypto_size to use (set to zero to use the default value)
+	    archive_data(): crypto(crypto_algo::none), crypto_size(0) {};
         };
 
         std::deque<struct archive_data> coordinate;  ///< list of archive used to build the database
