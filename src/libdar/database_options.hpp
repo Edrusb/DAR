@@ -141,15 +141,18 @@ namespace libdar
 
 	void set_crypto_algo(crypto_algo val) { algo = val; };
 	void set_crypto_pass(const secu_string & val) { pass = val; };
+	void set_crypto_size(U_32 val) { crypto_size = val; };
 
 	crypto_algo get_crypto_algo() const { return algo; };
 	const secu_string & get_crypto_pass() const { return pass; };
+	U_32 get_crypto_size() const { return crypto_size; };
 
-	void clear() { algo = crypto_algo::none; pass.clear(); };
+	void clear() { algo = crypto_algo::none; pass.clear(); crypto_size = 0; };
 
     private:
 	crypto_algo algo;
 	secu_string pass;
+	U_32 crypto_size;
     };
 
 	/// options to remove an archive from the base
