@@ -51,7 +51,7 @@ namespace libdar
     class database_archives
     {
     public:
-	database_archives(): algo(crypto_algo::none) {}; // fields "chemin" and "base" are objects and get initialized by the std::string default constructor
+	database_archives(): algo(crypto_algo::none), crypto_size(0) {}; // fields "chemin" and "base" are objects and get initialized by the std::string default constructor
 	database_archives(const database_archives & ref) = default;
 	database_archives(database_archives && ref) noexcept = default;
 	database_archives & operator = (const database_archives & ref) = default;
@@ -61,6 +61,7 @@ namespace libdar
 	void set_path(const std::string & val) { chemin = val; };
 	void set_basename(const std::string & val) { base = val; };
 	void set_crypto_algo(crypto_algo val) { algo = val; };
+	void set_crypto_size(U_32 val) { crypto_size = val; };
 
 	    /// this provides the path where is located this archive
 	const std::string & get_path() const { return chemin; };
@@ -71,10 +72,16 @@ namespace libdar
 	    /// this provides the crypto algo of the archive
 	crypto_algo get_crypto_algo() const { return algo; };
 
+	    /// this provides the crypto block size to use for this archive
+
+	    /// \note if set to zero, it means to use the libdar default value
+	U_32 get_crypto_size() const { return crypto_size; };
+
     private:
 	std::string chemin;
 	std::string base;
 	crypto_algo algo;
+	U_32 crypto_size;
     };
 
 	/// list of archives found in a database
