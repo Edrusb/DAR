@@ -753,6 +753,37 @@ void line_tools_4_4_build_compatible_overwriting_policy(bool allow_over,
     }
 }
 
+libdar::crypto_algo line_tools_crypto_string_to_crypto_algo(const string & val)
+{
+    crypto_algo algo = crypto_algo::none;
+
+    if(val == "scrambling" || val == "scram")
+	algo = crypto_algo::scrambling;
+    else
+	if(val == "none")
+	    algo = crypto_algo::none;
+	else
+	    if(val == "blowfish" || val == "bf")
+		algo = crypto_algo::blowfish;
+	    else
+		if(val == "aes" || val == "aes256")
+		    algo = crypto_algo::aes256;
+		else
+		    if(val == "twofish" || val == "twofish256")
+			algo = crypto_algo::twofish256;
+		    else
+			if(val == "serpent" || val == "serpent256")
+			    algo = crypto_algo::serpent256;
+			else
+			    if(val == "camellia" || val == "camellia256")
+				algo = crypto_algo::camellia256;
+			    else
+				throw Erange("line_tools_crypto_string_to_crypt_algo", string(gettext("unknown cryptographic algorithm: ")) + val);
+
+    return algo;
+}
+
+
 void line_tools_crypto_split_algo_pass(const secu_string & all,
 				       crypto_algo & algo,
 				       secu_string & pass,
@@ -785,40 +816,31 @@ void line_tools_crypto_split_algo_pass(const secu_string & all,
 		// pass holds the string after ':'
 	    pass = secu_string(it, fin - it);
 
-	    no_cipher_given = (tmp == "");
-
-	    if(tmp == "scrambling" || tmp == "scram")
-		algo = crypto_algo::scrambling;
+	    if(tmp.empty())
+	    {
+		no_cipher_given = true;
+		algo = crypto_algo::aes256;
+	    }
 	    else
-		if(tmp == "none")
-		    algo = crypto_algo::none;
+	    {
+		no_cipher_given = false;
+		if(tmp != "gnupg")
+		    algo = line_tools_crypto_string_to_crypto_algo(string(tmp.c_str()));
 		else
-		    if(tmp == "blowfish" || tmp == "bf")
-			algo = crypto_algo::blowfish;
-		    else
-			if(tmp == "aes" || tmp == "aes256" || tmp == "")
-			    algo = crypto_algo::aes256; // AES is the default cypher ("")
-			else
-			    if(tmp == "twofish" || tmp == "twofish256")
-				algo = crypto_algo::twofish256;
-			    else
-				if(tmp == "serpent" || tmp == "serpent256")
-				    algo = crypto_algo::serpent256;
-				else
-				    if(tmp == "camellia" || tmp == "camellia256")
-					algo = crypto_algo::camellia256;
-				    else
-					if(tmp == "gnupg")
-					{
-					    secu_string emails;
-					    line_tools_crypto_split_algo_pass(pass, algo, emails, no_cipher_given, recipients);
-					    line_tools_split(emails.c_str(), ',', recipients);
-					    pass.clear();
-					}
-					else
-					    throw Erange("crypto_split_algo_pass", string(gettext("unknown cryptographic algorithm: ")) + tmp.c_str());
+		{
+		    secu_string emails;
+
+			// this is a recursive call, we removed the 'gnupg:' and try
+			// to get the 'emails' string as password, the 'recipients' fields
+			// is not set by this recursive call but is set right after below
+			// from the emails string:
+		    line_tools_crypto_split_algo_pass(pass, algo, emails, no_cipher_given, recipients);
+		    line_tools_split(emails.c_str(), ',', recipients);
+		    pass.clear();
+		}
+	    }
 	}
-	else // no ':' using blowfish as default cypher
+	else // no ':' using blowfish as default cypher, now aes256
 	{
 	    no_cipher_given = true;
 	    algo = crypto_algo::aes256;

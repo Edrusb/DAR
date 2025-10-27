@@ -163,11 +163,14 @@ extern void line_tools_4_4_build_compatible_overwriting_policy(bool allow_over,
 							       bool ea_erase,
 							       const libdar::crit_action * & overwrite);
 
+    /// converts algorithm string name expected on command-line (dar and dar_manager) to crypto_algo enum
+extern libdar::crypto_algo line_tools_crypto_string_to_crypto_algo(const std::string & val);
+
     /// split the argument to -K, -J and -$ in their different parts
     /// \param[in] all is what the user provided on command-line
     /// \param[out] algo is the symmetrical algorithm to use
     /// \param[out] pass is either the passphrase
-    /// \param[out] no_cipher_given is true if the use did not specified the cipher (which defaults to blowfish)
+    /// \param[out] no_cipher_given is true if the use did not specified the cipher (which defaults to blowfish, now aes)
     /// \param[out] recipients emails recipients to use (empty list if gnupg has not to be used)
 extern void line_tools_crypto_split_algo_pass(const secu_string & all,
 					      crypto_algo & algo,
