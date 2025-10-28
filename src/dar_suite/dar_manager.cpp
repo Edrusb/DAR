@@ -74,9 +74,9 @@ using namespace libdar;
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
 #define MISSING_ARG "Missing argument to -%c"
 #define INVALID_ARG "Invalid argument given to -%c (requires integer)"
-#define OPT_STRING "C:B:A:lD:b:p:od:ru:f:shVm:vQjw:ie:c@:N;:ka:9:z:x"
+#define OPT_STRING "C:B:A:lD:b:p:od:ru:f:shVm:vQjw:ie:c@:N;:ka:9:z:xJ:"
 
-enum operation { none_op, create, add, listing, del, chbase, where, options, dar, restore, used, files, stats, moving, interactive, check, batch };
+enum operation { none_op, create, add, listing, del, chbase, where, options, dar, restore, used, files, stats, moving, interactive, check, batch, archcrypto };
 
 static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char *const argv[], const char **env);
 static bool command_line(shell_interaction & dialog,
@@ -96,7 +96,9 @@ static bool command_line(shell_interaction & dialog,
 			 U_I & compression_level,
 			 bool & change_compression,
 			 bool & detailed_dates,
+			 string & arch_crypto_params,
 			 bool recursive); // true if called from op_batch
+
 static void show_usage(shell_interaction & dialog, const char *command);
 static void show_version(shell_interaction & dialog, const char *command);
 
@@ -166,7 +168,8 @@ static void action(shared_ptr<user_interaction> & dialog,
 		   bool early_release,
 		   bool ignore_database_options,
 		   bool even_when_removed,
-		   bool detailed_dates);
+		   bool detailed_dates,
+		   const string & arch_crypto_params);
 static void signed_int_to_archive_num(S_I input, archive_num &num, bool & positive);
 static void split_arch_crypto_params(const string & arch_crypto_params,
 				     libdar::crypto_algo & algo, ///< crypto_algo::none is returned if not specified (libdar default algo will have to be used)
@@ -208,6 +211,7 @@ S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * const ar
     U_I compression_level;
     bool change_compression;
     bool detailed_dates;
+    string arch_crypto_params;
     shell_interaction *shelli = dynamic_cast<shell_interaction *>(dialog.get());
 
     if(!dialog)
@@ -235,6 +239,7 @@ S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * const ar
 		     compression_level,
 		     change_compression,
 		     detailed_dates,
+		     arch_crypto_params,
 		     false))
 	return EXIT_SYNTAX;
 
@@ -290,7 +295,10 @@ S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * const ar
 	{
 	    try
 	    {
-		action(dialog, op, dat, arg, num, rest, num2, date, base, info_details, true, ignore_dat_options, even_when_removed, detailed_dates);
+		action(dialog, op, dat, arg, num, rest, num2, date, base,
+		       info_details, true, ignore_dat_options, even_when_removed,
+		       detailed_dates,
+		       arch_crypto_params);
 		finalize(dialog, op, dat, base, info_details, change_compression, algozip, compression_level);
 	    }
 	    catch(Edata & e)
@@ -330,6 +338,7 @@ static bool command_line(shell_interaction & dialog,
 			 U_I & compression_level,
 			 bool & change_compression,
 			 bool & detailed_dates,
+			 string & arch_crypto_params,
 			 bool recursive)
 {
     S_I lu, min;
@@ -561,15 +570,42 @@ static bool command_line(shell_interaction & dialog,
 						      compr_bs); // we ignore this in dar_manager
 		    change_compression = true;
 		    break;
+		case 'J':
+		    if(optarg == nullptr)
+			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
+		    switch(op)
+		    {
+		    case none_op: // becoming archcrypto operation
+			op = archcrypto;
+
+			    // the argument to -J is <number> not the crypto params which are seen as non-optional argument
+			try
+			{
+			    line_tools_read_range(string(optarg), min, max);
+			}
+			catch(Edeci & e)
+			{
+			    throw Erange("command_line", tools_printf(gettext(INVALID_ARG), char(lu)));
+			}
+			break;
+		    case archcrypto:
+			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
+		    case add:
+			arch_crypto_params = optarg;
+			break; // keep the same operation but will fill the archive crypto parameters
+		    default:
+			throw Erange("command_line", tools_printf(gettext("-J option is only valide as standalone command or after -A option")));
+		    }
+		    break;
 		case 'x':
 		    detailed_dates = true;
 		    break;
 		case ':':
-		    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(optopt)));
+		    throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(optopt)));
 		case '?':
-		    throw Erange("get_args", tools_printf(gettext("Ignoring unknown option -%c"), char(optopt)));
+		    throw Erange("command_line", tools_printf(gettext("Ignoring unknown option -%c"), char(optopt)));
 		default:
-		    throw Erange("get_args", tools_printf(gettext("Ignoring unknown option -%c"), char(lu)));
+		    throw Erange("command_line", tools_printf(gettext("Ignoring unknown option -%c"), char(lu)));
 		}
 		if(lu == 'o' || lu == 'r')
 		    break; // stop reading arguments
@@ -674,6 +710,17 @@ static bool command_line(shell_interaction & dialog,
 	    rest.clear();
 	    break;
 	case batch:
+	    break;
+	case archcrypto:
+	    if(rest.size() != 1)
+	    {
+		dialog.message(gettext("only two arguments are expected after -J option, aborting"));
+		    // two because the first was fetched as optarg above
+		    // but for user point of view, -J option is followed by <number> and <J-options>
+		    // which make two arguments.
+		return false;
+	    }
+	    arch_crypto_params = rest[0];
 	    break;
 	default:
 	    throw SRC_BUG;
@@ -1390,6 +1437,7 @@ static void op_batch(shared_ptr<user_interaction> & dialog, database *dat, const
     U_I compression_level; // not used here neither but at the level of the function that called op_batch
     bool change_compression; // not used here neither but at the level of the function that called op_batch
     bool detailed_dates;
+    string arch_crypto_params;
     shell_interaction *shelli = dynamic_cast<shell_interaction *>(dialog.get());
 
     if(shelli == nullptr)
@@ -1451,6 +1499,7 @@ static void op_batch(shared_ptr<user_interaction> & dialog, database *dat, const
 			     compression_level,
 			     change_compression,
 			     detailed_dates,
+			     arch_crypto_params,
 			     true))
 		throw Erange("op_batch", tools_printf(gettext("Syntax error in batch file: %S"), &line));
 
@@ -1460,7 +1509,9 @@ static void op_batch(shared_ptr<user_interaction> & dialog, database *dat, const
 	    if(sub_op == interactive)
 		throw Erange("op_batch", gettext("Syntax error in batch file: -i option not allowed"));
 
-	    action(dialog, sub_op, dat, arg, num, rest, num2, date, faked_base, sub_info_details, false, ignore_dat_options, even_when_removed, detailed_dates);
+	    action(dialog, sub_op, dat, arg, num, rest, num2, date, faked_base, sub_info_details, false,
+		   ignore_dat_options, even_when_removed, detailed_dates,
+		   arch_crypto_params);
 	}
 	while(tmp == '\n');
     }
@@ -1547,7 +1598,8 @@ static void action(shared_ptr<user_interaction> & dialog,
 		   bool early_release,
 		   bool ignore_database_options,
 		   bool even_when_removed,
-		   bool detailed_dates)
+		   bool detailed_dates,
+		   const string & arch_crypto_params)
 {
     shell_interaction *shelli = dynamic_cast<shell_interaction *>(dialog.get());
 
