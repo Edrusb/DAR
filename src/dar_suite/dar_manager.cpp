@@ -76,7 +76,26 @@ using namespace libdar;
 #define INVALID_ARG "Invalid argument given to -%c (requires integer)"
 #define OPT_STRING "C:B:A:lD:b:p:od:ru:f:shVm:vQjw:ie:c@:N;:ka:9:z:xJ:"
 
-enum operation { none_op, create, add, listing, del, chbase, where, options, dar, restore, used, files, stats, moving, interactive, check, batch, archcrypto };
+enum operation {
+    none_op,
+    create,
+    add,
+    listing,
+    del,
+    chbase,
+    where,
+    options,
+    dar,
+    restore,
+    used,
+    files,
+    stats,
+    moving,
+    interactive,
+    check,
+    batch,
+    archcrypto
+};
 
 static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char *const argv[], const char **env);
 static bool command_line(shell_interaction & dialog,
@@ -106,7 +125,13 @@ static void show_version(shell_interaction & dialog, const char *command);
 static const struct option *get_long_opt();
 #endif
 static void op_create(shared_ptr<user_interaction> & dialog, const string & base, compression algozip, U_I compr_level, bool info_details);
-static void op_add(shared_ptr<user_interaction> & dialog, database *dat, const string &arg, string fake, const infinint & min_digits, bool info_details);
+static void op_add(shared_ptr<user_interaction> & dialog,
+		   database *dat,
+		   const string &arg,
+		   string fake,
+		   const infinint & min_digits,
+		   const string & arch_crypto_params,
+		   bool info_details);
 static void op_listing(shell_interaction & dialog, const database *dat, bool info_details);
 static void op_del(shared_ptr<user_interaction> & dialog, database *dat, S_I min, archive_num max, bool info_details);
 static void op_chbase(shared_ptr<user_interaction> & dialog, database *dat, S_I num, const string & arg, bool info_details);
@@ -271,6 +296,7 @@ S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * const ar
     case where:
     case options:
     case dar:
+    case archcrypto:
 	partial_read = true;
 	if(change_compression)
 	    throw Erange("little_main", gettext("Cannot change compression when the requested operation only modifies the database header"));
@@ -755,15 +781,32 @@ static void op_create(shared_ptr<user_interaction> & dialog, const string & base
         dialog->message(gettext("Database has been successfully created empty."));
 }
 
-static void op_add(shared_ptr<user_interaction> & dialog, database *dat, const string &arg, string fake, const infinint & min_digits, bool info_details)
+static void op_add(shared_ptr<user_interaction> & dialog,
+		   database *dat,
+		   const string &arg,
+		   string fake,
+		   const infinint & min_digits,
+		   const string & arch_crypto_params,
+		   bool info_details)
 {
     thread_cancellation thr;
     string arch_path, arch_base;
     bool date_order_problem = false;
     archive_options_read read_options;
+    libdar::crypto_algo algo = libdar::crypto_algo::none;
+    libdar::secu_string pass;
+    U_32 crypto_bs = 0;
 
     if(dat == nullptr)
 	throw SRC_BUG;
+
+    if(! arch_crypto_params.empty())
+    {
+	split_arch_crypto_params(arch_crypto_params,
+				 algo,
+				 pass,
+				 crypto_bs);
+    }
 
     thr.check_self_cancellation();
     if(info_details)
@@ -771,6 +814,10 @@ static void op_add(shared_ptr<user_interaction> & dialog, database *dat, const s
     line_tools_split_path_basename(arg, arch_path, arch_base);
     read_options.set_info_details(info_details);
     read_options.set_slice_min_digits(min_digits);
+    read_options.set_crypto_algo(algo); // if set to crypto_algo::none, algo is fetched from the archive header
+    read_options.set_crypto_pass(pass); // if empty string, libdar will ask for password interactively (if archive is encrypted)
+    if(crypto_bs != 0)
+	read_options.set_crypto_size(crypto_bs);
     archive *arch = new (nothrow) archive(dialog, path(arch_path), arch_base, EXTENSION, read_options);
     if(arch == nullptr)
 	throw Ememory("dar_manager.cpp:op_add");
@@ -778,6 +825,7 @@ static void op_add(shared_ptr<user_interaction> & dialog, database *dat, const s
     try
     {
 	string chemin, b;
+	database_add_options opt;
 
 	thr.check_self_cancellation();
 	if(info_details)
@@ -785,7 +833,10 @@ static void op_add(shared_ptr<user_interaction> & dialog, database *dat, const s
 	if(fake == "")
 	    fake = arg;
 	line_tools_split_path_basename(fake, chemin, b);
-	dat->add_archive(*arch, chemin, b, database_add_options());
+	opt.set_crypto_algo(algo);
+	opt.set_crypto_pass(pass);
+	opt.set_crypto_size(crypto_bs);
+	dat->add_archive(*arch, chemin, b, opt);
 	thr.check_self_cancellation();
 	if(info_details)
 	    dialog->message(gettext("Checking date ordering of files between archives..."));
@@ -1570,6 +1621,7 @@ static void finalize(shared_ptr<user_interaction> & dialog,
     case dar:
     case moving:
     case batch:
+    case archcrypto:
 	if(info_details)
 	    dialog->message(gettext("Compressing and writing back database to file..."));
 	write_base(dialog,
@@ -1613,7 +1665,7 @@ static void action(shared_ptr<user_interaction> & dialog,
     case create:
 	throw SRC_BUG;
     case add:
-	op_add(dialog, dat, arg, rest.empty() ? "" : rest[0], date, info_details);
+	op_add(dialog, dat, arg, rest.empty() ? "" : rest[0], date, arch_crypto_params, info_details);
 	break;
     case listing:
 	op_listing(*shelli, dat, info_details);
@@ -1656,6 +1708,10 @@ static void action(shared_ptr<user_interaction> & dialog,
 	break;
     case batch:
 	op_batch(dialog, dat, arg, info_details);
+	break;
+    case archcrypto:
+//	op_chcrypto(dialog, dat, num, arch_crypto_params, info_details);
+	throw Efeature("standalone -J option");
 	break;
     default:
 	throw SRC_BUG;
