@@ -155,9 +155,36 @@ namespace libdar
 	U_32 crypto_size;
     };
 
+
+	/// base class to record whether the archive numbering is from the start or the end of the database
+
+    class database_numbering
+    {
+    public:
+	database_numbering() { clear(); };
+	database_numbering(const database_numbering & ref) = default;
+	database_numbering(database_numbering && ref) noexcept = default;
+	database_numbering & operator = (const database_numbering & ref) = default;
+	database_numbering & operator = (database_numbering && ref) noexcept = default;
+	~database_numbering() = default;
+
+	void clear() { x_revert_archive_numbering = false; };
+
+	    /// defines whether the archive number is counted from the beginning or from the end of the database
+	void set_revert_archive_numbering(bool revert) { x_revert_archive_numbering = revert; };
+
+	    /// get current value
+	bool get_revert_archive_numbering() const { return x_revert_archive_numbering; };
+
+    private:
+	bool x_revert_archive_numbering;
+    };
+
+
 	/// options to remove an archive from the base
 
-    class database_remove_options
+
+    class database_remove_options: public database_numbering
     {
     public:
 	database_remove_options() { clear(); };
@@ -167,21 +194,12 @@ namespace libdar
 	database_remove_options & operator = (database_remove_options && ref) noexcept = default;
 	~database_remove_options() = default;
 
-	void clear() { x_revert_archive_numbering = false; };
-
-	    /// defines whether the archive number is counted from the beginning or from the end of the database
-	void set_revert_archive_numbering(bool revert) { x_revert_archive_numbering = revert; };
-
-	bool get_revert_archive_numbering() const { return x_revert_archive_numbering; };
-
-    private:
-	bool x_revert_archive_numbering;
-
+	void clear() { database_numbering::clear(); };
     };
 
 	/// options for changing a given archive's basename
 
-    class database_change_basename_options
+    class database_change_basename_options: public database_numbering
     {
     public:
 	database_change_basename_options() { clear(); };
@@ -191,22 +209,13 @@ namespace libdar
 	database_change_basename_options & operator = (database_change_basename_options && ref) noexcept = default;
 	~database_change_basename_options() = default;
 
-	void clear() { x_revert_archive_numbering = false; };
-
-	    /// defines whether the archive number is counted from the beginning or from the end of the database
-	void set_revert_archive_numbering(bool revert) { x_revert_archive_numbering = revert; };
-
-	bool get_revert_archive_numbering() const { return x_revert_archive_numbering; };
-
-    private:
-	bool x_revert_archive_numbering;
-
+	void clear() { database_numbering::clear(); };
     };
 
 
 	/// options for changing a given archive's path
 
-    class database_change_path_options
+    class database_change_path_options: public database_numbering
     {
     public:
 	database_change_path_options() { clear(); };
@@ -216,21 +225,12 @@ namespace libdar
 	database_change_path_options & operator = (database_change_path_options && ref) noexcept = default;
 	~database_change_path_options() = default;
 
-	void clear() { x_revert_archive_numbering = false; };
-
-	    /// defines whether the archive number is counted from the beginning or from the end of the database
-	void set_revert_archive_numbering(bool revert) { x_revert_archive_numbering = revert; };
-
-	bool get_revert_archive_numbering() const { return x_revert_archive_numbering; };
-
-    private:
-	bool x_revert_archive_numbering;
-
+	void clear() { database_numbering::clear(); };
     };
 
 	/// options for changing a given archive's encryption params
 
-    class database_change_crypto_options
+    class database_change_crypto_options: public database_numbering
     {
     public:
 	database_change_crypto_options() { clear(); };
@@ -240,18 +240,14 @@ namespace libdar
 	database_change_crypto_options & operator = (database_change_crypto_options && ref) noexcept = default;
 	~database_change_crypto_options() = default;
 
-	void clear() { x_revert_archive_numbering = false; crypto_size = 0; };
+	void clear() { database_numbering::clear(); crypto_size = 0; };
 
-	    /// defines whether the archive number is counted from the beginning or from the end of the database
-	void set_revert_archive_numbering(bool revert) { x_revert_archive_numbering = revert; };
+	    /// \note: set to zero for using the libdar default value
 	void set_crypto_size(U_32 val) { crypto_size = val; };
-	void unset_crypto_size() { crypto_size = 0; }; ///< will use the libdar default value
 
-	bool get_revert_archive_numbering() const { return x_revert_archive_numbering; };
 	U_32 get_crypto_size() const { return crypto_size; };
 
     private:
-	bool x_revert_archive_numbering;
 	U_32 crypto_size;
 
     };
@@ -331,7 +327,7 @@ namespace libdar
 
 	/// options for file "used" in archive
 
-    class database_used_options
+    class database_used_options: public database_numbering
     {
     public:
 	database_used_options() { clear(); };
@@ -341,16 +337,7 @@ namespace libdar
 	database_used_options & operator = (database_used_options && ref) noexcept = default;
 	~database_used_options() = default;
 
-	void clear() { x_revert_archive_numbering = false; };
-
-	    /// defines whether the archive number is counted from the beginning or from the end of the database
-	void set_revert_archive_numbering(bool revert) { x_revert_archive_numbering = revert; };
-
-	bool get_revert_archive_numbering() const { return x_revert_archive_numbering; };
-
-    private:
-	bool x_revert_archive_numbering;
-
+	void clear() { database_numbering::clear(); };
     };
 
 
