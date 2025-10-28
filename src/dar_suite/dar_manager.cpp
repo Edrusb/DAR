@@ -204,6 +204,9 @@ static void split_arch_crypto_params(const string & arch_crypto_params,
 				     U_32 & crypto_block_size); ///< zero is returned if not specified
 static secu_string fetch_password_from_file(const string & path);
 
+    /// \return true if user set encryption parameters, false if the archive is not encrypted
+static bool ask_crypto_params(shared_ptr<user_interaction> & dialog, crypto_algo & algo, secu_string & pass, U_32 & crypto_bs);
+
 
 int main(S_I argc, char *const argv[], const char **env)
 {
@@ -1226,7 +1229,13 @@ static void op_interactive(shared_ptr<user_interaction> & dialog, database *dat,
     database_change_path_options opt_change_path;
     database_remove_options opt_remove;
     database_used_options opt_used;
+    database_add_options opt_add;
+    database_change_crypto_options opt_change_crypto;
     shell_interaction *shelli = dynamic_cast<shell_interaction *>(dialog.get());
+    crypto_algo cipher;
+    secu_string pass;
+    U_32 crypto_bs;
+
 
     if(dat == nullptr)
 	throw SRC_BUG;
@@ -1252,6 +1261,7 @@ static void op_interactive(shared_ptr<user_interaction> & dialog, database *dat,
 	    dialog->printf(gettext(" u : list archive contents   \t D : Remove an archive\n"));
 	    dialog->printf(gettext(" f : give file localization  \t m : modify archive order\n"));
 	    dialog->printf(gettext(" p : modify path of archives \t b : modify basename of archives\n"));
+	    dialog->printf(gettext(" J : modify crypto parameters of archives\n"));
 	    dialog->printf(gettext(" d : path to dar             \t o : options to dar\n"));
 	    dialog->printf(gettext(" w : write changes to file   \t s : database statistics\n"));
 	    dialog->printf(gettext(" c : check date order        \t z : change compression algorithm\n"));
@@ -1323,18 +1333,32 @@ static void op_interactive(shared_ptr<user_interaction> & dialog, database *dat,
 		saved = true;
 		break;
 	    case 'A':
-		input = dialog->get_string(gettext("Archive basename (or extracted catalogue basename) to add: "), true);
-		dialog->message(gettext("Reading catalogue of the archive to add..."));
-		line_tools_split_path_basename(input, input, input2);
 		read_options.clear();
 		read_options.set_info_details(true);
+		opt_add.clear();
+
+		input = dialog->get_string(gettext("Archive path+basename (or extracted catalogue basename) to add: "), true);
+		if(ask_crypto_params(dialog, cipher, pass, crypto_bs))
+		{
+			// we don't set cipher as it is not asked to the user
+			// for now (for long, it is no more necessary to know it to
+			// read an archive).
+
+		    read_options.set_crypto_pass(pass);
+		    read_options.set_crypto_size(crypto_bs);
+		    opt_add.set_crypto_pass(pass);
+		    opt_add.set_crypto_size(crypto_bs);
+		}
+
+		dialog->message(gettext("Reading catalogue of the archive to add..."));
+		line_tools_split_path_basename(input, input, input2);
 		arch = new (nothrow) archive(dialog, path(input), input2, EXTENSION, read_options);
 		if(arch == nullptr)
 		    throw Ememory("dar_manager.cpp:op_interactive");
 		try
 		{
 		    dialog->message(gettext("Updating database with catalogue..."));
-		    dat->add_archive(*arch, input, input2, database_add_options());
+		    dat->add_archive(*arch, input, input2, opt_add);
 		    thr.check_self_cancellation();
 		    dialog->message(gettext("Checking date ordering of files between archives..."));
 		    (void)dat->check_order();
@@ -1395,6 +1419,27 @@ static void op_interactive(shared_ptr<user_interaction> & dialog, database *dat,
 	    case 'c':
 		dialog->message(gettext("Checking file's dates ordering..."));
 		(void)dat->check_order();
+		break;
+	    case 'J':
+		input = dialog->get_string(gettext("Archive number to modify: "), true);
+		tmp_si = line_tools_str2signed_int(input);
+		signed_int_to_archive_num(tmp_si, num, tmp_sign);
+		opt_change_crypto.set_revert_archive_numbering(!tmp_sign);
+
+		if(ask_crypto_params(dialog, cipher, pass, crypto_bs))
+		{
+			// we don't set cipher as it is not asked to the user
+			// for now (for long, it is no more necessary to know it to
+			// read an archive).
+
+		    opt_change_crypto.set_crypto_size(crypto_bs);
+		}
+
+		dat->change_crypto_algo_pass(num,
+					     cipher,
+					     pass,
+					     opt_change_crypto);
+		saved = false;
 		break;
 	    case 'q':
 		if(!saved)
@@ -1889,6 +1934,38 @@ static secu_string fetch_password_from_file(const string & path)
 	throw;
     }
     close(fd);
+
+    return ret;
+}
+
+
+static bool ask_crypto_params(shared_ptr<user_interaction> & dialog, crypto_algo & algo, secu_string & pass, U_32 & crypto_bs)
+{
+    bool ret = false;
+    try
+    {
+	string tmp;
+	U_I val;
+
+	dialog->pause("Is the archive encrypted?"); // exception thrown if answer is no
+	pass = dialog->get_secu_string("Password to decipher the archive: ", false);
+	tmp = dialog->get_string("Crypto block size (use 0 for default value): ", true);
+	if(tools_my_atoi(tmp.c_str(), val))
+	    crypto_bs = val;
+	else
+	    throw Erange("ask_crypto_params",  gettext("Invalid number given for crypto block, aborting"));
+
+	    // we don't set the algo, as only very old archive need that info to be read.
+	    // if some user still need it, we will add a new question
+	    // here displaying also a letter to algo map for user to select
+	    // the cipher algorithm.
+	algo = crypto_algo::none;
+	ret = true;
+    }
+    catch(Euser_abort & e)
+    {
+	    // not an encrypted archive
+    }
 
     return ret;
 }
