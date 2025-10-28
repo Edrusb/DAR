@@ -147,10 +147,16 @@ namespace libdar
 	    /// \param[in] pass is the symmetrical key to use in order to open this archive
 	    /// \param[in] opt optional parameters for this operation
 	    /// \note this method *is* available with partially extracted databases, but with partial_read_only ones
+	    /// \note: algo should stay equal to crypto_algo none for the algo to be fetched from the archive header
+	    /// \note: an empty password will drive interactive request of the password, if you want to remove
+	    /// crypto info associated to this archive, use clear_crypto_pass() method below
 	void change_crypto_algo_pass(archive_num num,
 				     crypto_algo algo,
 				     const secu_string & pass,
 				     const database_change_crypto_options & opt);
+
+	    /// clear the crypto, algo, pass and optional crypto infos from the database for this archive
+	void clear_crypto_algo_pass(archive_num num, const database_numbering & opt);
 
 	    /// change the default options given to dar when performing restoration
 

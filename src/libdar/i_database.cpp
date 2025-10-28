@@ -300,9 +300,22 @@ namespace libdar
 	    dat.chemin = chemin;
 	    dat.basename = basename;
 	    dat.root_last_mod = arch.pimpl->get_catalogue().get_root_dir_last_modif();
-	    dat.crypto = opt.get_crypto_algo();
-	    dat.pass = opt.get_crypto_pass();
-	    dat.crypto_size = opt.get_crypto_size();
+	    if(opt.is_encrypted())
+	    {
+		if(opt.get_crypto_pass().empty())
+		    dat.pass = get_ui().get_secu_string(gettext("Provide the password for the archive to be added: "), false);
+		else
+		    dat.pass = opt.get_crypto_pass();
+		dat.crypto = opt.get_crypto_algo();
+		dat.crypto_size = opt.get_crypto_size();
+	    }
+	    else
+	    {
+		dat.pass.clear();
+		dat.crypto = crypto_algo::none;
+		dat.crypto_size = 0;
+	    }
+
 	    coordinate.push_back(dat);
 	    files->data_tree_update_with(arch.pimpl->get_catalogue().get_contenu(), number);
 	    if(number > 1)
@@ -393,17 +406,37 @@ namespace libdar
 	    num = get_real_archive_num(num, opt.get_revert_archive_numbering());
 	    if(num < coordinate.size() && num != 0)
 	    {
-		coordinate[num].crypto = algo;
-		if(algo != crypto_algo::none)
-		{
-		    coordinate[num].pass = pass;
-		    coordinate[num].crypto_size = opt.get_crypto_size();
-		}
+		if(pass.empty())
+		    coordinate[num].pass = get_ui().get_secu_string(tools_printf(gettext("Provide the new password for archive number %d: "), num), false);
 		else
-		{
-		    coordinate[num].pass.clear();
-		    coordinate[num].crypto_size = 0;
-		}
+		    coordinate[num].pass = pass;
+
+		coordinate[num].crypto = algo;
+		coordinate[num].crypto_size = opt.get_crypto_size();
+	    }
+	    else
+		throw Erange("database::i_database::change_name", gettext("Non existent archive in database"));
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
+    }
+
+    void database::i_database::clear_crypto_algo_pass(archive_num num,
+						      const database_numbering & opt)
+    {
+	NLS_SWAP_IN;
+	try
+	{
+	    num = get_real_archive_num(num, opt.get_revert_archive_numbering());
+	    if(num < coordinate.size() && num != 0)
+	    {
+		coordinate[num].crypto = crypto_algo::none;
+		coordinate[num].pass.clear();
+		coordinate[num].crypto_size = 0;
 	    }
 	    else
 		throw Erange("database::i_database::change_name", gettext("Non existent archive in database"));

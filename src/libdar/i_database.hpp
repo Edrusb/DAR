@@ -108,6 +108,9 @@ namespace libdar
 				     const secu_string & pass,
 				     const database_change_crypto_options & opt);
 
+	    /// remove encryption parameters for the given archive
+	void clear_crypto_algo_pass(archive_num num, const database_numbering & opt);
+
             /// change the default options given to dar when performing restoration
         void set_options(const std::vector<std::string> &opt) { options_to_dar = opt; };
 

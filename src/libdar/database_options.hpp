@@ -140,19 +140,21 @@ namespace libdar
 	~database_add_options() = default;
 
 	void set_crypto_algo(crypto_algo val) { algo = val; };
-	void set_crypto_pass(const secu_string & val) { pass = val; };
+	void set_crypto_pass(const secu_string & val) { pass = val; encrypted = true; };
 	void set_crypto_size(U_32 val) { crypto_size = val; };
 
 	crypto_algo get_crypto_algo() const { return algo; };
 	const secu_string & get_crypto_pass() const { return pass; };
 	U_32 get_crypto_size() const { return crypto_size; };
+	bool is_encrypted() const { return encrypted; };
 
-	void clear() { algo = crypto_algo::none; pass.clear(); crypto_size = 0; };
+	void clear() { algo = crypto_algo::none; pass.clear(); crypto_size = 0; encrypted = false; };
 
     private:
 	crypto_algo algo;
 	secu_string pass;
 	U_32 crypto_size;
+	bool encrypted;
     };
 
 

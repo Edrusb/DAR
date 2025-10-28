@@ -198,10 +198,11 @@ static void action(shared_ptr<user_interaction> & dialog,
 		   bool detailed_dates,
 		   const string & arch_crypto_params);
 static void signed_int_to_archive_num(S_I input, archive_num &num, bool & positive);
-static void split_arch_crypto_params(const string & arch_crypto_params,
-				     libdar::crypto_algo & algo, ///< crypto_algo::none is returned if not specified (libdar default algo will have to be used)
-				     libdar::secu_string & pass, ///< a non empty string should always be returned or an exception be thrown
-				     U_32 & crypto_block_size); ///< zero is returned if not specified
+static void split_arch_crypto_params(shared_ptr<user_interaction> & dialog, ///< user interaction
+				     const string & arch_crypto_params, ///< input string to be split
+				     libdar::crypto_algo & algo,    ///< crypto_algo::none is returned if not specified (libdar default algo will have to be used)
+				     libdar::secu_string & pass,    ///< a non empty string should always be returned or an exception be thrown
+				     U_32 & crypto_block_size);     ///< zero is returned if not specified
 static secu_string fetch_password_from_file(const string & path);
 
     /// \return true if user set encryption parameters, false if the archive is not encrypted
@@ -807,10 +808,16 @@ static void op_add(shared_ptr<user_interaction> & dialog,
 
     if(! arch_crypto_params.empty())
     {
-	split_arch_crypto_params(arch_crypto_params,
+	split_arch_crypto_params(dialog,
+				 arch_crypto_params,
 				 algo,
 				 pass,
 				 crypto_bs);
+	read_options.set_crypto_algo(algo);
+	read_options.set_crypto_pass(pass);
+	    // if empty string, libdar will ask for password interactively
+	if(crypto_bs != 0)
+	    read_options.set_crypto_size(crypto_bs);
     }
 
     thr.check_self_cancellation();
@@ -819,10 +826,6 @@ static void op_add(shared_ptr<user_interaction> & dialog,
     line_tools_split_path_basename(arg, arch_path, arch_base);
     read_options.set_info_details(info_details);
     read_options.set_slice_min_digits(min_digits);
-    read_options.set_crypto_algo(algo); // if set to crypto_algo::none, algo is fetched from the archive header
-    read_options.set_crypto_pass(pass); // if empty string, libdar will ask for password interactively (if archive is encrypted)
-    if(crypto_bs != 0)
-	read_options.set_crypto_size(crypto_bs);
     archive *arch = new (nothrow) archive(dialog, path(arch_path), arch_base, EXTENSION, read_options);
     if(arch == nullptr)
 	throw Ememory("dar_manager.cpp:op_add");
@@ -1627,21 +1630,8 @@ static void op_chcrypto(shared_ptr<user_interaction> & dialog,
 			bool info_details)
 {
     thread_cancellation thr;
-    database_change_crypto_options opt;
     bool sign_plus;
     archive_num rnum;
-    libdar::crypto_algo algo;
-    libdar::secu_string pass;
-    U_32 crypto_block_size;
-
-    split_arch_crypto_params(arch_crypto_params,
-			     algo,
-			     pass,
-			     crypto_block_size);
-
-    signed_int_to_archive_num(num, rnum, sign_plus);
-    opt.set_revert_archive_numbering(! sign_plus);
-    opt.set_crypto_size(crypto_block_size);
 
     if(dat == nullptr)
 	throw SRC_BUG;
@@ -1649,7 +1639,32 @@ static void op_chcrypto(shared_ptr<user_interaction> & dialog,
     thr.check_self_cancellation();
     if(info_details)
 	dialog->message(gettext("Changing database header information..."));
-    dat->change_crypto_algo_pass(rnum, algo, pass, opt);
+    signed_int_to_archive_num(num, rnum, sign_plus);
+
+    if(! arch_crypto_params.empty())
+    {
+	database_change_crypto_options opt;
+	libdar::crypto_algo algo;
+	libdar::secu_string pass;
+	U_32 crypto_block_size;
+
+	opt.set_revert_archive_numbering(! sign_plus);
+	split_arch_crypto_params(dialog,
+				 arch_crypto_params,
+				 algo,
+				 pass,
+				 crypto_block_size);
+	opt.set_crypto_size(crypto_block_size);
+	dat->change_crypto_algo_pass(rnum, algo, pass, opt);
+    }
+    else
+    {
+	database_numbering opt;
+
+	opt.set_revert_archive_numbering(! sign_plus);
+	dat->clear_crypto_algo_pass(rnum, opt);
+    }
+
     thr.check_self_cancellation();
 }
 
@@ -1814,10 +1829,11 @@ static void signed_int_to_archive_num(S_I input, archive_num &num, bool & positi
 }
 
 
-static void split_arch_crypto_params(const string & arch_crypto_params,
-				     libdar::crypto_algo & algo, ///< crypto_algo::none is returned if not specified (libdar default algo will have to be used)
-				     libdar::secu_string & pass, ///< a non empty string should always be returned or an exception be thrown
-				     U_32 & crypto_block_size) ///< zero is returned if not specified
+static void split_arch_crypto_params(shared_ptr<user_interaction> & dialog,
+				     const string & arch_crypto_params,
+				     libdar::crypto_algo & algo,
+				     libdar::secu_string & pass,
+				     U_32 & crypto_block_size)
 {
 	// expected syntax is either:
 	//    [<algo>:]f:<path>[:<crypto-block-size>]
@@ -1838,12 +1854,13 @@ static void split_arch_crypto_params(const string & arch_crypto_params,
 	switch(splitted.size())
 	{
 	case 0:
+	    throw SRC_BUG;
 	case 1:
 	    throw Erange("split_arch_crypto_params", gettext("invalid argument given to -J option"));
 	case 2:
 	    if(splitted[0] == "p")
 		pass = secu_string(splitted[1].c_str(), splitted[1].size());
-		// if pass is empty libdar will ask for password interactively
+		    // if pass is empty, libdar will interactively ask for the password
 	    else
 		if(splitted[0] == "f")
 		    pass = fetch_password_from_file(splitted[1]);
