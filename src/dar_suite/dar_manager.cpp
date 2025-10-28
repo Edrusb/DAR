@@ -47,6 +47,10 @@ extern "C"
 #include <errno.h>
 #endif
 
+#if HAVE_FCNTL_H
+#include <fcntl.h>
+#endif
+
 #include "getopt_decision.h"
 } // end extern "C"
 
@@ -164,6 +168,11 @@ static void action(shared_ptr<user_interaction> & dialog,
 		   bool even_when_removed,
 		   bool detailed_dates);
 static void signed_int_to_archive_num(S_I input, archive_num &num, bool & positive);
+static void split_arch_crypto_params(const string & arch_crypto_params,
+				     libdar::crypto_algo & algo, ///< crypto_algo::none is returned if not specified (libdar default algo will have to be used)
+				     libdar::secu_string & pass, ///< a non empty string should always be returned or an exception be thrown
+				     U_32 & crypto_block_size); ///< zero is returned if not specified
+static secu_string fetch_password_from_file(const string & path);
 
 
 int main(S_I argc, char *const argv[], const char **env)
@@ -1617,3 +1626,127 @@ static void signed_int_to_archive_num(S_I input, archive_num &num, bool & positi
     num = input;
 }
 
+
+static void split_arch_crypto_params(const string & arch_crypto_params,
+				     libdar::crypto_algo & algo, ///< crypto_algo::none is returned if not specified (libdar default algo will have to be used)
+				     libdar::secu_string & pass, ///< a non empty string should always be returned or an exception be thrown
+				     U_32 & crypto_block_size) ///< zero is returned if not specified
+{
+	// expected syntax is either:
+	//    [<algo>:]f:<path>[:<crypto-block-size>]
+        // or
+	//    [<algo>:]p:<password>[:<crypto-block-size>]
+
+    algo = libdar::crypto_algo::none;
+    pass.clear();
+    crypto_block_size = 0;
+
+    deque<string> splitted;
+    bool loop = false;
+
+    line_tools_split(arch_crypto_params, ':', splitted);
+
+    do
+    {
+	switch(splitted.size())
+	{
+	case 0:
+	case 1:
+	    throw Erange("split_arch_crypto_params", gettext("invalid argument given to -J option"));
+	case 2:
+	    if(splitted[0] == "p")
+		pass = secu_string(splitted[1].c_str(), splitted[1].size());
+		// if pass is empty libdar will ask for password interactively
+	    else
+		if(splitted[0] == "f")
+		    pass = fetch_password_from_file(splitted[1]);
+		else
+		    throw Erange("split_arch_crypto_params", gettext("invalid argument given to -J option"));
+	    loop = false;
+	    break;
+	case 3:
+		// maybe either the syntax: algo:f/p:string
+	    if(splitted[1] == "p" || splitted[1] == "f")
+	    {
+		algo = line_tools_crypto_string_to_crypto_algo(splitted[0]);
+
+		    // dropping the algo string and looping
+		splitted.pop_front();
+		loop = true;
+	    }
+	    else   // or maybe the syntax: f/p:string:crypto-block-size
+		if(splitted[0] == "p" || splitted[0] == "f")
+		{
+		    U_I tmp;
+		    if(tools_my_atoi(splitted[2].c_str(), tmp))
+		    {
+			crypto_block_size = tmp;
+
+			    // dropping the crypto-block-size string and looping
+			splitted.pop_back();
+			loop = true;
+		    }
+		    else
+			throw Erange("split_arch_crypto_params", gettext("invalid argument given to -J option"));
+		}
+		else
+		    throw Erange("split_arch_crypto_params", gettext("invalid argument given to -J option"));
+	    break;
+	case 4:
+		// expecting both algo: and :crypto-block size around f:path or p:password
+	    if(splitted[1] == "p" || splitted[1] == "f")
+	    {
+		algo = line_tools_crypto_string_to_crypto_algo(splitted[0]);
+
+		    // dropping the algo string and looping
+		splitted.pop_front();
+		loop = true;
+	    }
+	    else
+		throw Erange("split_arch_crypto_params", gettext("invalid argument given to -J option"));
+	    break;
+	default:
+	    throw Erange("split_arch_crypto_params", gettext("invalid argument given to -J option"));
+	}
+    }
+    while(loop);
+}
+
+
+static secu_string fetch_password_from_file(const string & path)
+{
+    secu_string ret;
+    int fd = open(path.c_str(), O_RDONLY);
+
+    if(fd < 0)
+    {
+	Esystem::io_error err = errno == EACCES ? Esystem::io_access: Esystem::io_absent;
+
+	throw Esystem("fetch_password_from_file",
+		      tools_printf(gettext("Error while reading password from file %s: %s"), path.c_str(),
+				   tools_strerror_r(errno).c_str()),
+		      err);
+    }
+
+    try
+    {
+	struct stat metadata;
+	if(fstat(fd, &metadata) < 0)
+	{
+	    throw Esystem("fetch_password_from_file)",
+			  tools_printf(gettext("Error while reading file size of file %s: %s"), path.c_str(),
+				       tools_strerror_r(errno).c_str()),
+			  Esystem::io_access);
+	}
+
+	ret.set(fd, metadata.st_size);
+    }
+    catch(...)
+    {
+	close(fd);
+	throw;
+    }
+    close(fd);
+
+    return ret;
+}
