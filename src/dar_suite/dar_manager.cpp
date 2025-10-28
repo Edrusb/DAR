@@ -158,6 +158,8 @@ static void op_move(shared_ptr<user_interaction> & dialog, database *dat, S_I sr
 static void op_interactive(shared_ptr<user_interaction> & dialog, database *dat, string base);
 static void op_check(shared_ptr<user_interaction> & dialog, const database *dat, bool info_details);
 static void op_batch(shared_ptr<user_interaction> & dialog, database *dat, const string & filename, bool info_details);
+static void op_chcrypto(shared_ptr<user_interaction> & dialog, database *dat, S_I num, const string & arch_crypto_params, bool info_details);
+
 
 static database *read_base(shared_ptr<user_interaction> & dialog,
 			   const string & base,
@@ -1573,6 +1575,39 @@ static void op_batch(shared_ptr<user_interaction> & dialog, database *dat, const
     }
 }
 
+static void op_chcrypto(shared_ptr<user_interaction> & dialog,
+			database *dat,
+			S_I num,
+			const string & arch_crypto_params,
+			bool info_details)
+{
+    thread_cancellation thr;
+    database_change_crypto_options opt;
+    bool sign_plus;
+    archive_num rnum;
+    libdar::crypto_algo algo;
+    libdar::secu_string pass;
+    U_32 crypto_block_size;
+
+    split_arch_crypto_params(arch_crypto_params,
+			     algo,
+			     pass,
+			     crypto_block_size);
+
+    signed_int_to_archive_num(num, rnum, sign_plus);
+    opt.set_revert_archive_numbering(! sign_plus);
+    opt.set_crypto_size(crypto_block_size);
+
+    if(dat == nullptr)
+	throw SRC_BUG;
+
+    thr.check_self_cancellation();
+    if(info_details)
+	dialog->message(gettext("Changing database header information..."));
+    dat->change_crypto_algo_pass(rnum, algo, pass, opt);
+    thr.check_self_cancellation();
+}
+
 static vector<string> read_vector(shared_ptr<user_interaction> & dialog)
 {
     vector<string> ret;
@@ -1710,8 +1745,7 @@ static void action(shared_ptr<user_interaction> & dialog,
 	op_batch(dialog, dat, arg, info_details);
 	break;
     case archcrypto:
-//	op_chcrypto(dialog, dat, num, arch_crypto_params, info_details);
-	throw Efeature("standalone -J option");
+	op_chcrypto(dialog, dat, num, arch_crypto_params, info_details);
 	break;
     default:
 	throw SRC_BUG;
