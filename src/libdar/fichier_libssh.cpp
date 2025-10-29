@@ -298,7 +298,7 @@ namespace libdar
 		    throw Erange("fichier_libssh::fichier_global_inherited_read",
 				 tools_printf(gettext("Error while fetching SFTP read-ahead data: %s"),
 					      connect->get_sftp_error_msg()));
-		if(ret != rallocated && rareq.size() != 1)
+		if((ret < 0 || (U_I)(ret) != rallocated) && rareq.size() != 1)
 		    throw SRC_BUG; // unless this is last request, amount size per request should equal rallocated
 
 		rasize = ret;
@@ -387,7 +387,9 @@ namespace libdar
 		throw Erange("fichier_libssh::inherited_read_ahead",
 			     tools_printf(gettext("SFTP read-ahead failed: %s"),
 					  connect->get_sftp_error_msg()));
-	    if(ret != microstep)
+	    if(ret < 0)
+		throw SRC_BUG;
+	    if((size_t)(ret) != microstep)
 		throw SRC_BUG;
 		// libssh should not request less than microstep
 		// as microstep <= rallocated < limit->max_read_length

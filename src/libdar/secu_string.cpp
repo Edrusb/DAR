@@ -290,6 +290,9 @@ namespace libdar
     {
 	if(!ref.zero_length)
 	{
+
+		// sanity checks
+
 	    if(ref.allocated_size == nullptr)
 		throw SRC_BUG;
 	    if(*(ref.allocated_size) == 0)
@@ -299,7 +302,11 @@ namespace libdar
 	    if(ref.string_size == nullptr)
 		throw SRC_BUG;
 
-	    init(*(ref.allocated_size) - 1);
+		// we must not waste secured memory while
+		// copying a object, so we allocate it at
+		// the minimum sized needed to store the
+		// string
+	    init(*(ref.string_size) + 1);
 
 	    (void)memcpy(mem, ref.mem, *(ref.string_size) + 1); // +1 to copy the ending '\0'
 	    *string_size = *(ref.string_size);
