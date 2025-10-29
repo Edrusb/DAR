@@ -121,24 +121,24 @@ requirements()
     xbps-install -SUy || (xbps-install -uy xbps && xbps-install -SUy) || return 1
 
     # tools used to build the different packages involved here
-    xbps-install -y gcc make wget pkg-config cmake xz || return 1
+    xbps-install -yf gcc make wget pkg-config cmake xz || return 1
 
     #direct dependencies of libdar
-    xbps-install -y bzip2-devel e2fsprogs-devel libargon2-devel libgcc-devel liblz4-devel \
-		 liblzma-devel libstdc++-devel libzstd-devel liblz4-devel \
+    xbps-install -yf bzip2-devel e2fsprogs-devel libargon2-devel libgcc-devel liblz4-devel\
+		 liblzma-devel libstdc++-devel libzstd-devel liblz4-devel\
 		 lzo-devel musl-devel zlib-devel || return 1
 
     # needed to build static flavor of librsync
-    xbps-install -y libb2-devel || return 1
+    xbps-install -yf libb2-devel || return 1
 
     # needed to build static flavor of gnutls
-    xbps-install -y  nettle-devel libtasn1-devel libunistring-devel unbound-devel unbound || return 1
+    xbps-install -yf  nettle-devel libtasn1-devel libunistring-devel unbound-devel unbound || return 1
 
     #needed for static flavor of libcurl
-    xbps-install -y libpsl-devel libidn2-devel || return 1
+    xbps-install -yf libpsl-devel libidn2-devel || return 1
 
     # optional but interesting to get a smaller dar_static binary
-    xbps-install -y upx || return 1
+    xbps-install -yf upx || return 1
 
     # need to tweak the hogweed.pc file provided by the system, we do not modify the system but shadow it by a local version located in higher priority dir
     HOGWEED_PC=/usr/lib/pkgconfig/hogweed.pc
