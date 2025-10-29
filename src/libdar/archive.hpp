@@ -350,6 +350,20 @@ namespace libdar
 	    /// \note may return 0 if the slice header is not known
 	U_64 get_non_first_slice_header_size() const;
 
+		    /// fetch the cipher algo
+
+	    /// needed when feeding dar_manager database with an encrypted arhive
+	    /// \note this info can also be obtained using get_summary() but this fetches/returns the whole header information
+	crypto_algo get_live_crypto_algo() const;
+
+	    /// fetch the live password (at creation time it may have been set interactively)
+	    /// needed when feeding dar_manager database with an encrypted arhive
+	const secu_string & get_live_crypto_pass() const;
+
+	    /// fetch the live crypto block size
+
+	    /// needed when feeding dar_manager database with an encrypted arhive
+	U_32 get_live_crypto_block_size() const;
 
     private:
 	class i_archive;

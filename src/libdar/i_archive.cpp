@@ -89,6 +89,9 @@ namespace libdar
 	    throw Ememory("archive::i_archive::archive");
 
 	cat = nullptr;
+	live_crypto_bs = options.get_crypto_size();
+	live_pass = options.get_crypto_pass();
+
 
 	try
 	{
@@ -115,8 +118,8 @@ namespace libdar
 					 options.get_slice_min_digits(),
 					 extension,
 					 options.get_crypto_algo(),
-					 options.get_crypto_pass(),
-					 options.get_crypto_size(),
+					 live_pass,
+					 live_crypto_bs,
 					 stack,
 					 ver,
 					 options.get_input_pipe(),
@@ -161,6 +164,8 @@ namespace libdar
 			try
 			{
 			    slice_layout ignored;
+			    secu_string live_ref_pass = options.get_ref_crypto_pass();
+			    U_32 live_ref_crypto_bs = options.get_ref_crypto_size();
 
 			    if(options.get_ref_basename() == "-")
 				throw Erange("archive::i_archive::archive", gettext("Reading the archive of reference from pipe or standard input is not possible"));
@@ -174,8 +179,8 @@ namespace libdar
 						     options.get_ref_slice_min_digits(),
 						     extension,
 						     options.get_ref_crypto_algo(),
-						     options.get_ref_crypto_pass(),
-						     options.get_ref_crypto_size(),
+						     live_ref_pass,
+						     live_ref_crypto_bs,
 						     ref_stack,
 						     ref_ver,
 						     "",
@@ -2386,7 +2391,8 @@ namespace libdar
 	    if(st_ptr == nullptr)
 		throw SRC_BUG;
 
-	    secu_string real_pass = pass;
+	    live_crypto_bs = crypto_size;
+	    live_pass = pass;
 	    internal_name.generate_internal_filename();
 
 	    try

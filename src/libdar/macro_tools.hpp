@@ -112,9 +112,9 @@ namespace libdar
                                          const std::string &basename,   ///< slice basename
 					 const infinint & min_digits,   ///< minimum digits for the slice number
                                          const std::string &extension,  ///< slice extensions
-					 crypto_algo crypto,            ///< encryption algorithm
-                                         const secu_string &pass,       ///< pass key for crypto/scrambling
-					 U_32 crypto_size,              ///< crypto block size
+					 crypto_algo crypto,            ///< encryption algorithm (updated value from archive found in ver, below)
+                                         secu_string & pass,            ///< pass key for crypto/scrambling updated if interactivelay set
+					 U_32 & crypto_size,            ///< crypto block size, may be updated in a future implementation
 					 pile & stack,                  ///< the stack of generic_file resulting of the archive openning
                                          header_version &ver,           ///< header read from raw data
                                          const std::string &input_pipe, ///< named pipe for input when basename is "-" (dar_slave)

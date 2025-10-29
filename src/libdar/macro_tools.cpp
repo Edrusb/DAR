@@ -434,8 +434,8 @@ namespace libdar
 				  const infinint & min_digits,
                                   const string &extension,
 				  crypto_algo crypto,
-                                  const secu_string & pass,
-				  U_32 crypto_size,
+                                  secu_string & pass,
+				  U_32 & crypto_size,
 				  pile & stack,
                                   header_version &ver,
                                   const string &input_pipe,
@@ -454,7 +454,6 @@ namespace libdar
 				  bool silent,
 				  bool force_read_first_slice)
     {
-	secu_string real_pass = pass;
 	generic_file *tmp = nullptr;
 	contextual *tmp_ctxt = nullptr;
 	cache *tmp_cache = nullptr;
@@ -697,14 +696,14 @@ namespace libdar
 
 		    // substitution of the pass by the clear_key if decrypt succeeded (else it throws an exception)
 
-		real_pass = clear_key.get_contents();
+		pass = clear_key.get_contents();
 	    }
 
-	    if(crypto != crypto_algo::none && real_pass == "")
+	    if(crypto != crypto_algo::none && pass == "")
 	    {
 		if(!secu_string::is_string_secured())
 		    dialog->message(gettext("WARNING: support for secure memory was not available at compilation time, in case of heavy memory load, this may lead the password you are about to provide to be wrote to disk (swap space) in clear. You have been warned!"));
-		real_pass = dialog->get_secu_string(tools_printf(gettext("Archive %S requires a password: "), &basename), false);
+		pass = dialog->get_secu_string(tools_printf(gettext("Archive %S requires a password: "), &basename), false);
 	    }
 
 	    switch(crypto)
@@ -735,7 +734,7 @@ namespace libdar
 		if(info_details)
 		    dialog->message(gettext("Opening cyphering layer..."));
 #ifdef LIBDAR_NO_OPTIMIZATION
-		tools_secu_string_show(*dialog, string("Used clear key: "), real_pass);
+		tools_secu_string_show(*dialog, string("Used clear key: "), pass);
 #endif
 
 		try
@@ -744,7 +743,7 @@ namespace libdar
 		    unique_ptr<crypto_module> ptr;
 		    try
 		    {
-			ptr = make_unique<crypto_sym>(real_pass,
+			ptr = make_unique<crypto_sym>(pass,
 						      ver.get_edition(),
 						      crypto,
 						      ver.get_salt(),
@@ -837,9 +836,9 @@ namespace libdar
 		if(info_details)
 		    dialog->message(gettext("Opening cyphering layer..."));
 #ifdef LIBDAR_NO_OPTIMIZATION
-		tools_secu_string_show(*dialog, string("Used clear key: "), real_pass);
+		tools_secu_string_show(*dialog, string("Used clear key: "), pass);
 #endif
-		tmp = new (nothrow) scrambler(real_pass, *(stack.top()));
+		tmp = new (nothrow) scrambler(pass, *(stack.top()));
 		break;
 	    default:
 		throw Erange("macro_tools_open_archive", gettext("Unknown encryption algorithm"));

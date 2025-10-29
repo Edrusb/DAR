@@ -497,4 +497,20 @@ namespace libdar
         return tmp;
     }
 
+    crypto_algo archive::get_live_crypto_algo() const
+    {
+	return pimpl->get_live_crypto_algo();
+    }
+
+    const secu_string & archive::get_live_crypto_pass() const
+    {
+	return pimpl->get_live_crypto_pass();
+    }
+
+    U_32 archive::get_live_crypto_block_size() const
+    {
+	return pimpl->get_live_crypto_block_size();
+    }
+
+
 } // end of namespace

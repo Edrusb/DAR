@@ -203,6 +203,20 @@ namespace libdar
 
 	U_64 get_non_first_slice_header_size() const;
 
+	    /// fetch the cipher algo
+
+	    /// needed when feeding dar_manager database with an encrypted arhive
+	    /// \note this info can also be obtained using get_summary() but this fetches/returns the whole header information
+	crypto_algo get_live_crypto_algo() const { return ver.get_sym_crypto_algo(); };
+
+	    /// fetch the live password (at creation time it may have been set interactively)
+	    /// needed when feeding dar_manager database with an encrypted arhive
+	const secu_string & get_live_crypto_pass() const { return live_pass; };
+
+	    /// fetch the live crypto block size
+
+	    /// needed when feeding dar_manager database with an encrypted arhive
+	U_32 get_live_crypto_block_size() const { return live_crypto_bs; };
 
     private:
 	enum operation { oper_create, oper_isolate, oper_merge, oper_repair };
@@ -216,6 +230,9 @@ namespace libdar
 	bool sequential_read;    ///< whether the archive is read in sequential mode
 	std::list<signator> gnupg_signed; ///< list of signature found in the archive (reading an existing archive)
 	slice_layout slices;     ///< slice layout, archive is not sliced <=> first_size or other_size fields are set to zero (in practice both are set to zero, but one being set is enought to determine the archive is not sliced)
+
+	U_32 live_crypto_bs;     ///< this fields is never written to file but left available to feed a dar_manager database when needed
+	secu_string live_pass;   ///< this fields is never written to file but left available to feed a dar_manager database when needed
 
 	void free_mem();
 	void check_gnupg_signed() const;
