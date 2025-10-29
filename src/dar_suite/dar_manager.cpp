@@ -1062,22 +1062,24 @@ static void op_move(shared_ptr<user_interaction> & dialog, database *dat, S_I sr
 static void show_usage(shell_interaction & dialog, const char *command)
 {
     dialog.printf("usage :\n\n");
-    dialog.printf("\tdar_manager [options] -C [<path>/]<database>\n");
-    dialog.printf("\tdar_manager [options] -B [<path>/]<database> -A [<path>/]<basename> [[<path>/]<archive_basename>]\n");
+    dialog.printf("\tdar_manager [options] -C [<path>/]<database> [-z algo] [-K <K-options>]\n");
+    dialog.printf("\tdar_manager [options] -B [<path>/]<database> -A [<path>/]<basename> [-z algo] [-J <J-options>] [[<path>/]<archive_basename>]\n");
     dialog.printf("\tdar_manager [options] -B [<path>/]<database> -l\n");
     dialog.printf("\tdar_manager [options] -B [<path>/]<database> -D <number>\n");
     dialog.printf("\tdar_manager [options] -B [<path>/]<database> -b <number> <new_archive_basename>\n");
     dialog.printf("\tdar_manager [options] -B [<path>/]<database> -p <number> <path>\n");
+    dialog.printf("\tdar_manager [options] -B [<path>/]<database> -J <number> [algo:](f:<path> | p:<pass>)[:crypto-block-size]\n");
     dialog.printf("\tdar_manager [options] -B [<path>/]<database> -o [list of options to pass to dar]\n");
     dialog.printf("\tdar_manager [options] -B [<path>/]<database> -d [<path to dar command>]\n");
-    dialog.printf("\tdar_manager [options] -B [<path>/]<database> [-w <date>] [-e \"<options to dar>\"] -r [list of files to restore]\n");
+    dialog.printf("\tdar_manager [options] -B [<path>/]<database> |-N] [-k] [-w <date>] [-e \"<options to dar>\"] -r [list of files to restore]\n");
     dialog.printf("\tdar_manager [options] -B [<path>/]<database> -u <number>\n");
     dialog.printf("\tdar_manager [options] -B [<path>/]<database> -f file\n");
     dialog.printf("\tdar_manager [options] -B [<path>/]<database> -s\n");
     dialog.printf("\tdar_manager [options] -B [<path>/]<database> -m <number> <number>\n");
-    dialog.printf("\tdar_manager [options] -B [<path>/]<database> -i\n");
     dialog.printf("\tdar_manager [options] -B [<path>/]<database> -c\n");
+    dialog.printf("\tdar_manager [options] -B [<path>/]<database> -i\n");
     dialog.printf("\tdar_manager [options] -B [<path>/]<database> -@ <filename>\n");
+    dialog.printf("\tdar_manager [options] -B [<path>/]<database> -K [algo:](f:<path> | p:<pass>)[:<hashalgo>:<iteration-count>]\n");
     dialog.printf("\tdar_manager -h\n");
     dialog.printf("\tdar_manager -V\n");
     dialog.printf("\n");
@@ -1090,6 +1092,7 @@ static void show_usage(shell_interaction & dialog, const char *command)
     dialog.printf(gettext("   -D <number[-number]> delete an archive from the database\n"));
     dialog.printf(gettext("   -b <number>\t   change the basename to use for the give archive number\n"));
     dialog.printf(gettext("   -p <number>\t   change the path to use for the given archive number\n"));
+    dialog.printf(gettext("   -J <number>\t   change the encryption parameters to use for the given archive number\n"));
     dialog.printf(gettext("   -o <options>    specify a list of option to always pass to dar\n"));
     dialog.printf(gettext("   -d <dar's path> specify the path to dar\n"));
     dialog.printf(gettext("   -r <files>\t   restores the given files\n"));
@@ -1103,6 +1106,7 @@ static void show_usage(shell_interaction & dialog, const char *command)
     dialog.printf(gettext("   -c\t\t   check database for dates order\n"));
     dialog.printf(gettext("   -@ <filename>   execute on a given database a batch of action as defined by\n"));
     dialog.printf(gettext("\t\t   the provided file.\n"));
+    dialog.printf(gettext("   -K <K-options>  change the encryption of the database\n"));
     dialog.printf(gettext("   -h\t\t   displays this help information\n"));
     dialog.printf(gettext("   -V\t\t   displays software version\n"));
     dialog.printf(gettext("\n"));
