@@ -188,6 +188,7 @@ namespace libdar
 	    break;
 	case 5:
 	case 6:
+	case 7:
 	    f.read((char *)&flag, 1);
 	    if((flag & STATUS_PLUS_FLAG_ME) != 0)
 		base = create_crc_from_file(f, false);
@@ -275,6 +276,7 @@ namespace libdar
 	    case 4:
 	    case 5:
 	    case 6:
+	    case 7:
 		sta_plus.read(f, db_version);
 		last_mod[k] = sta_plus;
 		break;
@@ -300,6 +302,7 @@ namespace libdar
 	    case 4:
 	    case 5:
 	    case 6:
+	    case 7:
 		sta.read(f, db_version);
 		last_change[k] = sta;
 		break;
