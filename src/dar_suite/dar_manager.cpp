@@ -802,6 +802,7 @@ static void op_add(shared_ptr<user_interaction> & dialog,
     libdar::crypto_algo algo = libdar::crypto_algo::none;
     libdar::secu_string pass;
     U_32 crypto_bs = 0;
+    archive *arch = nullptr;
 
     if(dat == nullptr)
 	throw SRC_BUG;
@@ -826,9 +827,15 @@ static void op_add(shared_ptr<user_interaction> & dialog,
     line_tools_split_path_basename(arg, arch_path, arch_base);
     read_options.set_info_details(info_details);
     read_options.set_slice_min_digits(min_digits);
-    archive *arch = new (nothrow) archive(dialog, path(arch_path), arch_base, EXTENSION, read_options);
+    arch = new (nothrow) archive(dialog, path(arch_path), arch_base, EXTENSION, read_options);
     if(arch == nullptr)
 	throw Ememory("dar_manager.cpp:op_add");
+
+	// updating crypto fields from what libdar
+	// has found in the archive header or interactively
+    algo = arch->get_live_crypto_algo();
+    pass = arch->get_live_crypto_pass();
+    crypto_bs = arch->get_live_crypto_block_size();
 
     try
     {
