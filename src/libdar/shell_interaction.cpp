@@ -299,7 +299,7 @@ namespace libdar
 	    database_archives_list content = ref.get_contents();
 
 	    string opt = tools_concat_vector(" ", ref.get_options());
-	    string road, base;
+	    string road, base, crypto, crypto_bs;
 	    string compr = compression2string(ref.get_compression());
 	    U_I compr_lvl = ref.get_compression_level();
 	    string dar_path = ref.get_dar_path();
@@ -312,16 +312,27 @@ namespace libdar
 	    printf(gettext("compression used : %S"), &compr);
 	    printf(gettext("compression level: %d"), compr_lvl);
 	    message("");
-	    printf(gettext("archive #   |    path      |    basename"));
-	    printf("------------+--------------+---------------");
+	    printf(gettext("archive #   | ciphered | crypto bs |    path      |    basename"));
+	    printf(        "------------+----------+-----------+--------------+-------------------");
 
 
 	    for(archive_num i = 1; i < content.size(); ++i)
 	    {
 		road = content[i].get_path();
 		base = content[i].get_basename();
+		crypto = crypto_algo_2_string(content[i].get_crypto_algo());
+		if(content[i].get_crypto_algo() != crypto_algo::none)
+		{
+		    if(content[i].get_crypto_size() == 0)
+			crypto_bs = "default";
+		    else
+			crypto_bs = tools_printf("%u", content[i].get_crypto_size());
+		}
+		else
+		    crypto_bs = "    -    ";
+
 		opt = (road == "") ? gettext("<empty>") : road;
-		printf(" \t%u\t%S\t%S", i, &opt, &base);
+		printf(" \t%u\t%S\t%S\t%S\t%S", i, &crypto, &crypto_bs, &opt, &base);
 	    }
 	}
 	catch(...)
