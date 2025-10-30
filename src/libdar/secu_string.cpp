@@ -93,7 +93,7 @@ namespace libdar
 	U_I offset = 0;
 	S_I lu;
 
-	if(size < get_allocated_size())
+	if(size > get_allocated_size())
 	{
 	    clean_and_destroy();
 	    init(size);
