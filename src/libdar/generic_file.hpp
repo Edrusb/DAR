@@ -123,13 +123,11 @@ namespace libdar
 	    /// to provide read content to reader thread. However, read_ahead is a waste of CPU cycle for in a single threading model
 	void ignore_read_ahead(bool mode) { no_read_ahead = mode; };
 
-	    /// read data from the generic_file inherited from proto_generic_file
+	    /// read data from the generic_file, inherited from proto_generic_file
         virtual U_I read(char *a, U_I size) override;
 
-	    /// write data to the generic_file inherited from proto_generic_file
+	    /// write data to the generic_file, inherited from proto_generic_file
         virtual void write(const char *a, U_I size) override;
-
-	    /// write a string to the generic_file
 
 	    /// \note throws a exception if not all data could be written as expected
         void write(const std::string & arg);
