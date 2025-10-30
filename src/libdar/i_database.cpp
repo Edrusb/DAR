@@ -300,21 +300,9 @@ namespace libdar
 	    dat.chemin = chemin;
 	    dat.basename = basename;
 	    dat.root_last_mod = arch.pimpl->get_catalogue().get_root_dir_last_modif();
-	    if(opt.is_encrypted())
-	    {
-		if(opt.get_crypto_pass().empty())
-		    dat.pass = get_ui().get_secu_string(gettext("Provide the password for the archive to be added: "), false);
-		else
-		    dat.pass = opt.get_crypto_pass();
-		dat.crypto = opt.get_crypto_algo();
-		dat.crypto_size = opt.get_crypto_size();
-	    }
-	    else
-	    {
-		dat.pass.clear();
-		dat.crypto = crypto_algo::none;
-		dat.crypto_size = 0;
-	    }
+	    dat.pass = arch.get_live_crypto_pass();
+	    dat.crypto = arch.get_live_crypto_algo();
+	    dat.crypto_size = arch.get_live_crypto_block_size();
 
 	    coordinate.push_back(dat);
 	    files->data_tree_update_with(arch.pimpl->get_catalogue().get_contenu(), number);

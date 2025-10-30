@@ -831,12 +831,6 @@ static void op_add(shared_ptr<user_interaction> & dialog,
     if(arch == nullptr)
 	throw Ememory("dar_manager.cpp:op_add");
 
-	// updating crypto fields from what libdar
-	// has found in the archive header or interactively
-    algo = arch->get_live_crypto_algo();
-    pass = arch->get_live_crypto_pass();
-    crypto_bs = arch->get_live_crypto_block_size();
-
     try
     {
 	string chemin, b;
@@ -848,9 +842,6 @@ static void op_add(shared_ptr<user_interaction> & dialog,
 	if(fake == "")
 	    fake = arg;
 	line_tools_split_path_basename(fake, chemin, b);
-	opt.set_crypto_algo(algo);
-	opt.set_crypto_pass(pass);
-	opt.set_crypto_size(crypto_bs);
 	dat->add_archive(*arch, chemin, b, opt);
 	thr.check_self_cancellation();
 	if(info_details)
@@ -1354,14 +1345,9 @@ static void op_interactive(shared_ptr<user_interaction> & dialog, database *dat,
 		input = dialog->get_string(gettext("Archive path+basename (or extracted catalogue basename) to add: "), true);
 		if(ask_crypto_params(dialog, cipher, pass, crypto_bs))
 		{
-			// we don't set cipher as it is not asked to the user
-			// for now (for long, it is no more necessary to know it to
-			// read an archive).
-
+		    read_options.set_crypto_algo(cipher);
 		    read_options.set_crypto_pass(pass);
 		    read_options.set_crypto_size(crypto_bs);
-		    opt_add.set_crypto_pass(pass);
-		    opt_add.set_crypto_size(crypto_bs);
 		}
 
 		dialog->message(gettext("Reading catalogue of the archive to add..."));
