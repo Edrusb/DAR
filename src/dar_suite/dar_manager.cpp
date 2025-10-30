@@ -609,16 +609,8 @@ static bool command_line(shell_interaction & dialog,
 		    {
 		    case none_op: // becoming archcrypto operation
 			op = archcrypto;
-
 			    // the argument to -J is <number> not the crypto params which are seen as non-optional argument
-			try
-			{
-			    line_tools_read_range(string(optarg), min, max);
-			}
-			catch(Edeci & e)
-			{
-			    throw Erange("command_line", tools_printf(gettext(INVALID_ARG), char(lu)));
-			}
+			num = line_tools_str2signed_int(optarg);
 			break;
 		    case archcrypto:
 			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
@@ -1651,6 +1643,10 @@ static void op_chcrypto(shared_ptr<user_interaction> & dialog,
 				 algo,
 				 pass,
 				 crypto_block_size);
+	if(pass.empty()) // empty path though arch_crypto_params_empty was here with crypto infos
+	    pass = dialog->get_secu_string(tools_printf(gettext("Please provide the password for archive %d; "), rnum), false);
+	if(! pass.empty() && algo == crypto_algo::none)
+	    algo = crypto_algo::aes256;
 	opt.set_crypto_size(crypto_block_size);
 	dat->change_crypto_algo_pass(rnum, algo, pass, opt);
     }
@@ -1853,11 +1849,16 @@ static void split_arch_crypto_params(shared_ptr<user_interaction> & dialog,
 	case 0:
 	    throw SRC_BUG;
 	case 1:
-	    throw Erange("split_arch_crypto_params", gettext("invalid argument given to -J option"));
+	    if(splitted[0] == "p")
+		    // requested interactive input of the password
+		splitted.push_back("");
+	    else
+		throw Erange("split_arch_crypto_params", gettext("invalid argument given to -J option"));
+
+		/* no break */
 	case 2:
 	    if(splitted[0] == "p")
 		pass = secu_string(splitted[1].c_str(), splitted[1].size());
-		    // if pass is empty, libdar will interactively ask for the password
 	    else
 		if(splitted[0] == "f")
 		    pass = fetch_password_from_file(splitted[1]);
