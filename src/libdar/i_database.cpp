@@ -143,8 +143,11 @@ namespace libdar
 				     gettext("integer type unable to handle such too large value for archive key size in database"));
 
 		    dat.pass.clear();
-		    dat.pass.resize(i_keysize);
-		    f.read(dat.pass.c_str(), i_keysize);
+		    if(i_keysize > 0)
+		    {
+			dat.pass.resize(i_keysize);
+			f.read(dat.pass.c_str(), i_keysize);
+		    }
 
 		    keysize.read(f); // recycling keysize temporary variable to fetch crypto_size as an infinint
 		    dat.crypto_size = 0;
@@ -243,7 +246,9 @@ namespace libdar
 
 		    f->write(&a, 1);
 		    keysize.dump(*f);
-		    f->write(coordinate[i].pass.c_str(), coordinate[i].pass.get_size());
+		    if(coordinate[i].pass.get_size() > 0)
+			f->write(coordinate[i].pass.c_str(), coordinate[i].pass.get_size());
+
 			// recycling keysize to store crypto_size as an infinint:
 		    keysize = coordinate[i].crypto_size;
 		    keysize.dump(*f);
