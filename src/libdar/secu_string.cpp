@@ -214,14 +214,13 @@ namespace libdar
 	*string_size = size;
     }
 
-    char * secu_string::get_array()
+    char* secu_string::get_array()
     {
 	if(zero_length)
-	    return nullptr;
+	    throw SRC_BUG;
 	else
 	    return mem == nullptr ? throw SRC_BUG : mem;
     }
-
 
     char & secu_string::operator[] (U_I index)
     {

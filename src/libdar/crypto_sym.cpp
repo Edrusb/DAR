@@ -811,7 +811,7 @@ namespace libdar
 				    1,   // assuming less parallelization leads to longer hash time and thus more difficult dictionnary attack (?)
 				    password.c_str(), password.get_size(),
 				    salt.c_str(), salt.size(),
-				    ret.c_str(), ret.get_allocated_size());
+				    ret.get_array(), ret.get_allocated_size());
 
 	if(err != ARGON2_OK)
 	{

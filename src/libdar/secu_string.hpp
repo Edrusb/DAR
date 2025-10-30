@@ -149,12 +149,16 @@ namespace libdar
 
 	    /// \return the address of the first byte of the string
 	    /// \note check the "size()" method to know how much bytes can be read
-	const char* c_str() const { if(zero_length) return ""; return mem == nullptr ? throw SRC_BUG : mem; };
-	char* c_str() { if(zero_length) return ""; return mem == nullptr ? throw SRC_BUG : mem; };
+	const char* c_str() const { if(zero_length) return empty_string; return mem == nullptr ? throw SRC_BUG : mem; };
+
+
+	    /// change allocated bytes amount exposed as part of the secured_string
+
+	    /// \note it is assumed the proper data has been set thanks to get_array() + get_allocate_size()
 	void set_size(U_I size);
 
 	    /// non constant flavor of direct secure memory access
-	char * get_array();
+	char* get_array();
 
 	    /// get access to the secure string by index
 
@@ -169,7 +173,7 @@ namespace libdar
 	bool empty() const { if(zero_length) return true; if(string_size == nullptr) throw SRC_BUG; return *string_size == 0; };
 
 	    /// get the size of the allocated secure space
-	U_I get_allocated_size() const { if(zero_length) return 0; return zero_length ? 0 : *allocated_size - 1; };
+	U_I get_allocated_size() const { return zero_length ? 0 : *allocated_size - 1; };
 
     private:
 	bool zero_length;     ///< true if none of the other field are set due to zero byte length string requested
@@ -183,6 +187,8 @@ namespace libdar
 	void move_from(secu_string && ref) noexcept;
 	bool compare_with(const char *ptr, U_I size) const; // return true if given sequence is the same as the one stored in "this"
 	void clean_and_destroy();
+
+	static constexpr const char* empty_string = "";
     };
 
 	/// @}
