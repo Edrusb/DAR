@@ -145,8 +145,9 @@ namespace libdar
 		    dat.pass.clear();
 		    if(i_keysize > 0)
 		    {
-			dat.pass.resize(i_keysize);
-			f.read(dat.pass.c_str(), i_keysize);
+			dat.pass.resize(i_keysize + 1); // alocate data
+			dat.pass.set_size(i_keysize); // size of the key
+			f.read(dat.pass.get_array(), i_keysize);
 		    }
 
 		    keysize.read(f); // recycling keysize temporary variable to fetch crypto_size as an infinint
