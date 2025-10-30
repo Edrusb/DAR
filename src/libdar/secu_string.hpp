@@ -148,9 +148,9 @@ namespace libdar
 	    /// get access to the secure string
 
 	    /// \return the address of the first byte of the string
-	    /// \note check the "size" method to know how much bytes can be read
-	const char* c_str() const { if(zero_length) return nullptr; return mem == nullptr ? throw SRC_BUG : mem; };
-	char* c_str() { if(zero_length) return nullptr; return mem == nullptr ? throw SRC_BUG : mem; };
+	    /// \note check the "size()" method to know how much bytes can be read
+	const char* c_str() const { if(zero_length) return ""; return mem == nullptr ? throw SRC_BUG : mem; };
+	char* c_str() { if(zero_length) return ""; return mem == nullptr ? throw SRC_BUG : mem; };
 	void set_size(U_I size);
 
 	    /// non constant flavor of direct secure memory access
