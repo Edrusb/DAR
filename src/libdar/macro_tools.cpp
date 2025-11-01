@@ -1476,9 +1476,9 @@ namespace libdar
 
 		    // ************ building the encryption layer if required ****** //
 		    // the encryption layer need to be setup now, for the salt to be determined,
-		    // it will be recorded in the archive header which has to be wrote down at the
+		    // it will be recorded in the archive header which has to be written down at the
 		    // beginning of the archive.
-		    // Once the archvie header has been wrote the initial_shift (offset of the first
+		    // Once the archvie header has been wrote, the initial_shift (offset of the first
 		    // encrypted data) will be possible to be given to the encryption layer
 		    //
 		    // this info is necessary to determine the encryption block boundaries.
@@ -1597,6 +1597,12 @@ namespace libdar
 		}
 		else
 		{
+			// when writing_to_pipe, level1 is a cache layer added to the stack
+			// and without encryption a cache layer is used in place of encryption
+			// but when both writing_to_pipe and no encryption, there is no need
+			// to add a cache layer on top of level1 which is already a cache layer
+			// thus we expect tmp to be nullptr, unlike other cases (encrypted layer
+			// or cache layer over level1 layer).
 		    if(tmp != nullptr)
 			throw SRC_BUG;
 		}
