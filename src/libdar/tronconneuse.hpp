@@ -103,7 +103,7 @@ namespace libdar
 	virtual void write_end_of_file() override { if(is_terminated()) throw SRC_BUG; flush(); weof = true; };
 
 
-	    /// this method to modify the initial shift. This overrides the constructor "no_initial_shift" of the constructor
+	    /// this method to modify the initial shift.
 
 	virtual void set_initial_shift(const infinint & x) override { initial_shift = x; };
 
