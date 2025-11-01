@@ -1622,7 +1622,7 @@ namespace libdar
     {
 	terminateur coord;
 	pile_descriptor pdesc(&layers);
-	proto_tronco *tronco_ptr = nullptr;
+	tronco_with_elastic *tronco_ptr = nullptr;
 	scrambler *scram_ptr = nullptr;
 	memory_file *hash_to_sign = nullptr;
 	tlv *signed_hash = nullptr;
@@ -1819,7 +1819,7 @@ namespace libdar
 
 	    // *********** writing down the first terminator at the end of the archive  *************** //
 
-	tronco_ptr = dynamic_cast<proto_tronco *>(layers.top());
+	tronco_ptr = dynamic_cast<tronco_with_elastic *>(layers.top());
 	scram_ptr = dynamic_cast<scrambler *>(layers.top());
 
 	if(info_details)

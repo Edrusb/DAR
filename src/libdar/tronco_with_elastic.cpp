@@ -128,7 +128,7 @@ namespace libdar
 
 	add_elastic_buffer(*encrypted, GLOBAL_ELASTIC_BUFFER_SIZE, 0, 0);
 
-	status = reading;
+	status = writing;
     }
 
     void tronco_with_elastic::get_ready_for_reading(const infinint & initial_shift)
@@ -181,8 +181,19 @@ namespace libdar
 
 	U_32 block_size = 0;
 
-	if(status != init)
+	switch(status)
+	{
+	case init:
+	    break;  // we will write the final elastic buffer
+	case reading:
+	    throw SRC_BUG; // only supported in writing mode
+	case writing:
+	    break;   // we will write the final elastic buffer
+	case closed:
+	    return; // final elastic buffer already written, nothing more to do
+	default:
 	    throw SRC_BUG;
+	}
 
 	if(!behind)
 	    throw SRC_BUG;
@@ -217,7 +228,7 @@ namespace libdar
 	    // terminal elastic buffer (after terminateur to protect against
 	    // plain text attack on the terminator string)
 
-	status = writing;
+	status = closed;
     }
 
     bool tronco_with_elastic::skippable(skippability direction, const infinint & amount)
@@ -363,15 +374,15 @@ namespace libdar
     {
 	switch(status)
 	{
-	init:
-	    break; // nothing to do
-	reading:
-	    break; // nothing to do
-	writing:
+	case init:
+	    break; // nothing to do at this level
+	case reading:
+	    break; // nothing to do at this level
+	case writing:
 	    write_end_of_file();
 	    break;
-	closed:
-	    return; // not propagating to *behind
+	case closed:
+	    break; // nothing to do at this level
 	default:
 	    throw SRC_BUG;
 	}
@@ -380,6 +391,7 @@ namespace libdar
 	    throw SRC_BUG;
 
 	behind->terminate();
+	status = closed;
     }
 
 
