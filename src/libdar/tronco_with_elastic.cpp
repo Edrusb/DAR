@@ -55,62 +55,79 @@ namespace libdar
 					     bool info_details):
 	generic_file(encrypted_side.get_mode() == gf_read_only ? gf_read_only: gf_write_only),
 	mem_ui(dialog),
+	beh(nullptr),
 	status(init),
 	encrypted(&encrypted_side),
 	reading_version(reading_ver),
 	info(info_details)
     {
-	unique_ptr<crypto_module> ptr;
+	if(algo == crypto_algo::scrambling)
+	{
+	    behind_weak.reset(new (nothrow) scrambler(password, *encrypted));
+	    if(behind_weak == nullptr)
+		throw Ememory("tronco_with_elastic::tronc_with_elastic");
 
-	if(encrypted == nullptr)
-	    throw SRC_BUG;
-
-	ptr.reset(new (nothrow) crypto_sym(password,
-					   reading_version,
-					   algo,
-					   salt,
-					   iteration_count,
-					   kdf_hash,
-					   use_pkcs5));
-	if(!ptr)
-	    throw Ememory("tronco_with_elastic::tronc_with_elastic");
+	    beh = behind_weak.get();
+	}
 	else
 	{
-	    crypto_sym *csym = dynamic_cast<crypto_sym*>(ptr.get());
-	    if(csym == nullptr)
-		throw SRC_BUG; // for now only a crypto_sym is available as class inherited from crypto_module
-	    sel = csym->get_salt();
-	}
+	    unique_ptr<crypto_module> ptr;
 
-	switch(workers)
-	{
-	case 0:
-	    throw SRC_BUG;
-	case 1:
-	    behind.reset(new (nothrow) tronconneuse(block_size,
-						    *encrypted,
-						    reading_version,
-						    ptr));
-	    if(info)
-		get_ui().message(tools_printf(gettext("single-threaded cyphering layer open")));
-	    break;
-	default:
+	    if(encrypted == nullptr)
+		throw SRC_BUG;
+
+	    ptr.reset(new (nothrow) crypto_sym(password,
+					       reading_version,
+					       algo,
+					       salt,
+					       iteration_count,
+					       kdf_hash,
+					       use_pkcs5));
+	    if(! ptr)
+		throw Ememory("tronco_with_elastic::tronc_with_elastic");
+	    else
+	    {
+		crypto_sym *csym = dynamic_cast<crypto_sym*>(ptr.get());
+		if(csym == nullptr)
+		    throw SRC_BUG; // for now only a crypto_sym is available as class inherited from crypto_module
+		sel = csym->get_salt();
+	    }
+
+	    switch(workers)
+	    {
+	    case 0:
+		throw SRC_BUG;
+	    case 1:
+		behind.reset(new (nothrow) tronconneuse(block_size,
+							*encrypted,
+							reading_version,
+							ptr));
+		if(info)
+		    get_ui().message(tools_printf(gettext("single-threaded cyphering layer open")));
+		break;
+	    default:
 #if LIBTHREADAR_AVAILABLE
-	    behind.reset(new (nothrow) parallel_tronconneuse(workers,
-							     block_size,
-							     *encrypted,
-							     reading_version,
-							     ptr));
-	    if(info)
-		get_ui().message(tools_printf(gettext("multi-threaded cyphering layer open, with %d worker thread(s)"), workers));
-	    break;
+		behind.reset(new (nothrow) parallel_tronconneuse(workers,
+								 block_size,
+								 *encrypted,
+								 reading_version,
+								 ptr));
+		if(info)
+		    get_ui().message(tools_printf(gettext("multi-threaded cyphering layer open, with %d worker thread(s)"), workers));
+		break;
 #else
-	    throw Ecompilation(gettext("libthreadar is required at compilation time in order to use more than one thread for cryptography"));
+		throw Ecompilation(gettext("libthreadar is required at compilation time in order to use more than one thread for cryptography"));
 #endif
+	    }
+
+	    if(! behind)
+		throw Ememory("tronco_with_elastic::tronc_with_elastic");
+
+	    beh = behind.get();
 	}
 
-	if(!behind)
-	    throw Ememory("tronco_with_elastic::tronc_with_elastic");
+	if(beh == nullptr)
+	    throw SRC_BUG;
     }
 
     void tronco_with_elastic::get_ready_for_writing(const infinint & initial_shift)
@@ -118,15 +135,21 @@ namespace libdar
 	if(status != init)
 	    throw SRC_BUG;
 
-	if(!behind)
-	    throw SRC_BUG;
+	if(! behind_weak)
+	{
+	    if(! behind)
+		throw SRC_BUG;
 
-	behind->set_initial_shift(initial_shift);
+	    behind->set_initial_shift(initial_shift);
 
-	if(info)
-	    get_ui().message(gettext("Writing down the initial elastic buffer through the encryption layer..."));
+	    if(info)
+		get_ui().message(gettext("Writing down the initial elastic buffer through the encryption layer..."));
 
-	add_elastic_buffer(*encrypted, GLOBAL_ELASTIC_BUFFER_SIZE, 0, 0);
+	    add_elastic_buffer(*encrypted, GLOBAL_ELASTIC_BUFFER_SIZE, 0, 0);
+	}
+	    // else nothing to do for scrambling:
+	    // no initial elastic_buffer for scrambling
+	    // due to historical reasons
 
 	status = writing;
     }
@@ -136,42 +159,46 @@ namespace libdar
 	if(status != init)
 	    throw SRC_BUG;
 
-	if(!behind)
-	    throw SRC_BUG;
+	if(! behind_weak)
+	{
+	    if(! behind)
+		throw SRC_BUG;
 
-	behind->set_initial_shift(initial_shift);
-
-	if(info)
-	    get_ui().message(gettext("Writing down the initial elastic buffer through the encryption layer..."));
+	    behind->set_initial_shift(initial_shift);
+	}
+	    // else nothing to do, scrambling not concerned by initial_shift
 
 	status = reading;
     }
 
     void tronco_with_elastic::get_ready_for_reading(trailing_clear_data_callback callback,
-						   bool skip_after_initial_elastic)
+						    bool skip_after_initial_elastic)
     {
-	if(status != writing)
+	if(status != init)
 	    throw SRC_BUG;
 
-	if(!behind)
-	    throw SRC_BUG;
+	if(! behind_weak)
+	{
 
-	if(encrypted == nullptr)
-	    throw SRC_BUG;
+	    if(! behind)
+		throw SRC_BUG;
 
-	behind->set_callback_trailing_clear_data(callback);
-	behind->set_initial_shift(encrypted->get_position());
+	    if(encrypted == nullptr)
+		throw SRC_BUG;
 
-	if(skip_after_initial_elastic)
-	    elastic(*behind, elastic_forward, reading_version);
-	    // this is line creates a temporary anonymous object and destroys it just afterward
-	    // this is necessary to skip the reading of the initial elastic buffer
-	    // nothing prevents the elastic buffer from carrying what could
-	    // be considered an escape mark.
+	    behind->set_callback_trailing_clear_data(callback);
+	    behind->set_initial_shift(encrypted->get_position());
 
-	behind->sync_write();
+	    if(skip_after_initial_elastic)
+		elastic(*behind, elastic_forward, reading_version);
+		// this is line creates a temporary anonymous object and destroys it just afterward
+		// this is necessary to skip the reading of the initial elastic buffer
+		// nothing prevents the elastic buffer from carrying what could
+		// be considered an escape mark.
+	}
+	    // there is no initial elastic_buffer to read when scrambling is used
 
-	status = closed;
+	status = reading;
     }
 
 
@@ -181,6 +208,7 @@ namespace libdar
 
 	U_32 block_size = 0;
 
+	    // this als handles the context where behind_weak is true (scrambling)
 	switch(status)
 	{
 	case init:
@@ -195,11 +223,17 @@ namespace libdar
 	    throw SRC_BUG;
 	}
 
-	if(!behind)
-	    throw SRC_BUG;
-	block_size = behind->get_clear_block_size();
+	if(! behind_weak)
+	{
+	    if(! behind)
+		throw SRC_BUG;
+	    block_size = behind->get_clear_block_size();
+	}
+	else
+	    block_size = 0;
 
-	    // calculating the current offset modulo block_size
+
+		// calculating the current offset modulo block_size
 
 	U_32 offset = 0;
 
@@ -213,12 +247,15 @@ namespace libdar
 
 	    euclide(encrypted->get_position(), infinint(block_size), times, reste);
 	    reste.unstack(offset);
-	    if(!reste.is_zero())
+	    if(! reste.is_zero())
 		throw SRC_BUG;
 	}
 
 	if(info)
 	    get_ui().message(gettext("writing down the final elastic buffer through the encryption layer..."));
+
+	    // a final elastic_buffer is added also when scrambling is used (with offset = 0 and block_size = 0)
+	    // for historical reasons,
 
 	add_elastic_buffer(*encrypted,
 			   GLOBAL_ELASTIC_BUFFER_SIZE,
@@ -228,6 +265,16 @@ namespace libdar
 	    // terminal elastic buffer (after terminateur to protect against
 	    // plain text attack on the terminator string)
 
+	if(behind_weak)
+	    behind_weak->sync_write();
+	else
+	{
+	    if(behind)
+		behind->sync_write();
+	    else
+		throw SRC_BUG;
+	}
+
 	status = closed;
     }
 
@@ -236,10 +283,10 @@ namespace libdar
 	if(status != reading && status != writing)
 	    return false;
 
-	if(!behind)
+	if(beh == nullptr)
 	    throw SRC_BUG;
-
-	return behind->skippable(direction, amount);
+	else
+	    return beh->skippable(direction, amount);
     }
 
     bool tronco_with_elastic::skip(const infinint & pos)
@@ -247,10 +294,10 @@ namespace libdar
 	if(status != reading && status != writing)
 	    return false;
 
-	if(!behind)
+	if(beh == nullptr)
 	    throw SRC_BUG;
 
-	return behind->skip(pos);
+	return beh->skip(pos);
     }
 
     bool tronco_with_elastic::skip_to_eof()
@@ -258,10 +305,10 @@ namespace libdar
 	if(status != reading && status != writing)
 	    return false;
 
-	if(!behind)
+	if(beh == nullptr)
 	    throw SRC_BUG;
 
-	return behind->skip_to_eof();
+	return beh->skip_to_eof();
     }
 
 
@@ -270,10 +317,10 @@ namespace libdar
 	if(status != reading && status != writing)
 	    return false;
 
-	if(!behind)
+	if(beh == nullptr)
 	    throw SRC_BUG;
 
-	return behind->skip_relative(x);
+	return beh->skip_relative(x);
     }
 
     bool tronco_with_elastic::truncatable(const infinint & pos) const
@@ -281,10 +328,10 @@ namespace libdar
 	if(status != reading && status != writing)
 	    return false;
 
-	if(!behind)
+	if(beh == nullptr)
 	    throw SRC_BUG;
 
-	return behind->truncatable(pos);
+	return beh->truncatable(pos);
     }
 
 
@@ -293,10 +340,10 @@ namespace libdar
 	if(status != reading && status != writing)
 	    return false;
 
-	if(!behind)
+	if(beh == nullptr)
 	    throw SRC_BUG;
 
-	return behind->get_position();
+	return beh->get_position();
     }
 
 
@@ -305,10 +352,10 @@ namespace libdar
 	if(status != reading)
 	    throw SRC_BUG;
 
-	if(!behind)
+	if(beh == nullptr)
 	    throw SRC_BUG;
 
-	behind->read_ahead(amount);
+	beh->read_ahead(amount);
     }
 
     U_I tronco_with_elastic::inherited_read(char *a, U_I size)
@@ -316,10 +363,10 @@ namespace libdar
 	if(status != reading)
 	    throw SRC_BUG;
 
-	if(!behind)
+	if(beh == nullptr)
 	    throw SRC_BUG;
 
-	return behind->read(a, size);
+	return beh->read(a, size);
     }
 
 
@@ -328,10 +375,10 @@ namespace libdar
 	if(status != writing)
 	    throw SRC_BUG;
 
-	if(!behind)
+	if(beh == nullptr)
 	    throw SRC_BUG;
 
-	behind->write(a, size);
+	beh->write(a, size);
     }
 
 
@@ -340,10 +387,10 @@ namespace libdar
 	if(status != writing)
 	    throw SRC_BUG;
 
-	if(!behind)
+	if(beh == nullptr)
 	    throw SRC_BUG;
 
-	behind->truncate(pos);
+	beh->truncate(pos);
     }
 
 
@@ -352,10 +399,10 @@ namespace libdar
 	if(status != writing)
 	    throw SRC_BUG;
 
-	if(!behind)
+	if(beh == nullptr)
 	    throw SRC_BUG;
 
-	behind->sync_write();
+	beh->sync_write();
     }
 
 
@@ -364,10 +411,10 @@ namespace libdar
 	if(status != reading)
 	    throw SRC_BUG;
 
-	if(!behind)
+	if(beh == nullptr)
 	    throw SRC_BUG;
 
-	behind->flush_read();
+	beh->flush_read();
     }
 
     void tronco_with_elastic::inherited_terminate()
@@ -387,10 +434,10 @@ namespace libdar
 	    throw SRC_BUG;
 	}
 
-	if(!behind)
+	if(beh == nullptr)
 	    throw SRC_BUG;
 
-	behind->terminate();
+	beh->terminate();
 	status = closed;
     }
 

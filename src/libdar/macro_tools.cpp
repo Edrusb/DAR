@@ -57,7 +57,6 @@ extern "C"
 #include "cat_all_entrees.hpp"
 #include "crc.hpp"
 #include "entrepot_libcurl.hpp"
-#include "scrambler.hpp"
 #include "hash_fichier.hpp"
 #include "tools.hpp"
 #include "compressor.hpp"
@@ -702,6 +701,7 @@ namespace libdar
 		}
 		break;
 
+	    case crypto_algo::scrambling:
 	    case crypto_algo::blowfish:
 	    case crypto_algo::aes256:
 	    case crypto_algo::twofish256:
@@ -737,15 +737,6 @@ namespace libdar
 		else // archive openned by the beginning
 		    tmp_tronco->get_ready_for_reading(&macro_tools_get_terminator_start,
 						      sequential_read);
-		break;
-
-	    case crypto_algo::scrambling:
-		if(info_details)
-		    dialog->message(gettext("Opening cyphering layer..."));
-#ifdef LIBDAR_NO_OPTIMIZATION
-		tools_secu_string_show(*dialog, string("Used clear key: "), pass);
-#endif
-		tmp = new (nothrow) scrambler(pass, *(stack.top()));
 		break;
 	    default:
 		throw Erange("macro_tools_open_archive", gettext("Unknown encryption algorithm"));
@@ -1396,13 +1387,6 @@ namespace libdar
 		switch(crypto)
 		{
 		case crypto_algo::scrambling:
-		    if(info_details)
-			dialog->message(gettext("Adding a new layer on top: scrambler object..."));
-		    tmp = new (nothrow) scrambler(real_pass, *(layers.top()));
-#ifdef LIBDAR_NO_OPTIMIZATION
-		    tools_secu_string_show(*dialog, string("real_pass used: "), real_pass);
-#endif
-		    break;
 		case crypto_algo::blowfish:
 		case crypto_algo::aes256:
 		case crypto_algo::twofish256:
@@ -1427,7 +1411,7 @@ namespace libdar
 		    if(tmp_tronco == nullptr)
 			throw Ememory("macro_tools_create_layers");
 
-		    if(use_pkcs5)
+		    if(use_pkcs5 && crypto != crypto_algo::scrambling)
 		    {
 			ver.set_salt(tmp_tronco->get_salt());
 			ver.set_iteration_count(iteration_count);
@@ -1623,7 +1607,6 @@ namespace libdar
 	terminateur coord;
 	pile_descriptor pdesc(&layers);
 	tronco_with_elastic *tronco_ptr = nullptr;
-	scrambler *scram_ptr = nullptr;
 	memory_file *hash_to_sign = nullptr;
 	tlv *signed_hash = nullptr;
 	hash_fichier *hasher = nullptr;
@@ -1820,7 +1803,6 @@ namespace libdar
 	    // *********** writing down the first terminator at the end of the archive  *************** //
 
 	tronco_ptr = dynamic_cast<tronco_with_elastic *>(layers.top());
-	scram_ptr = dynamic_cast<scrambler *>(layers.top());
 
 	if(info_details)
 	    dialog->message(gettext("Writing down the first archive terminator..."));
@@ -1828,39 +1810,26 @@ namespace libdar
 
 	if(crypto != crypto_algo::none)
 	{
-	    if(tronco_ptr != nullptr && scram_ptr != nullptr)
+	    if(tronco_ptr == nullptr)
 		throw SRC_BUG;
 
-	    if(tronco_ptr != nullptr)
-		tronco_ptr->write_end_of_file();
-
-		// we need to read ending elastic_buffer
-		// when scrambling is used
-	}
+	    tronco_ptr->write_end_of_file();
 
 	    // releasing memory by calling destructors and releases file descriptors
 
-	if(tronco_ptr != nullptr || scram_ptr != nullptr)
-	{
 	    if(info_details)
 		dialog->message(gettext("Closing the encryption layer..."));
-	}
 
-	if(tronco_ptr != nullptr)
 	    tronco_ptr->write_end_of_file();
 
-	if(tronco_ptr != nullptr)
-	{
 	    if(!layers.pop_and_close_if_type_is(tronco_ptr))
 		throw SRC_BUG;
 	}
-
-	if(scram_ptr != nullptr)
+	else
 	{
-	    if(!layers.pop_and_close_if_type_is(scram_ptr))
+	    if(tronco_ptr != nullptr)
 		throw SRC_BUG;
 	}
-
 
 	    // *********** writing down the trailier_version with the second terminateur *************** //
 

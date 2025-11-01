@@ -40,6 +40,7 @@
 #include "proto_tronco.hpp"
 #include "elastic.hpp"
 #include "mem_ui.hpp"
+#include "scrambler.hpp"
 
 namespace libdar
 {
@@ -186,6 +187,8 @@ namespace libdar
 	enum { init, reading, writing, closed } status;
 
 	std::unique_ptr<proto_tronco> behind;
+	std::unique_ptr<scrambler> behind_weak; // either behind or behind_weak is used
+	generic_file* beh; // either points to the object of behind or the one of behind_weak
 	generic_file* encrypted;
 	archive_version reading_version;
 	std::string sel;
