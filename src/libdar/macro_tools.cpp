@@ -53,7 +53,6 @@ extern "C"
 #include "generic_to_global_file.hpp"
 #include "tlv.hpp"
 #include "crypto_sym.hpp"
-#include "tronconneuse.hpp"
 #include "crypto_asym.hpp"
 #include "cat_all_entrees.hpp"
 #include "crc.hpp"
@@ -71,10 +70,10 @@ extern "C"
 #include "zstd_module.hpp"
 #include "block_compressor.hpp"
 #include "entrepot_libssh.hpp"
+#include "tronco_with_elastic.hpp"
 
 #ifdef LIBTHREADAR_AVAILABLE
 #include "parallel_block_compressor.hpp"
-#include "parallel_tronconneuse.hpp"
 #endif
 
 #define PRE_2_7_0_LZO_BLOCK_SIZE 246660
@@ -97,31 +96,6 @@ namespace libdar
 
 
     static void version_check(user_interaction & dialog, const header_version & ver);
-
-	/// append an elastic buffer of given size to the file
-
-	/// \param[in,out] f file to append elastic buffer to
-	/// \param[in] max_size size of the elastic buffer to add
-	/// \param[in] modulo defines the size to choose (see note)
-	/// \param[in] offset defines the offset to apply (see note)
-	/// \note the size of the elastic buffer should not exceed max_size but
-	/// should be chosen in order to reach a size which is zero modulo "modulo"
-	/// assuming the offset we add the elastic buffer at is "offset". If modulo is zero
-	/// this the elastic buffer is randomly chosen from 1 to max_size without any
-	/// concern about being congruent to a given modulo.
-	/// Example if module is 5 and offset is 2, the elastic buffer possible size
-	/// can be 3 (2+3 is congruent to 0 modulo 5), 8 (2+8 is congruent to modulo 5), 12, etc.
-	/// but not exceed max_size+modulo-1
-	/// \note this is to accomodate the case when encrypted data is followed by clear data
-	/// at the end of an archive. There is no way to known when we read clear data, but we
-	/// know the clear data size is very inferior to crypted block size, thus when reading
-	/// a uncompleted block of data we can be sure we have reached and of file and that
-	/// the data is clear without any encrypted part because else we would have read an entire
-	/// block of data.
-    static void macro_tools_add_elastic_buffer(generic_file & f,
-					       U_32 max_size,
-					       U_32 modulo,
-					       U_32 offset);
 
 	/// create a compress_module based on the provided arguments
     static unique_ptr<compress_module> make_compress_module_ptr(compression algo, U_I compression_level = 9);
@@ -457,6 +431,7 @@ namespace libdar
 	generic_file *tmp = nullptr;
 	contextual *tmp_ctxt = nullptr;
 	cache *tmp_cache = nullptr;
+	tronco_with_elastic *tmp_tronco = nullptr;
 	string salt;
 	bool by_the_end = ! sequential_read;
 	bool remote_repo = false;
@@ -726,6 +701,7 @@ namespace libdar
 			dialog->message(gettext("No cyphering layer opened"));
 		}
 		break;
+
 	    case crypto_algo::blowfish:
 	    case crypto_algo::aes256:
 	    case crypto_algo::twofish256:
@@ -737,101 +713,32 @@ namespace libdar
 		tools_secu_string_show(*dialog, string("Used clear key: "), pass);
 #endif
 
-		try
-		{
-		    proto_tronco *tmp_ptr = nullptr;
-		    unique_ptr<crypto_module> ptr;
-		    try
-		    {
-			ptr = make_unique<crypto_sym>(pass,
-						      ver.get_edition(),
-						      crypto,
-						      ver.get_salt(),
-						      ver.get_iteration_count(),
-						      ver.get_kdf_hash(),
-						      ver.get_crypted_key() == nullptr);
-		    }
-		    catch(bad_alloc &)
-		    {
+		tmp_tronco = new (nothrow) tronco_with_elastic(dialog,
+							       multi_threaded_crypto,
+							       crypto_size,
+							       *(stack.top()),
+							       pass,
+							       ver.get_edition(),
+							       crypto,
+							       ver.get_salt(),
+							       ver.get_iteration_count(),
+							       ver.get_kdf_hash(),
+							       ver.get_crypted_key() == nullptr,
+							       info_details);
+
+		if(tmp_tronco == nullptr)
 			throw Ememory("macro_tools_open_archive");
-		    }
+		else
+		    tmp = tmp_tronco;
 
-		    if(!second_terminateur_offset.is_zero()
-		       || tmp_ctxt->is_an_old_start_end_archive()) // we have openned the archive by the end
-		    {
-			if(multi_threaded_crypto > 1)
-			{
-#if LIBTHREADAR_AVAILABLE
-			    tmp = tmp_ptr = new (nothrow) parallel_tronconneuse(multi_threaded_crypto,
-										crypto_size,
-										*(stack.top()),
-										ver.get_edition(),
-										ptr);
-			    if(info_details)
-				dialog->message(tools_printf(gettext("multi-threaded cyphering layer open, with %d worker thread(s)"), multi_threaded_crypto));
-
-#else
-			    throw Ecompilation(gettext("libthreadar is required at compilation time in order to use more than one thread for cryptography"));
-#endif
-			}
-			else
-			{
-			    tmp = tmp_ptr = new (nothrow) tronconneuse(crypto_size,
-								       *(stack.top()),
-								       ver.get_edition(),
-								       ptr);
-			    if(info_details)
-				dialog->message(tools_printf(gettext("single-threaded cyphering layer open")));
-			}
-
-			if(tmp_ptr != nullptr)
-			    tmp_ptr->set_initial_shift(ver.get_initial_offset());
-		    }
-		    else // archive openned by the beginning
-		    {
-			if(multi_threaded_crypto > 1)
-			{
-#if LIBTHREADAR_AVAILABLE
-			    tmp = tmp_ptr = new (nothrow) parallel_tronconneuse(multi_threaded_crypto,
-										crypto_size,
-										*(stack.top()),
-										ver.get_edition(),
-										ptr);
-			    if(info_details)
-				dialog->message(tools_printf(gettext("multi-threaded cyphering layer open, with %d worker thread(s)"), multi_threaded_crypto));
-
-#else
-			    throw Ecompilation(gettext("libthreadar is required at compilation time in order to use more than one thread for cryptography"));
-#endif
-			}
-			else
-			{
-			    tmp = tmp_ptr = new (nothrow) tronconneuse(crypto_size,
-								       *(stack.top()),
-								       ver.get_edition(),
-								       ptr);
-			    if(info_details)
-				dialog->message(tools_printf(gettext("single-threaded cyphering layer open")));
-			}
-
-			if(tmp_ptr != nullptr)
-			{
-			    tmp_ptr->set_callback_trailing_clear_data(&macro_tools_get_terminator_start);
-			    tmp_ptr->set_initial_shift((stack.top())->get_position());
-
-			    if(sequential_read)
-				elastic(*tmp_ptr, elastic_forward, ver.get_edition()); // this is line creates a temporary anonymous object and destroys it just afterward
-				// this is necessary to skip the reading of the initial elastic buffer
-				// nothing prevents the elastic buffer from carrying what could
-				// be considered an escape mark.
-			}
-		    }
-		}
-		catch(std::bad_alloc &)
-		{
-		    throw Ememory("macro_tools_open_archive");
-		}
+		if(!second_terminateur_offset.is_zero()
+		   || tmp_ctxt->is_an_old_start_end_archive()) // we have openned the archive by the end
+		    tmp_tronco->get_ready_for_reading(ver.get_initial_offset());
+		else // archive openned by the beginning
+		    tmp_tronco->get_ready_for_reading(&macro_tools_get_terminator_start,
+						      sequential_read);
 		break;
+
 	    case crypto_algo::scrambling:
 		if(info_details)
 		    dialog->message(gettext("Opening cyphering layer..."));
@@ -1483,7 +1390,7 @@ namespace libdar
 		    //
 		    // this info is necessary to determine the encryption block boundaries.
 
-		proto_tronco *tmp_tronco = nullptr;
+		tronco_with_elastic *tmp_tronco = nullptr;
 		bool use_pkcs5 = gnupg_recipients.empty();
 
 		switch(crypto)
@@ -1503,64 +1410,28 @@ namespace libdar
 		case crypto_algo::camellia256:
 		    if(info_details)
 			dialog->message(gettext("Adding a new layer on top: Strong encryption object..."));
-		    try
-		    {
-			unique_ptr<crypto_module> ptr = make_unique<crypto_sym>(real_pass,
-										macro_tools_supported_version,
-										crypto,
-										"",   // the salt, will be generated by the crypto_module
-										iteration_count,
-										kdf_hash,
-										use_pkcs5);
 
-			if(!ptr)
-			    throw Ememory("macro_tools_create_layers");
+		    tmp = tmp_tronco = new (nothrow) tronco_with_elastic(dialog,
+									 multi_threaded_crypto,
+									 crypto_size,
+									 *(layers.top()),
+									 real_pass,
+									 macro_tools_supported_version,
+									 crypto,
+									 "",  // the salt, will be generated
+									 iteration_count,
+									 kdf_hash,
+									 use_pkcs5,
+									 info_details);
 
-			    // updating the archive_header with the KDF parameters
-			crypto_sym* sym_ptr = dynamic_cast<crypto_sym*>(ptr.get());
-			if(sym_ptr != nullptr)
-			{
-			    if(use_pkcs5)
-			    {
-				ver.set_salt(sym_ptr->get_salt());
-				ver.set_iteration_count(iteration_count);
-				ver.set_kdf_hash(kdf_hash);
-			    }
-			}
-			else
-			    throw SRC_BUG;
-			    // today only crypto_sym is used, the
-			    // dynamic_cast should thus always succeed
-
-
-			if(multi_threaded_crypto > 1)
-			{
-#if LIBTHREADAR_AVAILABLE
-			    tmp = tmp_tronco = new (nothrow) parallel_tronconneuse(multi_threaded_crypto,
-										   crypto_size,
-										   *(layers.top()),
-										   macro_tools_supported_version,
-										   ptr);
-
-			    if(info_details)
-				dialog->message(tools_printf(gettext("multi-threaded cyphering layer open, with %d worker thread(s)"), multi_threaded_crypto));
-#else
-			    throw Ecompilation(gettext("libthreadar is required at compilation time in order to use more than one thread for cryptography"));
-#endif
-			}
-			else
-			{
-			    tmp = tmp_tronco = new (nothrow) tronconneuse(crypto_size,
-									  *(layers.top()),
-									  macro_tools_supported_version,
-									  ptr);
-			    if(info_details)
-				dialog->message(tools_printf(gettext("single-threaded cyphering layer open")));
-			}
-		    }
-		    catch(std::bad_alloc &)
-		    {
+		    if(tmp_tronco == nullptr)
 			throw Ememory("macro_tools_create_layers");
+
+		    if(use_pkcs5)
+		    {
+			ver.set_salt(tmp_tronco->get_salt());
+			ver.set_iteration_count(iteration_count);
+			ver.set_kdf_hash(kdf_hash);
 		    }
 
 #ifdef LIBDAR_NO_OPTIMIZATION
@@ -1661,19 +1532,13 @@ namespace libdar
 		ver.set_initial_offset(level1->get_position());
 
 
-		    // ********** now that the archive header has been wrote down, we can set the initial_shift for the encryption layer ***** //
+		    // ********** now that the archive header has been wrote down, we can set the initial_shift
+		    //   for the encryption layer. We also add a elastic buffer as first ciphered data after the
+		    // clear archive header ****** //
 
 		if(tmp_tronco != nullptr)
-		    tmp_tronco->set_initial_shift(ver.get_initial_offset());
+		    tmp_tronco->get_ready_for_writing(ver.get_initial_offset());
 
-		    // ***** adding a elastic buffer as first ciphered data after the clear archive header ****** //
-
-		if(crypto != crypto_algo::none)
-		{
-		    if(info_details)
-			dialog->message(gettext("Writing down the initial elastic buffer through the encryption layer..."));
-		    macro_tools_add_elastic_buffer(layers, GLOBAL_ELASTIC_BUFFER_SIZE, 0, 0);
-		}
 
 		    // ********** if required building the escape layer  ***** //
 
@@ -1963,39 +1828,14 @@ namespace libdar
 
 	if(crypto != crypto_algo::none)
 	{
-	    if(info_details)
-		dialog->message(gettext("writing down the final elastic buffer through the encryption layer..."));
-
-		// obtaining the crypto block size (for clear data)
-
-	    U_32 block_size = 0;
-
-	    if(tronco_ptr != nullptr)
-		block_size = tronco_ptr->get_clear_block_size();
-	    if(tronco_ptr == nullptr && scram_ptr == nullptr)
+	    if(tronco_ptr != nullptr && scram_ptr != nullptr)
 		throw SRC_BUG;
 
-		// calculating the current offset modulo block_size
+	    if(tronco_ptr != nullptr)
+		tronco_ptr->write_end_of_file();
 
-	    U_32 offset = 0;
-
-	    if(block_size > 0)
-	    {
-		infinint times = 0;
-		infinint reste = 0;
-
-		euclide(layers.get_position(), infinint(block_size), times, reste);
-		reste.unstack(offset);
-		if(!reste.is_zero())
-		    throw SRC_BUG;
-	    }
-
-	    macro_tools_add_elastic_buffer(layers,
-					   GLOBAL_ELASTIC_BUFFER_SIZE,
-					   block_size,
-					   offset);
-		// terminal elastic buffer (after terminateur to protect against
-		// plain text attack on the terminator string)
+		// we need to read ending elastic_buffer
+		// when scrambling is used
 	}
 
 	    // releasing memory by calling destructors and releases file descriptors
@@ -2307,37 +2147,6 @@ namespace libdar
     {
         if(ver.get_edition() > macro_tools_supported_version)
             dialog.pause(gettext("The format version of the archive is too high for that software version, try reading anyway?"));
-    }
-
-    static void macro_tools_add_elastic_buffer(generic_file & f,
-					       U_32 max_size,
-					       U_32 modulo,
-					       U_32 offset)
-    {
-	U_32 size = tools_pseudo_random(max_size-1) + 1; // range from 1 to max_size;
-
-	if(modulo > 0)
-	{
-	    U_32 shift = modulo - (offset % modulo);
-	    size = (size/modulo)*modulo + shift;
-	}
-
-        elastic tic = size;
-        char *buffer = new (nothrow) char[tic.get_size()];
-
-        if(buffer == nullptr)
-            throw Ememory("tools_add_elastic_buffer");
-        try
-        {
-            tic.dump((unsigned char *)buffer, tic.get_size());
-            f.write(buffer, tic.get_size());
-        }
-        catch(...)
-        {
-            delete [] buffer;
-            throw;
-        }
-        delete [] buffer;
     }
 
     static unique_ptr<compress_module> make_compress_module_ptr(compression algo, U_I compression_level)

@@ -66,8 +66,6 @@ namespace libdar
 	/// \addtogroup Private
 	/// @{
 
-    constexpr U_I GLOBAL_ELASTIC_BUFFER_SIZE = 51200;
-
     extern const archive_version macro_tools_supported_version;
     extern const std::string LIBDAR_STACK_LABEL_UNCOMPRESSED;
     extern const std::string LIBDAR_STACK_LABEL_CLEAR;
@@ -94,7 +92,7 @@ namespace libdar
 	/// +-------------------------------------------------------+---------------------+
 	/// | [ escape ]                                            |v   v   v            |
 	/// +-------------------------------------------------------+v---v---v------------+
-	/// | [ cache ]  | (parallel_)tronconneuse | scrambler      |v   v   v            |
+	/// | [ cache ]  | tronco_with_elastic     | scrambler      |v   v   v            |
 	/// | [ tronc ]                                             |LEVEL 1              |
 	/// | trivial_sar  |  zapette  |  sar                       |v   v   v            |
 	/// +-------------------------------------------------------+---------------------+
@@ -127,7 +125,7 @@ namespace libdar
 					 bool info_details,    ///< be or not verbose about the archive openning
 					 std::list<signator> & gnupg_signed, ///< list of existing signature found for that archive (valid or not)
 					 slice_layout & sl,    ///< slicing layout of the archive (read from sar header if present)
-					 U_I multi_threaded_crypto,  ///< number of worker thread to run for cryptography (1 -> tronconneuse object, more -> parallel_tronconneuse object)
+					 U_I multi_threaded_crypto,  ///< number of worker thread to run for cryptography
 					 U_I multi_threaded_compress,  ///< number of worker threads to compress/decompress (need compression_block_size > 0)
 					 bool header_only,     ///< if true, stop the process before openning the encryption layer
 					 bool silent,          ///< do not display some informational messages of low importance
@@ -223,7 +221,7 @@ namespace libdar
 	/// +---------------------------------------------------------+---------------------+
 	/// | [ escape ]                                              |                     |
 	/// +-- - - - - - - - - - - - - - - - - - - - - - - - - - - - +---------------------+
-	/// | cache  |  (paralle_)tronconneuse |  scrambler           |                     |
+	/// | cache  | tronco_with_elastic     |  scrambler           |                     |
 	/// | [ cache ]                                               |_CACHE_PIPE          |
 	/// | trivial_sar  |  null_file  |  sar                       |                     |
 	/// +---------------------------------------------------------+---------------------+
