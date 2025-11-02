@@ -278,7 +278,7 @@ namespace libdar
 	NLS_SWAP_OUT;
     }
 
-        void database::set_compression_level(U_I compr_level) const
+    void database::set_compression_level(U_I compr_level) const
     {
 	NLS_SWAP_IN;
 	try
@@ -292,6 +292,83 @@ namespace libdar
 	}
 	NLS_SWAP_OUT;
     }
+
+
+    void database::set_database_crypto_algo(crypto_algo algo)
+    {
+	NLS_SWAP_IN;
+	try
+	{
+	    pimpl->set_database_crypto_algo(algo);
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
+    }
+
+    void database::set_database_crypto_pass(const secu_string & key)
+    {
+	NLS_SWAP_IN;
+	try
+	{
+	    pimpl->set_database_crypto_pass(key);
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
+    }
+
+    void database::set_database_kdf_hash(hash_algo val)
+    {
+	NLS_SWAP_IN;
+	try
+	{
+	    pimpl->set_database_kdf_hash(val);
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
+    }
+
+    void database::set_database_kdf_iteration_count(const infinint & val)
+    {
+	NLS_SWAP_IN;
+	try
+	{
+	    pimpl->set_database_kdf_iteration_count(val);
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
+    }
+
+    void database::set_database_crypto_block_size(U_32 val)
+    {
+	NLS_SWAP_IN;
+	try
+	{
+	    pimpl->set_database_crypto_block_size(val);;
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
+    }
+
 
     database_archives_list database::get_contents() const
     {
@@ -405,6 +482,66 @@ namespace libdar
 	NLS_SWAP_OUT;
 
 	return ret;
+    }
+
+    crypto_algo database::get_crypto_algo() const
+    {
+	crypto_algo ret;
+
+	NLS_SWAP_IN;
+	try
+	{
+	    ret = pimpl->get_crypto_algo();
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
+
+	return ret;
+    }
+
+    hash_algo database::get_kdf_hash() const
+    {
+	hash_algo ret;
+
+	NLS_SWAP_IN;
+	try
+	{
+	    ret = pimpl->get_kdf_hash();
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
+
+	return ret;
+    }
+
+    const infinint & database::get_kdf_iteration() const
+    {
+	const infinint *ret = nullptr;
+
+	NLS_SWAP_IN;
+	try
+	{
+	    ret = &(pimpl->get_kdf_iteration());
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
+
+	if(ret == nullptr)
+	    throw SRC_BUG;
+
+	return *ret;
     }
 
     void database::get_files(database_listing_show_files_callback callback,

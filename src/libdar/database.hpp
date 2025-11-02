@@ -180,6 +180,22 @@ namespace libdar
 	    /// change the compression level to use when storing base in file
 	void set_compression_level(U_I compr_level) const;
 
+	    /// change crypto algo to use
+	void set_database_crypto_algo(crypto_algo algo);
+
+	    /// change crypto key to use
+	void set_database_crypto_pass(const secu_string & key);
+
+	    /// change kdf hash
+	void set_database_kdf_hash(hash_algo val);
+
+	    /// change kdf iteration count
+	void set_database_kdf_iteration_count(const infinint & val);
+
+	    /// change encryption block size
+	void set_database_crypto_block_size(U_32 val);
+
+
 	    // "GETTINGS"
 
 	    /// provides the list of archive used to build the database
@@ -200,8 +216,17 @@ namespace libdar
 	    /// returns the compression level used on file
 	U_I get_compression_level() const;
 
-	    /// return the database format version
-	std::string get_database_version() const;
+	    /// returns the database format version
+        std::string get_database_version() const;
+
+	    /// returns the crypto algo used
+	crypto_algo get_crypto_algo() const;
+
+	    /// returns the kdf hash
+	hash_algo get_kdf_hash() const;
+
+	    /// returns the kdf iteration count
+	const infinint & get_kdf_iteration() const;
 
 	    /// list files which are present in a given archive
 
