@@ -56,11 +56,11 @@ namespace libdar
 
 	void set_compression(compression algozip) { algo = algozip; };
 	void set_compression_level(U_I level) { compression_level = level; };
-	void set_crypto(crypto_algo val) { crypto = val; };
-	void set_pass(const secu_string & val) { pass = val; };
-	void set_kdf_hash(hash_algo val) { kdf_hash = val; };
-	void set_kdf_iteration(const infinint & val) { kdf_count = val; };
-	void set_crypto_block_size(U_32 val) { crypto_bs = val; };
+	void set_crypto(crypto_algo val);
+	void set_pass(const secu_string & val);
+	void set_kdf_hash(hash_algo val);
+	void set_kdf_iteration(const infinint & val);
+	void set_crypto_block_size(U_32 val);
 	void set_kdf_salt(const std::string & val) { salt = val; };
 
 	U_I get_version() const { return version; };
@@ -82,6 +82,7 @@ namespace libdar
 	infinint kdf_count;
 	U_32 crypto_bs;
 	std::string salt;
+
     };
 
 	/// \addtogroup Private

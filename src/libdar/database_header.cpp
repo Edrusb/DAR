@@ -81,9 +81,9 @@ namespace libdar
 	pass.clear();
 	compression_level = 9;
 	crypto = crypto_algo::none;
-	kdf_hash = hash_algo::none;
-	kdf_count = 0;
-	crypto_bs = 0;
+	kdf_hash = hash_algo::argon2;
+	kdf_count = default_iteration_count_argon2;
+	crypto_bs = default_crypto_size;
 	salt.clear();
     }
 
@@ -193,6 +193,78 @@ namespace libdar
 	    tools_write_string_all(f, salt);
 	}
     }
+
+    void database_header::set_crypto(crypto_algo val)
+    {
+	switch(val)
+	{
+	case crypto_algo::none:
+	    break;
+	case crypto_algo::scrambling:
+	    throw Erange("database_header::set_crypto",
+			 gettext("weak crypto algorithm requested, aborting"));
+	case crypto_algo::blowfish: // databases should barely exceed 4GB of size... even uncompressed.
+	case crypto_algo::aes256:
+	case crypto_algo::twofish256:
+	case crypto_algo::serpent256:
+	case crypto_algo::camellia256:
+	    break;
+	default:
+	    throw SRC_BUG;
+	}
+
+	crypto = val;
+    }
+
+    void database_header::set_pass(const secu_string & val)
+    {
+	if(val.empty())
+	    throw SRC_BUG; // should be caught before reaching here to interactively ask for a real password
+	pass = val;
+    }
+
+    void database_header::set_kdf_hash(hash_algo val)
+    {
+	switch(val)
+	{
+	case hash_algo::none:
+	case hash_algo::md5:
+	case hash_algo::sha1:
+	    throw Erange("database_header::set_kdf_hash",
+			 gettext("invalid hash algorithm set for the key derivation function"));
+	case hash_algo::sha512:
+	case hash_algo::argon2:
+	case hash_algo::whirlpool:
+	    break;
+	default:
+	    throw SRC_BUG;
+	}
+
+	kdf_hash = val;
+    }
+
+    void database_header::set_kdf_iteration(const infinint & val)
+    {
+	if(val < default_iteration_count_argon2) // even if hash algo is not argon2
+	    throw Erange("database_header::set_kdf_iteration",
+			 gettext("Setting KDF iteration count too low would deserve the benefit of KDF cost, facilitating dictionnary attack type"));
+
+	kdf_count = val;
+
+    }
+
+
+    void database_header::set_crypto_block_size(U_32 val)
+    {
+	if(val < default_crypto_size)
+	    throw Erange("database_header::set_crypto_block_size",
+		gettext("Setting crypto block size below the default value, would lead to lower performance and weaken security"));
+
+	crypto_bs = val;
+    }
+
+
+	//////////
 
     generic_file *database_header_create(const shared_ptr<user_interaction> & dialog,
 					 const string & filename,
