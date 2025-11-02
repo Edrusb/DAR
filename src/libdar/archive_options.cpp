@@ -37,13 +37,9 @@ using namespace std;
 
 namespace libdar
 {
-	// public default values
-    const infinint default_iteration_count = 200000;
-    const infinint default_iteration_count_argon2 = 10000;
 
 	// general default values
 
-    static const U_32 default_crypto_size = 10240;
     static const path default_ref_chem("/");
     static const U_I default_min_compr_size = 100;
     static const comparison_fields default_comparison_fields = comparison_fields::all;

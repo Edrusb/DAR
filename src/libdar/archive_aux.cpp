@@ -43,6 +43,12 @@ using namespace std;
 namespace libdar
 {
 
+	// public default values
+    const infinint default_iteration_count = 200000;
+    const infinint default_iteration_count_argon2 = 10000;
+    const U_32 default_crypto_size = 10240;
+
+
     string hash_algo_to_string(hash_algo algo)
     {
 	switch(algo)
@@ -155,6 +161,8 @@ namespace libdar
 	    throw Erange("char_to_hash_algo", tools_printf(gettext("unknown hash algorithm corresponding to char `%c'"), arg));
 	}
     }
+
+
 
 
 } // end of namespace

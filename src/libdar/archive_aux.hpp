@@ -30,6 +30,7 @@
 #include "../my_config.h"
 
 #include "integers.hpp"
+#include "infinint.hpp"
 #include <string>
 
 namespace libdar
@@ -37,6 +38,17 @@ namespace libdar
 
     	/// \addtogroup API
 	/// @{
+
+	/// default iteration count for all KDF hash algo except argon2
+    extern const infinint default_iteration_count;
+
+	/// default iteration count for argon2 KDF hash
+    extern const infinint default_iteration_count_argon2;
+
+	/// default crypto block size
+    extern const U_32 default_crypto_size;
+
+
 
 	/// how to detect data has changed when some fields
 
@@ -89,6 +101,8 @@ namespace libdar
 
 	/// \note throw Erange exception if provided char is invalid
     extern hash_algo char_to_hash_algo(unsigned char arg);
+
+
 
 	/// @}
 

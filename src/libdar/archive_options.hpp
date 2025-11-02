@@ -58,12 +58,6 @@ namespace libdar
 	/// \addtogroup API
 	/// @{
 
-	/// default iteration count for all KDF hash algo except argon2
-    extern const infinint default_iteration_count;
-
-	/// default iteration count for argon2 KDF hash
-    extern const infinint default_iteration_count_argon2;
-
 	/// class holding optional parameters used to read an existing archive
 
     class archive_options_read
