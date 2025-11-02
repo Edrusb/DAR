@@ -73,7 +73,7 @@ namespace libdar
 	patch_base_check = nullptr;
 	delta_sig = nullptr;
 	delta_sig_read = false;
-	read_ver = macro_tools_supported_version;
+	read_ver = archive_format_supported_version;
 	in_place.reset();
 
         try

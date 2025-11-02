@@ -66,7 +66,6 @@ namespace libdar
 	/// \addtogroup Private
 	/// @{
 
-    extern const archive_version macro_tools_supported_version;
     extern const std::string LIBDAR_STACK_LABEL_UNCOMPRESSED;
     extern const std::string LIBDAR_STACK_LABEL_CLEAR;
     extern const std::string LIBDAR_STACK_LABEL_UNCYPHERED;

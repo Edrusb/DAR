@@ -31,6 +31,7 @@
 
 #include "integers.hpp"
 #include "infinint.hpp"
+#include "archive_version.hpp"
 #include <string>
 
 namespace libdar
@@ -48,6 +49,8 @@ namespace libdar
 	/// default crypto block size
     extern const U_32 default_crypto_size;
 
+	/// archive format created by the current code
+    extern const archive_version archive_format_supported_version;
 
 
 	/// how to detect data has changed when some fields

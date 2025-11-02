@@ -37,7 +37,7 @@ namespace libdar
 				       const label & data_name) : catalogue(dialog, root_last_modif, data_name)
     {
 	set_esc_and_stack(x_pdesc);
-	x_ver.set_edition(macro_tools_supported_version);
+	x_ver.set_edition(archive_format_supported_version);
 	x_ver.set_compression_algo(compression::none);
 	x_lax = false;
 	corres.clear();
