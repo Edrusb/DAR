@@ -141,15 +141,15 @@ namespace libdar
 		throw SRC_BUG;
 
 	    behind->set_initial_shift(initial_shift);
-
-	    if(info)
-		get_ui().message(gettext("Writing down the initial elastic buffer through the encryption layer..."));
-
-	    add_elastic_buffer(*encrypted, GLOBAL_ELASTIC_BUFFER_SIZE, 0, 0);
 	}
-	    // else nothing to do for scrambling:
-	    // no initial elastic_buffer for scrambling
-	    // due to historical reasons
+
+	if(info)
+	    get_ui().message(gettext("Writing down the initial elastic buffer through the encryption layer..."));
+
+	if(beh == nullptr)
+	    throw SRC_BUG;
+
+	add_elastic_buffer(*beh, GLOBAL_ELASTIC_BUFFER_SIZE, 0, 0);
 
 	status = writing;
     }
@@ -257,7 +257,10 @@ namespace libdar
 	    // a final elastic_buffer is added also when scrambling is used (with offset = 0 and block_size = 0)
 	    // for historical reasons,
 
-	add_elastic_buffer(*encrypted,
+	if(beh == nullptr)
+	    throw SRC_BUG;
+
+	add_elastic_buffer(*beh,
 			   GLOBAL_ELASTIC_BUFFER_SIZE,
 			   block_size,
 			   offset);
