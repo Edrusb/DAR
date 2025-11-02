@@ -44,6 +44,7 @@
 #include "archive_options.hpp"
 #include "crypto.hpp"
 #include "secu_string.hpp"
+#include "database_header.hpp"
 
 namespace libdar
 {
@@ -118,16 +119,26 @@ namespace libdar
         void set_dar_path(const std::string & chemin) { dar_path = chemin; };
 
             /// change compression to use when storing base on file
-        void set_compression(compression algozip) const { algo = algozip; };
+        void set_compression(compression algozip) { head.set_compression(algozip); };
 
 	    /// change the compression level to use when storing base in file
-	void set_compression_level(U_I level) const { compr_level = level; };
+	void set_compression_level(U_I level) { head.set_compression_level(level); };
 
 	    /// change crypto algo to use
-	void set_database_crypto_algo(crypto_algo algo) const { db_cryptalgo = algo; };
+	void set_database_crypto_algo(crypto_algo algo) { head.set_crypto(algo); };
 
 	    /// change crypto key to use
-	void set_database_crypto_pass(const secu_string & key) const { db_cryptpass = key; };
+	void set_database_crypto_pass(const secu_string & key) { head.set_pass(key); };
+
+	    /// change kdf hash
+	void set_database_kdf_hash(hash_algo val) { head.set_kdf_hash(val); };
+
+	    /// change kdf iteration count
+	void set_database_kdf_iteration_count(const infinint & val) { head.set_kdf_iteration(val); };
+
+	    /// change encryption block size
+	void set_database_crypto_block_size(U_32 val) { head.set_crypto_block_size(val); };
+
 
 	    ////////////////////////
 	    //
@@ -144,13 +155,23 @@ namespace libdar
         std::string get_dar_path() const { return dar_path; }; // show path to dar command
 
             /// returns the compression algorithm used on filesystem
-        compression get_compression() const { return algo; };
+        compression get_compression() const { return head.get_compression(); };
 
 	    /// returns the compression level used on file
-	U_I get_compression_level() const { return compr_level; };
+	U_I get_compression_level() const { return head.get_compression_level(); };
 
-            /// return the database format version
-        std::string get_database_version() const { return tools_uint2str(cur_db_version); };
+            /// returns the database format version
+        std::string get_database_version() const { return tools_uint2str(head.get_version()); };
+
+	    /// returns the crypto algo used
+	crypto_algo get_crypto_algo() const { return head.get_crypto_algo(); };
+
+	    /// returns the kdf hash
+	hash_algo get_kdf_hash() const { return head.get_kdf_hash(); };
+
+	    /// returns the kdf iteration count
+	const infinint & get_kdf_iteration() const { return head.get_kdf_iteration(); };
+
 
             /// list files which are present in a given archive
         void get_files(database_listing_show_files_callback callback,
@@ -215,13 +236,9 @@ namespace libdar
 	data_dir *files;                             ///< structure containing files and their status in the set of archive used for that database (is set to nullptr in partial mode)
 	storage *data_files;                         ///< when reading archive in partial mode, this is where is located the "not readed" part of the archive (is set to nullptr in partial-read-only mode)
 	bool check_order_asked;                      ///< whether order check has been asked
-	unsigned char cur_db_version;                ///< current db version (for informational purposes)
-	mutable compression algo;                    ///< compression used/to use when writing down the base to file
-	mutable U_I compr_level;                     ///< the compression level to use
-	mutable crypto_algo db_cryptalgo;            ///< the crypto algo used to cipher the whole database
-	mutable secu_string db_cryptpass;            ///< the symmetric key to use to cipher the whole database
+	database_header head;                        ///< database header releated parameters
 
-	void build(generic_file & f, bool partial, bool read_only, unsigned char db_version);  ///< used by constructors
+	void build(generic_file & f, bool partial, bool read_only);  ///< used by constructors
 	archive_num get_real_archive_num(archive_num num, bool revert) const;
 
 	const datetime & get_root_last_mod(const archive_num & num) const;

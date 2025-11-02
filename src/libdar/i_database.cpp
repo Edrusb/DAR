@@ -66,29 +66,22 @@ namespace libdar
 	    throw Ememory("database::i_database::database");
 	data_files = nullptr;
 	check_order_asked = true;
-	cur_db_version = database_header_get_supported_version();
-	algo = compression::gzip;   // stays the default algorithm for new databases
-	compr_level = 9; // stays the default compression level for new databases
-	db_cryptalgo = crypto_algo::none;
-	db_cryptpass.clear();
+	head.clear();
     }
 
-    database::i_database::i_database(const shared_ptr<user_interaction> & dialog, const string & base, const database_open_options & opt): mem_ui(dialog)
+    database::i_database::i_database(const shared_ptr<user_interaction> & dialog,
+				     const string & base,
+				     const database_open_options & opt): mem_ui(dialog)
     {
 	generic_file *f = database_header_open(dialog,
 					       base,
-					       cur_db_version,
-					       algo,
-					       compr_level);
-	db_cryptalgo = crypto_algo::none; // for now the value is not written to nor fetched from disk
-	db_cryptpass.clear();
-
+					       head);
 	if(f == nullptr)
 	    throw Ememory("database::i_database::database");
 	try
 	{
 	    check_order_asked = opt.get_warn_order();
-	    build(*f, opt.get_partial(), opt.get_partial_read_only(), cur_db_version);
+	    build(*f, opt.get_partial(), opt.get_partial_read_only());
 	}
 	catch(...)
 	{
@@ -99,16 +92,15 @@ namespace libdar
     }
 
     void database::i_database::build(generic_file & f,
-			 bool partial,
-			 bool read_only,
-			 const unsigned char db_version)
+				     bool partial,
+				     bool read_only)
     {
 	NLS_SWAP_IN;
 	try
 	{
 	    struct archive_data dat;
 
-	    if(db_version > database_header_get_supported_version())
+	    if(head.get_version() > database_header_get_supported_version())
 		throw SRC_BUG; // we should not get there if the database is more recent than what that software can handle. this is necessary if we do not want to destroy the database or loose data.
 
 	    coordinate.clear();
@@ -119,8 +111,8 @@ namespace libdar
 
 		tools_read_string(f, dat.chemin);
 		tools_read_string(f, dat.basename);
-		if(db_version >= 3)
-		    dat.root_last_mod.read(f, db2archive_version(db_version));
+		if(head.get_version() >= 3)
+		    dat.root_last_mod.read(f, db2archive_version(head.get_version()));
 		else
 		    dat.root_last_mod = datetime(0);
 
@@ -168,12 +160,12 @@ namespace libdar
 		throw Erange("database::i_database::database", gettext("Badly formatted database"));
 	    tools_read_vector(f, options_to_dar);
 	    tools_read_string(f, dar_path);
-	    if(db_version < database_header_get_supported_version())
+	    if(head.get_version() < database_header_get_supported_version())
 		partial = false;
 
 	    if(!partial)
 	    {
-		files = data_dir::data_tree_read(f, db_version);
+		files = data_dir::data_tree_read(f, head.get_version());
 		if(files == nullptr)
 		    throw Ememory("database::i_database::database");
 		if(files->get_name() != PSEUDO_ROOT)
@@ -219,8 +211,8 @@ namespace libdar
 	generic_file *f = database_header_create(get_pointer(),
 						 filename,
 						 opt.get_overwrite(),
-						 algo,
-						 compr_level);
+						 head);
+
 	if(f == nullptr)
 	    throw Ememory("database::i_database::dump");
 

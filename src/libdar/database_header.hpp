@@ -30,11 +30,59 @@
 #include "generic_file.hpp"
 #include "user_interaction.hpp"
 #include "compression.hpp"
+#include "crypto.hpp"
+#include "archive_aux.hpp"
+#include "secu_string.hpp"
 
 #include <memory>
 
 namespace libdar
 {
+
+    class database_header
+    {
+    public:
+	database_header() { clear(); };
+	database_header(const database_header & ref) = default;
+	database_header(database_header && ref) noexcept = default;
+	database_header & operator = (const database_header & ref) = default;
+	database_header & operator = (database_header && ref) noexcept = default;
+	~database_header() = default;
+
+	void clear();
+
+	void read(generic_file & f);
+	void write(generic_file & f) const;
+
+	void set_compression(compression algozip) { algo = algozip; };
+	void set_compression_level(U_I level) { compression_level = level; };
+	void set_crypto(crypto_algo val) { crypto = val; };
+	void set_pass(const secu_string & val) { pass = val; };
+	void set_kdf_hash(hash_algo val) { kdf_hash = val; };
+	void set_kdf_iteration(const infinint & val) { kdf_count = val; };
+	void set_crypto_block_size(U_32 val) { crypto_bs = val; };
+	void set_kdf_salt(const std::string & val) { salt = val; };
+
+	U_I get_version() const { return version; };
+	compression get_compression() const { return algo; };
+	U_I get_compression_level() const { return compression_level; };
+	crypto_algo get_crypto_algo() const { return crypto; };
+	hash_algo get_kdf_hash() const { return kdf_hash; };
+	const infinint & get_kdf_iteration() const { return kdf_count; };
+	U_32 get_crypto_block_size() const { return crypto_bs; };
+	const std::string & get_salt() const { return salt; };
+
+    private:
+	unsigned char version;
+	compression algo;
+	secu_string pass;
+	U_I compression_level;
+	crypto_algo crypto;
+	hash_algo kdf_hash;
+	infinint kdf_count;
+	U_32 crypto_bs;
+	std::string salt;
+    };
 
 	/// \addtogroup Private
 	/// @{
@@ -44,29 +92,23 @@ namespace libdar
 	/// \param[in] dialog is used for user interaction
 	/// \param[in] filename is the file's name to create/overwrite
 	/// \param[in] overwrite set to true to allow file overwriting (else generates an error if file exists)
-	/// \param[in] algozip compression algorithm used for the database
-	/// \param[in] compr_level compression level
+	/// \param[in] params parameter to use to create the database (compression, encryption and so forth)
 	/// \return the database header has been read and checked the database can now be read from the returned generic_file pointed by the returned value
 	/// then it must be destroyed with the delete operator.
     extern generic_file *database_header_create(const std::shared_ptr<user_interaction> & dialog,
 						const std::string & filename,
 						bool overwrite,
-						compression algozip,
-						U_I compr_level);
+						const database_header & params);
 
 	/// read the header of a dar_manager database
 
 	/// \param[in] dialog for user interaction
 	/// \param[in] filename is the filename to read from
-	/// \param[out] db_version version of the database
-	/// \param[out] algozip compression algorithm used in the database
-	/// \param[out] compr_level compression level used in the database
+	/// \param[out] params parameters of the openned database (version, compression, encryption...)
 	/// \return the generic_file where the database header has been put
     extern generic_file *database_header_open(const std::shared_ptr<user_interaction> & dialog,
 					      const std::string & filename,
-					      unsigned char & db_version,
-					      compression & algozip,
-					      U_I & compr_level);
+					      database_header & params);
 
     extern const unsigned char database_header_get_supported_version();
 

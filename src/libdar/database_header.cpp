@@ -74,46 +74,18 @@ namespace libdar
 	// this mechanism can be extended in the future by a second extension bit 0x8080
 	// and so on forth
 
-    class database_header
+    void database_header::clear()
     {
-    public:
-	database_header() { version = database_version; algo = compression::gzip; compression_level = 9; };
-	database_header(const database_header & ref) = default;
-	database_header(database_header && ref) noexcept = default;
-	database_header & operator = (const database_header & ref) = default;
-	database_header & operator = (database_header && ref) noexcept = default;
-	~database_header() = default;
-
-	void read(generic_file & f);
-	void write(generic_file & f);
-
-	void set_compression(compression algozip, U_I level);
-
-	void set_crypto(crypto_algo val) { crypto = val; };
-	void set_kdf_hash(hash_algo val) { kdf_hash = val; };
-	void set_kdf_interation(const infinint & val) { kdf_count = val; };
-	void set_crypto_block_size(U_32 val) { crypto_bs = val; };
-	void set_kdf_salt(const std::string & val) { salt = val; };
-
-	U_I get_version() const { return version; };
-	compression get_compression() const { return algo; };
-	U_I get_compression_level() const { return compression_level; };
-	crypto_algo get_crypto_algo() const { return crypto; };
-	hash_algo get_kdf_hash() const { return kdf_hash; };
-	const infinint & get_kdf_interation() const { return kdf_count; };
-	U_32 get_crypto_block_size() const { return crypto_bs; };
-	const std::string & get_salt() const { return salt; };
-
-    private:
-	unsigned char version;
-	compression algo;
-	U_I compression_level;
-	crypto_algo crypto;
-	hash_algo kdf_hash;
-	infinint kdf_count;
-	U_32 crypto_bs;
-	std::string salt;
-    };
+	version = database_version;
+	algo = compression::gzip;
+	pass.clear();
+	compression_level = 9;
+	crypto = crypto_algo::none;
+	kdf_hash = hash_algo::none;
+	kdf_count = 0;
+	crypto_bs = 0;
+	salt.clear();
+    }
 
     void database_header::read(generic_file & f)
     {
@@ -178,7 +150,7 @@ namespace libdar
 	}
     }
 
-    void database_header::write(generic_file & f)
+    void database_header::write(generic_file & f) const
     {
 	unsigned char options = HEADER_OPTION_NONE;
 
@@ -198,7 +170,7 @@ namespace libdar
 	{
 	    char tmp = compression2char(algo);
 	    f.write(&tmp, 1);
-	    infinint(compression_level).dump(f);
+	    infinint(compression_level).dump(f); // not needed at openning time, just stored for information
 	}
 	if(crypto != crypto_algo::none)
 	{
@@ -222,23 +194,15 @@ namespace libdar
 	}
     }
 
-    void database_header::set_compression(compression algozip, U_I level)
-    {
-	algo = algozip;
-	compression_level = level;
-    }
-
     generic_file *database_header_create(const shared_ptr<user_interaction> & dialog,
 					 const string & filename,
 					 bool overwrite,
-					 compression algozip,
-					 U_I compr_level)
+					 const database_header & params)
     {
 	pile* stack = new (nothrow) pile();
 	generic_file *tmp = nullptr;
 
 	struct stat buf;
-	database_header h;
 	proto_compressor *comp;
 
 	if(stack == nullptr)
@@ -254,12 +218,11 @@ namespace libdar
 
 	    stack->push(tmp); // now the fichier_local is managed by stack
 
-	    h.set_compression(algozip, compr_level);
-	    h.write(*stack);
+	    params.write(*stack);
 
-	    comp = macro_tools_build_streaming_compressor(algozip,
+	    comp = macro_tools_build_streaming_compressor(params.get_compression(),
 							  *(stack->top()),
-							  compr_level,
+							  params.get_compression_level(),
 							  2); // using 2 workers at most
 	    if(comp == nullptr)
 		throw Ememory("database_header_create");
@@ -277,9 +240,7 @@ namespace libdar
 
     generic_file *database_header_open(const shared_ptr<user_interaction> & dialog,
 				       const string & filename,
-				       unsigned char & db_version,
-				       compression & algozip,
-				       U_I & compr_level)
+				       database_header & params)
     {
 	pile *stack = new (nothrow) pile();
 	generic_file *tmp = nullptr;
@@ -289,8 +250,6 @@ namespace libdar
 
 	try
 	{
-	    database_header h;
-
 	    try
 	    {
 		tmp = new (nothrow) fichier_local(filename, false);
@@ -304,14 +263,11 @@ namespace libdar
 
 	    stack->push(tmp);
 
-	    h.read(*stack);
-	    db_version = h.get_version();
-	    algozip = h.get_compression();
-	    compr_level = h.get_compression_level();
+	    params.read(*stack);
 
-	    tmp = macro_tools_build_streaming_compressor(algozip,
+	    tmp = macro_tools_build_streaming_compressor(params.get_compression(),
 							 *(stack->top()),
-							 compr_level, // not used for decompression (here)
+							 params.get_compression_level(), // not used for decompression (here)
 							 2); // using 2 workers at most
 	    if(tmp == nullptr)
 		throw Ememory("database_header_open");
@@ -327,7 +283,7 @@ namespace libdar
 	return stack;
     }
 
-    extern const unsigned char database_header_get_supported_version()
+    const unsigned char database_header_get_supported_version()
     {
 	return database_version;
     }
