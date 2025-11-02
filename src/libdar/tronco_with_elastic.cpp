@@ -191,7 +191,7 @@ namespace libdar
 
 	    if(skip_after_initial_elastic)
 		elastic(*behind, elastic_forward, reading_version);
-		// this is line creates a temporary anonymous object and destroys it just afterward
+		// this line creates a temporary anonymous object and destroys it just afterward
 		// this is necessary to skip the reading of the initial elastic buffer
 		// nothing prevents the elastic buffer from carrying what could
 		// be considered an escape mark.

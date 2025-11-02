@@ -58,6 +58,7 @@ extern "C"
 #include "compressor.hpp"
 #include "pile.hpp"
 #include "macro_tools.hpp"
+#include "tronco_with_elastic.hpp"
 
 using namespace std;
 
@@ -74,6 +75,9 @@ namespace libdar
 	// this mechanism can be extended in the future by a second extension bit 0x8080
 	// and so on forth
 
+    static infinint database_clear_data_callback(generic_file &below, const archive_version & reading_ver);
+
+
     void database_header::clear()
     {
 	version = database_version;
@@ -85,6 +89,7 @@ namespace libdar
 	kdf_count = default_iteration_count_argon2;
 	crypto_bs = default_crypto_size;
 	salt.clear();
+	format = archive_format_supported_version;
     }
 
     void database_header::read(generic_file & f)
@@ -122,6 +127,8 @@ namespace libdar
 	{
 	    char tmp;
 	    infinint itmp;
+
+	    format.read(f);
 
 	    f.read(&tmp, 1);
 	    crypto = char_2_crypto_algo(tmp);
@@ -176,6 +183,12 @@ namespace libdar
 	{
 	    char tmp;
 	    infinint itmp;
+
+		// we always write header using the latest known format
+		// as it is the one that will be used to structure the
+		// encryption layer
+	    archive_format_supported_version.dump(f);
+	    format = archive_format_supported_version;
 
 	    tmp = crypto_algo_2_char(crypto);
 	    f.write(&tmp, 1);
@@ -269,7 +282,8 @@ namespace libdar
     generic_file *database_header_create(const shared_ptr<user_interaction> & dialog,
 					 const string & filename,
 					 bool overwrite,
-					 const database_header & params)
+					 const database_header & params,
+					 bool info_details)
     {
 	pile* stack = new (nothrow) pile();
 	generic_file *tmp = nullptr;
@@ -290,7 +304,51 @@ namespace libdar
 
 	    stack->push(tmp); // now the fichier_local is managed by stack
 
-	    params.write(*stack);
+	    if(params.get_crypto() != crypto_algo::none)
+	    {
+		tronco_with_elastic* cipher = new (nothrow) tronco_with_elastic(dialog,
+										2, // 2 threads at most
+										params.get_crypto_block_size(),
+										*(stack->top()),
+										params.get_pass(),
+										params.get_archive_format(),
+										params.get_crypto(),
+										"", // asking to use pkcs5 to set the salt
+										params.get_kdf_iteration(),
+										params.get_kdf_hash(),
+										true, // asking to use pkcs5
+										info_details);
+		if(cipher == nullptr)
+		    throw Ememory("database_header_create");
+
+		try
+		{
+
+			// adding the newly calculated salt to the database header to be exposed there in clear text
+		    params.set_kdf_salt(cipher->get_salt());
+
+			// now dropping the header in clear text
+		    params.write(*stack);
+
+
+			// adding the initial elastic buffer
+		    cipher->get_ready_for_writing(stack->get_position());
+
+		    stack->push(cipher); // cipher pointed to object now managed by the stack
+		}
+		catch(...)
+		{
+		    if(cipher != nullptr)
+			delete cipher;
+
+		    throw;
+		}
+	    }
+	    else
+	    {
+		params.set_kdf_salt("");
+		params.write(*stack);
+	    }
 
 	    comp = macro_tools_build_streaming_compressor(params.get_compression(),
 							  *(stack->top()),
@@ -312,7 +370,8 @@ namespace libdar
 
     generic_file *database_header_open(const shared_ptr<user_interaction> & dialog,
 				       const string & filename,
-				       database_header & params)
+				       database_header & params,
+				       bool info_details)
     {
 	pile *stack = new (nothrow) pile();
 	generic_file *tmp = nullptr;
@@ -337,6 +396,40 @@ namespace libdar
 
 	    params.read(*stack);
 
+	    if(params.get_crypto() != crypto_algo::none)
+	    {
+		tronco_with_elastic* cipher = new (nothrow) tronco_with_elastic(dialog,
+										2,
+										params.get_crypto_block_size(),
+										*(stack->top()),
+										params.get_pass(),
+										params.get_archive_format(),
+										params.get_crypto(),
+										params.get_salt(),
+										params.get_kdf_iteration(),
+										params.get_kdf_hash(),
+										true, // activating KDF
+										info_details);
+
+		if(cipher == nullptr)
+		    throw Ememory("database_header_open");
+
+		try
+		{
+		    cipher->get_ready_for_reading(database_clear_data_callback,
+						  true);
+
+		    stack->push(cipher);
+		}
+		catch(...)
+		{
+		    if(cipher != nullptr)
+			delete cipher;
+
+		    throw;
+		}
+	    }
+
 	    tmp = macro_tools_build_streaming_compressor(params.get_compression(),
 							 *(stack->top()),
 							 params.get_compression_level(), // not used for decompression (here)
@@ -358,6 +451,21 @@ namespace libdar
     const unsigned char database_header_get_supported_version()
     {
 	return database_version;
+    }
+
+    static infinint database_clear_data_callback(generic_file &below, const archive_version & reading_ver)
+    {
+	if(!below.skip_to_eof())
+	    throw Erange("database_clear_data_callback",
+			 "Probable data corruption in encrypted database file, aborting");
+
+	    // we return the offset of end of file as we don't
+	    // expect clear data after encrypted data when treating
+	    // as here a dar_manager database. If we got called back
+	    // here, this is very probable due to data corruption in
+	    // the database (encrypted) file, as all data should be
+	    // possible to decipher at or near end of file.
+	return below.get_position();
     }
 
 } // end of namespace

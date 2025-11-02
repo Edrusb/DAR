@@ -164,7 +164,7 @@ namespace libdar
         std::string get_database_version() const { return tools_uint2str(head.get_version()); };
 
 	    /// returns the crypto algo used
-	crypto_algo get_crypto_algo() const { return head.get_crypto_algo(); };
+	crypto_algo get_crypto_algo() const { return head.get_crypto(); };
 
 	    /// returns the kdf hash
 	hash_algo get_kdf_hash() const { return head.get_kdf_hash(); };

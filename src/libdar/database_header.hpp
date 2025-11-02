@@ -61,16 +61,18 @@ namespace libdar
 	void set_kdf_hash(hash_algo val);
 	void set_kdf_iteration(const infinint & val);
 	void set_crypto_block_size(U_32 val);
-	void set_kdf_salt(const std::string & val) { salt = val; };
+	void set_kdf_salt(const std::string & val) const { salt = val; };
 
 	U_I get_version() const { return version; };
 	compression get_compression() const { return algo; };
 	U_I get_compression_level() const { return compression_level; };
-	crypto_algo get_crypto_algo() const { return crypto; };
+	crypto_algo get_crypto() const { return crypto; };
+	const secu_string & get_pass() const { return pass; };
 	hash_algo get_kdf_hash() const { return kdf_hash; };
 	const infinint & get_kdf_iteration() const { return kdf_count; };
 	U_32 get_crypto_block_size() const { return crypto_bs; };
 	const std::string & get_salt() const { return salt; };
+	archive_version get_archive_format() const { return format; };
 
     private:
 	unsigned char version;
@@ -81,7 +83,8 @@ namespace libdar
 	hash_algo kdf_hash;
 	infinint kdf_count;
 	U_32 crypto_bs;
-	std::string salt;
+	mutable std::string salt;
+	mutable archive_version format; ///< as we share the encryption layer with archive objects we need to store the archive format used
 
     };
 
@@ -93,23 +96,27 @@ namespace libdar
 	/// \param[in] dialog is used for user interaction
 	/// \param[in] filename is the file's name to create/overwrite
 	/// \param[in] overwrite set to true to allow file overwriting (else generates an error if file exists)
-	/// \param[in] params parameter to use to create the database (compression, encryption and so forth)
+	/// \param[in,out] params parameter to use to create the database (compression, encryption and so forth)
+	/// \param[in] info_details set to true to get informational messages
 	/// \return the database header has been read and checked the database can now be read from the returned generic_file pointed by the returned value
 	/// then it must be destroyed with the delete operator.
     extern generic_file *database_header_create(const std::shared_ptr<user_interaction> & dialog,
 						const std::string & filename,
 						bool overwrite,
-						const database_header & params);
+						const database_header & params,
+						bool info_details);
 
 	/// read the header of a dar_manager database
 
 	/// \param[in] dialog for user interaction
 	/// \param[in] filename is the filename to read from
-	/// \param[out] params parameters of the openned database (version, compression, encryption...)
+	/// \param[in,out] params parameters of the openned database (password[in], version[out], compression[out], encryption[out]...)
+	/// \param[in] info_details set to true to get informational messages
 	/// \return the generic_file where the database header has been put
     extern generic_file *database_header_open(const std::shared_ptr<user_interaction> & dialog,
 					      const std::string & filename,
-					      database_header & params);
+					      database_header & params,
+					      bool info_details);
 
     extern const unsigned char database_header_get_supported_version();
 

@@ -75,7 +75,8 @@ namespace libdar
     {
 	generic_file *f = database_header_open(dialog,
 					       base,
-					       head);
+					       head,
+					       true);
 	if(f == nullptr)
 	    throw Ememory("database::i_database::database");
 	try
@@ -211,7 +212,8 @@ namespace libdar
 	generic_file *f = database_header_create(get_pointer(),
 						 filename,
 						 opt.get_overwrite(),
-						 head);
+						 head,
+						 true);
 
 	if(f == nullptr)
 	    throw Ememory("database::i_database::dump");
