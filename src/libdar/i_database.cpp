@@ -100,6 +100,7 @@ namespace libdar
 	try
 	{
 	    struct archive_data dat;
+	    char a;
 
 	    if(head.get_version() > database_header_get_supported_version())
 		throw SRC_BUG; // we should not get there if the database is more recent than what that software can handle. this is necessary if we do not want to destroy the database or loose data.
@@ -117,23 +118,28 @@ namespace libdar
 		else
 		    dat.root_last_mod = datetime(0);
 
-		if(db_cryptalgo != crypto_algo::none)
+		if(head.get_version() >= 7)
 		{
-			// crypto credentials info for archives are only written to file
-			// if the database is itself encrypted
-
-		    char a;
-		    infinint keysize;
-		    U_I i_keysize = 0;
-
 		    f.read(&a, 1);
 		    dat.crypto = char_2_crypto_algo(a);
+		}
+		else
+		{
+		    dat.crypto = crypto_algo::none;
+		    dat.pass.clear();
+		    dat.crypto_size = 0; // we will use the default value archive_options
+		}
+
+		if(dat.crypto != crypto_algo::none)
+		{
+		    infinint keysize;
+		    U_I i_keysize = 0;
 
 		    keysize.read(f);
 		    keysize.unstack(i_keysize);
 		    if(!keysize.is_zero())
 			throw Erange("database::i_database::build",
-				     gettext("integer type unable to handle such too large value for archive key size in database"));
+				     gettext("integer type unable to handle such too large value for archive key size in database, data corruption may have occured on disk"));
 
 		    dat.pass.clear();
 		    if(i_keysize > 0)
@@ -146,6 +152,9 @@ namespace libdar
 		    keysize.read(f); // recycling keysize temporary variable to fetch crypto_size as an infinint
 		    dat.crypto_size = 0;
 		    keysize.unstack(dat.crypto_size);
+		    if(!keysize.is_zero())
+			throw Erange("database::i_database::build",
+				     gettext("integer type unable to handle such too large value for archive key size in database, data corruption may have occured on disk"));
 		}
 		else
 		{
@@ -231,15 +240,17 @@ namespace libdar
 		tools_write_string(*f, coordinate[i].chemin);
 		tools_write_string(*f, coordinate[i].basename);
 		coordinate[i].root_last_mod.dump(*f);
-		if(db_cryptalgo != crypto_algo::none)
-		{
-			// we do not write down cipher information of archives
-			// if the database is not encrypted
 
-		    char a = crypto_algo_2_char(coordinate[i].crypto);
+		char a = crypto_algo_2_char(coordinate[i].crypto);
+		f->write(&a, 1);
+
+		if(coordinate[i].crypto != crypto_algo::none)
+		{
+		    if(get_database_crypto_algo() == crypto_algo::none)
+			throw Erange("database::dump", gettext("Refusing to write down database containing archive credentials, when the database itself is not ciphered"));
+
 		    infinint keysize = coordinate[i].pass.get_size();
 
-		    f->write(&a, 1);
 		    keysize.dump(*f);
 		    if(coordinate[i].pass.get_size() > 0)
 			f->write(coordinate[i].pass.c_str(), coordinate[i].pass.get_size());
