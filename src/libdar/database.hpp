@@ -220,13 +220,13 @@ namespace libdar
         std::string get_database_version() const;
 
 	    /// returns the crypto algo used
-	crypto_algo get_crypto_algo() const;
+	crypto_algo get_database_crypto_algo() const;
 
 	    /// returns the kdf hash
-	hash_algo get_kdf_hash() const;
+	hash_algo get_database_kdf_hash() const;
 
 	    /// returns the kdf iteration count
-	const infinint & get_kdf_iteration() const;
+	const infinint & get_database_kdf_iteration() const;
 
 	    /// list files which are present in a given archive
 

@@ -484,14 +484,14 @@ namespace libdar
 	return ret;
     }
 
-    crypto_algo database::get_crypto_algo() const
+    crypto_algo database::get_database_crypto_algo() const
     {
 	crypto_algo ret;
 
 	NLS_SWAP_IN;
 	try
 	{
-	    ret = pimpl->get_crypto_algo();
+	    ret = pimpl->get_database_crypto_algo();
 	}
 	catch(...)
 	{
@@ -503,14 +503,14 @@ namespace libdar
 	return ret;
     }
 
-    hash_algo database::get_kdf_hash() const
+    hash_algo database::get_database_kdf_hash() const
     {
 	hash_algo ret;
 
 	NLS_SWAP_IN;
 	try
 	{
-	    ret = pimpl->get_kdf_hash();
+	    ret = pimpl->get_database_kdf_hash();
 	}
 	catch(...)
 	{
@@ -522,14 +522,14 @@ namespace libdar
 	return ret;
     }
 
-    const infinint & database::get_kdf_iteration() const
+    const infinint & database::get_database_kdf_iteration() const
     {
 	const infinint *ret = nullptr;
 
 	NLS_SWAP_IN;
 	try
 	{
-	    ret = &(pimpl->get_kdf_iteration());
+	    ret = &(pimpl->get_database_kdf_iteration());
 	}
 	catch(...)
 	{
