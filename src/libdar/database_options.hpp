@@ -47,44 +47,6 @@ namespace libdar
 	/// \addtogroup API
 	/// @{
 
-	/// options to create a database
-
-    class database_create_options
-    {
-    public:
-	database_create_options() { clear(); };
-	database_create_options(const database_create_options & ref) = default;
-	database_create_options(database_create_options && ref) noexcept = default;
-	database_create_options & operator = (const database_create_options & ref) = default;
-	database_create_options & operator = (database_create_options && ref) noexcept = default;
-	~database_create_options() = default;
-
-	void clear() { algo = crypto_algo::none; pass.clear(); kdf_hash = hash_algo::none; iter_count = 0; bs = 0; };
-
-	    // setings
-	void set_crypto_algo(crypto_algo val) { algo = val; }
-	void set_crypto_pass(const secu_string & val) { pass = val; };
-	void set_kdf_hash(hash_algo val) { kdf_hash = val; };
-	void set_kdf_iteration_count(const infinint & val) { iter_count = val; };
-	void set_crypto_block_size(U_32 val) { bs = val; };
-
-	    // gettings
-
-	crypto_algo get_crypto_algo() const { return algo; };
-	const secu_string & get_crypto_pass() const { return pass; };
-	hash_algo get_kdf_hash() const { return kdf_hash; };
-	const infinint & get_kdf_iteration_count() const { return iter_count; };
-	U_32 get_crypto_block_size() const { return bs; };
-
-    private:
-	crypto_algo algo;
-	secu_string pass;
-	hash_algo kdf_hash;
-	infinint iter_count;
-	U_32 bs;
-
-    };
-
 
 	/// options to open a database
 
