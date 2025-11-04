@@ -94,7 +94,8 @@ enum operation {
     interactive,
     check,
     batch,
-    archcrypto
+    archcrypto,
+    basecrypto
 };
 
 static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char *const argv[], const char **env);
@@ -116,6 +117,7 @@ static bool command_line(shell_interaction & dialog,
 			 bool & change_compression,
 			 bool & detailed_dates,
 			 string & arch_crypto_params,
+			 string & base_crypto_params,
 			 bool recursive); // true if called from op_batch
 
 static void show_usage(shell_interaction & dialog, const char *command);
@@ -124,7 +126,12 @@ static void show_version(shell_interaction & dialog, const char *command);
 #if HAVE_GETOPT_LONG
 static const struct option *get_long_opt();
 #endif
-static void op_create(shared_ptr<user_interaction> & dialog, const string & base, compression algozip, U_I compr_level, bool info_details);
+static void op_create(shared_ptr<user_interaction> & dialog,
+		      const string & base,
+		      compression algozip,
+		      U_I compr_level,
+		      const string & base_crypto_params,
+		      bool info_details);
 static void op_add(shared_ptr<user_interaction> & dialog,
 		   database *dat,
 		   const string &arg,
@@ -159,7 +166,9 @@ static void op_interactive(shared_ptr<user_interaction> & dialog, database *dat,
 static void op_check(shared_ptr<user_interaction> & dialog, const database *dat, bool info_details);
 static void op_batch(shared_ptr<user_interaction> & dialog, database *dat, const string & filename, bool info_details);
 static void op_chcrypto(shared_ptr<user_interaction> & dialog, database *dat, S_I num, const string & arch_crypto_params, bool info_details);
-
+static void op_chbasecrypto(shared_ptr<user_interaction> & dialog,
+			    database *dat,
+			    const string & specs);
 
 static database *read_base(shared_ptr<user_interaction> & dialog,
 			   const string & base,
@@ -196,13 +205,16 @@ static void action(shared_ptr<user_interaction> & dialog,
 		   bool ignore_database_options,
 		   bool even_when_removed,
 		   bool detailed_dates,
-		   const string & arch_crypto_params);
+		   const string & arch_crypto_params,
+		   const string & base_crypto_params);
 static void signed_int_to_archive_num(S_I input, archive_num &num, bool & positive);
 static void split_arch_crypto_params(shared_ptr<user_interaction> & dialog, ///< user interaction
 				     const string & arch_crypto_params, ///< input string to be split
 				     libdar::crypto_algo & algo,    ///< crypto_algo::none is returned if not specified (libdar default algo will have to be used)
 				     libdar::secu_string & pass,    ///< a non empty string should always be returned or an exception be thrown
 				     U_32 & crypto_block_size);     ///< zero is returned if not specified
+
+
 static secu_string fetch_password_from_file(const string & path);
 
     /// \return true if user set encryption parameters, false if the archive is not encrypted
@@ -243,6 +255,7 @@ S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * const ar
     bool change_compression;
     bool detailed_dates;
     string arch_crypto_params;
+    string base_crypto_params;
     shell_interaction *shelli = dynamic_cast<shell_interaction *>(dialog.get());
 
     if(!dialog)
@@ -271,6 +284,7 @@ S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * const ar
 		     change_compression,
 		     detailed_dates,
 		     arch_crypto_params,
+		     base_crypto_params,
 		     false))
 	return EXIT_SYNTAX;
 
@@ -291,6 +305,7 @@ S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * const ar
     case interactive:
     case check:
     case batch:
+    case basecrypto:
 	partial_read = false;
 	break;
     case listing:
@@ -312,7 +327,12 @@ S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * const ar
     }
 
     if(op == create)
-	op_create(dialog, base, algozip, compression_level, info_details);
+	op_create(dialog,
+		  base,
+		  algozip,
+		  compression_level,
+		  base_crypto_params,
+		  info_details);
     else
     {
 	if(info_details)
@@ -330,7 +350,8 @@ S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * const ar
 		action(dialog, op, dat, arg, num, rest, num2, date, base,
 		       info_details, true, ignore_dat_options, even_when_removed,
 		       detailed_dates,
-		       arch_crypto_params);
+		       arch_crypto_params,
+		       base_crypto_params);
 		finalize(dialog, op, dat, base, info_details, change_compression, algozip, compression_level);
 	    }
 	    catch(Edata & e)
@@ -371,6 +392,7 @@ static bool command_line(shell_interaction & dialog,
 			 bool & change_compression,
 			 bool & detailed_dates,
 			 string & arch_crypto_params,
+			 string & base_crypto_params,
 			 bool recursive)
 {
     S_I lu, min;
@@ -621,6 +643,23 @@ static bool command_line(shell_interaction & dialog,
 			throw Erange("command_line", tools_printf(gettext("-J option is only valide as standalone command or after -A option")));
 		    }
 		    break;
+		case 'K':
+		    if(optarg == nullptr)
+			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
+
+		    switch(op)
+		    {
+		    case none_op:
+			op = basecrypto;
+			base_crypto_params = optarg;
+			break;
+		    case create:
+			base_crypto_params = optarg;
+			break;
+		    default:
+			throw Erange("command_line", tools_printf(gettext("-K option is only valide as standalone command or after -C option")));
+		    }
+		    break;
 		case 'x':
 		    detailed_dates = true;
 		    break;
@@ -765,9 +804,18 @@ static bool command_line(shell_interaction & dialog,
     return true;
 }
 
-static void op_create(shared_ptr<user_interaction> & dialog, const string & base, compression algozip, U_I compr_level, bool info_details)
+static void op_create(shared_ptr<user_interaction> & dialog,
+		      const string & base,
+		      compression algozip,
+		      U_I compr_level,
+		      const string & base_crypto_params,
+		      bool info_details)
 {
     database dat(dialog); // created empty;
+
+    op_chbasecrypto(dialog,
+		    &dat,
+		    base_crypto_params);
 
     if(info_details)
     {
@@ -1528,6 +1576,7 @@ static void op_batch(shared_ptr<user_interaction> & dialog, database *dat, const
     bool change_compression; // not used here neither but at the level of the function that called op_batch
     bool detailed_dates;
     string arch_crypto_params;
+    string base_crypto_params;
     shell_interaction *shelli = dynamic_cast<shell_interaction *>(dialog.get());
 
     if(shelli == nullptr)
@@ -1590,6 +1639,7 @@ static void op_batch(shared_ptr<user_interaction> & dialog, database *dat, const
 			     change_compression,
 			     detailed_dates,
 			     arch_crypto_params,
+			     base_crypto_params,
 			     true))
 		throw Erange("op_batch", tools_printf(gettext("Syntax error in batch file: %S"), &line));
 
@@ -1601,7 +1651,8 @@ static void op_batch(shared_ptr<user_interaction> & dialog, database *dat, const
 
 	    action(dialog, sub_op, dat, arg, num, rest, num2, date, faked_base, sub_info_details, false,
 		   ignore_dat_options, even_when_removed, detailed_dates,
-		   arch_crypto_params);
+		   arch_crypto_params,
+		   base_crypto_params);
 	}
 	while(tmp == '\n');
     }
@@ -1660,6 +1711,104 @@ static void op_chcrypto(shared_ptr<user_interaction> & dialog,
 
     thr.check_self_cancellation();
 }
+
+static void op_chbasecrypto(shared_ptr<user_interaction> & dialog,
+			    database *dat,
+			    const string & base_crypto_params)
+{
+	// base_crypto_params expected syntax is either:
+	//    [<algo>:]f:<path>[:<kdf_hash>:<kdf_iteration>]
+        // or
+	//    [<algo>:]p:<password>[:<kdf_hash>:<kdf_iteration>]
+
+    crypto_algo algo = crypto_algo::none;
+    secu_string pass;
+    hash_algo kdf_hash = hash_algo::none;
+    infinint kdf_count;
+
+    deque<string> splitted;
+    bool loop = false;
+
+    line_tools_split(base_crypto_params, ':', splitted);
+
+    do
+    {
+	switch(splitted.size())
+	{
+	case 0:
+	    if(! base_crypto_params.empty())
+		throw SRC_BUG;
+	    loop = false;
+	    break;
+	case 1:
+	    if(splitted[0] == "p")
+		    // requested interactive input if the password
+		splitted.push_back("");
+	    else
+		throw Erange("split_base_crypto_params", gettext("invalid argument given to -K option"));
+
+		/* no break to go to case 2 */
+	case 2:
+	    if(splitted[0] == "p")
+		pass = secu_string(splitted[1].c_str(), splitted[1].size());
+	    else
+		if(splitted[0] == "f")
+		    pass = fetch_password_from_file(splitted[1]);
+		else
+		    throw Erange("split_base_crypto_params", gettext("invalid argument given to -K option"));
+	    loop = false; // exiting the while loop
+	    break;
+	case 3: // only valid syntax is algo:(f|p):<string>
+	    algo = line_tools_crypto_string_to_crypto_algo(splitted[0]);
+		// if splitted[0] is an invalid field an exception would be thrown
+	    splitted.pop_front();
+	    loop = true; // looping to case 2
+	    break;
+	case 4: // only valid syntax is (f|p):<string>:<kdf_hash>:<kdf_count>
+	    if(! string_to_hash_algo(splitted[2], kdf_hash))
+		throw Erange("split_base_crypto_params", gettext("invalid argument given to -K option"));
+	    try
+	    {
+		kdf_count = deci(splitted[3]).computer();
+	    }
+	    catch(Edeci & e)
+	    {
+		throw Erange("split_base_crypto_params",
+			     gettext("invalid interation count given to -K option"));
+	    }
+	    splitted.pop_back(); // removing the iteration count
+	    splitted.pop_back(); // removing the kdf hash
+	    loop = true; // looping to case 2
+	    break;
+	case 5: // only valid syntax is algo:(f|p):<string>:<kdf_hash>:<kdf_count>
+	    algo = line_tools_crypto_string_to_crypto_algo(splitted[0]);
+		// if splitted[0] is an invalid field an exception would be thrown
+	    splitted.pop_front();
+	    loop = true; // looping to case 4
+	    break;
+	default:
+	    throw Erange("split_base_crypto_params", gettext("invalid argument given to -K option"));
+	}
+    }
+    while(loop);
+
+    if(dat == nullptr)
+	throw SRC_BUG;
+
+    dat->set_database_crypto_algo(algo);
+    if(algo != crypto_algo::none)
+    {
+	dat->set_database_crypto_pass(pass);
+	if(kdf_hash != hash_algo::none)
+	    dat->set_database_kdf_hash(kdf_hash);
+	    // else we assume the hash was not specified
+
+	if(kdf_count > 0)
+	    dat->set_database_kdf_iteration_count(kdf_count);
+	    // else we assime the iteration count was not specified
+    }
+}
+
 
 static vector<string> read_vector(shared_ptr<user_interaction> & dialog)
 {
@@ -1739,7 +1888,8 @@ static void action(shared_ptr<user_interaction> & dialog,
 		   bool ignore_database_options,
 		   bool even_when_removed,
 		   bool detailed_dates,
-		   const string & arch_crypto_params)
+		   const string & arch_crypto_params,
+		   const string & base_crypto_params)
 {
     shell_interaction *shelli = dynamic_cast<shell_interaction *>(dialog.get());
 
