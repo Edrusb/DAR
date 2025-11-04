@@ -210,8 +210,8 @@ static void action(shared_ptr<user_interaction> & dialog,
 static void signed_int_to_archive_num(S_I input, archive_num &num, bool & positive);
 static void split_arch_crypto_params(shared_ptr<user_interaction> & dialog, ///< user interaction
 				     const string & arch_crypto_params, ///< input string to be split
-				     libdar::crypto_algo & algo,    ///< crypto_algo::none is returned if not specified (libdar default algo will have to be used)
-				     libdar::secu_string & pass,    ///< a non empty string should always be returned or an exception be thrown
+				     crypto_algo & algo,    ///< crypto_algo::none is returned if not specified (libdar default algo will have to be used)
+				     secu_string & pass,    ///< a non empty string should always be returned or an exception be thrown
 				     U_32 & crypto_block_size);     ///< zero is returned if not specified
 
 
@@ -596,7 +596,7 @@ static bool command_line(shell_interaction & dialog,
 			    // note that the namespace specification is necessary
 			    // due to similar existing name in std namespace under
 			    // certain OS (FreeBSD 10.0)
-			libdar::deci tmp = string(optarg);
+			deci tmp = string(optarg);
 			date = tmp.computer();
 			date_set = date_set_by_9;
 		    }
@@ -839,8 +839,8 @@ static void op_add(shared_ptr<user_interaction> & dialog,
     string arch_path, arch_base;
     bool date_order_problem = false;
     archive_options_read read_options;
-    libdar::crypto_algo algo = libdar::crypto_algo::none;
-    libdar::secu_string pass;
+    crypto_algo algo = crypto_algo::none;
+    secu_string pass;
     U_32 crypto_bs = 0;
     archive *arch = nullptr;
 
@@ -1684,8 +1684,8 @@ static void op_chcrypto(shared_ptr<user_interaction> & dialog,
     if(! arch_crypto_params.empty())
     {
 	database_change_crypto_options opt;
-	libdar::crypto_algo algo;
-	libdar::secu_string pass;
+	crypto_algo algo;
+	secu_string pass;
 	U_32 crypto_block_size;
 
 	opt.set_revert_archive_numbering(! sign_plus);
@@ -1974,8 +1974,8 @@ static void signed_int_to_archive_num(S_I input, archive_num &num, bool & positi
 
 static void split_arch_crypto_params(shared_ptr<user_interaction> & dialog,
 				     const string & arch_crypto_params,
-				     libdar::crypto_algo & algo,
-				     libdar::secu_string & pass,
+				     crypto_algo & algo,
+				     secu_string & pass,
 				     U_32 & crypto_block_size)
 {
 	// expected syntax is either:
@@ -1983,7 +1983,7 @@ static void split_arch_crypto_params(shared_ptr<user_interaction> & dialog,
         // or
 	//    [<algo>:]p:<password>[:<crypto-block-size>]
 
-    algo = libdar::crypto_algo::none;
+    algo = crypto_algo::none;
     pass.clear();
     crypto_block_size = 0;
 
