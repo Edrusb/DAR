@@ -1756,6 +1756,8 @@ static void op_chbasecrypto(shared_ptr<user_interaction> & dialog,
 		    pass = fetch_password_from_file(splitted[1]);
 		else
 		    throw Erange("split_base_crypto_params", gettext("invalid argument given to -K option"));
+	    if(algo == crypto_algo::none)
+		algo = crypto_algo::aes256;
 	    loop = false; // exiting the while loop
 	    break;
 	case 3: // only valid syntax is algo:(f|p):<string>
