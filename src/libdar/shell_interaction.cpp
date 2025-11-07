@@ -304,6 +304,11 @@ namespace libdar
 	    U_I compr_lvl = ref.get_compression_level();
 	    string dar_path = ref.get_dar_path();
 	    string db_version = ref.get_database_version();
+	    string db_algo = crypto_algo_2_string(ref.get_database_crypto_algo());
+	    string db_kdf_hash = hash_algo_to_string(ref.get_database_kdf_hash());
+	    infinint db_kdf_count = ref.get_database_kdf_iteration();
+	    U_32 db_crypto_bs = ref.get_database_crypto_block_size();
+
 
 	    message("");
 	    printf(gettext("dar path         : %S"), &dar_path);
@@ -311,6 +316,13 @@ namespace libdar
 	    printf(gettext("database version : %S"), &db_version);
 	    printf(gettext("compression used : %S"), &compr);
 	    printf(gettext("compression level: %d"), compr_lvl);
+	    printf(gettext("encryption algo  : %S"), &db_algo);
+	    if(ref.get_database_crypto_algo() != crypto_algo::none)
+	    {
+		printf(gettext("KDF hash         : %S"), &db_kdf_hash);
+		printf(gettext("KDF interation   : %i"), &db_kdf_count);
+		printf(gettext("crypto block size: %d"), db_crypto_bs);
+	    }
 	    message("");
 	    printf(gettext("archive #   | ciphered | crypto bs |    path      |    basename"));
 	    printf(        "------------+----------+-----------+--------------+-------------------");
