@@ -544,6 +544,27 @@ namespace libdar
 	return *ret;
     }
 
+
+    U_32 database::get_database_crypto_block_size() const
+    {
+	U_32 ret = 0;
+
+	NLS_SWAP_IN;
+	try
+	{
+	    ret = pimpl->get_database_crypto_block_size();
+	}
+	catch(...)
+	{
+	    NLS_SWAP_OUT;
+	    throw;
+	}
+	NLS_SWAP_OUT;
+
+	return ret;
+    }
+
+
     void database::get_files(database_listing_show_files_callback callback,
 			     void *context,
 			     archive_num num,

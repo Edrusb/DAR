@@ -172,6 +172,10 @@ namespace libdar
 	    /// returns the kdf iteration count
 	const infinint & get_database_kdf_iteration() const { return head.get_kdf_iteration(); };
 
+	    /// returns the crypto block size
+	U_32 get_database_crypto_block_size() const { return head.get_crypto_block_size(); };
+
+
 
             /// list files which are present in a given archive
         void get_files(database_listing_show_files_callback callback,
