@@ -272,6 +272,9 @@ namespace libdar
 		    memory2file(*data_files, *f);
 		else
 		    throw SRC_BUG;
+
+		// dropping ending elastic buffer if encryption is set
+	    f->terminate();
 	}
 	catch(...)
 	{

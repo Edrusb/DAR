@@ -398,6 +398,9 @@ namespace libdar
 
 	    if(params.get_crypto() != crypto_algo::none)
 	    {
+		if(params.get_pass().empty())
+		    params.set_pass(dialog->get_secu_string(tools_printf(gettext("Database %S required a password: "), &filename), false));
+
 		tronco_with_elastic* cipher = new (nothrow) tronco_with_elastic(dialog,
 										2,
 										params.get_crypto_block_size(),
