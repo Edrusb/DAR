@@ -6,43 +6,43 @@ dar_manager \- compiles several archives contents in a database to ease file res
 
 dar_manager [-v] -C [<path>/]<database> [-z <algo>] [-K <K-options>]
 
-dar_manager [-v] -B [<path>/]<database> -A [<path>/]<basename> [-9 <min-digits>] [-J <J-options>] [[<path>/]<archive_basename>]
+dar_manager [-v] -B [<path>/]<database> [-L <args>] -A [<path>/]<basename> [-9 <min-digits>] [-J <J-options>] [[<path>/]<archive_basename>]
 
-dar_manager [-v] -B [<path>/]<database> -l
+dar_manager [-v] -B [<path>/]<database> [-L <args>] -l
 
-dar_manager [-v] -B [<path>/]<database> -D <number>[-<number>]
+dar_manager [-v] -B [<path>/]<database> [-L <args>] -D <number>[-<number>]
 
-dar_manager [-v] -B [<path>/]<database> -b <number> <new_archive_basename>
+dar_manager [-v] -B [<path>/]<database> [-L <args>] -b <number> <new_archive_basename>
 
-dar_manager [-v] -B [<path>/]<database> -p <number> <path>
+dar_manager [-v] -B [<path>/]<database> [-L <args>] -p <number> <path>
 
-dar_manager [-v] -B [<path>/]<database> -J <number> [<algo>:]f:<path>[:<crypto-block-size>]
+dar_manager [-v] -B [<path>/]<database> [-L <args>] -J <number> [<algo>:]f:<path>[:<crypto-block-size>]
 
-dar_manager [-v] -B [<path>/]<database> -J <number> [<algo>:]p:<password>[:<crypto-block-size>]
+dar_manager [-v] -B [<path>/]<database> [-L <args>] -J <number> [<algo>:]p:<password>[:<crypto-block-size>]
 
-dar_manager [-v] -B [<path>/]<database> -o [list of options to pass to dar]
+dar_manager [-v] -B [<path>/]<database> [-L <args>] -o [list of options to pass to dar]
 
-dar_manager [-v] -B [<path>/]<database> -d [<path to dar command>]
+dar_manager [-v] -B [<path>/]<database> [-L <args>] -d [<path to dar command>]
 
-dar_manager [-v] -B [<path>/]<database> [-N] [-k] [-w <date>] [-e "<extra options to dar>"] -r [list of files to restore]
+dar_manager [-v] -B [<path>/]<database> [-L <args>] [-N] [-k] [-w <date>] [-e "<extra options to dar>"] -r [list of files to restore]
 
-dar_manager [-v] -B [<path>/]<database> -u <number>
+dar_manager [-v] -B [<path>/]<database> [-L <args>] -u <number>
 
-dar_manager [-v] -B [<path>/]<database> -f file [-x]
+dar_manager [-v] -B [<path>/]<database> [-L <args>] -f file [-x]
 
-dar_manager [-v] -B [<path>/]<database> -s
+dar_manager [-v] -B [<path>/]<database> [-L <args>] -s
 
-dar_manager [-v] -B [<path>/]<database> -m <number> <number>
+dar_manager [-v] -B [<path>/]<database> [-L <args>] -m <number> <number>
 
-dar_manager [-v] -B [<path>/]<database> -c
+dar_manager [-v] -B [<path>/]<database> [-L <args>] -c
 
-dar_manager [-v] -B [<path>/]<database> -i
+dar_manager [-v] -B [<path>/]<database> [-L <args>] -i
 
-dar_manager [-v] -B [<path>/]<database> -@ { <filename> | "-" }
+dar_manager [-v] -B [<path>/]<database> [-L <args>] -@ { <filename> | "-" }
 
-dar_manager [-v] -B [<path>/]<database> -K [<algo>:]f:<path>[:<hash>:<iteration-count>]
+dar_manager [-v] -B [<path>/]<database> [-L <args>] -K [<algo>:]f:<path>[:<hash>:<iteration-count>]
 
-dar_manager [-v] -B [<path>/]<database> -K [<algo>:]p:<password>[:<hash>:<iteration-count>]
+dar_manager [-v] -B [<path>/]<database> [-L <args>] -K [<algo>:]p:<password>[:<hash>:<iteration-count>]
 
 dar_manager -h
 
@@ -135,7 +135,7 @@ check the database consistency, in particular the date ordering is verified and 
 allows you to do several operations on a given database. All operations are defined in the provided <filename> and refer to the same database as defined by the -B switch on command line. This batch file, must thus not contain neither -B, -C, -i or -ai option (-ai are global to the batch operation). The batch file expected layout is one command per line, thus several arguments (like -l -v for example) may take place on a given line of the file (-v can be found both on command line for verbose output about the batch operation steps, as well as inside the batch file for verbose output of a particular batched command). Arguments are separated by spaces or tabs, other characters are passed as-is. In consequence, you should only need to use quotes (using " or ') if you intend to use an argument containing space. Last, comments may be placed on any line beginning by a hash character (#).
 .TP 20
 -K, --db-key [<algo>:]( p:<password> | f:<path> )[:<hash>:<iteration-count>:<crypto-block-size>]
-modify or set (when used with -C option) the encryption schema of the database. By default database are not encrypted and cannot store any password of encrypted archive/backup to the filesystem. <algo> is optional and is one of the algorithm available with dar's -K option, it defaults to AES. If the string 'p:' is provided the following string is expected to be the password to use to encrypt the database. If the password is an empty string it will be asked interactively (for example:-K "p:" or -K "aes:p::argon2:20000"). If the string 'f:' is provided instead, the path to a plain file containing the password to used to encrypt the database is expected, this avoid exposing the password to command-line. In such file the password must be the only thing stored, without newline before or after. <hash> and <iteraction-count> are used to setup a Key Derivation Function and defaults to argon2 with 10,000 iterations (a random salt is also added so you can reuse the same password between different databases and archives, the encryption key will still be different).
+modify or set (when used with -C option) the encryption schema of the database. By default database are not encrypted and cannot store any password of encrypted archive/backup to the filesystem. <algo> is optional and is one of the algorithm available with dar's -K option, it defaults to AES256 (see dar's -K option for an up to date list of available ciphers). If the string 'p:' is provided the following string is expected to be the password to use to encrypt the database. If the password is an empty string it will be asked interactively (for example:-K "p:" or -K "aes:p::argon2:20000"). If the string 'f:' is provided instead, the path to a plain file containing the password to used to encrypt the database is expected, this avoid exposing the password to command-line. In such file the password must be the only thing stored, without newline before or after. <hash> and <iteraction-count> are used to setup a Key Derivation Function and defaults to argon2 with 10,000 iterations (a random salt is also added so you can reuse the same password between different databases and archives, the encryption key will still be different).
 .P
 .RS
 Examples of use: -K "p:my_password", -K "camellia:f:/home/me/mypass.txt", -K "p:my password:sha512:100000", -K "serpent:f/home/me/mypass.txt:argon2:20000"
@@ -186,7 +186,10 @@ By default, dar_manager does not ask dar to restore file that have been removed 
 avoid dar_manager to issue a warning for each file not following a chronological order of modification date when the archive number in the database is growing.
 .TP 20
 -z, --compression <algo>[:<level>]
-Available creating or modifying a database content (-C, -A, -D, -m, -i, -L options), this option let you set the compression algorithm and eventually the compression level to use when the database is wrote to file. By default gzip:9 is use, but you can use "none" for no compression, "bzip2", "xz" and "lzo" and other compression algorithms (see -z option in dar's man page for an up to date list of available algorithms). Note: this option is only needed if you want to *change* the compression algorithm or level. Once defined, either at database creation time using -C option, or modified afterward, the compression scheme is stored in the database header and used for writing down database back to file.
+Available creating or modifying a database content (-C, -A, -D, -m, -i options), this option let you set the compression algorithm and eventually the compression level to use when the database is wrote to file. By default gzip:9 is use, but you can use "none" for no compression, "bzip2", "xz" and "lzo" and other compression algorithms (see -z option in dar's man page for an up to date list of available algorithms). Note: this option is only needed if you want to *change* the compression algorithm or level. Once defined, either at database creation time using -C option, or modified afterward, the compression scheme is stored in the database header and used for writing down database back to file.
+.TP 20
+-L, --load-db-password (p:<password> | f:<path>)
+Available with -B option to avoid user being interactively asked for password when loading a ciphered database. This option is useless and ignored when the database is not ciphered.
 .TP 20
 -Q
 Do not display any message on stderr when not launched from a terminal (for example when launched from an at job or crontab). Remains that any question to the user will be assumed a 'no' answer, which most of the time will abort the program.
