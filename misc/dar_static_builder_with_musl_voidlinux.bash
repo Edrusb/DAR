@@ -326,7 +326,7 @@ dar_static()
 		--enable-threadar\
 		--enable-libargon2-linking\
 		--disable-python-binding\
-		--enable-librhash-linkling\
+		--enable-librhash-linking\
                 --enable-dar-static\
 		--prefix="$LOCAL_PREFIX" || return 1
     make ${MAKE_FLAGS} || return 1
