@@ -49,6 +49,12 @@ LIBSSH=1
 GNUTLS_WGET_OPT="--no-check-certificate"
 REPO="$LOCAL_PREFIX/src"
 
+nok()
+{
+    echo "$*"
+    exit 1
+}
+
 #
 check()
 {
@@ -82,7 +88,7 @@ check()
     fi
 
     if [ ! -e "${REPO}" ] ; then
-	mkdir "${REPO}" || (echo "Failed creating ${REPO}" ; return 1)
+	mkdir "${REPO}" || nok "Failed creating ${REPO}"
     fi
 
     if [ ! -d "${REPO}" ] ; then
@@ -91,11 +97,11 @@ check()
     fi
 
     if [ ! -e "${LOCAL_PKG_CONFIG_DIR1}" ] ; then
-	mkdir -p "${LOCAL_PKG_CONFIG_DIR1}"  || (echo "Failed creating ${LOCAL_PKG_CONFIG_DIR1}" ; exit 1)
+	mkdir -p "${LOCAL_PKG_CONFIG_DIR1}"  || nok "Failed creating ${LOCAL_PKG_CONFIG_DIR1}"
     fi
 
     if [ ! -e "${LOCAL_PKG_CONFIG_DIR2}" ] ; then
-	mkdir -p "${LOCAL_PKG_CONFIG_DIR2}" ||  (echo "Failed creating ${LOCAL_PKG_CONFIG_DI2}" ; exit 1)
+	mkdir -p "${LOCAL_PKG_CONFIG_DIR2}" ||  nok "Failed creating ${LOCAL_PKG_CONFIG_DI2}"
     fi
 
     if [ ! -d "${LOCAL_PKG_CONFIG_DIR1}" ] ; then
@@ -119,7 +125,7 @@ requirements()
 
     #direct dependencies of libdar
     xbps-install -y bzip2-devel e2fsprogs-devel libargon2-devel libgcc-devel liblz4-devel \
-		 liblzma-devel libstdc++-devel libzstd-devel lz4-devel \
+		 liblzma-devel libstdc++-devel libzstd-devel liblz4-devel \
 		 lzo-devel musl-devel zlib-devel || return 1
 
     # needed to build static flavor of librsync
@@ -151,7 +157,7 @@ libthreadar()
     if [ ! -e "${REPO}/${LIBTHREADAR_PKG}" ] ; then wget "https://dar.edrusb.org/libthreadar/Releases/${LIBTHREADAR_PKG}" && mv "${LIBTHREADAR_PKG}" "${REPO}" || return 1 ; fi
     tar -xf "${REPO}/${LIBTHREADAR_PKG}" || return 1
     cd libthreadar-${LIBTHREADAR_VERSION} || return 1
-    ./configure --prefix="$LOCAL_PREFIX" && make ${MAKE_FLAGS} || (cd .. ; return 1)
+    ./configure --prefix="$LOCAL_PREFIX" && make ${MAKE_FLAGS} || return 1
     make install || (cd .. ; return 1)
     cd ..
     ldconfig
@@ -166,10 +172,10 @@ libgcrypt()
 
     tar -xf "${REPO}/${LIBGCRYPT_PKG}" || return 1
     cd libgcrypt-${LIBGCRYPT_VERSION}
-    ./configure --enable-static --prefix="$LOCAL_PREFIX" || (cd .. : return 1)
-    make ${MAKE_FLAGS} || (cd .. : return 1)
-    make check || (cd .. : return 1)
-    make install || (cd .. : return 1)
+    ./configure --enable-static --prefix="$LOCAL_PREFIX" || return 1
+    make ${MAKE_FLAGS} || return 1
+    make check || return 1
+    make install || return 1
     cd ..
     ldconfig
     rm -rf libgcrypt-${LIBGCRYPT_VERSION}
@@ -182,9 +188,9 @@ libgpg-error()
     if [ ! -e "${REPO}/${LIBGPG_ERROR_PKG}" ] ; then wget https://www.gnupg.org/ftp/gcrypt/libgpg-error/${LIBGPG_ERROR_PKG} && mv "${LIBGPG_ERROR_PKG}" "${REPO}" || return 1 ; fi
     tar -xf "${REPO}/${LIBGPG_ERROR_PKG}"  || return 1
     cd libgpg-error-${LIBGPG_ERROR_VERSION}  || return 1
-    ./configure --enable-static --prefix="$LOCAL_PREFIX" || (cd .. ; return 1)
-    make ${MAKE_FLAGS} || (cd .. ; return 1)
-    make install || (cd .. ; return 1)
+    ./configure --enable-static --prefix="$LOCAL_PREFIX" || return 1
+    make ${MAKE_FLAGS} || return 1
+    make install || return 1
     cd ..
     ldconfig
     rm -rf libgpg-error-${LIBGPG_ERROR_VERSION}
@@ -218,10 +224,10 @@ gnutls()
     if [ ! -e "${REPO}/${GNUTLS_PKG}" ] ; then wget ${GNUTLS_WGET_OPT} "https://www.gnupg.org/ftp/gcrypt/gnutls/v${REPODIR}/${GNUTLS_PKG}" && mv "${GNUTLS_PKG}" "${REPO}" || return 1 ; fi
     tar -xf "${REPO}/${GNUTLS_PKG}" || return 1
     cd "gnutls-${GNUTLS_VERSION}" || return 1
-    unbound-anchor -a "/etc/unbound/root.key" || (cd .. ; return 1)
-    ./configure --enable-static --without-p11-kit --prefix="$LOCAL_PREFIX" || (cd .. ; return 1)
-    make ${MAKE_FLAGS} || (cd .. ; return 1)
-    make install || (cd .. ; return 1)
+    unbound-anchor -a "/etc/unbound/root.key" || return 1
+    ./configure --enable-static --without-p11-kit --prefix="$LOCAL_PREFIX" || return 1
+    make ${MAKE_FLAGS} || return 1
+    make install || return 1
     cd ..
     ldconfig
     rm -rf "gnutls-${GNUTLS_VERSION}"
@@ -236,11 +242,11 @@ libssh()
     if [ ! -e "${REPO}/${LIBSSH_PKG}" ] ; then wget "https://www.libssh.org/files/${REPODIR}/${LIBSSH_PKG}" && mv "${LIBSSH_PKG}" "${REPO}" || return 1 ; fi
     tar -xf "${REPO}/${LIBSSH_PKG}" || return 1
     cd libssh-${LIBSSH_VERSION} || return 1
-    mkdir ${builddir} || (echo "Failed creating build dir for libssh" ; cd .. ; return 1)
-    cd ${builddir} || (cd .. ; return 1)
-    cmake -DUNIT_TESTING=OFF -DCMAKE_INSTALL_PREFIX="$LOCAL_PREFIX" -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=OFF -DWITH_GCRYPT=ON  ..  || (cd ../.. ; return 1)
-    make ${MAKE_FLAGS} || (cd ../.. ; return 1)
-    make install || (cd ../.. ; return 1)
+    mkdir ${builddir} || nok "Failed creating build dir for libssh"
+    cd ${builddir} || return 1
+    cmake -DUNIT_TESTING=OFF -DCMAKE_INSTALL_PREFIX="$LOCAL_PREFIX" -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=OFF -DWITH_GCRYPT=ON  ..  || return 1
+    make ${MAKE_FLAGS} || return 1
+    make install || return 1
     cd ../.. || return 1
     ldconfig || return 1
     rm -rf libssh-${LIBSSH_VERSION} || return 1
@@ -259,9 +265,9 @@ libssh2()
     if [ ! -e "${REPO}/${LIBSSH2_PKG}" ] ; then wget "https://www.libssh2.org/download/${LIBSSH2_PKG}" && mv "${LIBSSH2_PKG}" "${REPO}" || return 1 ; fi
     tar -xf "${REPO}/${LIBSSH2_PKG}" || return 1
     cd libssh2-${LIBSSH2_VERSION} || return 1
-    ./configure --enable-shared --without-libssl --with-libz --with-crypto=libgcrypt --prefix="$LOCAL_PREFIX" || (cd .. ; return 1)
-    make ${MAKE_FLAGS} || (cd .. ; return 1)
-    make install || (cd .. ; return 1)
+    ./configure --enable-shared --without-libssl --with-libz --with-crypto=libgcrypt --prefix="$LOCAL_PREFIX" || return 1
+    make ${MAKE_FLAGS} || return 1
+    make install || return 1
     cd ..
     ldconfig
     rm -rf libssh2-${LIBSSH2_VERSION}
@@ -274,9 +280,9 @@ libcurl()
     if [ ! -e "${REPO}/${LIBCURL_PKG}" ] ; then wget "https://curl.se/download/${LIBCURL_PKG}" && mv "${LIBCURL_PKG}" "${REPO}" || return 1 ; fi
     tar -xf "${REPO}/${LIBCURL_PKG}" || return 1
     cd curl-${LIBCURL_VERSION} || return 1
-    ./configure --with-gnutls ${SSH_CURL_OPT} --enable-shared --enable-static --prefix="$LOCAL_PREFIX" || (cd .. : return 1)
-    make ${MAKE_FLAGS} || (cd .. ; return 1)
-    make install || (cd . ; return 1)
+    ./configure --with-gnutls ${SSH_CURL_OPT} --enable-shared --enable-static --prefix="$LOCAL_PREFIX" || return 1
+    make ${MAKE_FLAGS} || return 1
+    make install || return 1
     cd ..
     ldconfig
     rm -rf curl-${LIBCURL_VERSION}
@@ -290,9 +296,9 @@ librhash()
     if [ ! -e "${REPO}/${LIBRHASH_PKG}" ] ; then wget "https://github.com/rhash/RHash/archive/refs/tags/v${LIBRHASH_VERSION}.tar.gz" && mv "v${LIBRHASH_VERSION}.tar.gz" "${REPO}"/"${LIBRHASH_PKG}" || return 1 ; fi
     tar -xf "${REPO}/${LIBRHASH_PKG}" || return 1
     cd "RHash-${LIBRHASH_VERSION}" || return 1
-    ./configure --enable-static=librhash --prefix="$LOCAL_PREFIX" || (cd .. ; return 1)
-    make ${MAKE_FLAGS} lib-static lib-shared || (cd .. ; return 1)
-    make install-lib-static install-lib-shared || (cd .. ; return 1)
+    ./configure --enable-static=librhash --prefix="$LOCAL_PREFIX" || return 1
+    make ${MAKE_FLAGS} lib-static lib-shared || return 1
+    make install-lib-static install-lib-shared || return 1
     cd ..
     ldconfig
     rm -rf "RHash-${LIBRHASH_VERSION}"
@@ -336,19 +342,19 @@ dar_static()
 
 check
 
-requirements || (echo "Failed setting up requirements" ; exit 1)
-libthreadar || (echo "Failed building libthreadar" ; exit 1)
-libgcrypt || (echo "Failed building libgcrypt" ; exit 1)
-libgpg-error || (echo "Failed building libgpg-error static version" ; exit 1)
-librsync || (echo "Failed building librsync" ; exit 1)
-gnutls || (echo "Failed building gnutls" ; exit 1)
+requirements || nok "Failed setting up requirements"
+libthreadar || nok "Failed building libthreadar"
+libgpg-error || nok "Failed building libgpg-error static version"
+libgcrypt || nok "Failed building libgcrypt"
+librsync || nok "Failed building librsync"
+gnutls || nok "Failed building gnutls"
 case "$LIBSSH" in
     "1")
-	libssh || (echo "Failed building libssh" ; exit 1)
+	libssh || nok "Failed building libssh"
 	export SSH_CURL_OPT="--with-libssh"
 	;;
     "2")
-	libssh2 || (echo "Failed building libssh2" ; exit 1)
+	libssh2 || nok "Failed building libssh2"
 	export SSH_CURL_OPT="--with-libssh2"
 	;;
     *)
@@ -359,6 +365,6 @@ if [ -z "$SSH_CURL_OPT" ] ; then
     echo "SSH_CURL_OPT is not defined, but is needed to compile libcurl"
     exit 1;
 fi
-libcurl || (echo "Failed building libcurl" ; exit 1)
-librhash || (echo "Failed building librhash" ; exit 1)
-dar_static || (echo "Failed building dar_static" ; exit 1)
+libcurl || nok "Failed building libcurl"
+librhash || nok "Failed building librhash"
+dar_static || nok "Failed building dar_static"
