@@ -222,11 +222,19 @@ gnutls()
 
     if [ -z "$REPODIR" ] ; then echo "empty repo dir for guntls, check GNUTLS_VERSION is correct" ; return 1 ; fi
     if [ ! -e "${REPO}/${GNUTLS_PKG}" ] ; then wget ${GNUTLS_WGET_OPT} "https://www.gnupg.org/ftp/gcrypt/gnutls/v${REPODIR}/${GNUTLS_PKG}" && mv "${GNUTLS_PKG}" "${REPO}" || return 1 ; fi
+    echo "extracting gnutls archive"
     tar -xf "${REPO}/${GNUTLS_PKG}" || return 1
+    echo "chdir to gnutls dir"
     cd "gnutls-${GNUTLS_VERSION}" || return 1
-    unbound-anchor -a "/etc/unbound/root.key" || return 1
+    echo "unbound-anchor"
+
+        # calling twice unbound anchor as the first time it may fails but not the second time
+    unbound-anchor -a "/etc/unbound/root.key" || unbound-anchor -v -a "/etc/unbound/root.key" || return 1
+    echo "configuring gnutls"
     ./configure --enable-static --without-p11-kit --prefix="$LOCAL_PREFIX" || return 1
+    echo "running gnutls make"
     make ${MAKE_FLAGS} || return 1
+    echo "installing gnutls"
     make install || return 1
     cd ..
     ldconfig
