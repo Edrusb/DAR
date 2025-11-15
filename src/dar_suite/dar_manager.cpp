@@ -74,7 +74,7 @@ using namespace libdar;
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
 #define MISSING_ARG "Missing argument to -%c"
 #define INVALID_ARG "Invalid argument given to -%c (requires integer)"
-#define OPT_STRING "C:B:A:lD:b:p:od:ru:f:shVm:vQjw:ie:c@:N;:ka:9:z:xJ:K:"
+#define OPT_STRING "C:B:A:lD:b:p:od:ru:f:shVm:vQjw:ie:c@:N;:ka:9:z:xJ:K:L:"
 
 enum operation {
     none_op,
@@ -118,6 +118,7 @@ static bool command_line(shell_interaction & dialog,
 			 bool & detailed_dates,
 			 string & arch_crypto_params,
 			 string & base_crypto_params,
+			 secu_string & password,
 			 bool recursive); // true if called from op_batch
 
 static void show_usage(shell_interaction & dialog, const char *command);
@@ -174,7 +175,8 @@ static database *read_base(shared_ptr<user_interaction> & dialog,
 			   const string & base,
 			   bool partial,
 			   bool partial_read_only,
-			   bool check_order);
+			   bool check_order,
+			   const secu_string & pass); // if not set password is asked through dialog
 static void write_base(shared_ptr<user_interaction> & dialog,
 		       const string & filename,
 		       const database *base,
@@ -256,6 +258,7 @@ S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * const ar
     bool detailed_dates;
     string arch_crypto_params;
     string base_crypto_params;
+    secu_string password;
     shell_interaction *shelli = dynamic_cast<shell_interaction *>(dialog.get());
 
     if(!dialog)
@@ -285,6 +288,7 @@ S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * const ar
 		     detailed_dates,
 		     arch_crypto_params,
 		     base_crypto_params,
+		     password,
 		     false))
 	return EXIT_SYNTAX;
 
@@ -342,7 +346,7 @@ S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * const ar
 	    else
 		dialog->message(gettext("Decompressing and loading database to memory..."));
 	}
-	dat = read_base(dialog, base, partial_read, partial_read_only, check_order);
+	dat = read_base(dialog, base, partial_read, partial_read_only, check_order, password);
 	try
 	{
 	    try
@@ -393,6 +397,7 @@ static bool command_line(shell_interaction & dialog,
 			 bool & detailed_dates,
 			 string & arch_crypto_params,
 			 string & base_crypto_params,
+			 secu_string & password,
 			 bool recursive)
 {
     S_I lu, min;
@@ -414,6 +419,7 @@ static bool command_line(shell_interaction & dialog,
     compression_level = 9;
     change_compression = false;
     detailed_dates = false;
+    password.clear();
     string extra = "";
 
     try
@@ -661,6 +667,17 @@ static bool command_line(shell_interaction & dialog,
 		    default:
 			throw Erange("command_line", tools_printf(gettext("-K option is only valide as standalone command or after -C option")));
 		    }
+		    break;
+		case 'L':
+		    if(recursive)
+			throw Erange("command_line", tools_printf(gettext("-L option cannot be given inside a batch file")));
+		    if(optarg == nullptr)
+			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
+
+		    if(! password.empty())
+			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
+		    else
+			password.append(optarg, strlen(optarg));
 		    break;
 		case 'x':
 		    detailed_dates = true;
@@ -1211,7 +1228,12 @@ static const struct option *get_long_opt()
 }
 #endif
 
-static database *read_base(shared_ptr<user_interaction> & dialog, const string & base, bool partial, bool partial_read_only, bool check_order)
+static database *read_base(shared_ptr<user_interaction> & dialog,
+			   const string & base,
+			   bool partial,
+			   bool partial_read_only,
+			   bool check_order,
+			   const secu_string & pass)
 {
     database *ret = nullptr;
 
@@ -1221,6 +1243,7 @@ static database *read_base(shared_ptr<user_interaction> & dialog, const string &
 	dat_opt.set_warn_order(check_order);
 	dat_opt.set_partial(partial);
 	dat_opt.set_partial_read_only(partial_read_only);
+	dat_opt.set_password(pass);
         ret = new (nothrow) database(dialog, base, dat_opt);
         if(ret == nullptr)
             throw Ememory("read_base");
@@ -1579,6 +1602,7 @@ static void op_batch(shared_ptr<user_interaction> & dialog, database *dat, const
     bool detailed_dates;
     string arch_crypto_params;
     string base_crypto_params;
+    secu_string unused_pass_here;
     shell_interaction *shelli = dynamic_cast<shell_interaction *>(dialog.get());
 
     if(shelli == nullptr)
@@ -1642,6 +1666,7 @@ static void op_batch(shared_ptr<user_interaction> & dialog, database *dat, const
 			     detailed_dates,
 			     arch_crypto_params,
 			     base_crypto_params,
+			     unused_pass_here,
 			     true))
 		throw Erange("op_batch", tools_printf(gettext("Syntax error in batch file: %S"), &line));
 
