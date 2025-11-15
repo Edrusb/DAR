@@ -86,15 +86,26 @@ namespace libdar
 	    /// \param[in] value whether to warn when file chronological ordering does not respect the order of archives
 	void set_warn_order(bool value) { x_warn_order = value; };
 
+
+	    /// specify the password to use to open the database
+
+	    /// \param[in] pass the password to use
+	    /// \note if not provided and the database needs a password, this one will be
+	    /// asked interactively. If a password is given while the database is not
+	    /// ciphered, the password information will be ignored
+	void set_password(const secu_string & pass) { x_pass = pass; };
+
 	    // gettings
 	bool get_partial() const { return x_partial; };
 	bool get_partial_read_only() const { return x_partial_read_only; };
 	bool get_warn_order() const { return x_warn_order; };
+	const secu_string & get_password() const { return x_pass; };
 
     private:
 	bool x_partial;
 	bool x_partial_read_only;
 	bool x_warn_order;
+	secu_string x_pass;
     };
 
 	/// options to write a database to file
