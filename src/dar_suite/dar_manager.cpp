@@ -644,6 +644,8 @@ static bool command_line(shell_interaction & dialog,
 		    }
 		    break;
 		case 'K':
+		    if(recursive)
+			throw Erange("command_line", tools_printf(gettext("-K option cannot be given inside a batch file")));
 		    if(optarg == nullptr)
 			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
 
