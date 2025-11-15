@@ -217,6 +217,7 @@ static void split_arch_crypto_params(shared_ptr<user_interaction> & dialog, ///<
 				     U_32 & crypto_block_size);     ///< zero is returned if not specified
 
 
+static secu_string parse_password_p_or_f(const string & type, const string & arg);
 static secu_string fetch_password_from_file(const string & path);
 
     /// \return true if user set encryption parameters, false if the archive is not encrypted
@@ -677,7 +678,20 @@ static bool command_line(shell_interaction & dialog,
 		    if(! password.empty())
 			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
 		    else
-			password.append(optarg, strlen(optarg));
+		    {
+			try
+			{
+			    deque<string> splitted;
+
+			    line_tools_split(optarg, ':', splitted);
+			    password = parse_password_p_or_f(splitted[0], splitted[1]);
+			}
+			catch(Erange & e)
+			{
+			    e.prepend_message(gettext("Error while parsing -L option"));
+			    throw;
+			}
+		    }
 		    break;
 		case 'x':
 		    detailed_dates = true;
@@ -1769,20 +1783,22 @@ static void op_chbasecrypto(shared_ptr<user_interaction> & dialog,
 	    break;
 	case 1:
 	    if(splitted[0] == "p")
-		    // requested interactive input if the password
+		    // requested interactive input as if the password was given empty
 		splitted.push_back("");
 	    else
 		throw Erange("split_base_crypto_params", gettext("invalid argument given to -K option"));
 
 		/* no break to go to case 2 */
 	case 2:
-	    if(splitted[0] == "p")
-		pass = secu_string(splitted[1].c_str(), splitted[1].size());
-	    else
-		if(splitted[0] == "f")
-		    pass = fetch_password_from_file(splitted[1]);
-		else
-		    throw Erange("split_base_crypto_params", gettext("invalid argument given to -K option"));
+	    try
+	    {
+		pass = parse_password_p_or_f(splitted[0], splitted[1]);
+	    }
+	    catch(Erange & e)
+	    {
+		e.prepend_message(gettext("Error while parsing -K option"));
+		throw;
+	    }
 	    if(algo == crypto_algo::none)
 		algo = crypto_algo::aes256;
 	    loop = false; // exiting the while loop
@@ -2093,6 +2109,17 @@ static void split_arch_crypto_params(shared_ptr<user_interaction> & dialog,
     while(loop);
 }
 
+static secu_string parse_password_p_or_f(const string & type, const string & arg)
+{
+    secu_string ret;
+
+    if(type == "p")
+	ret = secu_string(arg.c_str(), arg.size());
+    else if(type == "f")
+	ret = fetch_password_from_file(arg);
+    else
+	throw Erange("parse_password_p_or_f", gettext("invalid argument given after p: or f: in password string argument"));
+}
 
 static secu_string fetch_password_from_file(const string & path)
 {
