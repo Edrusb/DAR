@@ -1,3 +1,11 @@
+from 2.8.x to 2.9.0
+- added support for encrypted archive and with dar_manager databases.
+  See dar_manager's -J option for non-default behavior regarding archive
+  key provision to the database.
+- added support for encrypted dar_manager databases
+  (see dar_manager's -K options and eventually -L option for non-default
+  behavior regarding dar_manager key provisionning.
+
 from 2.8.1 to 2.8.2
 - fixed compilation warning about signed and unsigned int comparison
 
