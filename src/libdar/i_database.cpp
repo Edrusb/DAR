@@ -75,6 +75,7 @@ namespace libdar
     {
 	generic_file *f = database_header_open(dialog,
 					       base,
+					       opt.get_password(),
 					       head,
 					       true);
 	if(f == nullptr)

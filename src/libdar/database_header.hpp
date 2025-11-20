@@ -110,11 +110,13 @@ namespace libdar
 
 	/// \param[in] dialog for user interaction
 	/// \param[in] filename is the filename to read from
+	/// \param[in] pass ignored if empty string, else used as password if the db is encrypted
 	/// \param[in,out] params parameters of the openned database (password[in], version[out], compression[out], encryption[out]...)
 	/// \param[in] info_details set to true to get informational messages
 	/// \return the generic_file where the database header has been put
     extern generic_file *database_header_open(const std::shared_ptr<user_interaction> & dialog,
 					      const std::string & filename,
+					      const secu_string & pass,
 					      database_header & params,
 					      bool info_details);
 

@@ -370,6 +370,7 @@ namespace libdar
 
     generic_file *database_header_open(const shared_ptr<user_interaction> & dialog,
 				       const string & filename,
+				       const secu_string & pass,
 				       database_header & params,
 				       bool info_details)
     {
@@ -398,7 +399,9 @@ namespace libdar
 
 	    if(params.get_crypto() != crypto_algo::none)
 	    {
-		if(params.get_pass().empty())
+		if(! pass.empty())
+		    params.set_pass(pass);
+		else
 		    params.set_pass(dialog->get_secu_string(tools_printf(gettext("Database %S required a password: "), &filename), false));
 
 		tronco_with_elastic* cipher = new (nothrow) tronco_with_elastic(dialog,

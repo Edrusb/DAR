@@ -2119,6 +2119,8 @@ static secu_string parse_password_p_or_f(const string & type, const string & arg
 	ret = fetch_password_from_file(arg);
     else
 	throw Erange("parse_password_p_or_f", gettext("invalid argument given after p: or f: in password string argument"));
+
+    return ret;
 }
 
 static secu_string fetch_password_from_file(const string & path)
