@@ -746,6 +746,18 @@ namespace libdar
 	return ptr != nullptr;
     }
 
+    path cat_directory::get_path() const
+    {
+	if(parent == nullptr)
+	    return path(get_name());
+	else
+	{
+	    path ret = parent->get_path();
+	    ret += get_name();
+	    return ret;
+	}
+    }
+
     void cat_directory::recursive_has_changed_update() const
     {
 	deque<cat_nomme *>::const_iterator it = ordered_fils.begin();
