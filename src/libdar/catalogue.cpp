@@ -624,7 +624,9 @@ namespace libdar
 	}
     }
 
-    infinint catalogue::update_destroyed_with(const catalogue & ref)
+    infinint catalogue::update_destroyed_with(const catalogue & ref,
+					      const path & fs_root,
+					      bool display_treated)
     {
 	cat_directory *current = contenu;
 	const cat_nomme *ici;
@@ -674,6 +676,22 @@ namespace libdar
 		    throw Ememory("catalogue::update_destroyed_with");
 		try
 		{
+		    if(display_treated)
+		    {
+			path curdir = ref.get_current_read_path();
+			string tmp;
+
+			curdir += pro_nom->get_name();
+			if(curdir.degre() < 2)
+			    throw SRC_BUG;
+			    // the returned path should at worse have PSEUDO_ROOT of the filesystem which we
+			    // will remove here after, and the get_name() we just added above
+			curdir.pop_front(tmp); // remove the initial PSEUDO_ROOT to be able to concact with fs_root
+			if(tmp != PSEUDO_ROOT)
+
+			get_ui().message(tools_printf(gettext("Recording removed filed: %s"),
+						      (fs_root + curdir).display().c_str()));
+		    }
 		    current->add_children(det_tmp);
 		}
 		catch(...)

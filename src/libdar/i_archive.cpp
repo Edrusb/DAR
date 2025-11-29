@@ -2748,7 +2748,7 @@ namespace libdar
 		    if(aborting)
 			cat->update_absent_with(*ref_cat1, aborting_next_etoile);
 		    else
-			st_ptr->add_to_deleted(cat->update_destroyed_with(*ref_cat1));
+			st_ptr->add_to_deleted(cat->update_destroyed_with(*ref_cat1, fs_root, display_treated));
 		}
 
 		cat->drop_escape_layer();

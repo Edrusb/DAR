@@ -178,14 +178,15 @@ namespace libdar
             // always return false, while it temporarily stores the missing directory structure
 
 
-
 	    // non-iterative methods:
 
 
 	    /// add into "this" detruit object corresponding to object of ref absent in "this"
 
 	    ///\note ref must have the same directory tree "this", else the operation generates an exception
-        infinint update_destroyed_with(const catalogue & ref);
+        infinint update_destroyed_with(const catalogue & ref,
+				       const path & fs_root,
+				       bool display_treated);
 
 
 	    /// copy from ref missing files in "this" and mark then as "not_saved" (no change since reference)
