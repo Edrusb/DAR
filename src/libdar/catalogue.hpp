@@ -298,7 +298,7 @@ namespace libdar
     private :
         cat_directory *contenu;                   ///< catalogue contents
         mutable path out_compare;                 ///< stores the missing directory structure, when extracting
-        mutable cat_directory *current_compare;   ///< points to the current directory when extracting
+        mutable cat_directory *current_compare;   ///< points to the current directory when comparing
         mutable cat_directory *current_add;       ///< points to the directory where to add the next file with add_file;
         mutable cat_directory *current_read;      ///< points to the directory where the next item will be read
         path *sub_tree;                           ///< path to sub_tree
