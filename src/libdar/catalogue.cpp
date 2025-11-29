@@ -428,6 +428,14 @@ namespace libdar
 	current_add = contenu;
     }
 
+    path catalogue::get_current_read_path() const
+    {
+	if(current_read == nullptr)
+	    throw SRC_BUG;
+
+	return current_read->get_path();
+    }
+
     void catalogue::add(cat_entree *ref, bool addtostats)
     {
 	if(current_add == nullptr)

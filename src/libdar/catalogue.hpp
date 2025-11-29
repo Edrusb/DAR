@@ -129,6 +129,9 @@ namespace libdar
 	    // only directory may be read() twice.
 	virtual bool read_second_time_dir() const { return false; };
 
+	    /// return the <ROOT> based path of the current directory where reading is currently taking place
+	path get_current_read_path() const;
+
 
 	    // Additions methods. The addition is also iterative but uses its specific current_add directory pointer
 
