@@ -89,7 +89,7 @@ namespace libdar
 
 	try
 	{
-	    contenu = new (nothrow) cat_directory(0,0,0,datetime(0),root_last_modif,datetime(0),"root",0);
+	    contenu = new (nothrow) cat_directory(0,0,0,datetime(0),root_last_modif,datetime(0),PSEUDO_ROOT,0);
 	    if(contenu == nullptr)
 		throw Ememory("catalogue::catalogue(path)");
 	    current_compare = contenu;
