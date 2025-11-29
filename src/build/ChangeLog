@@ -1,5 +1,7 @@
 from 2.8.1 to 2.8.2
 - fixed compilation warning about signed and unsigned int comparison
+- fixed display bug where the list of delete file flags were not showing
+  with -vt option set for a differential backup
 
 from 2.8.0 to 2.8.1
 - fixed src/python/Makefile.am where CFLAGS was used in C++ compilation
