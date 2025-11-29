@@ -32,5 +32,13 @@ PAR=par2
 
 echo "creating PAR file for file $1/$2.$3.dar ..."
 
+mask="$1/$2.$3.dar.*par2"
+need_cleanup=`ls -l $mask 2> /dev/null | wc -l`
+
+if [ $need_cleanup -gt 0 ] ; then
+    echo "cleaning up old par2 files for slice $1/$2.$3.dar"
+    rm -f $mask
+fi
+
 exec $PAR c -r$6 -n1 "$1/$2.$3.$4"
 # script returned code it those of par
