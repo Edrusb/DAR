@@ -566,7 +566,7 @@ namespace libdar
 		{
 		    stop_threads();
 		    join_threads();
-		    throw SRC_BUG; // if join did not through an exception
+		    throw SRC_BUG; // if join() has not thrown an exception
 		}
 		catch(...)
 		{
