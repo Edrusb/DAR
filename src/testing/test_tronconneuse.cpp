@@ -126,7 +126,7 @@ void f1(const shared_ptr<user_interaction> & dialog)
 	throw Ememory("test");
     tronconneuse* toto = new tronconneuse(10,
 					  fic,
-					  macro_tools_supported_version,
+					  archive_format_supported_version,
 		 			  ptr);
     if(toto == nullptr)
 	throw Ememory("test");
@@ -154,7 +154,7 @@ void f2(const shared_ptr<user_interaction> & dialog)
 	throw Ememory("test");
     tronconneuse *toto = new tronconneuse(10,
 					  fic,
-					  macro_tools_supported_version,
+					  archive_format_supported_version,
 					  ptr);
     if(toto == nullptr)
 	throw Ememory("test");
@@ -215,7 +215,7 @@ void f3(const shared_ptr<user_interaction> & dialog)
 	throw Ememory("test");
     tronconneuse fuc(10,
 		    fic,
-		    macro_tools_supported_version,
+		    archive_format_supported_version,
 		    ptr);
     cout << "pos = " << fuc.get_position() << endl;
 

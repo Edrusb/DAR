@@ -90,12 +90,12 @@ void f1()
 	// check the resulting buffer thanks to debugger
     cout << stic.get_size() << endl;
 
-    elastic stoc = elastic(buffer, taille, elastic_forward, macro_tools_supported_version);
+    elastic stoc = elastic(buffer, taille, elastic_forward, archive_format_supported_version);
     cout << stoc.get_size() << endl;
 
     stoc.dump(biffir, taille);
 
-    elastic stuc = elastic(biffir, 10, elastic_backward, macro_tools_supported_version);
+    elastic stuc = elastic(biffir, 10, elastic_backward, archive_format_supported_version);
     cout << stuc.get_size() << endl;
 }
 
@@ -109,18 +109,18 @@ void f2()
     stic.dump(buffer, taille);
     cout << stic.get_size() << endl;
 
-    elastic stuc = elastic(buffer, taille, elastic_forward, macro_tools_supported_version);
+    elastic stuc = elastic(buffer, taille, elastic_forward, archive_format_supported_version);
     cout << stuc.get_size() << endl;
-    stuc = elastic(buffer, 1, elastic_backward, macro_tools_supported_version);
+    stuc = elastic(buffer, 1, elastic_backward, archive_format_supported_version);
     cout << stuc.get_size() << endl;
 
     stic = 2;
     stic.dump(buffer, taille);
     cout << stic.get_size() << endl;
 
-    stuc = elastic(buffer, taille, elastic_forward, macro_tools_supported_version);
+    stuc = elastic(buffer, taille, elastic_forward, archive_format_supported_version);
     cout << stuc.get_size() << endl;
-    stuc = elastic(buffer, 2, elastic_backward, macro_tools_supported_version);
+    stuc = elastic(buffer, 2, elastic_backward, archive_format_supported_version);
     cout << stuc.get_size() << endl;
 
 
@@ -130,9 +130,9 @@ void f2()
     stic.dump(buffer, taille);
     cout << stic.get_size() << endl;
 
-    stuc = elastic(buffer, taille, elastic_forward, macro_tools_supported_version);
+    stuc = elastic(buffer, taille, elastic_forward, archive_format_supported_version);
     cout << stuc.get_size() << endl;
-    stuc = elastic(buffer, 256, elastic_backward, macro_tools_supported_version);
+    stuc = elastic(buffer, 256, elastic_backward, archive_format_supported_version);
     cout << stuc.get_size() << endl;
 
 }
@@ -158,10 +158,10 @@ void f3()
 	tic.dump(buffer, taille);
 	fic.write((char *)buffer, 1);
 	fic.skip(3);
-	toc = elastic(fic, elastic_forward, macro_tools_supported_version);
+	toc = elastic(fic, elastic_forward, archive_format_supported_version);
 	cout << toc.get_size() << " " << fic.get_position() << endl;
 	fic.skip(4);
-	toc = elastic(fic, elastic_backward, macro_tools_supported_version);
+	toc = elastic(fic, elastic_backward, archive_format_supported_version);
 	cout << toc.get_size() << " " <<  fic.get_position() << endl;
 
 	tic = 2;
@@ -169,10 +169,10 @@ void f3()
 	tic.dump(buffer, taille);
 	fic.write((char *)buffer, 2);
 	fic.skip(3);
-	toc = elastic(fic, elastic_forward, macro_tools_supported_version);
+	toc = elastic(fic, elastic_forward, archive_format_supported_version);
 	cout << toc.get_size() <<  " " << fic.get_position() << endl;
 	fic.skip(5);
-	toc = elastic(fic, elastic_backward, macro_tools_supported_version);
+	toc = elastic(fic, elastic_backward, archive_format_supported_version);
 	cout << toc.get_size() <<  " " << fic.get_position() << endl;
 
 	tic = 3;
@@ -180,10 +180,10 @@ void f3()
 	tic.dump(buffer, taille);
 	fic.write((char *)buffer, 3);
 	fic.skip(3);
-	toc = elastic(fic, elastic_forward, macro_tools_supported_version);
+	toc = elastic(fic, elastic_forward, archive_format_supported_version);
 	cout << toc.get_size() <<  " " << fic.get_position() << endl;
 	fic.skip(6);
-	toc = elastic(fic, elastic_backward, macro_tools_supported_version);
+	toc = elastic(fic, elastic_backward, archive_format_supported_version);
 	cout << toc.get_size() <<  " " << fic.get_position() << endl;
 
 	tic = 3;
@@ -191,10 +191,10 @@ void f3()
 	tic.dump(buffer, taille);
 	fic.write((char *)buffer, 3);
 	fic.skip(0);
-	toc = elastic(fic, elastic_forward, macro_tools_supported_version);
+	toc = elastic(fic, elastic_forward, archive_format_supported_version);
 	cout << toc.get_size() <<  " " << fic.get_position() << endl;
 	fic.skip(3);
-	toc = elastic(fic, elastic_backward, macro_tools_supported_version);
+	toc = elastic(fic, elastic_backward, archive_format_supported_version);
 	cout << toc.get_size() <<  " " << fic.get_position() << endl;
 
 	tic = 257;
@@ -202,10 +202,10 @@ void f3()
 	tic.dump(buffer, taille);
 	fic.write((char *)buffer, 257);
 	fic.skip(3);
-	toc = elastic(fic, elastic_forward, macro_tools_supported_version);
+	toc = elastic(fic, elastic_forward, archive_format_supported_version);
 	cout << toc.get_size() <<  " " << fic.get_position() << endl;
 	fic.skip(260);
-	toc = elastic(fic, elastic_backward, macro_tools_supported_version);
+	toc = elastic(fic, elastic_backward, archive_format_supported_version);
 	cout << toc.get_size() <<  " " << fic.get_position() << endl;
     }
     catch(Egeneric & e)

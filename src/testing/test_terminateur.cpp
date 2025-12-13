@@ -83,7 +83,7 @@ static void f1()
     term.set_catalogue_start(grand);
     term.dump(toto);
     toto.skip(0);
-    term.read_catalogue(toto, false, macro_tools_supported_version);
+    term.read_catalogue(toto, false, archive_format_supported_version);
     conv = term.get_catalogue_start();
     cout << conv.human() << endl;
 }

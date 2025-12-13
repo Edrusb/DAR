@@ -219,7 +219,7 @@ void f1()
     else
     {
 	ptr1 = make_unique<crypto_sym>(secu_pass,
-				       macro_tools_supported_version,
+				       archive_format_supported_version,
 				       crypto_algo::aes256,
 				       "sans sel c'est fade",
 				       2000,
@@ -237,13 +237,13 @@ void f1()
     if(single_encr)
 	encry = make_unique<tronconneuse>(chain_size,
 					  *dst,
-					  macro_tools_supported_version,
+					  archive_format_supported_version,
 					  ptr1);
     else
 	encry = make_unique<parallel_tronconneuse>(2, // workers
 						   chain_size,
 						   *dst,
-						   macro_tools_supported_version,
+						   archive_format_supported_version,
 						   ptr1);
 
 
@@ -266,12 +266,12 @@ void f1()
 	decry = make_unique<parallel_tronconneuse>(2, // worker
 						   chain_size,
 						   *src,
-						   macro_tools_supported_version,
+						   archive_format_supported_version,
 						   ptr2);
     else
 	decry = make_unique<tronconneuse>(chain_size,
 					  *src,
-					  macro_tools_supported_version,
+					  archive_format_supported_version,
 					  ptr2);
 
     temp = time(NULL);
@@ -302,7 +302,7 @@ void f2(const char *src, const char *dst, bool encrypt, U_I num, const char *pas
     unique_ptr<fichier_local> dst_f = make_unique<fichier_local>(ui, dst, gf_write_only, 0644, true, false, false);
     unique_ptr<proto_tronco> tronco;
     unique_ptr<crypto_module> crypto = make_unique<crypto_sym>(secu_string(pass, strlen(pass)),
-							       macro_tools_supported_version,
+							       archive_format_supported_version,
 							       crypto_algo::aes256,
 							       "sans sel c'est fade",
 							       100,
@@ -314,24 +314,24 @@ void f2(const char *src, const char *dst, bool encrypt, U_I num, const char *pas
 	    tronco = make_unique<parallel_tronconneuse>(num,
 							block_size,
 							*dst_f,
-							macro_tools_supported_version,
+							archive_format_supported_version,
 							crypto);
 	else
 	    tronco = make_unique<tronconneuse>(block_size,
 					       *dst_f,
-					       macro_tools_supported_version,
+					       archive_format_supported_version,
 					       crypto);
     else
 	if(num > 1)
 	    tronco = make_unique<parallel_tronconneuse>(num,
 							block_size,
 							*src_f,
-							macro_tools_supported_version,
+							archive_format_supported_version,
 							crypto);
 	else
 	    tronco = make_unique<tronconneuse>(block_size,
 					       *src_f,
-					       macro_tools_supported_version,
+					       archive_format_supported_version,
 					       crypto);
 
     if(encrypt)
