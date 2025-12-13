@@ -323,7 +323,9 @@ void f3()
     dif.add(new cat_prise(1030, 108, 0650, datetime(19), datetime(20), datetime(21), "prise", 0));
     dif.add(new cat_detruit("ancien fichier", 'f', datetime(12)));
 
-    dif.update_destroyed_with(cat);
+    dif.update_destroyed_with(cat,
+			      FAKE_ROOT,
+			      true);
 
 //    cat.listing(*ui, false, tmp, tmp, false, false, false, "");
 //    dif.listing(*ui, false, tmp, tmp, false, false, false, "");
