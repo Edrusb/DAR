@@ -11,6 +11,7 @@ install-data-hook:
 	for f in $(EXE_SAMPLES); do $(INSTALL) -m 0755 '$(srcdir)/'"$${f}" $(DESTDIR)$(pkgdatadir)/samples; done
 	$(INSTALL) -d $(DESTDIR)$(sysconfdir)
 	sed -e "s%SOMEPATH%$(pkgdatadir)/samples%g" '$(srcdir)/etc_darrc' > $(DESTDIR)$(sysconfdir)/darrc
+	chmod 0644 $(DESTDIR)$(sysconfdir)/darrc
 
 uninstall-local:
 	rm -rf $(DESTDIR)$(pkgdatadir)/samples

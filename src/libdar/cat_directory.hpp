@@ -118,6 +118,9 @@ namespace libdar
         cat_directory * get_parent() const { return parent; };
         bool search_children(const std::string &name, const cat_nomme *&ref) const;
 
+	    /// provide the current path of the directory (including its parent and ancestor)
+	path get_path() const;
+
             // using is_more_recent_than() from cat_inode class
             // using method has_changed_since() from cat_inode class
         virtual unsigned char signature() const override { return 'd'; };

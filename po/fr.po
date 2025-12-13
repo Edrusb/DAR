@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: DAR 2.7.0\n"
 "Report-Msgid-Bugs-To: https://github.com/Edrusb/DAR/issues\n"
-"POT-Creation-Date: 2025-09-24 14:44+0200\n"
-"PO-Revision-Date: 2025-09-24 14:45+0200\n"
+"POT-Creation-Date: 2025-12-13 12:53+0100\n"
+"PO-Revision-Date: 2025-12-13 12:54+0100\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
 "Language: fr\n"
@@ -5436,7 +5436,7 @@ msgstr ""
 "n'ont jamais existé, mais conduira plus probablement à d'autres échecs lors "
 "de la restauration des fichiers. Doit-on poursuivre malgré tout ?"
 
-#: src/libdar/catalogue.cpp:285 src/libdar/catalogue.cpp:504
+#: src/libdar/catalogue.cpp:285 src/libdar/catalogue.cpp:512
 msgid "early memory release has completed, cannot read again"
 msgstr ""
 "la libération de mémoire par anticipation est effectuée, impossible de lire "
@@ -5458,13 +5458,13 @@ msgstr "la racine n'a pas de répertoire père"
 msgid "no current reading directory defined"
 msgstr "aucun répertoire courant défini pour la lecture"
 
-#: src/libdar/catalogue.cpp:472
+#: src/libdar/catalogue.cpp:480
 msgid "Cannot recurs in a non directory entry"
 msgstr ""
 "Impossible de poursuivre la récursion dans une entrée qui n'est pas un "
 "répertoire"
 
-#: src/libdar/catalogue.cpp:475
+#: src/libdar/catalogue.cpp:483
 msgid ""
 "The entry to recurs in does not exist, cannot add further entry to that "
 "absent subdirectory"
@@ -5472,9 +5472,14 @@ msgstr ""
 "L'entrée dans laquelle poursuivre la récursion n'existe pas. Impossible "
 "d'ajouter celle-ci à un répertoire absent"
 
-#: src/libdar/catalogue.cpp:549
+#: src/libdar/catalogue.cpp:557
 msgid "root has no parent directory"
 msgstr "la racine n'a pas de répertoire père"
+
+#: src/libdar/catalogue.cpp:692
+#, c-format
+msgid "Recording removed filed: %s"
+msgstr "Enregistrement de fichier supprimé: %s"
 
 #: src/libdar/criterium.cpp:507
 msgid ""

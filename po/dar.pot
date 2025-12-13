@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: dar 2.8.1\n"
+"Project-Id-Version: dar 2.8.2\n"
 "Report-Msgid-Bugs-To: https://github.com/Edrusb/DAR/issues\n"
-"POT-Creation-Date: 2025-09-24 14:44+0200\n"
+"POT-Creation-Date: 2025-12-13 12:53+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4784,7 +4784,7 @@ msgid ""
 "proceed anyway?"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:285 src/libdar/catalogue.cpp:504
+#: src/libdar/catalogue.cpp:285 src/libdar/catalogue.cpp:512
 msgid "early memory release has completed, cannot read again"
 msgstr ""
 
@@ -4804,18 +4804,23 @@ msgstr ""
 msgid "no current reading directory defined"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:472
+#: src/libdar/catalogue.cpp:480
 msgid "Cannot recurs in a non directory entry"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:475
+#: src/libdar/catalogue.cpp:483
 msgid ""
 "The entry to recurs in does not exist, cannot add further entry to that "
 "absent subdirectory"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:549
+#: src/libdar/catalogue.cpp:557
 msgid "root has no parent directory"
+msgstr ""
+
+#: src/libdar/catalogue.cpp:692
+#, c-format
+msgid "Recording removed filed: %s"
 msgstr ""
 
 #: src/libdar/criterium.cpp:507

@@ -1,3 +1,9 @@
+version 2.8.2
+--------------
+Thanks to John Goerzen for feedback, bug report and for maintaining and
+packaging dar, libdar and libthreadar for Debian.
+Thanks to anonymous123-code@github for bug report and analysis.
+
 version 2.8.1
 --------------
 Thanks to Joerg Plate for bug report. Thanks to Claudio-Helveticus at github for
