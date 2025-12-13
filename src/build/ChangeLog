@@ -2,6 +2,24 @@ from 2.8.1 to 2.8.2
 - fixed compilation warning about signed and unsigned int comparison
 - fixed display bug where the list of delete file flags were not showing
   with -vt option set for a differential backup
+- fixing typos in documentation
+- forcing permission of installed darrc (problem met when umask is too
+  restrictive for user installing dar/libdar)
+- fixed par2 integration to remove pre-existing par2 files of a slice
+  This fixes the case met when dar truncates an archive to re-save a
+  file uncompressed due to negative compressed ratio, or to re-save a file
+  that has changed at the time it was read for backup. In both cases
+  when the amount byte removed at end of archive is larger than the current
+  slice, this leads to remove it and truncating the one before the last,
+  which one has just got its par2 file computed, and will need them to
+  be recomputed when filled up again.
+- updating script used to build dar_static binary with musl library under
+  VoidLinux distro. Twofish algo is still broken when multi-threaded is
+  used under this environment in static build flavor (use -G 1,N option
+  as a workaround, where N is the number of threads for compression).
+  This problem is under investigations. Multi-threaded ciphering with other
+  algorithms works everywhere, multi-threaded twofish works with glibc
+  using dynamic linking.
 
 from 2.8.0 to 2.8.1
 - fixed src/python/Makefile.am where CFLAGS was used in C++ compilation
