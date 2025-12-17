@@ -64,9 +64,7 @@ namespace libdar
 	U_I algo_id;
 	S_I retry = use_pkcs5? MAX_RETRY_IF_WEAK_PASSWORD: 0;
 
-	main_clef = nullptr;
-	essiv_clef = nullptr;
-	ivec = nullptr;
+	nullify();
 
 	try
 	{
@@ -531,6 +529,15 @@ namespace libdar
 	ivec = (unsigned char *)gcry_malloc_secure(algo_block_size);
 	if(ivec == nullptr)
 	    throw Esecu_memory("crypto_sym::init_ivec");
+    }
+
+    void crypto_sym::nullify()
+    {
+	algo = crypto_algo::none;
+	main_clef = nullptr;
+	essiv_clef = nullptr;
+	algo_block_size = 0;
+	ivec = nullptr;
     }
 
     void crypto_sym::detruit()

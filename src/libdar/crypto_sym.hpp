@@ -74,7 +74,7 @@ namespace libdar
 		   hash_algo kdf_hash,       ///< not used if use_pkcs5 is not set
 		   bool use_pkcs5            ///< must be set to true when password is human defined to add a key derivation
 	    );
-	crypto_sym(const crypto_sym & ref) { copy_from(ref); };
+	crypto_sym(const crypto_sym & ref) { nullify(); copy_from(ref); };
 	crypto_sym(crypto_sym && ref) noexcept { try { move_from(std::move(ref)); } catch(...) {} };
 	crypto_sym & operator = (const crypto_sym & ref) { detruit(); copy_from(ref); return *this; };
 	crypto_sym & operator = (crypto_sym && ref) noexcept { try { detruit(); move_from(std::move(ref)); } catch(...) {} return *this; };
@@ -138,6 +138,7 @@ namespace libdar
 	void init_algo_block_size(crypto_algo algo);
 	void init_ivec(crypto_algo algo, size_t algo_block_size);
 
+	void nullify();
 	void detruit();
 	void copy_from(const crypto_sym & ref);
 	void move_from(crypto_sym && ref);
@@ -185,6 +186,7 @@ namespace libdar
 #endif
 
 #else
+	void nullify() { throw Ecompilation(gettext("Strong encryption support (libgcrypt)")); };
 	void detruit() { throw Ecompilation(gettext("Strong encryption support (libgcrypt)")); };
 	void copy_from(const crypto_sym & ref) { throw Ecompilation(gettext("Strong encryption support (libgcrypt)")); };
 	void move_from(crypto_sym && ref) { throw Ecompilation(gettext("Strong encryption support (libgcrypt)")); };
