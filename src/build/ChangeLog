@@ -1,3 +1,7 @@
+from 2.8.2 to 2.8.3
+- fixing bug met when symmetrical encryption object initialization failed
+  due to libgcrypt returned error code, leading libdar to segfault.
+
 from 2.8.1 to 2.8.2
 - fixed compilation warning about signed and unsigned int comparison
 - fixed display bug where the list of delete file flags were not showing
