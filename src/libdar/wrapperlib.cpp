@@ -408,7 +408,7 @@ namespace libdar
     void wrapperlib::lzma_set_next_in(const char *x)
     {
         CHECK_LZMA;
-        lzma_ptr->next_in = (Bytef *)x;
+        lzma_ptr->next_in = (uint8_t *)x;
     }
 
     void wrapperlib::lzma_set_avail_in(U_I x)
@@ -432,7 +432,7 @@ namespace libdar
     void wrapperlib::lzma_set_next_out(char *x)
     {
         CHECK_LZMA;
-        lzma_ptr->next_out = (Bytef *)x;
+        lzma_ptr->next_out = (uint8_t *)x;
     }
 
     char *wrapperlib::lzma_get_next_out() const
