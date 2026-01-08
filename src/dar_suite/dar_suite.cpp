@@ -177,7 +177,7 @@ int dar_suite_global(int argc,
 
 	try
 	{
-	    if(secured_memory_size == 0)
+	    if(secu_mem == nullptr)
 		get_version(maj, med, min);
 	    else
 		get_version(maj, med, min, secured_memory_size, true);
