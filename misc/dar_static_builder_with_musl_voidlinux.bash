@@ -37,13 +37,7 @@ LIBCURL_VERSION=8.17.0
 LIBSSH_VERSION=0.11.3
 LIBSSH2_VERSION=1.11.1
 LIBRHASH_VERSION=1.4.6
-
-# define whether to use libssh or libssh2
-# note that both libraries do support ssh version 2 protocol,
-# libssh even supports more recent ciphers than libssh2
-LIBSSH=1
-# LIBSSH=2
-
+LIBZ_VERSION=1.3.1
 
 # wget options need for gnutls website that does not provide all chain of trust in its certificate
 GNUTLS_WGET_OPT="--no-check-certificate"
@@ -118,7 +112,7 @@ check()
 requirements()
 {
     #updating xbps db
-    xbps-install -SUy || (xbps-install -uy xbps && xbps-install -SUy) || return 1
+    xbps-install -Suy || (xbps-install -uy xbps && xbps-install -Suy) || return 1
 
     # tools used to build the different packages involved here
     xbps-install -yf gcc make wget pkg-config cmake xz || return 1
@@ -126,7 +120,7 @@ requirements()
     #direct dependencies of libdar
     xbps-install -yf bzip2-devel e2fsprogs-devel libargon2-devel libgcc-devel liblz4-devel\
 		 liblzma-devel libstdc++-devel libzstd-devel liblz4-devel\
-		 lzo-devel musl-devel zlib-devel || return 1
+		 lzo-devel musl-devel || return 1
 
     # needed to build static flavor of librsync
     xbps-install -yf libb2-devel || return 1
@@ -174,7 +168,7 @@ libgcrypt()
     cd libgcrypt-${LIBGCRYPT_VERSION}
     ./configure --enable-static --prefix="$LOCAL_PREFIX" || return 1
     make ${MAKE_FLAGS} || return 1
-    make check || return 1
+    make ${MAKE_FLAGS} check || return 1
     make install || return 1
     cd ..
     ldconfig
@@ -266,21 +260,6 @@ libssh()
     fi
 }
 
-libssh2()
-{
-    local LIBSSH2_PKG=libssh2-${LIBSSH2_VERSION}.tar.gz
-
-    if [ ! -e "${REPO}/${LIBSSH2_PKG}" ] ; then wget "https://www.libssh2.org/download/${LIBSSH2_PKG}" && mv "${LIBSSH2_PKG}" "${REPO}" || return 1 ; fi
-    tar -xf "${REPO}/${LIBSSH2_PKG}" || return 1
-    cd libssh2-${LIBSSH2_VERSION} || return 1
-    ./configure --enable-shared --without-libssl --with-libz --with-crypto=libgcrypt --prefix="$LOCAL_PREFIX" || return 1
-    make ${MAKE_FLAGS} || return 1
-    make install || return 1
-    cd ..
-    ldconfig
-    rm -rf libssh2-${LIBSSH2_VERSION}
-}
-
 libcurl()
 {
     local LIBCURL_PKG=curl-${LIBCURL_VERSION}.tar.bz2
@@ -288,7 +267,7 @@ libcurl()
     if [ ! -e "${REPO}/${LIBCURL_PKG}" ] ; then wget "https://curl.se/download/${LIBCURL_PKG}" && mv "${LIBCURL_PKG}" "${REPO}" || return 1 ; fi
     tar -xf "${REPO}/${LIBCURL_PKG}" || return 1
     cd curl-${LIBCURL_VERSION} || return 1
-    ./configure --with-gnutls ${SSH_CURL_OPT} --enable-shared --enable-static --prefix="$LOCAL_PREFIX" || return 1
+    ./configure --without-libidn2 --without-ssl --without-zlib --without-zstd --without-ca-bundle --without-gnutls --without-brotli --without-libpsl --without-libgsasl  --enable-shared --enable-static --without-libssh --without-libssh2 --without-librtmp --prefix="$LOCAL_PREFIX" || return 1
     make ${MAKE_FLAGS} || return 1
     make install || return 1
     cd ..
@@ -312,16 +291,32 @@ librhash()
     rm -rf "RHash-${LIBRHASH_VERSION}"
 }
 
+libz()
+{
+    local LIBZ_PKG=zlib-${LIBZ_VERSION}.tar.gz
+
+    if [ ! -e "${REPO}/${LIBZ_PKG}" ] ; then wget "https://zlib.net/${LIBZ_PKG}" && mv "${LIBZ_PKG}" "${REPO}" || return 1 ; fi
+    tar -xf "${REPO}/${LIBZ_PKG}" || return 1
+    cd "zlib-${LIBZ_VERSION}" || return 1
+    ./configure --prefix=/usr/local || return 1
+    make ${MAKE_FLAGS} || return 1
+    make ${MAKE_FLAGS} test || return 1
+    make install
+    cd ..
+    ldconfig
+    rm -rf "zlib-${LIBZ_VERSION}"
+}
+
 dar_static()
 {
     #libpsl does not mention -lunistring which it relies on: updating pkgconfig file
-    local pkg_file=/usr/lib/pkgconfig/libpsl.pc
-    if [ -e "$pkg_file" ] ; then
-	cp "$pkg_file" "${pkg_file}.bak"
-	sed -r -e 's/-lpsl$/-lpsl -lunistring/' < "${pkg_file}.bak" > "$pkg_file"
-    else
-	echo "could not find pkg-config file for libpsl, and thus cannot patch it"
-    fi
+#    local pkg_file=/usr/lib/pkgconfig/libpsl.pc
+#    if [ -e "$pkg_file" ] ; then
+#	cp "$pkg_file" "${pkg_file}.bak"
+#	sed -r -e 's/-lpsl$/-lpsl -lunistring/' < "${pkg_file}.bak" > "$pkg_file"
+#    else
+#	echo "could not find pkg-config file for libpsl, and thus cannot patch it"
+#    fi
 
     make clean || /bin/true
     make distclean || /bin/true
@@ -335,6 +330,7 @@ dar_static()
 		--enable-libgcrypt-linking\
 		--enable-librsync-linking\
 		--enable-libcurl-linking\
+		--enable-libssh-linking\
 		--disable-build-html\
 		--disable-gpgme-linking\
 		--enable-threadar\
@@ -351,28 +347,13 @@ dar_static()
 check
 
 requirements || nok "Failed setting up requirements"
+libz || nok "Failed building zlib"
 libthreadar || nok "Failed building libthreadar"
 libgpg-error || nok "Failed building libgpg-error static version"
 libgcrypt || nok "Failed building libgcrypt"
 librsync || nok "Failed building librsync"
 gnutls || nok "Failed building gnutls"
-case "$LIBSSH" in
-    "1")
-	libssh || nok "Failed building libssh"
-	export SSH_CURL_OPT="--with-libssh"
-	;;
-    "2")
-	libssh2 || nok "Failed building libssh2"
-	export SSH_CURL_OPT="--with-libssh2"
-	;;
-    *)
-	echo "Unknow ssh library requested to build, aborting"
-	exit 1
-esac
-if [ -z "$SSH_CURL_OPT" ] ; then
-    echo "SSH_CURL_OPT is not defined, but is needed to compile libcurl"
-    exit 1;
-fi
+libssh || nok "Failed building libssh"
 libcurl || nok "Failed building libcurl"
 librhash || nok "Failed building librhash"
 dar_static || nok "Failed building dar_static"
