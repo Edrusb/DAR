@@ -20,7 +20,7 @@
 /*********************************************************************/
 
     /// \file crypto_segment.hpp
-    /// \brief defines unit block of information ciphered as once
+    /// \brief defines unit block of information ciphered at once
     /// \ingroup Private
     ///
 
