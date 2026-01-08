@@ -104,7 +104,7 @@ namespace libdar
         /// \param[out] minor the minor number of the version
         /// \param[in] gcrypt_secured_memory amount (in bytes) of secured memory to reserve while initializing libgcrypt
         /// \param[in] init_gpgme whether to initialize gpgme (not used if gpgme is not linked with libdar)
-	/// \note setting gcrypt_secured_memory still initializes libgcrypt (algorithms...) but does not setup
+	/// \note setting gcrypt_secured_memory to zero still initializes libgcrypt (algorithms...) but does not setup
 	/// secured memory at all. Libdar still cleans up (zeroing) allocated memory before releasing it when it is
 	/// expected to be secured memory, though it can be swapped out to disk, if the system decides so.
     extern void get_version(U_I & major, U_I & medium, U_I & minor, U_I gcrypt_secured_memory, bool init_gpgme);

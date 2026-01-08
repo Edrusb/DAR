@@ -148,6 +148,10 @@ int dar_suite_global(int argc,
     {
 	U_I min, med, maj;
 	bool silent;
+	U_I secured_memory_size = 0;
+	const char* env_name_secured_mem = "DAR_SECURED_MEMORY_SIZE_BYTES";
+	const char* secu_mem = line_tools_get_from_env(env, env_name_secured_mem);
+
 	line_tools_look_for_Q(argc,
 			      argv,
 			      getopt_string,
@@ -160,9 +164,23 @@ int dar_suite_global(int argc,
 	if(!ui)
 	    throw Ememory("dar_suite_global");
 
+	    // checking whether the user set the environment variable for non-default secured memory amount
+	if(secu_mem != nullptr)
+	    if(!tools_my_atoi(secu_mem, secured_memory_size))
+	    {
+		ui->printf(gettext("Invalid number given to environment variable %s: %s"),
+			   env_name_secured_mem,
+			   secu_mem);
+	    }
+	    // else conversion succeeded
+	    // else no secured mem specification provided by mean of environment variable, keeping the default value
+
 	try
 	{
-	    get_version(maj, med, min);
+	    if(secured_memory_size == 0)
+		get_version(maj, med, min);
+	    else
+		get_version(maj, med, min, secured_memory_size, true);
 	}
 	catch(Erange & e)
 	{

@@ -1663,7 +1663,9 @@ export GNUPGHOME=~myaccount/.gnupg
 .PP
 dar -K gnupg:...@...,...@... --sign:...@... etc.
 .RE
-
+.TP 10
+DAR_SECURED_MEMORY_SIZE_BYTES
+let the user specify the amount of secured dar/libdar should allocate. The provided value must be integer number defining the secured memory size in byte. By default 262144 bytes are allocated.
 .SH CAPABILITIES
 .B
 dar
