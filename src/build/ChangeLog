@@ -4,6 +4,9 @@ from 2.8.2 to 2.8.3
 - replace macro name of libz for unsigned char by the name used in
   liblzma header files in the calls to liblzma/xz library API. This fixes
   compilation failure when libz is not involved but libzma/libxz is.
+- fixed script used to build dar_static to set proper libgcrypt initialization
+  when sftp support is activated (libssh linking).
+
 
 from 2.8.1 to 2.8.2
 - fixed compilation warning about signed and unsigned int comparison
