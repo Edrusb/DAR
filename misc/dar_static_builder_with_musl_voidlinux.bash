@@ -246,9 +246,21 @@ libssh()
     cd libssh-${LIBSSH_VERSION} || return 1
     mkdir ${builddir} || nok "Failed creating build dir for libssh"
     cd ${builddir} || return 1
-    cmake -DUNIT_TESTING=OFF -DCMAKE_INSTALL_PREFIX="$LOCAL_PREFIX" -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=OFF -DWITH_GCRYPT=ON  ..  || return 1
+    cmake -DUNIT_TESTING=OFF -DCMAKE_INSTALL_PREFIX="$LOCAL_PREFIX" -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=OFF -DWITH_GCRYPT=OFF ..  || return 1
     make ${MAKE_FLAGS} || return 1
     make install || return 1
+
+    # fixing the libssh.pc to include -lcrypto as dependency
+    local PKGCONFIGFILE="$LOCAL_PREFIX/lib64/pkgconfig/libssh.pc"
+    if [ ! -f "$PKGCONFIGFILE" ] ; then
+        echo "could not find file \"$PKGCONFIGFILE\" to patch it"
+        exit 1
+    else
+        echo "patching \"$PKGCONFIGFILE\""
+    fi
+    cp "$PKGCONFIGFILE" "${PKGCONFIGFILE}.old"
+    sed -e "s/-lssh/-lssh -lcrypto/" < "${PKGCONFIGFILE}.old" > "$PKGCONFIGFILE" && rm "${PKGCONFIGFILE}.old"
+
     cd ../.. || return 1
     ldconfig || return 1
     rm -rf libssh-${LIBSSH_VERSION} || return 1
