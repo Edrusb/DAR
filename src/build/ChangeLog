@@ -1,16 +1,23 @@
 from 2.8.2 to 2.8.3
 - fixing bug met when symmetrical encryption object initialization failed
-  due to libgcrypt returned error code, leading libdar to segfault.
+  due to libgcrypt returning an error code, leading libdar to segfault.
 - replace macro name of libz for unsigned char by the name used in
   liblzma header files in the calls to liblzma/xz library API. This fixes
   compilation failure when libz is not involved but libzma/libxz is.
-- fixed script used to build dar_static to set proper libgcrypt initialization
-  when sftp support is activated (libssh linking).
+- added ssh_init()/ssh_finalize() libssh calls mentionned as required for
+  static linking, but this does not solve the problem of dar_static
+  failing with "Error while opening libgcrypt key handle to check password
+  strength: gcrypt/Out of memory". This problem only occured when libssh
+  linking was used. This problem has been fixed by:
+- modifying the script used to build dar_static to build libssh in a mode
+  where it does not rely on libgcrypt (and thus does not interfer with
+  this library initialization) but instead relies on openssl.
 - adding feature in dar command line to set the amount of secured memory
   to non-default value as indicated by the DAR_SECURED_MEMORY_SIZE_BYTES
-  environment variable (see man page for details).
-- added ssh_init()/ssh_finalize() libssh calls to address static linking
-  requirement of this library.
+  environment variable (see man page for details). Was added during the
+  troubleshooting phase of the problem described above and has been kept
+  because it has very little impact on the code and only in dar command
+  line part.
 
 from 2.8.1 to 2.8.2
 - fixed compilation warning about signed and unsigned int comparison
