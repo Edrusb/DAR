@@ -128,9 +128,6 @@ requirements()
     # needed to build static flavor of gnutls
     xbps-install -yf  nettle-devel libtasn1-devel libunistring-devel unbound-devel unbound || return 1
 
-    #needed for static flavor of libcurl
-    xbps-install -yf libpsl-devel libidn2-devel || return 1
-
     # optional but interesting to get a smaller dar_static binary
     xbps-install -yf upx || return 1
 
