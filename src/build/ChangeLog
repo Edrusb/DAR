@@ -9,6 +9,8 @@ from 2.8.2 to 2.8.3
 - adding feature in dar command line to set the amount of secured memory
   to non-default value as indicated by the DAR_SECURED_MEMORY_SIZE_BYTES
   environment variable (see man page for details).
+- added ssh_init()/ssh_finalize() libssh calls to address static linking
+  requirement of this library.
 
 from 2.8.1 to 2.8.2
 - fixed compilation warning about signed and unsigned int comparison
