@@ -377,8 +377,9 @@
 
 	<table class=center style="width: 100%;">
 	  <tr>
-	    <th>Distro</th>
-	    <th>Debian/Devuan/Ubuntu</th>
+	    <th style="width:30%;">Distro</th>
+	    <th style="width:35%;">Debian/Devuan/Ubuntu</th>
+	    <th style="width:35%;">OpenSuse (*)</th>
 	  </tr>
 	  <tr>
 	    <th>
@@ -386,6 +387,9 @@
 	    </th>
 	    <td>
 	      pkg-config
+	    </td>
+	    <td>
+	      pkgconfig
 	    </td>
 	  </tr>
 	  <tr>
@@ -395,6 +399,9 @@
 	    <td>
 	      zlib1g-dev
 	    </td>
+	    <td>
+	      zlib
+	    </td>
 	  </tr>
 	  <tr>
 	    <th>
@@ -402,6 +409,9 @@
 	    </th>
 	    <td>
 	      libbz2-dev
+	    </td>
+	    <td>
+	      bzip2
 	    </td>
 	  </tr>
 	  <tr>
@@ -411,6 +421,9 @@
 	    <td>
 	      liblzo2-dev
 	    </td>
+	    <td>
+	      lzo2
+	    </td>
 	  </tr>
 	  <tr>
 	    <th>
@@ -418,6 +431,9 @@
 	    </th>
 	    <td>
 	      liblzma-dev
+	    </td>
+	    <td>
+	      liblzma
 	    </td>
 	  </tr>
 	  <tr>
@@ -427,6 +443,9 @@
 	    <td>
 	      libzstd-dev
 	    </td>
+	    <td>
+	      libzstd
+	    </td>
 	  </tr>
 	  <tr>
 	    <th>
@@ -434,6 +453,9 @@
 	    </th>
 	    <td>
 	      liblz4-dev
+	    </td>
+	    <td>
+	      liblz4
 	    </td>
 	  </tr>
 	  <tr>
@@ -443,6 +465,9 @@
 	    <td>
 	      libgcrypt-dev
 	    </td>
+	    <td>
+	      libgcrypt
+	    </td>
 	  </tr>
 	  <tr>
 	    <th>
@@ -450,6 +475,10 @@
 	    </th>
 	    <td>
 	      libgpgme-dev
+	    </td>
+	    <td>
+	      gpg-error<br>
+	      gpgme
 	    </td>
 	  </tr>
 	  <tr>
@@ -459,6 +488,9 @@
 	    <td>
 	      doxygen
 	    </td>
+	    <td>
+	      ?
+	    </td>
 	  </tr>
 	  <tr>
 	    <th>
@@ -467,11 +499,17 @@
 	    <td>
 	      graphviz
 	    </td>
+	    <td>
+	      ?
+	    </td>
 	  </tr>
 	  <tr>
 	    <th>
 	      upx binary
 	    </th>
+	    <td>
+	      upx
+	    </td>
 	    <td>
 	      upx
 	    </td>
@@ -483,6 +521,9 @@
 	    <td>
 	      groff
 	    </td>
+	    <td>
+	      groff
+	    </td>
 	  </tr>
 	  <tr>
 	    <th>
@@ -490,6 +531,9 @@
 	    </th>
 	    <td>
 	      libext2fs-dev
+	    </td>
+	    <td>
+	      ext2fs
 	    </td>
 	  </tr>
 	  <tr>
@@ -499,6 +543,9 @@
 	    <td>
 	      libthreadar-dev
 	    </td>
+	    <td>
+	      libthreadar
+	    </td>
 	  </tr>
 	  <tr>
 	    <th>
@@ -506,6 +553,9 @@
 	    </th>
 	    <td>
 	      librsync-dev
+	    </td>
+	    <td>
+	      librsync-devel
 	    </td>
 	  </tr>
 	  <tr>
@@ -515,6 +565,9 @@
 	    <td>
 	      libcurl-dev
 	    </td>
+	    <td>
+	      libcurl
+	    </td>
 	  </tr>
 	  <tr>
 	    <th>
@@ -522,6 +575,9 @@
 	    </th>
 	    <td>
 	      libssh-dev
+	    </td>
+	    <td>
+	      ?
 	    </td>
 	  </tr>
 	  <tr>
@@ -532,6 +588,9 @@
 	      python3-pybind11
 	      <br/>python3-dev
 	    </td>
+	    <td>
+	      ?
+	    </td>
 	  </tr>
 	  <tr>
 	    <th>
@@ -539,6 +598,9 @@
 	    </th>
 	    <td>
 	      libargon2-dev
+	    </td>
+	    <td>
+	      libargon2
 	    </td>
 	  </tr>
 	  <tr>
@@ -548,9 +610,50 @@
 	    <td>
 	      librhash-dev
 	    </td>
+	    <td>
+	      ?
+	    </td>
 	  </tr>
-	</table>
+	  <tr>
+	    <th>
+	      miscellaneous
+	    </th>
+	    <td>
+	      par2<br>
+	    </td>
+	    <td>
+	      par<br/>
+	      libattr-devel<br/>
+	      gettext-tools<br/>
+	    </td>
+	  </tr>
 
+	</table>
+	<dl>
+	  <dt>(*)</dt><dd>
+	    Andy Capo has built a <a href="https://build.opensuse.org/package/show/home:andycapo/dar28">spec files for Opensuse</a>,
+	    even if it will probably not maintained often (after his words), this repo should be a good starting point
+	    for OpenSuse environment.
+	    Don't hesitate to send him your patches and modifications if necessary for this repo to stay more or less updated.
+	  </dd>
+	</dl>
+	<quote>
+	  <p>
+	    To quote Andy:
+	  </p>
+	  <i>
+	    <blockquote>
+	      The quickest way to install these packages (in opensuse 16.0 x64)
+	      is issuing the following commands:
+	    </blockquote>
+	    <p>
+	      <code class=block>
+  sudo zypper addrepo https://download.opensuse.org/repositories/home:andycapo/16.0/home:andycapo.repo
+  sudo zypper refresh
+  sudo zypper in dar libdar64-7000 dar-doc dar-lang
+	      </code>
+	    </p>
+	  </i>
 	<h2><a name="compiling">Compilation Process</a></h2>
 
 	<p>
