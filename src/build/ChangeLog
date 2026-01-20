@@ -9,15 +9,18 @@ from 2.8.2 to 2.8.3
   failing with "Error while opening libgcrypt key handle to check password
   strength: gcrypt/Out of memory". This problem only occured when libssh
   linking was used. This problem has been fixed by:
-- modifying the script used to build dar_static to build libssh in a mode
-  where it does not rely on libgcrypt (and thus does not interfer with
-  this library initialization) but instead relies on openssl.
+- modifying the script used to build dar_static for libssh be built in a
+  mode where it does not rely on libgcrypt (and thus does not interfer
+  with this library initialization) but instead relies on openssl.
 - adding feature in dar command line to set the amount of secured memory
   to non-default value as indicated by the DAR_SECURED_MEMORY_SIZE_BYTES
   environment variable (see man page for details). Was added during the
   troubleshooting phase of the problem described above and has been kept
   because it has very little impact on the code and only in dar command
   line part.
+- added OpenSuse info to buid dar/libdar and pointer to Andy Capo's repo
+  to overcome the today somehow outdated versions of dar/libdar provided
+  by Suse and OpenSuse.
 
 from 2.8.1 to 2.8.2
 - fixed compilation warning about signed and unsigned int comparison
