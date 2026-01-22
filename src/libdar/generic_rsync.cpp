@@ -400,9 +400,9 @@ namespace libdar
 	switch(status)
 	{
 	case sign:
-	case delta:
 	    send_eof();
 	    break;
+	case delta:
       	case patch:
 	    break;
 	default:
