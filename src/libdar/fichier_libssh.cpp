@@ -26,6 +26,9 @@ extern "C"
 #if HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
+#if HAVE_STRING_H
+#include <string.h>
+#endif
 }
 
 #include "fichier_libssh.hpp"
