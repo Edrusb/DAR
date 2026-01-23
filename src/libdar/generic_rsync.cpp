@@ -301,6 +301,7 @@ namespace libdar
 	    do
 	    {
 		U_I tmp = BUFFER_SIZE - working_size;
+
 		(void)step_forward(a + lu - remain, remain,
 				   false,
 				   working_buffer+working_size, tmp);
@@ -308,7 +309,8 @@ namespace libdar
 
 		// we flush the working_buffer only when is it full because the
 		// memory_file class does not scale well with short writes
-		if(working_size > 0 && tmp == 0) {
+		if(working_size > 0 && tmp == 0)
+		{
 		    x_output->write(working_buffer, working_size);
 		    working_size = 0;
 		}
