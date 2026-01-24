@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: DAR 2.7.0\n"
 "Report-Msgid-Bugs-To: https://github.com/Edrusb/DAR/issues\n"
-"POT-Creation-Date: 2026-01-24 11:06+0100\n"
+"POT-Creation-Date: 2026-01-24 11:47+0100\n"
 "PO-Revision-Date: 2026-01-24 11:20+0100\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
@@ -169,7 +169,8 @@ msgstr ""
 #: src/dar_suite/dar_suite.cpp:171
 #, c-format
 msgid "Invalid number given to environment variable %s: %s"
-msgstr "Valeur numérique incorrecte spécifiée dans la variable d'environnement %s: %s"
+msgstr ""
+"Valeur numérique incorrecte spécifiée dans la variable d'environnement %s: %s"
 
 #: src/dar_suite/dar_suite.cpp:195
 #, c-format
