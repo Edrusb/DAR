@@ -126,6 +126,7 @@ requirements()
     # optional but interesting to get a smaller dar_static binary
     xbps-install -y upx || echo "" && echo "WARNING!" && echo "Failed to install upx, will do without" && echo && sleep 3
 
+    uname > /dev/null || nok "missing uname command, aborting"
 }
 
 libthreadar()
@@ -268,10 +269,15 @@ dar_static()
 		--enable-threadar\
 		--enable-libargon2-linking\
 		--disable-python-binding\
-		--prefix=/DAR || exit 1
-    make ${MAKE_FLAGS} || exit 1
-    make DESTDIR=${tmp_dir} install-strip || exit 1
-    mv ${tmp_dir}/DAR/bin/dar_static . && echo "dar_static binary is available in the current directory"
+		--enable-upx\
+		--prefix=/DAR || return 1
+    make ${MAKE_FLAGS} || return 1
+    make DESTDIR=${tmp_dir} install-strip || return 1
+    VERSION=$(${LOCAL_PREFIX}/bin/dar_static -V | sed -rn -e 's/.*dar_static version\s+([\.0-9]+),\s+Copyright.*/\1/p')
+    OS=$(uname -o | sed -e 's#/#_#g')
+    TARGET="dar_static_${VERSION}_$(uname -m)_${OS}"
+    mkdir "$TARGET"
+    cp ${tmp_dir}/DAR/bin/*_static "$TARGET" && echo "static binaries are available in the directory $TARGET"
     rm -rf ${tmp_dir}/DAR
 }
 
