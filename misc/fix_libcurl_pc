@@ -19,6 +19,6 @@ is_fixed=$(echo "$libs_lline" | grep -- '-lidn2' | wc -l)
 
 if [ $is_fixed -eq 0 ] ; then
    cp "$curlpkg" "${curlpkg}.old"
-   sed -r -e 's/(^Libs:.*)/\1 -lidn2 -lunistring/' < "${curlpkg}.old" > "${curlpkg}"
+   sed -r -e 's/(^Libs:.*)/\1 -lunistring/' < "${curlpkg}.old" > "${curlpkg}"
    rm "${curlpkg}.old"
 fi

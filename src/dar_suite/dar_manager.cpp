@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002-2025 Denis Corbin
+// Copyright (C) 2002-2026 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -68,7 +68,7 @@ extern "C"
 
 using namespace libdar;
 
-#define DAR_MANAGER_VERSION "1.10.0"
+#define DAR_MANAGER_VERSION "1.10.1"
 
 
 #define ONLY_ONCE "Only one -%c is allowed, ignoring this extra option"
@@ -1188,7 +1188,7 @@ static void show_version(shell_interaction & dialog, const char *command_name)
 
     get_version(maj, med, min);
     dialog.change_non_interactive_output(cout);
-    dialog.printf("\n %s version %s, Copyright (C) 2002-2025 Denis Corbin\n", name.c_str(), DAR_MANAGER_VERSION);
+    dialog.printf("\n %s version %s, Copyright (C) 2002-2026 Denis Corbin\n", name.c_str(), DAR_MANAGER_VERSION);
     dialog.message(string("   ") + dar_suite_command_line_features() + "\n");
     if(maj > 2)
 	dialog.printf(gettext(" Using libdar %u.%u.%u built with compilation time options:\n"), maj, med, min);

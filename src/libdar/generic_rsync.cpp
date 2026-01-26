@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002-2025 Denis Corbin
+// Copyright (C) 2002-2026 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -300,13 +300,20 @@ namespace libdar
 	    remain = lu;
 	    do
 	    {
-		working_size = BUFFER_SIZE;
+		U_I tmp = BUFFER_SIZE - working_size;
+
 		(void)step_forward(a + lu - remain, remain,
 				   false,
-				   working_buffer, working_size);
+				   working_buffer+working_size, tmp);
+		working_size += tmp;
 
-		if(working_size > 0)
+		// we flush the working_buffer only when is it full because the
+		// memory_file class does not scale well with short writes
+		if(working_size > 0 && tmp == 0)
+		{
 		    x_output->write(working_buffer, working_size);
+		    working_size = 0;
+		}
 	    }
 	    while(remain > 0);
 	    break;
@@ -400,9 +407,9 @@ namespace libdar
 	switch(status)
 	{
 	case sign:
-	case delta:
 	    send_eof();
 	    break;
+	case delta:
       	case patch:
 	    break;
 	default:
@@ -515,6 +522,9 @@ namespace libdar
     {
 	U_I tmp;
 	bool finished;
+
+	if(working_size > 0)
+	    x_output->write(working_buffer, working_size);
 
 	do
 	{

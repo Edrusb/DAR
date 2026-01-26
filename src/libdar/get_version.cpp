@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002-2025 Denis Corbin
+// Copyright (C) 2002-2026 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -60,6 +60,11 @@ extern "C"
 
 #if HAVE_GPGME_H
 #include <gpgme.h>
+#endif
+
+#if HAVE_LIBSSH_LIBSSH_H
+#include <libssh/libssh.h>
+#include <libssh/sftp.h>
 #endif
 } // end extern "C"
 
@@ -207,6 +212,23 @@ namespace libdar
 		    throw Erange("libdar_init_libgcrypt", tools_printf(gettext("Too old version for libgcrypt, minimum required version is %s"), MIN_VERSION_GCRYPT));
 #endif
 
+#if LIBSSH_AVAILABLE
+	    if(ssh_init() != SSH_OK)
+	    {
+		static const char* ERROR = "Failed initializing libssh";
+		const char* tmp = ssh_get_error(nullptr);
+
+		if(tmp != nullptr)
+		    throw Erange("libdar_init_libssh_initialization",
+				 tools_printf("%s : %s",
+					      gettext(ERROR),
+					      tmp));
+		else
+		    throw Erange("libdar_init_libssh_initialization",
+				 tools_printf(gettext(ERROR)));
+	    }
+#endif
+
 	    // initializing gpgme
 
 #if GPGME_SUPPORT
@@ -276,10 +298,16 @@ namespace libdar
 	mycurl_easyhandle_node::release_defaults();
 	    // it must thus be released before released libgcrypt below
 #endif
+
+#if LIBSSH_AVAILABLE
+	ssh_finalize();
+#endif
+
 #ifdef CRYPTO_AVAILABLE
 	if(libdar_initialized_gcrypt)
 	    gcry_control(GCRYCTL_TERM_SECMEM, 0); // by precaution if not already done by libgcrypt itself
 #endif
+
 #if LIBCURL_AVAILABLE
 	curl_global_cleanup();
 #endif

@@ -1,6 +1,6 @@
 /*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002-2025 Denis Corbin
+// Copyright (C) 2002-2026 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -20,7 +20,7 @@
 /*********************************************************************/
 
     /// \file crypto_segment.hpp
-    /// \brief defines unit block of information ciphered as once
+    /// \brief defines unit block of information ciphered at once
     /// \ingroup Private
     ///
 

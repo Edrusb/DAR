@@ -1,3 +1,10 @@
+version 2.8.3
+--------------
+Thanks to Andy Capo for feedback and for having provided updated spec file of
+dar/libdar for OpenSuse (those available under Suse/OpenSuse were a bit
+outdated). Big Thank to Anthony Baire for a pull request improving performance
+of binary delta signature computation and surrounding code analysis.
+
 version 2.8.2
 --------------
 Thanks to John Goerzen for feedback, bug report and for maintaining and

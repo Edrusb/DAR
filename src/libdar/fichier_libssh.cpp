@@ -1,6 +1,6 @@
 //*********************************************************************/
 // dar - disk archive - a backup/restoration program
-// Copyright (C) 2002-2025 Denis Corbin
+// Copyright (C) 2002-2026 Denis Corbin
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -25,6 +25,9 @@ extern "C"
 {
 #if HAVE_FCNTL_H
 #include <fcntl.h>
+#endif
+#if HAVE_STRING_H
+#include <string.h>
 #endif
 }
 

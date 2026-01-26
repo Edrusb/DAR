@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: dar 2.8.2\n"
+"Project-Id-Version: dar 2.8.3\n"
 "Report-Msgid-Bugs-To: https://github.com/Edrusb/DAR/issues\n"
-"POT-Creation-Date: 2025-12-13 12:53+0100\n"
+"POT-Creation-Date: 2026-01-24 11:47+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -152,123 +152,128 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/dar_suite/dar_suite.cpp:177
+#: src/dar_suite/dar_suite.cpp:171
+#, c-format
+msgid "Invalid number given to environment variable %s: %s"
+msgstr ""
+
+#: src/dar_suite/dar_suite.cpp:195
 #, c-format
 msgid ""
 "We have linked with an incompatible version of libdar. Expecting version %d."
 "%d.x but having linked with version %d.%d.%d"
 msgstr ""
 
-#: src/dar_suite/dar_suite.cpp:189
+#: src/dar_suite/dar_suite.cpp:207
 msgid "NOT YET IMPLEMENTED FEATURE has been asked: "
 msgstr ""
 
-#: src/dar_suite/dar_suite.cpp:190
+#: src/dar_suite/dar_suite.cpp:208
 msgid "Please check documentation or upgrade your software if available"
 msgstr ""
 
-#: src/dar_suite/dar_suite.cpp:195 src/python/pybind11_libdar.cpp:210
+#: src/dar_suite/dar_suite.cpp:213 src/python/pybind11_libdar.cpp:210
 msgid "SEEMS TO BE A HARDWARE PROBLEM: "
 msgstr ""
 
-#: src/dar_suite/dar_suite.cpp:196
+#: src/dar_suite/dar_suite.cpp:214
 msgid "Please check your hardware"
 msgstr ""
 
-#: src/dar_suite/dar_suite.cpp:201 src/python/pybind11_libdar.cpp:214
+#: src/dar_suite/dar_suite.cpp:219 src/python/pybind11_libdar.cpp:214
 msgid "Lack of SECURED memory to achieve the operation, aborting operation"
 msgstr ""
 
-#: src/dar_suite/dar_suite.cpp:206 src/dar_suite/dar_suite.cpp:211
+#: src/dar_suite/dar_suite.cpp:224 src/dar_suite/dar_suite.cpp:229
 #: src/python/pybind11_libdar.cpp:218 src/python/pybind11_libdar.cpp:222
 msgid "Lack of memory to achieve the operation, aborting operation"
 msgstr ""
 
-#: src/dar_suite/dar_suite.cpp:216 src/dar_suite/dar_suite.cpp:261
+#: src/dar_suite/dar_suite.cpp:234 src/dar_suite/dar_suite.cpp:279
 #: src/python/pybind11_libdar.cpp:226
 msgid "FATAL error, aborting operation: "
 msgstr ""
 
-#: src/dar_suite/dar_suite.cpp:221 src/python/pybind11_libdar.cpp:230
+#: src/dar_suite/dar_suite.cpp:239 src/python/pybind11_libdar.cpp:230
 msgid "Aborting program. User refused to continue while asking: "
 msgstr ""
 
-#: src/dar_suite/dar_suite.cpp:226 src/python/pybind11_libdar.cpp:234
+#: src/dar_suite/dar_suite.cpp:244 src/python/pybind11_libdar.cpp:234
 msgid "Program has been aborted for the following reason: "
 msgstr ""
 
-#: src/dar_suite/dar_suite.cpp:236 src/python/pybind11_libdar.cpp:242
+#: src/dar_suite/dar_suite.cpp:254 src/python/pybind11_libdar.cpp:242
 msgid "Aborting program. An error occurred concerning user command execution: "
 msgstr ""
 
-#: src/dar_suite/dar_suite.cpp:241 src/python/pybind11_libdar.cpp:246
+#: src/dar_suite/dar_suite.cpp:259 src/python/pybind11_libdar.cpp:246
 msgid "Aborting program. An error occurred while calling libdar: "
 msgstr ""
 
-#: src/dar_suite/dar_suite.cpp:246 src/dar_suite/dar_suite.cpp:251
+#: src/dar_suite/dar_suite.cpp:264 src/dar_suite/dar_suite.cpp:269
 #: src/python/pybind11_libdar.cpp:250 src/python/pybind11_libdar.cpp:254
 msgid "Aborting program. "
 msgstr ""
 
-#: src/dar_suite/dar_suite.cpp:256 src/python/pybind11_libdar.cpp:258
+#: src/dar_suite/dar_suite.cpp:274 src/python/pybind11_libdar.cpp:258
 msgid ""
 "Aborting program. The requested operation needs a feature that has been "
 "disabled at compilation time: "
 msgstr ""
 
-#: src/dar_suite/dar_suite.cpp:266 src/python/pybind11_libdar.cpp:266
+#: src/dar_suite/dar_suite.cpp:284 src/python/pybind11_libdar.cpp:266
 msgid "FATAL error during network communication, aborting operation: "
 msgstr ""
 
-#: src/dar_suite/dar_suite.cpp:272 src/dar_suite/dar_suite.cpp:292
+#: src/dar_suite/dar_suite.cpp:290 src/dar_suite/dar_suite.cpp:310
 msgid "INTERNAL ERROR, PLEASE REPORT THE PREVIOUS OUTPUT TO MAINTAINER"
 msgstr ""
 
-#: src/dar_suite/dar_suite.cpp:291
+#: src/dar_suite/dar_suite.cpp:309
 msgid "CAUGHT A NON (LIB)DAR EXCEPTION"
 msgstr ""
 
-#: src/dar_suite/dar_suite.cpp:299
+#: src/dar_suite/dar_suite.cpp:317
 msgid ""
 "SANITY CHECK: AT LEAST ONE THREAD_CANCELLATION OBJECT HAS NOT BEEN DESTROYED "
 "AND REMAINS IN MEMORY WHILE THE PROGRAM REACHED ITS END"
 msgstr ""
 
-#: src/dar_suite/dar_suite.cpp:310 src/dar_suite/line_tools.cpp:58
+#: src/dar_suite/dar_suite.cpp:328 src/dar_suite/line_tools.cpp:58
 #: src/libdar/op_tools.cpp:259
 msgid "YES"
 msgstr ""
 
-#: src/dar_suite/dar_suite.cpp:312 src/dar_suite/line_tools.cpp:58
+#: src/dar_suite/dar_suite.cpp:330 src/dar_suite/line_tools.cpp:58
 #: src/libdar/op_tools.cpp:260
 msgid "NO"
 msgstr ""
 
-#: src/dar_suite/dar_suite.cpp:315
+#: src/dar_suite/dar_suite.cpp:333
 #, c-format
 msgid "Long options support         : %s\n"
 msgstr ""
 
-#: src/dar_suite/dar_suite.cpp:338
+#: src/dar_suite/dar_suite.cpp:356
 #, c-format
 msgid "Received signal: %s"
 msgstr ""
 
-#: src/dar_suite/dar_suite.cpp:343
+#: src/dar_suite/dar_suite.cpp:361
 msgid "Archive fast termination engaged"
 msgstr ""
 
-#: src/dar_suite/dar_suite.cpp:347
+#: src/dar_suite/dar_suite.cpp:365
 msgid "Archive delayed termination engaged"
 msgstr ""
 
-#: src/dar_suite/dar_suite.cpp:351
+#: src/dar_suite/dar_suite.cpp:369
 msgid ""
 "Disabling signal handler, the next time this signal is received the program "
 "will abort immediately"
 msgstr ""
 
-#: src/dar_suite/dar_suite.cpp:355
+#: src/dar_suite/dar_suite.cpp:373
 msgid ""
 "Cannot cleanly abort the operation, thread-safe support is missing, will "
 "thus abruptly stop the program, generated archive may be unusable"
@@ -4031,42 +4036,42 @@ msgstr ""
 msgid "Copied data does not match expected CRC"
 msgstr ""
 
-#: src/libdar/fichier_libssh.cpp:96
+#: src/libdar/fichier_libssh.cpp:99
 #, c-format
 msgid "Failed openning SFTP file %s: %s"
 msgstr ""
 
-#: src/libdar/fichier_libssh.cpp:136
+#: src/libdar/fichier_libssh.cpp:139
 #, c-format
 msgid "Unable to change permission of SFTP file %s: %s"
 msgstr ""
 
-#: src/libdar/fichier_libssh.cpp:154
+#: src/libdar/fichier_libssh.cpp:157
 #, c-format
 msgid "Unable to fetch SFTP file size of %s: %s"
 msgstr ""
 
-#: src/libdar/fichier_libssh.cpp:224 src/libdar/fichier_libcurl.cpp:288
+#: src/libdar/fichier_libssh.cpp:227 src/libdar/fichier_libcurl.cpp:288
 msgid ""
 "libcurl does not allow truncating at a given position while uploading files"
 msgstr ""
 
-#: src/libdar/fichier_libssh.cpp:299
+#: src/libdar/fichier_libssh.cpp:302
 #, c-format
 msgid "Error while fetching SFTP read-ahead data: %s"
 msgstr ""
 
-#: src/libdar/fichier_libssh.cpp:334
+#: src/libdar/fichier_libssh.cpp:337
 #, c-format
 msgid "Error while reading SFTP data: %s"
 msgstr ""
 
-#: src/libdar/fichier_libssh.cpp:342
+#: src/libdar/fichier_libssh.cpp:345
 #, c-format
 msgid "Libssh error while reading file's data: %s"
 msgstr ""
 
-#: src/libdar/fichier_libssh.cpp:388
+#: src/libdar/fichier_libssh.cpp:391
 #, c-format
 msgid "SFTP read-ahead failed: %s"
 msgstr ""
@@ -5357,7 +5362,7 @@ msgstr ""
 msgid "%d is not a valid block size"
 msgstr ""
 
-#: src/libdar/tronconneuse.cpp:454 src/libdar/crypto_sym.cpp:236
+#: src/libdar/tronconneuse.cpp:454 src/libdar/crypto_sym.cpp:234
 msgid "Data corruption may have occurred, cannot decrypt data"
 msgstr ""
 
@@ -6262,10 +6267,10 @@ msgid ""
 "libdar, ignore this entry and continue anyway?"
 msgstr ""
 
-#: src/libdar/crypto_sym.hpp:188 src/libdar/crypto_sym.hpp:189
-#: src/libdar/crypto_sym.hpp:190 src/libdar/crypto_sym.cpp:148
-#: src/libdar/crypto_sym.cpp:162 src/libdar/crypto_sym.cpp:211
-#: src/libdar/crypto_sym.cpp:242
+#: src/libdar/crypto_sym.hpp:189 src/libdar/crypto_sym.hpp:190
+#: src/libdar/crypto_sym.hpp:191 src/libdar/crypto_sym.hpp:192
+#: src/libdar/crypto_sym.cpp:146 src/libdar/crypto_sym.cpp:160
+#: src/libdar/crypto_sym.cpp:209 src/libdar/crypto_sym.cpp:240
 msgid "Strong encryption support (libgcrypt)"
 msgstr ""
 
@@ -6285,11 +6290,11 @@ msgstr ""
 msgid "Error met building the rsync hash table: "
 msgstr ""
 
-#: src/libdar/generic_rsync.cpp:487
+#: src/libdar/generic_rsync.cpp:494
 msgid "Error met while feeding data to librsync: "
 msgstr ""
 
-#: src/libdar/generic_rsync.cpp:509
+#: src/libdar/generic_rsync.cpp:516
 msgid "Error releasing librsync job: "
 msgstr ""
 
@@ -7427,41 +7432,41 @@ msgstr ""
 msgid "Invalid archive number: %d"
 msgstr ""
 
-#: src/libdar/get_version.cpp:172
+#: src/libdar/get_version.cpp:177
 msgid "Initialization problem for liblzo2 library"
 msgstr ""
 
-#: src/libdar/get_version.cpp:189 src/libdar/get_version.cpp:207
+#: src/libdar/get_version.cpp:194 src/libdar/get_version.cpp:212
 #, c-format
 msgid "Too old version for libgcrypt, minimum required version is %s"
 msgstr ""
 
-#: src/libdar/get_version.cpp:198
+#: src/libdar/get_version.cpp:203
 #, c-format
 msgid "Error while telling libgcrypt that initialization is finished: %s/%s"
 msgstr ""
 
-#: src/libdar/get_version.cpp:203
+#: src/libdar/get_version.cpp:208
 msgid "libgcrypt not initialized and libdar not allowed to do so"
 msgstr ""
 
-#: src/libdar/get_version.cpp:218
+#: src/libdar/get_version.cpp:240
 #, c-format
 msgid "GPGME version requirement is not satisfied, requires version > %s"
 msgstr ""
 
-#: src/libdar/get_version.cpp:222
+#: src/libdar/get_version.cpp:244
 #, c-format
 msgid "GPGME engine not available: %s"
 msgstr ""
 
-#: src/libdar/get_version.cpp:232 src/libdar/get_version.cpp:236
-#: src/libdar/get_version.cpp:238
+#: src/libdar/get_version.cpp:254 src/libdar/get_version.cpp:258
+#: src/libdar/get_version.cpp:260
 #, c-format
 msgid "libcurl initialization failed: %s"
 msgstr ""
 
-#: src/libdar/get_version.cpp:257
+#: src/libdar/get_version.cpp:279
 #, c-format
 msgid ""
 "libthreader version %d.%d.%d is too old, need version %s.%s.%s or more recent"
@@ -7549,133 +7554,133 @@ msgstr ""
 msgid "lz4 compression"
 msgstr ""
 
-#: src/libdar/crypto_sym.cpp:78
+#: src/libdar/crypto_sym.cpp:76
 msgid ""
 "Current implementation of blowfish encryption is not compatible with old "
 "(weak) implementation, use dar-2.3.x software or later (or other software "
 "based on libdar-4.4.x or greater) to read this archive"
 msgstr ""
 
-#: src/libdar/crypto_sym.cpp:81
+#: src/libdar/crypto_sym.cpp:79
 msgid "cannot use 'none' as hashing algorithm for key derivation function"
 msgstr ""
 
-#: src/libdar/crypto_sym.cpp:88 src/libdar/crypto_sym.cpp:268
+#: src/libdar/crypto_sym.cpp:86 src/libdar/crypto_sym.cpp:266
 #, c-format
 msgid "Cyphering algorithm not available in libgcrypt: %s/%s"
 msgstr ""
 
-#: src/libdar/crypto_sym.cpp:112
+#: src/libdar/crypto_sym.cpp:110
 #, c-format
 msgid ""
 "Failed to obtain a strong hashed password after %d retries with pkcs5 and "
 "different salt values, aborting"
 msgstr ""
 
-#: src/libdar/crypto_sym.cpp:198
+#: src/libdar/crypto_sym.cpp:196
 #, c-format
 msgid "Error while resetting encryption key for a new block: %s/%s"
 msgstr ""
 
-#: src/libdar/crypto_sym.cpp:202 src/libdar/crypto_sym.cpp:230
-#: src/libdar/crypto_sym.cpp:463
+#: src/libdar/crypto_sym.cpp:200 src/libdar/crypto_sym.cpp:228
+#: src/libdar/crypto_sym.cpp:461
 #, c-format
 msgid "Error while setting IV for current block: %s/%s"
 msgstr ""
 
-#: src/libdar/crypto_sym.cpp:205
+#: src/libdar/crypto_sym.cpp:203
 #, c-format
 msgid "Error while cyphering data: %s/%s"
 msgstr ""
 
-#: src/libdar/crypto_sym.cpp:233
+#: src/libdar/crypto_sym.cpp:231
 #, c-format
 msgid "Error while decyphering data: %s/%s"
 msgstr ""
 
-#: src/libdar/crypto_sym.cpp:273
+#: src/libdar/crypto_sym.cpp:271
 msgid "Failed retrieving from libgcrypt the maximum key length"
 msgstr ""
 
-#: src/libdar/crypto_sym.cpp:306
+#: src/libdar/crypto_sym.cpp:304
 #, c-format
 msgid ""
 "Error while opening libgcrypt key handle to check password strength: %s/%s"
 msgstr ""
 
-#: src/libdar/crypto_sym.cpp:318
+#: src/libdar/crypto_sym.cpp:316
 #, c-format
 msgid ""
 "Error while assigning key to libgcrypt key handle to check password "
 "strength: %s/%s"
 msgstr ""
 
-#: src/libdar/crypto_sym.cpp:376
+#: src/libdar/crypto_sym.cpp:374
 msgid "Too large value give for key derivation interation count"
 msgstr ""
 
-#: src/libdar/crypto_sym.cpp:425
+#: src/libdar/crypto_sym.cpp:423
 #, c-format
 msgid "Error while opening libgcrypt key handle: %s/%s"
 msgstr ""
 
-#: src/libdar/crypto_sym.cpp:433
+#: src/libdar/crypto_sym.cpp:431
 #, c-format
 msgid "Error while assigning key to libgcrypt key handle: %s/%s"
 msgstr ""
 
-#: src/libdar/crypto_sym.cpp:455
+#: src/libdar/crypto_sym.cpp:453
 #, c-format
 msgid "Error while creating ESSIV handle: %s/%s"
 msgstr ""
 
-#: src/libdar/crypto_sym.cpp:485
+#: src/libdar/crypto_sym.cpp:483
 #, c-format
 msgid "Error while assigning key to libgcrypt key handle (essiv): %s/%s"
 msgstr ""
 
-#: src/libdar/crypto_sym.cpp:494
+#: src/libdar/crypto_sym.cpp:492
 #, c-format
 msgid ""
 "Failed retrieving from libgcrypt the block size used by the cyphering "
 "algorithm (essiv): %s/%s"
 msgstr ""
 
-#: src/libdar/crypto_sym.cpp:521
+#: src/libdar/crypto_sym.cpp:519
 #, c-format
 msgid ""
 "Failed retrieving from libgcrypt the block size used by the cyphering "
 "algorithm: %s/%s"
 msgstr ""
 
-#: src/libdar/crypto_sym.cpp:637
+#: src/libdar/crypto_sym.cpp:644
 #, c-format
 msgid "Error while generating IV: %s/%s"
 msgstr ""
 
-#: src/libdar/crypto_sym.cpp:677
+#: src/libdar/crypto_sym.cpp:684
 #, c-format
 msgid "Error! SHA1 not available in libgcrypt: %s/%s"
 msgstr ""
 
-#: src/libdar/crypto_sym.cpp:683
+#: src/libdar/crypto_sym.cpp:690
 #, c-format
 msgid "Error while derivating key from password (HMAC open): %s/%s"
 msgstr ""
 
-#: src/libdar/crypto_sym.cpp:689
+#: src/libdar/crypto_sym.cpp:696
 #, c-format
 msgid "Error while derivating key from password (HMAC set key): %s/%s"
 msgstr ""
 
-#: src/libdar/crypto_sym.cpp:819
+#: src/libdar/crypto_sym.cpp:826
 #, c-format
 msgid "Error while computing KDF with argon2 algorithm: %d"
 msgstr ""
 
-#: src/libdar/crypto_sym.cpp:856 src/libdar/crypto_sym.cpp:862
-#: src/libdar/crypto_sym.cpp:871 src/libdar/crypto_sym.cpp:879
-#: src/libdar/crypto_sym.cpp:930
+#: src/libdar/crypto_sym.cpp:863 src/libdar/crypto_sym.cpp:869
+#: src/libdar/crypto_sym.cpp:878 src/libdar/crypto_sym.cpp:886
+#: src/libdar/crypto_sym.cpp:937
 msgid "Library used for blowfish encryption does not respect RFC 3962"
 msgstr ""
 

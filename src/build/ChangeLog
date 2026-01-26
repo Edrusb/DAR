@@ -6,6 +6,32 @@ from 2.8.x to 2.9.0
   (see dar_manager's -K options and eventually -L option for non-default
   behavior regarding dar_manager key provisionning.
 
+from 2.8.2 to 2.8.3
+- fixing bug met when symmetric encryption object initialization failed
+  due to libgcrypt returning an error code, leading libdar to segfault.
+- replaced macro from libz for unsigned char by the name used in
+  liblzma header files in the calls to liblzma/xz library API. This fixes
+  compilation failure when libz is not involved but libzma/libxz is.
+- added ssh_init()/ssh_finalize() libssh calls mentioned as required for
+  static linking, but this did not solved the problem of dar_static
+  failing with "Error while opening libgcrypt key handle to check password
+  strength: gcrypt/Out of memory". This problem only occurred when libssh
+  linking was used. This problem has been fixed by:
+- modifying the script used to build dar_static for libssh be built in a
+  mode where it does not rely on libgcrypt (and thus does not interfere
+  with this library initialization) but instead relies on openssl.
+- adding feature in dar command line to set the amount of secured memory
+  to non-default value as indicated by the DAR_SECURED_MEMORY_SIZE_BYTES
+  environment variable (see man page for details). Was added during the
+  troubleshooting phase of the problem described above and has been kept
+  because it had very little impact on the code and only in dar command
+  line part.
+- added OpenSuse info to build dar/libdar and pointer to Andy Capo's repo
+  to overcome the today somehow outdated versions of dar/libdar provided
+  by Suse and OpenSuse.
+- patch by Anthony Baire to improve the speed of binary delta signature
+  computation.
+
 from 2.8.1 to 2.8.2
 - fixed compilation warning about signed and unsigned int comparison
 - fixed display bug where the list of delete file flags were not showing

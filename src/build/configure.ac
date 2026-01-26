@@ -1,6 +1,6 @@
 #######################################################################
 # dar - disk archive - a backup/restoration program
-# Copyright (C) 2002-2025 Denis Corbin
+# Copyright (C) 2002-2026 Denis Corbin
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -1287,15 +1287,27 @@ AS_IF(        [test "x$enable_librsync_linking" != "xyes"],
                  local_librsync="no"
               ],
               [
-               AC_CHECK_LIB(rsync, [rs_strerror], [], [AC_MSG_WARN([librsync library not found])])
+	        PKG_CHECK_EXISTS(librsync,
+	         [
+		    PKG_CHECK_MODULES(LIBRSYNC, librsync, [], [AC_MSG_ERROR([pkgconfig file for librsync not found, but reported as existing!?!])])
+		 ],
+		 [
+		    AC_CHECK_LIB(rsync, [rs_strerror], [], [AC_MSG_WARN([librsync library not found])])
+		 ])
+
+	       CPPFLAGS__cache="$CPPFLAGS"
+               CPPFLAGS="$LIBRSYNC_CFLAGS $CPPFLAGS"
+               LIBS___cache="$LIBS"
+               LIBS="$LIBRSYNC_LIBS $LIBS"
+
                AC_CHECK_HEADER(librsync.h, [local_librsync="yes"
                                         AC_DEFINE(HAVE_LIBRSYNC_H, 1, [librsync.h header file is available])
                                        ],
                                        [AC_MSG_WARN([Cannot find librsync.h header file])
                                          local_librsync="no"
                                         ])
-                if test "$local_librsync" = "yes" ; then
-                AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
+              if test "$local_librsync" = "yes" ; then
+              AC_LINK_IFELSE([AC_LANG_PROGRAM([[ extern "C" {
                                                             #if HAVE_LIBRSYNC_H
                                                             #include <stdio.h>
                                                             #include <librsync.h>
@@ -1308,12 +1320,22 @@ AS_IF(        [test "x$enable_librsync_linking" != "xyes"],
                               ],
                                [ AC_DEFINE(LIBRSYNC_AVAILABLE, 1, [librsync is usable])],
                                [ local_librsync="no" ])
-                else
+               else
                   AC_MSG_WARN([librsync compression support not available])
-                fi
+               fi
+
+               CPPFLAGS="$CPPFLAGS___cache"
+               LIBS="$LIBS___cache"
+               unset CPPFLAGS___cache
+               unset LIBS___cache
 
                 AS_IF( [ test "x$explicit_librsync_linking" = "xyes" -a "$local_librsync" != "yes" ],
-                       [ AC_MSG_ERROR([librsync linking failed]) ]
+                       [ AC_MSG_ERROR([librsync linking failed]) ],
+		       [
+			  CPPFLAGS="$LIBRSYNC_CFLAGS $CPPFLAGS"
+			  CXXFLAGS="$LIBRSYNC_CFLAGS $CXXFLAGS"
+                          LIBS="$LIBRSYNC_LIBS $LIBS"
+		       ]
                      )
               ]
      )

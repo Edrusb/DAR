@@ -1,6 +1,6 @@
 #######################################################################
 # dar - disk archive - a backup/restoration program
-# Copyright (C) 2002-2025 Denis Corbin
+# Copyright (C) 2002-2026 Denis Corbin
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -24,7 +24,7 @@
 #
 
 if BUILD_DAR_STATIC
-    ALSO_BUILD = dar_static dar_cp_static
+    ALSO_BUILD = dar_static dar_cp_static dar_manager_static dar_xform_static dar_slave_static dar_split_static
 else
     ALSO_BUILD =
 endif
@@ -99,7 +99,7 @@ else
 AM_LDFLAGS = $(LD_PROF)
 endif
 
-dar_SOURCES =  command_line.cpp command_line.hpp config_file.cpp config_file.hpp dar.cpp dar.hpp dar_suite.cpp dar_suite.hpp hide_file.cpp hide_file.hpp no_comment.cpp no_comment.hpp getopt_decision.h my_getopt_long.h line_tools.hpp line_tools.cpp crit_action_cmd_line.cpp crit_action_cmd_line.hpp
+dar_SOURCES = command_line.cpp command_line.hpp config_file.cpp config_file.hpp dar.cpp dar.hpp dar_suite.cpp dar_suite.hpp hide_file.cpp hide_file.hpp no_comment.cpp no_comment.hpp getopt_decision.h my_getopt_long.h line_tools.hpp line_tools.cpp crit_action_cmd_line.cpp crit_action_cmd_line.hpp
 dar_DEPENDENCIES = ../libdar/$(MYLIB).la
 
 dar_xform_SOURCES = dar_suite.cpp dar_suite.hpp dar_xform.cpp line_tools.hpp line_tools.cpp
@@ -128,3 +128,19 @@ dar_static_LDFLAGS = -all-static $(AM_LDFLAGS)
 dar_cp_static_SOURCES = dar_suite.cpp dar_suite.hpp dar_cp.cpp line_tools.hpp line_tools.cpp
 dar_cp_static_DEPENDENCIES = ../libdar/$(MYLIB).la
 dar_cp_static_LDFLAGS = -all-static $(AM_LDFLAGS)
+
+dar_manager_static_SOURCES = dar_suite.cpp dar_suite.hpp dar_manager.cpp getopt_decision.h my_getopt_long.h line_tools.hpp line_tools.cpp no_comment.cpp no_comment.hpp hide_file.cpp hide_file.hpp
+dar_manager_static_DEPENDENCIES = ../libdar/$(MYLIB).la
+dar_manager_static_LDFLAGS = -all-static $(AM_LDFLAGS)
+
+dar_xform_static_SOURCES = dar_suite.cpp dar_suite.hpp dar_xform.cpp line_tools.hpp line_tools.cpp
+dar_xform_static_DEPENDENCIES = ../libdar/$(MYLIB).la
+dar_xform_static_LDFLAGS = -all-static $(AM_LDFLAGS)
+
+dar_slave_static_SOURCES =  dar_suite.cpp dar_suite.hpp dar_slave.cpp line_tools.hpp line_tools.cpp
+dar_slave_static_DEPENDENCIES = ../libdar/$(MYLIB).la
+dar_slave_static_LDFLAGS = -all-static $(AM_LDFLAGS)
+
+dar_split_static_SOURCES = dar_split.c
+dar_split_static_CPPFLAGS = -I'$(srcdir)/../libdar' -DDAR_LOCALEDIR=\"$(localedir)\" -DDAR_SYS_DIR=\"$(sysconfdir)\" $(CPP_PROF)
+dar_split_static_LDFLAGS = -all-static $(AM_LDFLAGS)
