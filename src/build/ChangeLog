@@ -21,7 +21,7 @@ from 2.8.2 to 2.8.3
 - added OpenSuse info to build dar/libdar and pointer to Andy Capo's repo
   to overcome the today somehow outdated versions of dar/libdar provided
   by Suse and OpenSuse.
-- patch by a-ba@github to improve the speed of binary delta signature
+- patch by Anthony Baire to improve the speed of binary delta signature
   computation.
 
 from 2.8.1 to 2.8.2
