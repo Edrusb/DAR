@@ -138,6 +138,8 @@ requirements()
 	echo "${HOGWEED_PC} not found"
 	return 1
     fi
+
+    uname > /dev/null || nok "missing uname command, aborting"
 }
 
 libthreadar()
@@ -346,10 +348,15 @@ dar_static()
 		--disable-python-binding\
 		--enable-librhash-linking\
                 --enable-dar-static\
+		--enable-upx\
 		--prefix="$LOCAL_PREFIX" || return 1
     make ${MAKE_FLAGS} || return 1
     make install-strip || return 1
-    cp ${LOCAL_PREFIX}/bin/dar_static . && echo "dar_static binary is available in the current directory"
+    VERSION=$(${LOCAL_PREFIX}/bin/dar_static -V | sed -rn -e 's/.*dar_static version\s+([\.0-9]+),\s+Copyright.*/\1/p')
+    OS=$(uname -o | sed -e 's#/#_#g')
+    TARGET="dar_static_${VERSION}_$(uname -m)_${OS}"
+    mkdir "$TARGET"
+    cp ${LOCAL_PREFIX}/bin/*_static "$TARGET" && echo "static binaries are available in the directory $TARGET"
 }
 
 check
