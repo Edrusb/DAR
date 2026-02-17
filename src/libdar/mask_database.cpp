@@ -64,14 +64,17 @@ namespace libdar
 	else
 	{
 	    if(eit != expression.end())
-		if(*eit != '/')
+	    {
+		if(*eit != '/' && fs_racine != "/")
 		    throw SRC_BUG; // expression starts as the given fs_root but is not a subdir of it
 		else
 		{
-		    ++eit; // we skip over the last / to get a relative path to fs_racine
+		    if(*eit == '/') // if fs_racine is "/" we already removed the leading '/' from expression
+			++eit; // we skip over the last / to get a relative path to fs_racine
 		    relative_part += string(eit, expression.end());
 		}
-	    else  // expression equals fs_racine this the remaining part is empty
+	    }
+	    else  // expression equals fs_racine thus the remaining part is empty
 		throw SRC_BUG;
 	}
 
