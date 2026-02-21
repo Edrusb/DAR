@@ -453,6 +453,14 @@ dt.void::before
     content: ' ';
 }
 
+dd::after
+{
+    color: White;
+    content: "\A.";
+    white-space: pre;
+
+}
+
 /* synthesis */
 
 .optimum

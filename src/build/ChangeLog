@@ -6,6 +6,10 @@ from 2.8.x to 2.9.0
   (see dar_manager's -K options and eventually -L option for non-default
   behavior regarding dar_manager key provisionning.
 
+from 2.8.3 to 2.8.4
+- fixing self reported bug "file mask_database.cpp line 68" met used when
+  calling dar to restore from a database (-aefd option).
+
 from 2.8.2 to 2.8.3
 - fixing bug met when symmetric encryption object initialization failed
   due to libgcrypt returning an error code, leading libdar to segfault.
