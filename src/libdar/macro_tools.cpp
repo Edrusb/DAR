@@ -1602,6 +1602,7 @@ namespace libdar
 	terminateur coord;
 	pile_descriptor pdesc(&layers);
 	tronco_with_elastic *tronco_ptr = nullptr;
+	cache* cache_ptr = nullptr;
 	memory_file *hash_to_sign = nullptr;
 	tlv *signed_hash = nullptr;
 	hash_fichier *hasher = nullptr;
@@ -1797,7 +1798,8 @@ namespace libdar
 
 	    // *********** writing down the first terminator at the end of the archive  *************** //
 
-	tronco_ptr = dynamic_cast<tronco_with_elastic *>(layers.top());
+	tronco_ptr = dynamic_cast<tronco_with_elastic*>(layers.top());
+	cache_ptr = dynamic_cast<cache*>(layers.top());
 
 	if(info_details)
 	    dialog->message(gettext("Writing down the first archive terminator..."));
@@ -1824,6 +1826,17 @@ namespace libdar
 	{
 	    if(tronco_ptr != nullptr)
 		throw SRC_BUG;
+	}
+
+	if(cache_ptr != nullptr)
+	{
+		// a cache is inserted in the stack
+		// when no ciphering is used and not
+		// writing to a pipe
+
+	    if(!layers.pop_and_close_if_type_is(cache_ptr))
+		throw SRC_BUG;
+	    cache_ptr = nullptr;
 	}
 
 	    // *********** writing down the trailier_version with the second terminateur *************** //
