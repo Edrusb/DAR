@@ -269,7 +269,8 @@ namespace libdar
 	else
 	{
 	    if(behind)
-		behind->sync_write();
+		behind->write_end_of_file();
+		// propagating to the underlying encryption layer
 	    else
 		throw SRC_BUG;
 	}
