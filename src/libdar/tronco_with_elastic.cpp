@@ -212,7 +212,7 @@ namespace libdar
 	switch(status)
 	{
 	case init:
-	    break;  // we will write the final elastic buffer
+	    throw SRC_BUG; // no initial elastic buffer has been dropped with before data to encrypt
 	case reading:
 	    throw SRC_BUG; // only supported in writing mode
 	case writing:
