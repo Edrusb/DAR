@@ -75,24 +75,21 @@ namespace libdar
 
     bool secu_string::operator == (const secu_string &ref) const
     {
-	if(zero_length)
-	    if(ref.zero_length)
+	if(ptr == nullptr)
+	    if(ref.ptr == nullptr)
 		return true;
 	    else
-		return *(ref.string_size) == 0;
+		return ref.ptr->string_size == 0;
 	else
-	    if(ref.zero_length)
-		return false;
+	    if(ref.ptr == nullptr)
+		return ptr->string_size == 0;
 	    else
-		return compare_with(ref.mem, *(ref.string_size));
+		return compare_with(&(ref.ptr->mem), ref.ptr->string_size);
     }
 
 
     void secu_string::set(int fd, U_I size)
     {
-	U_I offset = 0;
-	S_I lu;
-
 	if(size > get_allocated_size())
 	{
 	    clean_and_destroy();
@@ -101,77 +98,68 @@ namespace libdar
 	else
 	    clear();
 
-	do
-	{
-	    lu = ::read(fd, mem + offset, *allocated_size - 1 - offset);
-
-	    if(lu < 0)
-	    {
-		*string_size = offset;
-		mem[offset] = '\0';
-		throw Erange("secu_string::read", string(gettext("Error while reading data for a secure memory:" )) + tools_strerror_r(errno));
-	    }
-	    else
-		offset += lu;
-	}
-	while(lu > 0 && offset < size);
-
-	*string_size = offset;
-	if(*string_size >= *allocated_size)
-	    throw SRC_BUG;
-	else
-	    mem[*string_size] = '\0';
+	append_at(0, fd, size);
     }
 
-    void secu_string::append_at(U_I offset, const char *ptr, U_I size)
+    void secu_string::append_at(U_I offset, const char *a, U_I size)
     {
 	if(size == 0)
 	    return; // nothing to append
 
-	if(zero_length || offset > *string_size)
+	if(ptr == nullptr || offset > ptr->string_size)
 	    throw Erange("secu_string::append", gettext("appending data after the end of a secured memory"));
 
-	if(size + offset >= *allocated_size)
-	    throw Esecu_memory("secu_string::append");
+	    // now we know that ptr != nullptr, else exception would have been thrown above
 
-	(void)memcpy(mem + offset, ptr, size);
+	if(size + offset > get_allocated_size())
+	    throw Erange("secu_string::append", gettext("Cannot receive that much data in regard to the allocated memory"));
+
+	(void)memcpy(&(ptr->mem) + offset, a, size);
 	offset += size;
-	*string_size = offset;
-	mem[*string_size] = '\0';
+	if(offset > ptr->string_size)
+	    ptr->string_size = offset;
+	get_array()[ptr->string_size] = '\0';
     }
 
     void secu_string::append_at(U_I offset, int fd, U_I size)
     {
+	U_I lu = 0;
+	S_I tmp = 0;
+
 	if(size == 0)
 	    return; // nothing to append
 
-	if(zero_length || offset > *string_size)
+	if(ptr == nullptr || offset > ptr->string_size)
 	    throw Erange("secu_string::append", gettext("appending data after the end of a secured memory"));
 
-	if(size + offset >= *allocated_size)
+	    // now we know that ptr != nullptr, else exception would have been thrown above
+
+	if(size + offset > get_allocated_size())
 	    throw Erange("secu_string::append", gettext("Cannot receive that much data in regard to the allocated memory"));
 
-	S_I lu = ::read(fd, mem + offset, size);
-	if(lu < 0)
+	do
 	{
-	    mem[*string_size] = '\0';
-	    throw Erange("secu_string::read", string(gettext("Error while reading data for a secure memory:" )) + tools_strerror_r(errno));
+	    tmp = ::read(fd, &(ptr->mem) + offset + lu, size - lu);
+	    if(tmp > 0)
+		lu += tmp;
 	}
-	if(lu + offset >= *allocated_size)
-	    throw SRC_BUG;
+	while(tmp > 0 && lu < size);
+
 	offset += lu;
-	if(*string_size < offset)
-	    *string_size = offset;
-	mem[*string_size] = '\0';
+	if(offset > ptr->string_size)
+	    ptr->string_size = offset;
+	get_array()[ptr->string_size] = '\0';
+	if(tmp < 0) // if tmp == 0 we reached eof, no issue thus.
+	    throw Erange("secu_string::read", string(gettext("Error while reading data for a secure memory:" )) + tools_strerror_r(errno));
     }
 
     void secu_string::reduce_string_size_to(U_I pos)
     {
-	if(zero_length || pos > *string_size)
+	if(ptr == nullptr || pos > ptr->string_size)
 	    throw Erange("secu_string::reduce_string_size_to", gettext("Cannot reduce the string to a size that is larger than its current size"));
 
-	*string_size = pos;
-	mem[*string_size] = '\0';
+	ptr->string_size = pos;
+	get_array()[ptr->string_size] = '\0';
     }
 
     void secu_string::expand_string_size_to(U_I size)
@@ -179,22 +167,22 @@ namespace libdar
 	if(size == 0)
 	    return; // nothing to expand
 
-	if(zero_length || size > get_allocated_size())
+	if(ptr == nullptr || size > get_allocated_size())
 	    throw Erange("secu_string::expand_string_size_to", gettext("Cannot expand secu_string size past its allocation size"));
-	if(size < *string_size)
-	    throw Erange("secu_stering::expand_string_size_to", gettext("Cannot shrink a secu_string"));
+	if(size < ptr->string_size)
+	    throw Erange("secu_stering::expand_string_size_to", gettext("asking to expand no to shrink a secu_string"));
 
-	memset(mem + *string_size, '\0', size - *string_size);
-	*string_size = size;
+	memset(get_array() + ptr->string_size, '\0', size - ptr->string_size);
+	ptr->string_size = size;
     }
 
     void secu_string::randomize(U_I size)
     {
 #if CRYPTO_AVAILABLE
-	if(! zero_length)
+	if(ptr != nullptr)
 	{
 	    set_size(size);
-	    gcry_randomize(mem, *string_size, GCRY_STRONG_RANDOM);
+	    gcry_randomize(&(ptr->mem), ptr->string_size, GCRY_STRONG_RANDOM);
 	}
 #else
 	throw Efeature("string randomization lacks libgcrypt");
@@ -203,7 +191,7 @@ namespace libdar
 
     void secu_string::set_size(U_I size)
     {
-	if(zero_length)
+	if(ptr == nullptr)
 	{
 	    if(size == 0)
 		return; // nothing to do
@@ -211,72 +199,63 @@ namespace libdar
 
 	if(size > get_allocated_size())
 	    throw Erange("secu_string::set_size", gettext("exceeding storage capacity while requesting secu_string::set_size()"));
-	*string_size = size;
+	if(ptr == nullptr)
+	    throw SRC_BUG;
+	    // if ptr is nullptr, get_allocated_size() returns zero
+	    // thus size > get_allocated_size() is true and we should
+	    // not reach this statement
+
+	ptr->string_size = size;
     }
 
     char* secu_string::get_array()
     {
-	if(zero_length)
+	if(ptr == nullptr)
 	    throw SRC_BUG;
 	else
-	    return mem == nullptr ? throw SRC_BUG : mem;
+	    return &(ptr->mem);
     }
 
     char & secu_string::operator[] (U_I index)
     {
-	if(! zero_length && index < get_size())
-	    return mem[index];
+	if(ptr != nullptr && index < get_size())
+	    return get_array()[index];
 	else
 	    throw Erange("secu_string::operator[]", gettext("Out of range index requested for a secu_string"));
     }
 
     void secu_string::init(U_I size)
     {
-	nullifyptr();
+	    // objective of this call is
+	    // to set ptr, thus the current
+	    // value is undefined (random value)
+	    // and no allocated memory has been done
+
+	U_I alloc_size = sizeof(allocated) + size; // +1 char (allocated.mem) for the terminal '\0' of ptr->mem
 
 	if(size == 0)
 	{
-	    zero_length = true;
+	    clean_and_destroy();
 	    return;
 	}
-	else
-	    zero_length = false;
 
 	try
 	{
+	    if(get_allocated_size() != size)
+	    {
 #if CRYPTO_AVAILABLE
-	    allocated_size = (U_I *)gcry_malloc_secure(sizeof(U_I));
-	    if(allocated_size == nullptr)
-		throw Esecu_memory("secu_string::secus_string");
+		ptr = (allocated*)gcry_malloc_secure(alloc_size);
+		if(ptr == nullptr)
+		    throw Esecu_memory("secu_string::secus_string");
 #else
-	    allocated_size = new (nothrow) U_I;
-	    if(allocated_size == nullptr)
-		throw Ememory("secu_string::secus_string");
+		ptr = (allocated*)(new (nothrow) char[alloc_size]);
+		if(ptr == nullptr)
+		    throw Ememory("secu_string::secus_string");
 #endif
-
-	    *allocated_size = size + 1;
-
-#if CRYPTO_AVAILABLE
-	    mem = (char *)gcry_malloc_secure(*allocated_size);
-	    if(mem == nullptr)
-		throw Esecu_memory("secu_string::secus_string");
-#else
-	    mem = new (nothrow) char[*allocated_size];
-	    if(mem == nullptr)
-		throw Ememory("secu_string::secus_string");
-#endif
-
-#if CRYPTO_AVAILABLE
-	    string_size = (U_I *)gcry_malloc_secure(sizeof(U_I));
-	    if(string_size == nullptr)
-		throw Esecu_memory("secu_string::secus_string");
-#else
-	    string_size = new (nothrow) U_I;
-	    if(string_size == nullptr)
-		throw Ememory("secu_string::secus_string");
-#endif
-	    *string_size = 0;
-	    mem[0] = '\0';
+		ptr->allocated_size = size + 1;
+	    }
+	    ptr->string_size = 0;
+	    ptr->mem = '\0';
 	}
 	catch(...)
 	{
@@ -287,58 +266,54 @@ namespace libdar
 
     void secu_string::copy_from(const secu_string & ref)
     {
-	if(!ref.zero_length)
+	if(ref.ptr != nullptr)
 	{
 
 		// sanity checks
 
-	    if(ref.allocated_size == nullptr)
-		throw SRC_BUG;
-	    if(*(ref.allocated_size) == 0)
-		throw SRC_BUG;
-	    if(ref.mem == nullptr)
-		throw SRC_BUG;
-	    if(ref.string_size == nullptr)
+	    if(ref.ptr->allocated_size == 0)
 		throw SRC_BUG;
 
 		// we must not waste secured memory while
 		// copying a object, so we allocate it at
-		// the minimum sized needed to store the
-		// string
-	    init(*(ref.string_size) + 1);
+		// the minimum size needed to store the
+		// string (not the allocated size of ref)
+	    init(ref.ptr->string_size);
 
-	    (void)memcpy(mem, ref.mem, *(ref.string_size) + 1); // +1 to copy the ending '\0'
-	    *string_size = *(ref.string_size);
+	    if(ref.ptr->string_size > 0)
+	    {
+		if(ptr == nullptr)
+		    throw SRC_BUG; // init() call above should have set it
+
+		if(ptr->allocated_size < ref.ptr->string_size + 1)
+		    throw SRC_BUG;
+
+		(void)memcpy(&(ptr->mem), &(ref.ptr->mem), ref.ptr->string_size + 1); // +1 to copy the ending '\0'
+		ptr->string_size = ref.ptr->string_size;
+	    }
+		// else this->ptr is not allocated at all, meaning an empty string
 	}
-	else
-	{
-	    zero_length = true;
-	    allocated_size = nullptr;
-	    mem = nullptr;
-	    string_size = nullptr;
-	}
+	// else nothing to do, "this" object should be unallocated
+	// and ptr set to null
     }
 
     void secu_string::move_from(secu_string && ref) noexcept
     {
-	std::swap(zero_length, ref.zero_length);
-	std::swap(allocated_size, ref.allocated_size);
-	std::swap(mem, ref.mem);
-	std::swap(string_size, ref.string_size);
+	std::swap(ptr, ref.ptr);
     }
 
-    bool secu_string::compare_with(const char *ptr, U_I size) const
+    bool secu_string::compare_with(const char *a, U_I size) const
     {
-	if(zero_length)
+	if(ptr == nullptr)
 	    return size == 0; // true (same string) if arg is an empty string too, as we are.
 	else
 	{
-	    if(size != *string_size)
+	    if(size != ptr->string_size)
 		return false;
 	    else
 	    {
 		U_I cur = 0;
-		while(cur < size && ptr[cur] == mem[cur])
+		while(cur < size && a[cur] == c_str()[cur])
 		    ++cur;
 		return cur == size;
 	    }
@@ -347,39 +322,16 @@ namespace libdar
 
     void secu_string::clean_and_destroy()
     {
-	if(string_size != nullptr)
+	if(ptr != nullptr)
 	{
-	    (void)memset(string_size, 0, sizeof(U_I));
+	    (void)memset(ptr, 0, ptr->allocated_size + 2*sizeof(U_I)); // not add 1 here as allocated_size counts for it
 #if CRYPTO_AVAILABLE
-	    gcry_free(string_size);
+	    gcry_free(ptr);
 #else
-	    delete string_size;
+	    delete [] ptr;
 #endif
-	    string_size = nullptr;
+	    ptr = nullptr;
 	}
-	if(mem != nullptr)
-	{
-	    if(allocated_size != nullptr)
-		(void)memset(mem, 0, *allocated_size);
-#if CRYPTO_AVAILABLE
-	    gcry_free(mem);
-#else
-	    delete [] mem;
-#endif
-	    mem = nullptr;
-	}
-	if(allocated_size != nullptr)
-	{
-	    (void)memset(allocated_size, 0, sizeof(U_I));
-#if CRYPTO_AVAILABLE
-	    gcry_free(allocated_size);
-#else
-	    delete allocated_size;
-#endif
-	    allocated_size = nullptr;
-	}
-
-	zero_length = true;
     }
 
 } // end of namespace

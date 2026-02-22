@@ -65,15 +65,15 @@ namespace libdar
 
 	    /// create the allocated string in secure memory
 	    /// \param[in] storage_size is the amount of secured memory to obtain when creating the object
-	secu_string(U_I storage_size = 0) { init(storage_size); };
+	secu_string(U_I storage_size = 0) { nullifyptr(); init(storage_size); };
 
 	    /// constructor 2
 
 	    /// create the string from a pointer to a (secure) string or from a portion of it
-	secu_string(const char *ptr, U_I size) { init(size); append_at(0, ptr, size); };
+	secu_string(const char *a, U_I size) { nullifyptr(); init(size); append_at(0, a, size); };
 
 	    /// the copy constructor
-	secu_string(const secu_string & ref) { copy_from(ref); };
+	secu_string(const secu_string & ref) { nullifyptr(); copy_from(ref); };
 
 	    /// the move constructor
 	secu_string(secu_string && ref) noexcept { nullifyptr(); move_from(std::move(ref)); };
@@ -99,26 +99,26 @@ namespace libdar
 	    /// set at most size bytes of data directly from the filedescriptor,
 	    /// \param[in] fd the filedescriptor to read data from
 	    /// \param[in] size is the maximum number of byte read
-	    /// \note if current storage size is not larg enough to hold size bytes,
+	    /// \note if current storage size is not large enough to hold size bytes,
 	    /// allocated secure memory is released and larger allocation of secure memory is done.
 	void set(int fd, U_I size);
 
 	    /// append some data to the string at a given offset
 
 	    /// \param[in] offset defines at which offset in the secu_string will be placed the string to append
-	    /// \param[in] ptr is the address of the string to append
+	    /// \param[in] a is the address of the string to append
 	    /// \param[in] size is the number of byte to append
 	    /// \note this call does not change the allocation size, (unlike set()), it adds the data pointed by the arguments
 	    /// to the object while there is enough place to do so.
 	    /// resize() must be used first to define enough secure memory to append the expected amount of data
 	    /// in one or several call to append.
-	void append_at(U_I offset, const char *ptr, U_I size);
+	void append_at(U_I offset, const char *a, U_I size);
 
 	    /// append some data to the string
 	void append_at(U_I offset, int fd, U_I size);
 
 	    /// append some data at the end of the string
-	void append(const char *ptr, U_I size) { append_at(get_size(), ptr, size); };
+	void append(const char *a, U_I size) { append_at(get_size(), a, size); };
 
 	    /// append some data at the end of the string
 	void append(int fd, U_I size) { append_at(get_size(), fd, size); };
@@ -132,8 +132,8 @@ namespace libdar
 	void expand_string_size_to(U_I size);
 
 
-	    /// clear the string (set to an empty string)
-	void clear() { if(!zero_length) *string_size = 0; };
+	    /// clear the string (set to an empty string), but keep memory allocated
+	void clear() { if(ptr != nullptr) ptr->string_size = 0; };
 
 	    /// clear and resize the string to the defined allocated size
 
@@ -149,7 +149,7 @@ namespace libdar
 
 	    /// \return the address of the first byte of the string
 	    /// \note check the "size()" method to know how much bytes can be read
-	const char* c_str() const { if(zero_length) return empty_string; return mem == nullptr ? throw SRC_BUG : mem; };
+	const char* c_str() const { if(ptr == nullptr) return empty_string; return &(ptr->mem); };
 
 
 	    /// change allocated bytes amount exposed as part of the secured_string
@@ -167,25 +167,29 @@ namespace libdar
 	char operator[](U_I index) const { return (const_cast<secu_string *>(this))->operator[](index); };
 
 	    /// get the size of the string
-	U_I get_size() const { if(zero_length) return 0; if(string_size == nullptr) throw SRC_BUG; return *string_size; }; // returns the size of the string
+	U_I get_size() const { if(ptr == nullptr) return 0; return ptr->string_size; }; // returns the size of the string
 
 	    /// tell whether string is empty
-	bool empty() const { if(zero_length) return true; if(string_size == nullptr) throw SRC_BUG; return *string_size == 0; };
+	bool empty() const { return ptr == nullptr ? true : ptr->string_size == 0; };
 
 	    /// get the size of the allocated secure space
-	U_I get_allocated_size() const { return zero_length ? 0 : *allocated_size - 1; };
+	U_I get_allocated_size() const { return ptr == nullptr ? 0 : ptr->allocated_size - 1; };
 
     private:
-	bool zero_length;     ///< true if none of the other field are set due to zero byte length string requested
-	U_I *allocated_size;  ///< stores the allocated size of the secu_string
-	char *mem;            ///< pointer to allocated block of data
-	U_I *string_size;     ///< stores the string info size in the secu string (*string_size < *allocated_size)
+	struct allocated
+	{
+	    U_I allocated_size;
+	    U_I string_size;
+	    char mem;
+	};
 
-	void nullifyptr() noexcept { allocated_size = string_size = nullptr; mem = nullptr; zero_length = true; };
-	void init(U_I size);   ///< to be used at creation time or after clean_and_destroy() only
+	allocated* ptr; ///< when equals to nullptr, this is equivalent to an empty string
+
+	void nullifyptr() noexcept { ptr = nullptr; };
+	void init(U_I size);   ///< to be used at creation time or after clean_and_destroy() only size if the max size of the secu_string, not the allocated size
 	void copy_from(const secu_string & ref); ///< to be used at creation time or after clean_and_destroy() only
 	void move_from(secu_string && ref) noexcept;
-	bool compare_with(const char *ptr, U_I size) const; // return true if given sequence is the same as the one stored in "this"
+	bool compare_with(const char *a, U_I size) const; // return true if given sequence is the same as the one stored in "this"
 	void clean_and_destroy();
 
 	static constexpr const char* empty_string = "";
