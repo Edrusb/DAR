@@ -232,20 +232,19 @@ namespace libdar
 	else
 	    block_size = 0;
 
+	if(beh == nullptr)
+	    throw SRC_BUG;
 
 		// calculating the current offset modulo block_size
 
 	U_32 offset = 0;
-
-	if(encrypted == nullptr)
-	    throw SRC_BUG;
 
 	if(block_size > 0)
 	{
 	    infinint times = 0;
 	    infinint reste = 0;
 
-	    euclide(encrypted->get_position(), infinint(block_size), times, reste);
+	    euclide(beh->get_position(), infinint(block_size), times, reste);
 	    reste.unstack(offset);
 	    if(! reste.is_zero())
 		throw SRC_BUG;
@@ -256,9 +255,6 @@ namespace libdar
 
 	    // a final elastic_buffer is added also when scrambling is used (with offset = 0 and block_size = 0)
 	    // for historical reasons,
-
-	if(beh == nullptr)
-	    throw SRC_BUG;
 
 	add_elastic_buffer(*beh,
 			   GLOBAL_ELASTIC_BUFFER_SIZE,
