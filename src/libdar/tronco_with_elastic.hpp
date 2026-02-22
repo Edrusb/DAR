@@ -49,7 +49,7 @@ namespace libdar
 	/// @{
 
 
-	/// this class abstracts encryption (tronconneuse & parallel_tronconneuse) adding elastic buffers a the extremities
+	/// this class abstracts encryption (tronconneuse & parallel_tronconneuse) adding elastic buffers at the extremities
 
     class tronco_with_elastic : public generic_file, public mem_ui
     {
