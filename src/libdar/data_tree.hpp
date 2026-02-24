@@ -232,10 +232,10 @@ namespace libdar
 
 	    /// give number of entry's last state (for data and ea) per archive number, followed by the total number of stored in each archive
 
-	    /// \param[in] data table giving for each archive the number of latest data entry (considering states from the flag_set provided set argument)
-	    /// \param[in] ea table giving for each archive the number of latest EA entry (considering states from the flag_set provided set argument)
-	    /// \param[in] total_data table giving for each archive the total number of data entry (considering states from the flag_set provided set argument)
-	    /// \param[in] total_ea table giving for each archive the total number of EA entry (considering states from the flag_set provided set argument)
+	    /// \param[in,out] data table giving for each archive the number of latest data entry (considering states from the flag_set provided set argument)
+	    /// \param[in,out] ea table giving for each archive the number of latest EA entry (considering states from the flag_set provided set argument)
+	    /// \param[in,out] total_data table giving for each archive the total number of data entry (considering states from the flag_set provided set argument)
+	    /// \param[in,out] total_ea table giving for each archive the total number of EA entry (considering states from the flag_set provided set argument)
 	    /// \param[in] ignore_older_than_that focus the computation on version not more recent that this date
 	    /// \param[in] flag_set set of state to consider (other states are not taken into account when looking for the archive number of the latest entry)
 	    /// \param[in] even_when_removed by default, do not count in any archive a entry which latest state is removed or absent, else increment the archive
