@@ -41,7 +41,7 @@ namespace libdar
 	/// \addtogroup Private
 	/// @{
 
-	///helper class for data_tree
+	/// helper class for data_tree
 
     	class candidates
 	{
