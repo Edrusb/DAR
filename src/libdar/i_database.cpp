@@ -727,27 +727,19 @@ namespace libdar
 
 	    //*** ANDING the subdir mask of extract_option with a mask_database from us
 
-	et_mask wrapper_mask;
+	mask_database mask_building = mask_database(files, fs_root, opt.get_date());
 
-	wrapper_mask.add_mask(mask_database(files, fs_root, opt.get_date()));
-	wrapper_mask.add_mask(extract_options.get_subtree());
-	extract_options.set_subtree(wrapper_mask);
+	mask_building.compose_with(extract_options.get_subtree());
+	extract_options.set_subtree(mask_building);
 
-	const et_mask* in_opt_et = dynamic_cast<const et_mask*>(& extract_options.get_subtree());
-	if(in_opt_et == nullptr)
-	    throw SRC_BUG; // the subtree should now be a et_mask!
-
-	if(in_opt_et->size() != 2)
-	    throw SRC_BUG; // the et_mask should have two items!
-
-	const mask_database* mask_base = dynamic_cast<const mask_database*>(in_opt_et->get_added(0));
+	const mask_database* mask_base = dynamic_cast<const mask_database*>(& extract_options.get_subtree());
 	if(mask_base == nullptr)
 	    throw SRC_BUG; // and the first component of the et_mask should be a mask_database!
 
 	    // Ok, now we have mask_base pointing to the
 	    // mask_databse inside the subtree() options of archive_extract,
-	    // we will be able to get the archive to focus on
-	    // without having to regenerate the whole mask stuff
+	    // we will be able to get the archive to focus on each archive in turn
+	    // without having to regenerate the whole mask stack
 
 	to_consider = mask_base->get_locations();
 
