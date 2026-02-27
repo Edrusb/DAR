@@ -725,16 +725,6 @@ namespace libdar
 	if(files == nullptr)
 	    throw SRC_BUG;
 
-	files->compute_restoration_needed_archives(stats_data, stats_ea, total_data, total_ea, opt.get_date());
-
-	for(unsigned int i = 0; i < coordinate.size(); ++i)
-	{
-	    if(stats_data[i] > 0)
-		to_consider.insert(i);
-	    if(stats_ea[i] > 0)
-		to_consider.insert(i);
-	}
-
 	    //*** ANDING the subdir mask of extract_option with a mask_database from us
 
 	et_mask wrapper_mask;
@@ -759,8 +749,9 @@ namespace libdar
 	    // we will be able to get the archive to focus on
 	    // without having to regenerate the whole mask stuff
 
-	    //*** for each archive_num
+	to_consider = mask_base->get_locations();
 
+	    //*** for each archive_num
 
 	for(set<archive_num>::iterator it = to_consider.begin(); it != to_consider.end(); ++it)
 	{
