@@ -85,6 +85,9 @@ namespace libdar
 	mask_database & operator = (mask_database && ref) noexcept = default;
         virtual ~mask_database() = default; // base is not
 
+	    /// get the overall set of archive to focus on (ignore all others)
+	std::set<archive_num> get_locations() const;
+
 	    /// condition the mask to return is_covered for this provided archive num
 	void set_focus(archive_num focus) const { zoom = focus; };
 

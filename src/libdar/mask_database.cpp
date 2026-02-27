@@ -44,6 +44,14 @@ namespace libdar
 	    throw Ememory("mask_database::mask_database");
     }
 
+    set<archive_num> mask_database::get_locations() const
+    {
+	if(! tree)
+	    throw SRC_BUG;
+	else
+	    return tree->get_locations();
+    }
+
     bool mask_database::is_covered(const std::string &expression) const
     {
 	string relative_part;
