@@ -714,11 +714,6 @@ namespace libdar
 
 	set<archive_num> to_consider;
 
-	deque<infinint> stats_data(coordinate.size(), 0);
-	deque<infinint> stats_ea(coordinate.size(), 0);
-	deque<infinint> total_data(coordinate.size(), 0);
-	deque<infinint> total_ea(coordinate.size(), 0);
-
 	if(opt.get_info_details())
 	    get_ui().message(gettext("Identifying the set of archive to use from the dar_manager database..."));
 
