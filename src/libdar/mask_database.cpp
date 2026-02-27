@@ -44,6 +44,11 @@ namespace libdar
 	    throw Ememory("mask_database::mask_database");
     }
 
+    void mask_database::compose_with(const mask & ref)
+    {
+	composition.reset(ref.clone());
+    }
+
     set<archive_num> mask_database::get_locations() const
     {
 	if(! tree)
