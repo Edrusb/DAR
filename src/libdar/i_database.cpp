@@ -756,7 +756,7 @@ namespace libdar
 
 	    // Ok, now we have mask_base pointing to the
 	    // mask_databse inside the subtree() options of archive_extract,
-	    // we will be able toset the archive to focus on
+	    // we will be able to get the archive to focus on
 	    // without having to regenerate the whole mask stuff
 
 	    //*** for each archive_num
