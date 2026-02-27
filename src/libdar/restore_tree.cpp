@@ -85,44 +85,48 @@ namespace libdar
 	}
     }
 
-    set<archive_num> restore_tree::get_locations() const
+    set<archive_num> restore_tree::get_locations(path & current_path,
+						 const shared_ptr<mask> & the_mask) const
     {
 	set<archive_num> ret = locations;
 	map<string, unique_ptr<restore_tree> >::const_iterator it = children.begin();
+	string tmp;
+
+	if(!the_mask)
+	    throw SRC_BUG;
 
 	while(it != children.end())
 	{
-	    if(it->second)
+	    current_path += it->first;
+	    if(the_mask->is_covered(current_path))
 	    {
-		set<archive_num> sub = it->second->get_locations();
+		if(it->second)
+		{
+		    set<archive_num> sub = it->second->get_locations(current_path, the_mask);
 
-		for(set<archive_num>::iterator p = sub.begin(); p != sub.end(); ++p)
-		    ret.insert(*p);
+		    for(set<archive_num>::iterator p = sub.begin(); p != sub.end(); ++p)
+			ret.insert(*p);
+		}
+		else
+		    throw SRC_BUG;
 	    }
-	    else
-		throw SRC_BUG;
+
+	    current_path.pop(tmp);
 	    ++it;
 	}
 
 	return ret;
     }
 
-    bool restore_tree::restore_from(const string & chem, archive_num num) const
+    bool restore_tree::restore_from(const path & chem, archive_num num) const
     {
 	const restore_tree* found = nullptr;
 
-	if(chem.empty())
+	if(! chem.is_relative())
 	    throw SRC_BUG;
-	else
-	{
-	    path tmp = path(chem);
 
-	    if(! tmp.is_relative())
-		throw SRC_BUG;
-
-	    tmp.reset_read();
-	    found = lookup(tmp);
-	}
+	chem.reset_read();
+	found = lookup(chem);
 
 	if(found == nullptr)
 	    throw SRC_BUG;
@@ -130,7 +134,7 @@ namespace libdar
 	return found->result_for(num);
     }
 
-    const restore_tree* restore_tree::lookup(path & chem) const
+    const restore_tree* restore_tree::lookup(const path & chem) const
     {
 	string tmp;
 
