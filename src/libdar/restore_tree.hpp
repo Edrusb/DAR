@@ -64,6 +64,10 @@ namespace libdar
 	restore_tree & operator = (restore_tree && ref) noexcept = default;
 	~restore_tree() = default;
 
+	    /// returns the set of archive to restore from
+	std::set<archive_num> get_locations() const;
+
+
 	    /// return wether the provided path should trigger restoration from archive number num
 
 	    /// \param[in] chem path to the inode to be restored (should always be a relative path)
@@ -79,6 +83,7 @@ namespace libdar
 
 	const restore_tree* lookup(path & chem) const;
 	bool result_for(archive_num num) const { return locations.find(num) != locations.end(); };
+
     };
 
 } // end of namespace

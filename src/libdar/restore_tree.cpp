@@ -80,17 +80,31 @@ namespace libdar
 		if(!tmp_ptr)
 		    throw Ememory("restore_tree:restore_tree");
 		else
-		{
-			// we merge the child archive num, because if this
-			// parent directly is excluded by the path filter,
-			// all child will be excluded by the same filter.
-		    for(set<archive_num>::iterator pr = tmp_ptr->locations.begin(); pr != tmp_ptr->locations.end(); ++pr)
-			locations.insert(*pr);
-
 		    children[*it] = std::move(tmp_ptr);
-		}
 	    }
 	}
+    }
+
+    set<archive_num> restore_tree::get_locations() const
+    {
+	set<archive_num> ret = locations;
+	map<string, unique_ptr<restore_tree> >::const_iterator it = children.begin();
+
+	while(it != children.end())
+	{
+	    if(it->second)
+	    {
+		set<archive_num> sub = it->second->update_sublocations();
+
+		for(set<archive_num>::iterator p = sub.begin(); p != sub.end(); ++p)
+		    ret.insert(*p);
+	    }
+	    else
+		throw SRC_BUG;
+	    ++it;
+	}
+
+	return ret;
     }
 
     bool restore_tree::restore_from(const string & chem, archive_num num) const
