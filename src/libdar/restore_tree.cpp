@@ -94,7 +94,7 @@ namespace libdar
 	{
 	    if(it->second)
 	    {
-		set<archive_num> sub = it->second->update_sublocations();
+		set<archive_num> sub = it->second->get_locations();
 
 		for(set<archive_num>::iterator p = sub.begin(); p != sub.end(); ++p)
 		    ret.insert(*p);
