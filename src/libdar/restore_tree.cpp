@@ -115,6 +115,14 @@ namespace libdar
 	    ++it;
 	}
 
+	    // adding to locations the archive needed
+	    // for child entries even if we don't have
+	    // any more recent data in this archive
+	restore_tree* me = const_cast<restore_tree*>(this);
+	if(me == nullptr)
+	    throw SRC_BUG;
+	me->locations = ret;
+
 	return ret;
     }
 
