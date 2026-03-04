@@ -1,0 +1,87 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <link href="style.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+    <title>DAR References</title>
+  </head>
+  <body>
+
+    <h1>Dar used at IRISA</h1>
+
+
+    <dl>
+      <dt class=void>Who</dt><dd>
+	<a href="https://www.irisa.fr/en" target=_blank>IRISA</a> (public research lab in computer science)
+
+      </dd>
+      <dt class=void>Context</dt><dd>
+	Backup of self-managed scientific databases hosted at a local datacenter.
+	The data was acquired over 15+ years using expensive equipment.
+      </dd>
+      <dt class=void>Start date</dt><dd>
+	Year 2024
+
+      </dd>
+      <dt class=void>Backup/archive size</dt><dd>
+	70To of objects saved with rclone<br/>
+	150Go of databases saved with dar
+
+      </dd>
+      <dt class=void>Media used</dt><dd>
+	S3
+
+      </dd>
+      <dt class=void>Why dar</dt><dd>
+	It has supports for differential backups, binary diffs, catalogue isolation
+	and is generally very tunable. The archive format is well documented and gives
+	good confidence.
+      </dd>
+      <dt class=void>other remarks</dt><dd>
+	We started with duplicity which worked off-the shelves, providing s3
+	storage, incremental backups, parity volumes and rotation. But it was not a
+	perfect fit for our use case:
+	<br/>
+	<ul>
+	  <li>
+	    it only had support for incremental backups. We prefer differential
+            backups for simplicity, robustness and the ability to set different
+            expiration dates for daily vs. weekly backups. Also the incremental
+            signature files were accumulated on the local disk (rather than
+            consolidated), using around 15 times more space than necessary.
+	  </li>
+	  <li>
+	    it did not suit our preferred S3 config. We wanted automatic object
+            locking (to be ransomware-proof) and automatic expiration based on
+            deletion time (NonCurrentVersionExpiration) for all buckets. Duplicity
+            did not support restoring a backup from non-current objects, which
+            would imply storing past backups longer than necessary. Also S3
+            objects were committed immediately after upload rather than at the end
+            of the backup, which would uselessly consume space in case the backup
+            is interrupted.
+	  </li>
+	  <li>
+	    it did not allow tuning the compression parameters (we prefer
+            zstd:1)
+	  </li>
+	  <li>
+	    it did not allow tuning the librsync block size (2048 bytes
+            only, which was smaller than necessary)
+	  </li>
+	</ul>
+	<br />
+	We did not find a libre alternative suiting all our needs and dar proved to
+	be the lower-level and versatile tool that let us implement exactly what we
+	wanted.
+      </dd>
+      <dt class=void>Source</dt><dd>
+	Anthony Baire, March 2026
+      </dd>
+    </dl>
+    <p>
+      <em><a href="References.html">Back to page of references</a></em>
+    </p>
+  </body>
+</html>
+

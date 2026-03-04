@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <link href="style.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+    <title>DAR References</title>
+  </head>
+  <body>
+
+    <h1>Dar used by John Goerzen</h1>
+
+
+    <dl>
+      <dt class=void>Who</dt><dd>
+	John Goerzen is the maintainer at <a href="https://debian.org" target=_blank>Debian</a> of
+	dar, libdar and libthreadar software.
+	<br/>
+	<br/>
+	He first explored a lot <a href="https://floss.social/@jgoerzen/110584716548088152" target=_blank>what was possible to do with and around dar</a>
+	and in particular he shared his finding on how to use <a href="https://www.complete.org/an-asynchronous-rsync-with-dar/" target=_blank>dar as an asynchronous rsync</a>
+      </dd>
+      <dt class=void>Context</dt><dd>
+	I use dar to back up almost all of my non-zfs systems.  This includes
+	Raspberry Pis, laptops, other smaller systems, and VMs in the cloud.
+
+      </dd>
+      <dt class=void>Start date</dt><dd>
+	<em>for a long time</em>
+
+      </dd>
+      <dt class=void>Backup/archive size</dt><dd>
+	<em>unknonwn</em>
+
+      </dd>
+      <dt class=void>Media used</dt><dd>
+	I use <em>Dar</em> in conjunction with
+	<a href="https://www.complete.org/nncp/" target=_blank>NNCP</a>
+	to transmit the backups asynchronously to the backup system.
+	<br/>
+	This allows daily backups to be captured even at
+	moments when the system isn't connected to the Internet or has poor
+	connectivity.  Then the batches of dailies can be transmitted when
+	connectivity is restored.
+	<br/>
+	I also use <em>Dar</em> for archiving.  I periodically burn BD-Rs with important
+	records (tax records, etc) and use dar for that.
+
+      </dd>
+      <dt class=void>Why dar</dt><dd>
+	On systems that run btrfs, I take a btrfs
+	snapshot and back that up with dar.  On the target, these are unpacked
+	in order (using my filespooler program) and history is maintained using
+	zfs snapshots on the backup system.
+	<br/>
+	<br/>
+	I have scripts that save off a catalog on the local machine being backed
+	up, and then after that first full backup, always send incrementals.
+	<br/>
+	<br/>
+	For a long time, I combined this with mtree, which is a tool from the
+	BSDs that will scan a directory tree and record metadata (size, mtime,
+	etc).  I would use this to periodically verify that the target matches
+	the source, since the incremental chain was effectively hundreds or even
+	thousands of backups long.  More recently, I've realized I could just
+	isolate the catalog from incoming archives and compare against that.
+	<br/>
+	<br/>
+	I also put Windows and
+	Linux binaries on every disc to make recovery easier (Plus DarGUI for
+	Windows).
+	<br/>
+	<br/>
+	I also have hard drives that I use for archiving, for things like family
+	photos and such.  I use dar to store a full backup and then incremental
+	dar files as well, updating it about once a month.  Every few years, I
+	restart the chain from scratch.
+	<br/>
+	<br/>
+	As I have started to explore dar more, I have also learned it is a nice
+	replacement for some other tools.  For instance, btrfs doesn't have
+	something like "zfs diff".  But I can create a dar isolated catalog from
+	one snapshot, and then compare the state of another.  This replaces
+	tools like mtree from BSD.
+      </dd>
+      <dt class=void>other remarks</dt><dd>
+	I wrote a comparison of
+	<a href="https://www.complete.org/roundup-of-data-backup-and-archiving-tools/" target=_blank>
+	  backup and archiving tools</a>
+      </dd>
+      <dt class=void>Source</dt><dd>
+	John Goerzen, in December 2025
+      </dd>
+    </dl>
+    <p>
+      <em><a href="References.html">Back to page of references</a></em>
+    </p>
+  </body>
+</html>
+
