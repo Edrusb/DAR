@@ -4,6 +4,11 @@ from 2.8.3 to 2.8.4
 - Enhancement of the filtering mechanism used when restoring data with dar
   and a dar_manager database (-aefd option) to avoid uselessly restoring
   some files in some intermediate state.
+- fixing bug met while testing in sequential more resulting in error message
+  "skipping backward is not possible on a pipe", this bug do not concern
+  the generated archives, bug the way they were read.
+- fixed several bugs that led the gpg signature validation to be inoperant
+  in sequential read mode.
 
 from 2.8.2 to 2.8.3
 - fixing bug met when symmetric encryption object initialization failed
