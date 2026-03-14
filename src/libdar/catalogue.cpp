@@ -965,7 +965,7 @@ namespace libdar
 
 	try
 	{
-	    while(ret && !read(moi))
+	    while(ret && read(moi))
 	    {
 		if(moi == nullptr)
 		    throw SRC_BUG;
