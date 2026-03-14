@@ -405,8 +405,20 @@ namespace libdar
 		    check_gnupg_signed();
 		exploitable = true;
 
-		if(options.get_early_memory_release())
+		if(options.get_early_memory_release()
+		   && (gnupg_signed.empty() || ! sequential_read))
 		    cat->set_early_memory_release();
+		    // using early memory release when both
+		    // - signatories are used
+		    // - and sequential read mode is set
+		    // will lead the catalog created while sequentially reading
+		    // the archive to become empty (memory eary released) a the
+		    // end of the sequential reading , when the internal catalogue
+		    // is read from the archive (and its gnupg signature is checked).
+		    // at this time, the archive content of the internal catalogue
+		    // is compared with the catalogue built in sequential reading,
+		    // to validate the archive content against the gnupg signature
+
 	    }
 	    catch(...)
 	    {
