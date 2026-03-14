@@ -46,6 +46,7 @@ namespace libdar
 	min_read_offset = 0;
 	depth = 0; // we start at the root... of course
 	wait_parent_depth = 0; // to disable this feature
+	has_read_data = false;
 
 	    // dropping the data_name in the archive
 	pdesc->stack->sync_write_above(pdesc->esc); // esc is now up to date
@@ -71,6 +72,7 @@ namespace libdar
 	min_read_offset = 0;
 	depth = 0; // we start at the root
 	wait_parent_depth = 0; // to disable this feature
+	has_read_data = false;
 
 	    // fetching the value of ref_data_name
 	pdesc->stack->flush_read_above(pdesc->esc);
@@ -430,6 +432,7 @@ namespace libdar
 	ceci->reset_reading_process();
 	catalogue::reset_read();
 	    // mem_released check is handled at catalogue::reset_read()
+	has_read_data = false;
     }
 
     void escape_catalogue::end_read() const
@@ -699,7 +702,13 @@ namespace libdar
 
 			// we only read detruit objects for internal catalogue
 			// if we could sequentially read some data
-		    only_detruit = !is_empty();
+			//
+			// But we cannot use is_empty() method because we use early_memory_release
+			// and even if some data has been read sequentially, at the end of
+			// the sequential reading operation in normal situation (non corrupted archive
+			// all data has been released and thus is_empty() is true.
+			// Thus we use the dedicated field
+		    only_detruit = has_read_data;
 
 			// we will compare content if encryption has been used and some data
 			// has been read sequentially
@@ -788,7 +797,7 @@ namespace libdar
 
 			// if the archive was signed we had to load it fully (not only its detruit and directories
 			// objects to be able to compare the signature, but not we must drop the signatures (which
-			// is done if loading the catalogue in only_detruit mode, to avoid having libdar skipping back
+			// is done if loading the catalogue in only_detruit mode), to avoid having libdar skipping back
 			// trying to fetch EA or FSA and restoring it again for directories leading to detruit objects
 		    if(x_ver.is_signed())
 			cat_det->drop_all_ea_and_fsa();
@@ -824,6 +833,15 @@ namespace libdar
 	    ref = nullptr;
 	    throw;
 	}
+
+	if(ref != nullptr)
+	    has_read_data = true;
+	    // note, this is not important if this
+	    // variable is not set when in ec_completed status
+	    // which has two dedicated return statement above
+	    // because this variable is needed before this state
+	    // is reached, more precisely when reaching the ec_signature or
+	    // ec_detruits states.
 
 	return ref != nullptr;
     }
