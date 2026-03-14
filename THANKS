@@ -1,3 +1,7 @@
+version 2.8.4
+--------------
+Thanks to Adam Watkins for bug report and sample code to reproduce it
+
 version 2.8.3
 --------------
 Thanks to Andy Capo for feedback and for having provided updated spec file of
