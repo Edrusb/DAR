@@ -993,8 +993,14 @@ namespace libdar
 		    ret = false;
 		else
 		{
+		    const cat_mirage* mmoi = dynamic_cast<const cat_mirage*>(moi);
+
+		    if(mmoi != nullptr)
+			moi = mmoi->get_inode();
+
 		    if(toi == nullptr)
 			throw SRC_BUG;
+
 		    if(*toi != *moi)
 			ret = false;
 		}
