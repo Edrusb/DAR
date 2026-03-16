@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: dar 2.7.19\n"
+"Project-Id-Version: dar 2.7.20.RC1\n"
 "Report-Msgid-Bugs-To: https://github.com/Edrusb/DAR/issues\n"
-"POT-Creation-Date: 2025-07-31 15:54+0200\n"
+"POT-Creation-Date: 2026-03-16 18:56+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3220,12 +3220,12 @@ msgstr ""
 msgid "missing data to build a special device"
 msgstr ""
 
-#: src/libdar/cat_device.cpp:146
+#: src/libdar/cat_device.cpp:151
 #, c-format
 msgid "devices have not the same major number: %d <--> %d"
 msgstr ""
 
-#: src/libdar/cat_device.cpp:148
+#: src/libdar/cat_device.cpp:153
 #, c-format
 msgid "devices have not the same minor number: %d <--> %d"
 msgstr ""

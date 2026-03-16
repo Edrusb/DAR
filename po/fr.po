@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: DAR 2.7.0\n"
 "Report-Msgid-Bugs-To: https://github.com/Edrusb/DAR/issues\n"
-"POT-Creation-Date: 2025-07-31 15:54+0200\n"
+"POT-Creation-Date: 2026-03-16 18:56+0100\n"
 "PO-Revision-Date: 2025-07-31 16:03+0200\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
@@ -3611,12 +3611,12 @@ msgstr ""
 msgid "missing data to build a special device"
 msgstr "il manque des données pour construire un fichier spécial"
 
-#: src/libdar/cat_device.cpp:146
+#: src/libdar/cat_device.cpp:151
 #, c-format
 msgid "devices have not the same major number: %d <--> %d"
 msgstr "les fichiers spéciaux n'ont pas le même numéro majeur : %d <--> %d"
 
-#: src/libdar/cat_device.cpp:148
+#: src/libdar/cat_device.cpp:153
 #, c-format
 msgid "devices have not the same minor number: %d <--> %d"
 msgstr "les fichiers spéciaux n'ont pas le même numéro mineur : %d <--> %d"
