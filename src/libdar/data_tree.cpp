@@ -355,7 +355,7 @@ namespace libdar
 		// be pointing at each entry, from the smallest to the highest archive number
 
 	datetime max_seen_date = datetime(0);
-	candidates candy(even_when_removed); //< Au pays de Candy, comme dans tous les pays ...
+	candidates candy(even_when_removed); ///< Au pays de Candy, comme dans tous les pays...
 	map<archive_num, status_plus>::const_iterator it = last_mod.begin();
 
 	while(it != last_mod.end())

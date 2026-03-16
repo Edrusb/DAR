@@ -1697,7 +1697,7 @@ namespace libdar
 	{
 	    Euser_abort *eabort = dynamic_cast<Euser_abort*>(&e);
 
-	    if(eabort != nullptr && ! repairing)
+	    if(eabort != nullptr || ! repairing)
 		throw;
 	}
     }

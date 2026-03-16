@@ -80,35 +80,61 @@ namespace libdar
 		if(!tmp_ptr)
 		    throw Ememory("restore_tree:restore_tree");
 		else
-		{
-			// we merge the child archive num, because if this
-			// parent directly is excluded by the path filter,
-			// all child will be excluded by the same filter.
-		    for(set<archive_num>::iterator pr = tmp_ptr->locations.begin(); pr != tmp_ptr->locations.end(); ++pr)
-			locations.insert(*pr);
-
 		    children[*it] = std::move(tmp_ptr);
-		}
 	    }
 	}
     }
 
-    bool restore_tree::restore_from(const string & chem, archive_num num) const
+    set<archive_num> restore_tree::get_locations(path & current_path,
+						 const shared_ptr<mask> & the_mask) const
+    {
+	set<archive_num> ret = locations;
+	map<string, unique_ptr<restore_tree> >::const_iterator it = children.begin();
+	string tmp;
+
+	if(!the_mask)
+	    throw SRC_BUG;
+
+	while(it != children.end())
+	{
+	    current_path += it->first;
+	    if(the_mask->is_covered(current_path))
+	    {
+		if(it->second)
+		{
+		    set<archive_num> sub = it->second->get_locations(current_path, the_mask);
+
+		    for(set<archive_num>::iterator p = sub.begin(); p != sub.end(); ++p)
+			ret.insert(*p);
+		}
+		else
+		    throw SRC_BUG;
+	    }
+
+	    current_path.pop(tmp);
+	    ++it;
+	}
+
+	    // adding to locations the archive needed
+	    // for child entries even if we don't have
+	    // any more recent data in this archive
+	restore_tree* me = const_cast<restore_tree*>(this);
+	if(me == nullptr)
+	    throw SRC_BUG;
+	me->locations = ret;
+
+	return ret;
+    }
+
+    bool restore_tree::restore_from(const path & chem, archive_num num) const
     {
 	const restore_tree* found = nullptr;
 
-	if(chem.empty())
+	if(! chem.is_relative())
 	    throw SRC_BUG;
-	else
-	{
-	    path tmp = path(chem);
 
-	    if(! tmp.is_relative())
-		throw SRC_BUG;
-
-	    tmp.reset_read();
-	    found = lookup(tmp);
-	}
+	chem.reset_read();
+	found = lookup(chem);
 
 	if(found == nullptr)
 	    throw SRC_BUG;
@@ -116,7 +142,7 @@ namespace libdar
 	return found->result_for(num);
     }
 
-    const restore_tree* restore_tree::lookup(path & chem) const
+    const restore_tree* restore_tree::lookup(const path & chem) const
     {
 	string tmp;
 

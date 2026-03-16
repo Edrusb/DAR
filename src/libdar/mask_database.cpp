@@ -35,7 +35,7 @@ namespace libdar
     mask_database::mask_database(const data_dir* racine,
 				 const path & fs_root,
 				 const datetime & ignore_older_than_that):
-	fs_racine(fs_root.display()),
+	fs_racine(fs_root),
 	zoom(0)
     {
 	tree.reset(new (nothrow) restore_tree(racine, ignore_older_than_that));
@@ -44,38 +44,83 @@ namespace libdar
 	    throw Ememory("mask_database::mask_database");
     }
 
-    bool mask_database::is_covered(const std::string &expression) const
+    void mask_database::compose_with(const mask & ref)
     {
-	string relative_part;
-	string::const_iterator eit = expression.begin();
-	string::const_iterator fsit = fs_racine.begin();
+	composition.reset(ref.clone());
+    }
 
-
-	    // removing the fs_racine part of expression
-
-	while(eit != expression.end() && fsit != fs_racine.end() && *eit == *fsit)
-	{
-	    ++eit;
-	    ++fsit;
-	}
-
-	if(fsit != fs_racine.end())
-	    throw SRC_BUG; // given expression is not a subdir of fs_racine
+    set<archive_num> mask_database::get_locations() const
+    {
+	if(! tree)
+	    throw SRC_BUG;
 	else
 	{
-	    if(eit != expression.end())
+	    path current_path = fs_racine;
+	    return tree->get_locations(current_path, composition);
+	}
+    }
+
+    bool mask_database::is_covered(const std::string & expression) const
+    {
+	throw SRC_BUG;
+    }
+
+    bool mask_database::is_covered(const path & expression) const
+    {
+	    // eliminating the case where the expression is out of the requested path
+	if(!composition)
+	    throw SRC_BUG;
+	else
+	    if(!composition->is_covered(expression))
+		return false;
+	    // else we continue below
+	    // to see if this entry should be restore
+	    // from the current archive number (zoom) of the base
+
+
+	    // we now have to find the corresponding data_tree
+	    // from the database to know whether this entry has something
+	    // to restore from the current (zoom index) archive
+
+
+	path relative_part = expression;
+	string tmp1, tmp2;
+
+	if(relative_part.degre() < fs_racine.degre())
+	    throw SRC_BUG;
+	    // expression is shorter than fs_root, it is out of
+	    // the root of the filesystem take for the operation
+
+	if(relative_part.is_absolute() ^ fs_racine.is_absolute())
+	    throw SRC_BUG;
+	    // both path should be absolute
+	    // or both relative
+
+	if(relative_part.is_absolute())
+	{
+		// we first convert the expression to a relative path
+		// by poping the front:
+	    if(! relative_part.pop_front(tmp1))
 	    {
-		if(*eit != '/' && fs_racine != "/")
-		    throw SRC_BUG; // expression starts as the given fs_root but is not a subdir of it
-		else
-		{
-		    if(*eit == '/') // if fs_racine is "/" we already removed the leading '/' from expression
-			++eit; // we skip over the last / to get a relative path to fs_racine
-		    relative_part += string(eit, expression.end());
-		}
+		    // the expression path was "/"
+
+		    // as fs_racine() is also absolute and has
+		    // a degre() less or equal to relative_part
+		    // it is also "/"
+
+		    // in that case we should always return true
+		    // as the root fs cannot be filtered out.
+		return true;
 	    }
-	    else  // expression equals fs_racine thus the remaining part is empty
-		throw SRC_BUG;
+	}
+
+	fs_racine.reset_read();
+	while(fs_racine.read_subdir(tmp1))
+	{
+	    if(! relative_part.pop_front(tmp2))
+		throw SRC_BUG; // should never occur as the degree is larger or equal to fs_racine
+	    if(tmp1 != tmp2)
+		throw SRC_BUG; // expression is not a subpath of fs_racine
 	}
 
 	if(!tree)

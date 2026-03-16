@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <link href="style.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+    <title>DAR References</title>
+  </head>
+  <body>
+
+    <div class=top>
+      <img alt="Dar Documentation" src="dar_s_doc.jpg" style="float:left;">
+      <h1>Dar used within the Max Planck Institute</h1>
+    </div>
+
+    <dl>
+      <dt class=void>Who</dt><dd>
+	<a href="https://www.aei.mpg.de/" target="_blank">Max Planck Institute for Gravitational Physics</a>
+
+      </dd>
+      <dt class=void>Context</dt><dd>
+	<a href="https://www.aei.mpg.de/atlas" target="_blank">The Atlas computing cluster (HPC)</a>
+
+      </dd>
+      <dt class=void>Start date</dt><dd>
+	Year 2021
+
+      </dd>
+      <dt class=void>Backup/archive size</dt><dd>
+	from a few 100GB up to 45TByte (compressed) so
+	far - all in 1 TByte chunks with isolated catalogue
+
+      </dd>
+      <dt class=void>Media used</dt><dd>
+	locally HDD (NAS/ZFS), remotely tape LTO8/9 I think at the moment
+
+      </dd>
+      <dt class=void>Why dar</dt><dd>
+	before using regular old tar/star but seqential only access is
+	prohibitively expensive when only need some files from very few
+	chunks in the middle
+
+      </dd>
+      <dt class=void>other remarks</dt><dd>
+	only downside right now is that it seems to be very slow when
+	generating archive/compressing very large directory structures
+	with a LOT of files.
+
+	But so far, no real time to investigate on my part, just running something like:
+	<code class=block>
+	  dar --create PROJECT --verbose=messages \
+	  --fs-root /srv/00transfer/PROJECT --alter=binary\
+	  --slice=1T --min-digits=4 \
+	  --compression=zstd:20:1M --multi-thread=12 \
+	  --slice-mode=0600 --hash=sha512
+	</code>
+
+      </dd>
+      <dt class=void>Source</dt><dd>
+	Carsten Aulbert in December 2025
+
+      </dd>
+    </dl>
+    <p>
+      <em><a href="References.html">Back to page of references</a></em>
+    </p>
+  </body>
+</html>

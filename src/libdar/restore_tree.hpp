@@ -51,6 +51,7 @@ extern "C"
 #include "path.hpp"
 #include "data_tree.hpp"
 #include "datetime.hpp"
+#include "mask.hpp"
 
 namespace libdar
 {
@@ -64,6 +65,15 @@ namespace libdar
 	restore_tree & operator = (restore_tree && ref) noexcept = default;
 	~restore_tree() = default;
 
+	    /// returns the set of archive to restore from
+
+	    /// \param[in] racine is the path of the root to consider
+	    /// \param[in] is the subtree to consider for restoration and this
+	    /// the archive location are reduced accordingly
+	std::set<archive_num> get_locations(path & current_path,
+					    const std::shared_ptr<mask> & the_mask) const;
+
+
 	    /// return wether the provided path should trigger restoration from archive number num
 
 	    /// \param[in] chem path to the inode to be restored (should always be a relative path)
@@ -71,14 +81,15 @@ namespace libdar
 	    /// \return true if the restoration should be applied to that path in the archive 'num', false else.
 	    /// \note false may be returned because the archive num does not have restorable data for this entry,
 	    /// but also because more recent archive have better version to be restored instread.
-	bool restore_from(const std::string & chem, archive_num num) const;
+	bool restore_from(const path & chem, archive_num num) const;
 
     private:
 	std::set<archive_num> locations;
 	std::map<std::string, std::unique_ptr<restore_tree> > children;
 
-	const restore_tree* lookup(path & chem) const;
+	const restore_tree* lookup(const path & chem) const;
 	bool result_for(archive_num num) const { return locations.find(num) != locations.end(); };
+
     };
 
 } // end of namespace

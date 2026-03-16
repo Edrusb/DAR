@@ -120,6 +120,7 @@ namespace libdar
 	infinint min_read_offset;   ///< next offset in archive should be greater than that to identify a mark
 	infinint depth;             ///< directory depth of archive being read sequentially
 	infinint wait_parent_depth; ///< ignore any further entry while depth is less than wait_parent_depth. disabled is set to zero
+	mutable bool has_read_data; ///< whether some data could be read since last call to reset_read()
 
 	void set_esc_and_stack(const pile_descriptor & x_pdesc);
 	void copy_from(const escape_catalogue & ref);

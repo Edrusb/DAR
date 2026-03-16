@@ -574,9 +574,37 @@ namespace libdar
 
 		    // extracting cat_inode from hard links
 		if(src_mir != nullptr)
-		    src_ino = src_mir->get_inode();
+		{
+		    cat_inode* chg_ino = const_cast<cat_inode*>(src_mir->get_inode());
+		    src_ino = chg_ino;
+
+		    if(src_ino == nullptr)
+			throw SRC_BUG;
+		    chg_ino->change_name(src_mir->get_name());
+			// this is needed on sequential read mode
+			// when comparing the in-line catalogue with
+			// the internal catalogue. The first has already
+			// been wholy read and mirage inode has the name
+			// of the last link pointing to it. While internal
+			// catalog has just been loaded to memory and cat_mirage
+			// inode has the name of the first hard link
+			//
+			// in next major release, the get_inode() call
+			// will imply the change of name of the pointed to image
+		}
 		if(dst_mir != nullptr)
-		    dst_ino = dst_mir->get_inode();
+		{
+		    cat_inode* chg_ino = const_cast<cat_inode*>(dst_mir->get_inode());
+		    dst_ino = chg_ino;
+
+		    if(dst_ino == nullptr)
+			throw SRC_BUG;
+		    chg_ino->change_name(dst_mir->get_name());
+			// same remark as above, once the first
+			// occurence of a hard link has been met
+			// the inode name has to be updated for
+			// comparison to succeed
+		}
 
 		    // updating internal structure to follow directory tree :
 		if(dir != nullptr)
@@ -965,7 +993,7 @@ namespace libdar
 
 	try
 	{
-	    while(ret && !read(moi))
+	    while(ret && read(moi))
 	    {
 		if(moi == nullptr)
 		    throw SRC_BUG;
@@ -974,8 +1002,14 @@ namespace libdar
 		    ret = false;
 		else
 		{
+		    const cat_mirage* mmoi = dynamic_cast<const cat_mirage*>(moi);
+
+		    if(mmoi != nullptr)
+			moi = mmoi->get_inode();
+
 		    if(toi == nullptr)
 			throw SRC_BUG;
+
 		    if(*toi != *moi)
 			ret = false;
 		}

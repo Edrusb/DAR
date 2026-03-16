@@ -85,11 +85,25 @@ namespace libdar
 	mask_database & operator = (mask_database && ref) noexcept = default;
         virtual ~mask_database() = default; // base is not
 
+	    /// provide the mask defining the directory tree set be restored
+
+	    /// \note this one is composed with the database to define not only
+	    /// what to restore but *from where* to restore it
+	void compose_with(const mask & ref);
+
+	    /// get the overall set of archive to focus on (ignore all others)
+	std::set<archive_num> get_locations() const;
+
 	    /// condition the mask to return is_covered for this provided archive num
 	void set_focus(archive_num focus) const { zoom = focus; };
 
+
 	    /// inherited from class mask
-        virtual bool is_covered(const std::string &expression) const override;
+	virtual bool is_covered(const std::string & expression) const;
+
+
+	    /// inherited from class mask
+        virtual bool is_covered(const path & expression) const override;
 
 	    /// inherited from class mask
 
@@ -102,9 +116,10 @@ namespace libdar
 
     private:
 
-	std::string fs_racine;              ///< prefix to reach the root where restoration will take place
+	path fs_racine;                     ///< prefix to reach the root where restoration will take place
 	mutable archive_num zoom;           ///< the archive to focus on
 	std::shared_ptr<restore_tree> tree; ///< contains all info to define archive set to use to restore a given path/file
+	std::shared_ptr<mask> composition;  ///< the mask defining what to restore, while "this" defines *from where* to restore
 
     };
 

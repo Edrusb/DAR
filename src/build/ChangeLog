@@ -9,6 +9,14 @@ from 2.8.x to 2.9.0
 from 2.8.3 to 2.8.4
 - fixing self reported bug "file mask_database.cpp line 68" met used when
   calling dar to restore from a database (-aefd option).
+- Enhancement of the filtering mechanism used when restoring data with dar
+  and a dar_manager database (-aefd option) to avoid uselessly restoring
+  some files in some intermediate state.
+- fixing bug met while testing in sequential more resulting in error message
+  "skipping backward is not possible on a pipe", this bug do not concern
+  the generated archives, bug the way they were read.
+- fixed several bugs that led the gpg signature validation to be inoperant
+  in sequential read mode.
 
 from 2.8.2 to 2.8.3
 - fixing bug met when symmetric encryption object initialization failed
@@ -146,6 +154,19 @@ from 2.7.x to 2.8.0
   from version 6 is little: It mainly concerns the abstraction of
   remote sftp/ftp repositories from their implementation (libcurl,
   libssh)[see remote_entrepot_api.hpp module part if libdar API].
+
+from 2.7.19 to 2.7.20
+- fixed bug leading dar in sequential-read mode not to completely check
+  gnupg signature when present. Signature check was properly performed
+  on the gnupg encrypted symmetrical key, on the internal catalog content,
+  but not on the in-lined content (used only in sequential read mode).
+  Not sure it would be possible to use this lack of validation to tamper
+  an archive as it would require to first gpg decrypt it (thus know the
+  private key of a recipient) then re-gpg-encrypt the archive for the same
+  recipient(s) using a symmetric key that should be itslef gnupg-encrypted
+  *and* signed by the original sender (thus also know the private key of
+  the sender).
+  This bug is not met in normal (direct access) mode.
 
 from 2.7.18 to 2.7.19
 - fixed the trailing slash support in path, that was broken by commit
