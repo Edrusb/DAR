@@ -98,6 +98,11 @@ namespace libdar
 		throw Erange("special::special", gettext("missing data to build a special device"));
 	    xminor = ntohs(tmp);
 	}
+	else
+	{
+	    xmajor = 0;
+	    xminor = 0;
+	}
     }
 
     bool cat_device::operator == (const cat_entree & ref) const
