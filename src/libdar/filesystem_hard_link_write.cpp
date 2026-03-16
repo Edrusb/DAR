@@ -317,7 +317,6 @@ namespace libdar
 			ref_cha = dynamic_cast<const cat_chardev *>(ref_mir->get_inode());
 			ref_tub = dynamic_cast<const cat_tube *>(ref_mir->get_inode());
 			ref_pri = dynamic_cast<const cat_prise *>(ref_mir->get_inode());
-			ref_mir->get_inode()->change_name(ref_mir->get_name()); // we temporarily change the name of the attached inode (it is not used usually), by the name of the cat_mirage object
 		    }
 		    else // hard link made
 			ret = 0; // not necessary, but avoids a warning from compilator ("ret" might be used uninitialized)

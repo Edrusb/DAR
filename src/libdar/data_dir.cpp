@@ -549,10 +549,7 @@ namespace libdar
 	    const cat_detruit *entry_det = dynamic_cast<const cat_detruit *>(entry);
 
 	    if(entry_mir != nullptr)
-	    {
 		entry_ino = entry_mir->get_inode();
-		entry_mir->get_inode()->change_name(entry_mir->get_name());
-	    }
 
 	    if(entry_ino == nullptr)
 		if(entry_det != nullptr)

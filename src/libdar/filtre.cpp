@@ -253,7 +253,6 @@ namespace libdar
 		    e_ino = e_mir->get_inode();
 		    if(e_ino == nullptr)
 			throw SRC_BUG; // !?! how is this possible ?
-		    e_mir->get_inode()->change_name(e_mir->get_name()); // temporarily changing the inode name to the one of the cat_mirage
 		    e_file = dynamic_cast<const cat_file *>(e_ino);
 		}
 
@@ -668,7 +667,6 @@ namespace libdar
 			    e_file = dynamic_cast<cat_file *>(e_mir->get_inode());
 			    if(e_ino == nullptr)
 				throw SRC_BUG;
-			    e_ino->change_name(e_mir->get_name());
 			}
 		    }
 
@@ -1262,10 +1260,7 @@ namespace libdar
 		const cat_file *e_file = dynamic_cast<const cat_file *>(e_mir->get_inode());
 
 		if(e_file == nullptr || e_mir->get_etoile_ref_count() == 1 || cat.get_escape_layer() == nullptr)
-		{
 		    e_ino = e_mir->get_inode();
-		    e_mir->get_inode()->change_name(e_mir->get_name());
-		}
 		else
 		    dialog->message(gettext("SKIPPED (hard link in sequential read mode): ") + e_mir->get_name());
 	    }

@@ -266,6 +266,21 @@ namespace libdar
 	return *this;
     }
 
+    cat_inode *cat_mirage::get_inode() const
+    {
+	cat_inode* ret = nullptr;
+
+	if(star_ref == nullptr)
+	    throw SRC_BUG;
+
+	    // we must change the name of the returned
+	    // inode to the name of the hard_link itself
+	ret = star_ref->get_inode();
+	ret->change_name(get_name());
+
+	return ret;
+    }
+
     void cat_mirage::post_constructor(const pile_descriptor & pdesc)
     {
 	cat_nomme::post_constructor(pdesc);
