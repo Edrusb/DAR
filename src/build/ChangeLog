@@ -1,4 +1,3 @@
-
 from 2.7.19 to 2.7.20
 - fixed bug leading dar in sequential-read mode not to completely check
   gnupg signature when present. Signature check was properly performed
@@ -6,10 +5,8 @@ from 2.7.19 to 2.7.20
   but not on the in-lined content (used only in sequential read mode).
   Not sure it would be possible to use this lack of validation to tamper
   an archive as it would require to first gpg decrypt it (thus know the
-  private key of a recipient) then re-gpg-encrypt the archive for the same
-  recipient(s) using a symmetric key that should be itslef gnupg-encrypted
-  *and* signed by the original sender (thus also know the private key of
-  the sender).
+  private key of a recipient) then re-encrypt the archive for the same
+  recipient(s).
   This bug is not met in normal (direct access) mode.
 
 from 2.7.18 to 2.7.19
