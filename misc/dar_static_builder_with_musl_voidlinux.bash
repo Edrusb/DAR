@@ -139,9 +139,6 @@ requirements()
 	return 1
     fi
 
-    # optional but interesting to get a smaller dar_static binary
-    xbps-install -y upx || echo "" && echo "WARNING!" && echo "Failed to install upx, will do without" && echo && return 1
-
     uname > /dev/null || nok "missing uname command, aborting"
 }
 
