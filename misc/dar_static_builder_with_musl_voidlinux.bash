@@ -284,9 +284,6 @@ libcurl()
     ldconfig
     rm -rf curl-${LIBCURL_VERSION}
     misc/fix_libcurl_pc
-
-    # fixing lame pkgconfig from libpsl used by libcurl
-    sed -ri -e "s/-lpsl/-lpsl -lunistring/" /usr/lib/pkgconfig/libpsl.pc
 }
 
 librhash()
