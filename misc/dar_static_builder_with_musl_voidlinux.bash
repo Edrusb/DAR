@@ -102,7 +102,7 @@ requirements()
 
     #direct dependencies of libdar
     xbps-install -y bzip2-devel e2fsprogs-devel libargon2-devel libgcc-devel libgcrypt-devel liblz4-devel \
-		 liblzma-devel libstdc++-devel libzstd-devel lz4-devel \
+		 liblzma-devel libstdc++-devel libzstd-devel \
 		 lzo-devel musl-devel zlib-devel || exit 1
 
     # needed to build static flavor of librsync
@@ -186,7 +186,7 @@ gnutls()
     if [ ! -e "${REPO}/${GNUTLS_PKG}" ] ; then wget ${GNUTLS_WGET_OPT} "https://www.gnupg.org/ftp/gcrypt/gnutls/v${REPODIR}/${GNUTLS_PKG}" && mv "${GNUTLS_PKG}" "${REPO}" || exit 1 ; fi
     tar -xf "${REPO}/${GNUTLS_PKG}"
     cd "gnutls-${GNUTLS_VERSION}"
-    ./configure --enable-static --without-p11-kit
+    ./configure --enable-static --without-p11-kit --disable-doc
     unbound-anchor -a "/etc/unbound/root.key"
     make ${MAKE_FLAGS}
     make install
@@ -248,6 +248,9 @@ libcurl()
     cd ..
     ldconfig
     rm -rf curl-${LIBCURL_VERSION}
+
+    # fixing lame pkgconfig from libpsl used by libcurl
+    sed -ri -e "s/-lpsl/-lpsl -lunistring/" /usr/lib/pkgconfig/libpsl.pc
 }
 
 dar_static()
