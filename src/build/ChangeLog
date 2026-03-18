@@ -17,7 +17,6 @@ from 2.8.3 to 2.8.4
   recipient(s).
   This bug is not met in normal (direct access) mode.
 
-
 from 2.8.2 to 2.8.3
 - fixing bug met when symmetric encryption object initialization failed
   due to libgcrypt returning an error code, leading libdar to segfault.

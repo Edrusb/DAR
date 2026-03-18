@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: dar 2.8.3\n"
+"Project-Id-Version: dar 2.8.4\n"
 "Report-Msgid-Bugs-To: https://github.com/Edrusb/DAR/issues\n"
-"POT-Creation-Date: 2026-01-24 11:47+0100\n"
+"POT-Creation-Date: 2026-03-18 23:08+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3077,40 +3077,40 @@ msgstr ""
 msgid "Error while setting libzstd compression level to %d: %s"
 msgstr ""
 
-#: src/libdar/escape_catalogue.cpp:90
+#: src/libdar/escape_catalogue.cpp:92
 msgid ""
 "incoherent data after escape sequence, cannot read internal data set label"
 msgstr ""
 
-#: src/libdar/escape_catalogue.cpp:100
+#: src/libdar/escape_catalogue.cpp:102
 msgid "Could not find tape mark for the internal catalogue"
 msgstr ""
 
-#: src/libdar/escape_catalogue.cpp:129
+#: src/libdar/escape_catalogue.cpp:131
 msgid "invalid in-place path value"
 msgstr ""
 
-#: src/libdar/escape_catalogue.cpp:137
+#: src/libdar/escape_catalogue.cpp:139
 msgid "Error while reading in-place path using tape marks"
 msgstr ""
 
-#: src/libdar/escape_catalogue.cpp:142
+#: src/libdar/escape_catalogue.cpp:144
 msgid ""
 "LAX MODE: Could not read in-place path information, assuming corruption "
 "occurred or no in-path place was present"
 msgstr ""
 
-#: src/libdar/escape_catalogue.cpp:152
+#: src/libdar/escape_catalogue.cpp:154
 msgid ""
 "LAX MODE: unexpected exception met when reading in-path place using tape "
 "marks, ignoring in-path info and continuing"
 msgstr ""
 
-#: src/libdar/escape_catalogue.cpp:160
+#: src/libdar/escape_catalogue.cpp:162
 msgid "Could not find tape mark for the in-place path"
 msgstr ""
 
-#: src/libdar/escape_catalogue.cpp:548
+#: src/libdar/escape_catalogue.cpp:551
 msgid ""
 "Escape sequences used for reading lead the archive to place some files out "
 "of the specified root. To overcome this problem, try reading the archive in "
@@ -3119,7 +3119,7 @@ msgid ""
 "lax mode"
 msgstr ""
 
-#: src/libdar/escape_catalogue.cpp:551
+#: src/libdar/escape_catalogue.cpp:554
 msgid ""
 "LAX MODE: Archive directory structure is corrupted, it would lead to place "
 "some files out of the specified root directory. Restoring different "
@@ -3127,36 +3127,36 @@ msgid ""
 "different directories in the specified root directory"
 msgstr ""
 
-#: src/libdar/escape_catalogue.cpp:566
+#: src/libdar/escape_catalogue.cpp:569
 msgid ""
 "LAX MODE: found unknown catalogue entry, assuming data corruption occurred. "
 "Skipping to the next entry, this may lead to improper directory structure "
 "being restored, if the corrupted data was a directory"
 msgstr ""
 
-#: src/libdar/escape_catalogue.cpp:573
+#: src/libdar/escape_catalogue.cpp:576
 msgid "Corrupted entry following an escape mark in the archive"
 msgstr ""
 
-#: src/libdar/escape_catalogue.cpp:637
+#: src/libdar/escape_catalogue.cpp:640
 msgid ""
 "Uncompleted archive! Assuming it has been interrupted during the backup "
 "process. If an error has been reported just above, simply ignore it, this is "
 "about the file that was saved at the time of the interruption."
 msgstr ""
 
-#: src/libdar/escape_catalogue.cpp:672
+#: src/libdar/escape_catalogue.cpp:675
 msgid "Cannot extract from the internal catalogue the list of files to remove"
 msgstr ""
 
-#: src/libdar/escape_catalogue.cpp:733 src/libdar/i_archive.cpp:289
+#: src/libdar/escape_catalogue.cpp:742 src/libdar/i_archive.cpp:289
 #: src/libdar/i_archive.cpp:323
 msgid ""
 "Archive internal catalogue is not identically signed as the archive itself, "
 "this might be the sign the archive has been compromised"
 msgstr ""
 
-#: src/libdar/escape_catalogue.cpp:749
+#: src/libdar/escape_catalogue.cpp:758
 msgid ""
 "Archive internal catalogue is properly signed but its content does not match "
 "the tape marks used so far for sequentially reading. Possible data "
@@ -3166,7 +3166,7 @@ msgid ""
 "has been generated"
 msgstr ""
 
-#: src/libdar/escape_catalogue.cpp:945
+#: src/libdar/escape_catalogue.cpp:963
 msgid ""
 "Resetting the sequential reading process of the archive contents while it is "
 "not finished, will make all data unread so far becoming inaccessible"
@@ -3388,12 +3388,12 @@ msgstr ""
 msgid "missing data to build a special device"
 msgstr ""
 
-#: src/libdar/cat_device.cpp:150
+#: src/libdar/cat_device.cpp:155
 #, c-format
 msgid "devices have not the same major number: %d <--> %d"
 msgstr ""
 
-#: src/libdar/cat_device.cpp:152
+#: src/libdar/cat_device.cpp:157
 #, c-format
 msgid "devices have not the same minor number: %d <--> %d"
 msgstr ""
@@ -4261,25 +4261,25 @@ msgid ""
 "permit to recover some files, at most)?"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:473
+#: src/libdar/i_archive.cpp:485
 msgid "Early memory release is not possible for a backup of reference"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:605 src/libdar/i_archive.cpp:2139
+#: src/libdar/i_archive.cpp:617 src/libdar/i_archive.cpp:2151
 msgid ""
 "\"first_file_size\" cannot be different from zero if \"file_size\" is equal "
 "to zero"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:607 src/libdar/i_archive.cpp:2141
+#: src/libdar/i_archive.cpp:619 src/libdar/i_archive.cpp:2153
 msgid "Crypto block size must be greater than 10 bytes"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:635
+#: src/libdar/i_archive.cpp:647
 msgid "Both reference archive are nullptr, cannot merge archive from nothing"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:668
+#: src/libdar/i_archive.cpp:680
 msgid ""
 "the \"Keep file compressed\" feature is not possible when merging two "
 "archives using different compression algorithms (This is for a future "
@@ -4288,121 +4288,121 @@ msgid ""
 "options) for the resulting archive"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:692 src/libdar/i_archive.cpp:879
+#: src/libdar/i_archive.cpp:704 src/libdar/i_archive.cpp:891
 #: src/libdar/macro_tools.cpp:949
 msgid ""
 "compression block size used in the archive exceed integer capacity of the "
 "current system"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:699 src/libdar/i_archive.cpp:702
+#: src/libdar/i_archive.cpp:711 src/libdar/i_archive.cpp:714
 msgid "Early memory release is not compatible with the merging operation"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:707
+#: src/libdar/i_archive.cpp:719
 msgid ""
 "Cannot calculate delta signature when merging if keep compressed is asked"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:709
+#: src/libdar/i_archive.cpp:721
 msgid ""
 "To calculate delta signatures of files saved as sparse files, you need to "
 "activate sparse file detection mechanism with merging operation"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:962
+#: src/libdar/i_archive.cpp:974
 #, c-format
 msgid ""
 "Archive repairing completed. WARNING! it is strongly advised to test the "
 "resulting archive before removing the damaged one"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:990 src/libdar/i_archive.cpp:1449
+#: src/libdar/i_archive.cpp:1002 src/libdar/i_archive.cpp:1461
 msgid "This archive is not exploitable, check documentation for more"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1004
+#: src/libdar/i_archive.cpp:1016
 msgid ""
 "File ownership will not be restored du to the lack of privilege, you can "
 "disable this message by asking not to restore file ownership"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1012 src/libdar/i_archive.cpp:1467
+#: src/libdar/i_archive.cpp:1024 src/libdar/i_archive.cpp:1479
 msgid ""
 "Cannot use in-place restoration as no in-place path is stored in the archive"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1062
+#: src/libdar/i_archive.cpp:1074
 msgid "Error while restoring data: "
-msgstr ""
-
-#: src/libdar/i_archive.cpp:1090
-#, c-format
-msgid "Catalogue size in archive            : %i bytes"
-msgstr ""
-
-#: src/libdar/i_archive.cpp:1092
-#, c-format
-msgid "Catalogue size in archive            : N/A"
-msgstr ""
-
-#: src/libdar/i_archive.cpp:1098
-#, c-format
-msgid "Archive is composed of %i file(s)"
 msgstr ""
 
 #: src/libdar/i_archive.cpp:1102
 #, c-format
-msgid "File size: %i bytes"
+msgid "Catalogue size in archive            : %i bytes"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1111
+#: src/libdar/i_archive.cpp:1104
 #, c-format
-msgid "First file size       : %i bytes"
+msgid "Catalogue size in archive            : N/A"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1112
+#: src/libdar/i_archive.cpp:1110
 #, c-format
-msgid "File size             : %i bytes"
-msgstr ""
-
-#: src/libdar/i_archive.cpp:1113
-#, c-format
-msgid "Last file size        : %i bytes"
+msgid "Archive is composed of %i file(s)"
 msgstr ""
 
 #: src/libdar/i_archive.cpp:1114
 #, c-format
-msgid "Archive total size is : %i bytes"
-msgstr ""
-
-#: src/libdar/i_archive.cpp:1122
-#, c-format
-msgid "Archive size is: %i bytes"
+msgid "File size: %i bytes"
 msgstr ""
 
 #: src/libdar/i_archive.cpp:1123
 #, c-format
-msgid "Previous archive size does not include headers present in each slice"
+msgid "First file size       : %i bytes"
+msgstr ""
+
+#: src/libdar/i_archive.cpp:1124
+#, c-format
+msgid "File size             : %i bytes"
+msgstr ""
+
+#: src/libdar/i_archive.cpp:1125
+#, c-format
+msgid "Last file size        : %i bytes"
 msgstr ""
 
 #: src/libdar/i_archive.cpp:1126
 #, c-format
+msgid "Archive total size is : %i bytes"
+msgstr ""
+
+#: src/libdar/i_archive.cpp:1134
+#, c-format
+msgid "Archive size is: %i bytes"
+msgstr ""
+
+#: src/libdar/i_archive.cpp:1135
+#, c-format
+msgid "Previous archive size does not include headers present in each slice"
+msgstr ""
+
+#: src/libdar/i_archive.cpp:1138
+#, c-format
 msgid "Archive size is unknown (reading from a pipe or in sequential mode)"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1132
+#: src/libdar/i_archive.cpp:1144
 #, c-format
 msgid ""
 "The overall archive size includes %i byte(s) wasted due to bad compression "
 "ratio"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1137
+#: src/libdar/i_archive.cpp:1149
 msgid "The global data compression ratio is: "
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1148
+#: src/libdar/i_archive.cpp:1160
 #, c-format
 msgid ""
 "\n"
@@ -4412,129 +4412,129 @@ msgid ""
 "from this archive alone\n"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1152
+#: src/libdar/i_archive.cpp:1164
 #, c-format
 msgid "\tUnknown or no slicing"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1156
+#: src/libdar/i_archive.cpp:1168
 #, c-format
 msgid "\tFirst slice : %i byte(s)"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1157
+#: src/libdar/i_archive.cpp:1169
 #, c-format
 msgid "\tOther slices: %i byte(s)"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1164
+#: src/libdar/i_archive.cpp:1176
 #, c-format
 msgid "in-place path: %S"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1166
+#: src/libdar/i_archive.cpp:1178
 msgid "no in-place path recorded"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1195 src/libdar/i_archive.cpp:1538
+#: src/libdar/i_archive.cpp:1207 src/libdar/i_archive.cpp:1550
 msgid ""
 "This archive is not exploitable, check the archive class usage in the API "
 "documentation"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1295 src/libdar/i_archive.cpp:1814
-#: src/libdar/i_archive.cpp:1850
+#: src/libdar/i_archive.cpp:1307 src/libdar/i_archive.cpp:1826
+#: src/libdar/i_archive.cpp:1862
 msgid ""
 "Fetching EA value while listing an archive is not possible in sequential "
 "read mode"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1301
+#: src/libdar/i_archive.cpp:1313
 msgid "slicing focused output is not available in sequential-read mode"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1308
+#: src/libdar/i_archive.cpp:1320
 #, c-format
 msgid ""
 "Using user provided modified slicing (first slice = %i bytes, other slices = "
 "%i bytes)"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1311
+#: src/libdar/i_archive.cpp:1323
 msgid ""
 "No slice layout of the archive of reference for the current isolated "
 "catalogue is available, cannot provide slicing information, aborting"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1386
+#: src/libdar/i_archive.cpp:1398
 #, c-format
 msgid "Exception caught from archive_listing_callback execution: %s"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1391
+#: src/libdar/i_archive.cpp:1403
 msgid "Exception caught from archive_listing_callback execution"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1420
+#: src/libdar/i_archive.cpp:1432
 msgid "Error while listing archive contents: "
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1507
+#: src/libdar/i_archive.cpp:1519
 msgid "Error while comparing archive with filesystem: "
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1550
+#: src/libdar/i_archive.cpp:1562
 msgid ""
 "WARNING! This is an isolated catalogue, no data or EA is present in this "
 "archive, only the catalogue structure can be checked"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1585
+#: src/libdar/i_archive.cpp:1597
 msgid "A problem occurred while reading this archive contents: "
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1600
+#: src/libdar/i_archive.cpp:1612
 msgid "Error while testing archive: "
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1649
+#: src/libdar/i_archive.cpp:1661
 msgid ""
 "Isolation with delta signature is not possible on a just created archive (on-"
 "fly isolation)"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1816
+#: src/libdar/i_archive.cpp:1828
 msgid ""
 "get_children_of is not possible on a catalogue set with early memory release"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1853
+#: src/libdar/i_archive.cpp:1865
 msgid ""
 "get_children_in_table is not possible on a catalogue set with early memory "
 "release"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:1950
+#: src/libdar/i_archive.cpp:1962
 msgid "cannot get catalogue which memory has been (early) released"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:2137
+#: src/libdar/i_archive.cpp:2149
 msgid "Compression_level must be between 1 and 9 included"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:2144
+#: src/libdar/i_archive.cpp:2156
 msgid ""
 "nodump flag feature has not been activated at compilation time, it is thus "
 "not available"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:2169
+#: src/libdar/i_archive.cpp:2181
 msgid ""
 "Cannot sequentially read an archive of reference when delta signature or "
 "delta patch is requested"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:2205
+#: src/libdar/i_archive.cpp:2217
 #, c-format
 msgid ""
 "WARNING! The archive is located in the directory to backup, this may create "
@@ -4543,76 +4543,76 @@ msgid ""
 "(see -h for help). Do you really want to continue?"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:2397
+#: src/libdar/i_archive.cpp:2409
 msgid "Ready to start writing down the archive?"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:2445
+#: src/libdar/i_archive.cpp:2457
 msgid "Building the catalog object..."
 msgstr ""
 
-#: src/libdar/i_archive.cpp:2463
+#: src/libdar/i_archive.cpp:2475
 #, c-format
 msgid "Error while fetching information for %S: "
 msgstr ""
 
-#: src/libdar/i_archive.cpp:2527
+#: src/libdar/i_archive.cpp:2539
 #, c-format
 msgid ""
 "Warning making a differential/incremental backup with a different root "
 "directory: %S <-> %S"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:2539
+#: src/libdar/i_archive.cpp:2551
 msgid "Processing files for backup..."
 msgstr ""
 
-#: src/libdar/i_archive.cpp:2621
+#: src/libdar/i_archive.cpp:2633
 msgid "Processing files for merging..."
 msgstr ""
 
-#: src/libdar/i_archive.cpp:2664
+#: src/libdar/i_archive.cpp:2676
 msgid "Processing files for fixing..."
 msgstr ""
 
-#: src/libdar/i_archive.cpp:2747
+#: src/libdar/i_archive.cpp:2759
 msgid ""
 "Adding reference to files that have been destroyed since reference backup..."
 msgstr ""
 
-#: src/libdar/i_archive.cpp:2802
+#: src/libdar/i_archive.cpp:2814
 msgid "Error while saving data: "
 msgstr ""
 
-#: src/libdar/i_archive.cpp:2828
+#: src/libdar/i_archive.cpp:2840
 msgid "WARNING! Incorrect signature found for archive, continue anyway?"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:2871
+#: src/libdar/i_archive.cpp:2883
 msgid ""
 "Cannot get data name of the archive, this archive is not completely "
 "initialized"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:2896
+#: src/libdar/i_archive.cpp:2908
 msgid ""
 "This archive contains an isolated catalogue, it cannot be used for this "
 "operation. It can only be used as reference for a incremental/differential "
 "backup or as backup of the original archive's catalogue"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:2903
+#: src/libdar/i_archive.cpp:2915
 msgid ""
 "LAX MODE: Archive seems to be only an isolated catalogue (no data in it), "
 "Can I assume data corruption occurred and consider the archive as being a "
 "real archive?"
 msgstr ""
 
-#: src/libdar/i_archive.cpp:2908
+#: src/libdar/i_archive.cpp:2920
 msgid "Error while fetching archive properties: "
 msgstr ""
 
-#: src/libdar/i_archive.cpp:3034
+#: src/libdar/i_archive.cpp:3046
 #, c-format
 msgid ""
 "libgcrypt version < %s. Ligcrypt used has a bug that leads md5 and sha1 hash "
@@ -4823,7 +4823,7 @@ msgstr ""
 msgid "root has no parent directory"
 msgstr ""
 
-#: src/libdar/catalogue.cpp:692
+#: src/libdar/catalogue.cpp:720
 #, c-format
 msgid "Recording removed filed: %s"
 msgstr ""
@@ -7418,16 +7418,16 @@ msgstr ""
 msgid "Cannot restore any file, nothing done"
 msgstr ""
 
-#: src/libdar/i_database.cpp:723
+#: src/libdar/i_database.cpp:718
 msgid "Identifying the set of archive to use from the dar_manager database..."
 msgstr ""
 
-#: src/libdar/i_database.cpp:790
+#: src/libdar/i_database.cpp:768
 #, c-format
 msgid "*** Archive [%s] fully loaded ***"
 msgstr ""
 
-#: src/libdar/i_database.cpp:817 src/libdar/i_database.cpp:825
+#: src/libdar/i_database.cpp:795 src/libdar/i_database.cpp:803
 #, c-format
 msgid "Invalid archive number: %d"
 msgstr ""
