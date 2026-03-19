@@ -242,7 +242,7 @@ libcurl()
     if [ ! -e "${REPO}/${LIBCURL_PKG}" ] ; then wget "https://curl.se/download/${LIBCURL_PKG}" && mv "${LIBCURL_PKG}" "${REPO}" || exit 1 ; fi
     tar -xf "${REPO}/${LIBCURL_PKG}"
     cd curl-${LIBCURL_VERSION}
-    ./configure --with-gnutls=/usr/local/lib ${SSH_CURL_OPT} --disable-shared --without-libpsl
+    ./configure --without-libidn2 --without-ssl --without-zlib --without-zstd --without-ca-bundle --without-gnutls --without-brotli --without-libpsl --without-libgsasl  --enable-shared --enable-static --without-libssh --without-libssh2 --without-librtmp
     make ${MAKE_FLAGS}
     make install
     cd ..
