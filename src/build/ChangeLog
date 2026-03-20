@@ -1,3 +1,24 @@
+from 2.7.20 to 2.7.21
+-  fixing bug of one hour shift in non-daylight saving months for
+   time-zones that have one.
+   dar_manager and dar can be given a date (-w option for dar_manager,
+   -af option for dar) which is expected to be provided in local time.
+   But libdar wrongly assumed it to always be given as summer time (or
+   daylight saving time) even when the given date took place in a
+   non-daylight saving period (winter time), which led most of the
+   time to a shift of one hour in the past.
+   Dar_manager using the -w option was restoring files older than the
+   provided date but forgot the ones having a modification date less
+   than one hour before the provided date/time when this date/time
+   was not in non-daylight saving period (winter time). Those were
+   restored in a earlier state or not restored at all if they did not
+   exist before that one hour shifted date.
+   With dar using -af option, this led dar to save files after the
+   given date as expected but also saving the files older than the
+   provided date for less an one hour, when this date was in non-daylight
+   saving period (winter time). Other files being saved as expected
+   as "un-modified" (only metadata saved).
+
 from 2.7.19 to 2.7.20
 - fixed bug leading dar in sequential-read mode not to completely check
   gnupg signature when present. Signature check was properly performed
