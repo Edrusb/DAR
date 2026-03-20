@@ -274,6 +274,7 @@ libcurl()
 {
     local LIBCURL_PKG=curl-${LIBCURL_VERSION}.tar.bz2
 
+
     if [ ! -e "${REPO}/${LIBCURL_PKG}" ] ; then wget "https://curl.se/download/${LIBCURL_PKG}" && mv "${LIBCURL_PKG}" "${REPO}" || return 1 ; fi
     tar -xf "${REPO}/${LIBCURL_PKG}" || return 1
     cd curl-${LIBCURL_VERSION} || return 1
