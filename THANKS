@@ -1,3 +1,7 @@
+version 2.7.21
+--------------
+Thanks to Per Jensen for bug report
+
 version 2.7.19
 --------------
 Thanks to RSmain at github for findings and feedback about script launching
