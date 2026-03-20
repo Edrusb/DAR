@@ -1202,7 +1202,6 @@ infinint line_tools_convert_date(const string & repres)
 	    when.tm_sec = when.tm_min = when.tm_hour = 0;
 	    when.tm_wday = 0;            // ignored by mktime
 	    when.tm_yday = 0;            // ignored by mktime
-	    when.tm_isdst = 1;           // provided time is local daylight saving time
 	    tmp = 0;
 	};
 	scan(const scan & ref) = default;
