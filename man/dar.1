@@ -307,37 +307,37 @@ Modify the -A option behavior, making it receiving a <date> as argument in place
 .PP
 For archive creation, the <date> is used to define which file to save: file which modification is newer or equal to <date>, and which to consider unchanged: those older than <date>.
 .PP
-For archive restoration from a dar_manager database, the given date defines the latest state into which to restore the data and EA. If not set, the most recent availabe state is restored, else the state of restored file is the most recent which is not more recent than the provided date.
+For archive restoration from a dar_manager database, the given date defines the latest state into which to restore the data and EA. Without this option, the most recent availabe state is restored.
 .RE
 .RS
 .PP
-<date> must be a date in the two following possible formats:
+the <date> is passed to -A option (which must follow -af option) and is expected to be a date in the two following possible formats:
 .RS
 .br
 - a number of second since Jan 1st, 1970
 .br
-- a date in the following form [[[year/]month/]day-]hour:minute[:second]
+- a date with the following structure [[[year/]month/]day-]hour:minute[:second]
 .RE
 .PP
 Here are some examples of date:
 .RS
 .B
-91836383927108078
+"-af -A 91836383927108078"
 .br
-.B 1
-2005/11/19-19:38:48
+.B
+"-af -A 2005/11/19-19:38:48"
 Which is 38 past 7 PM and 48 seconds, the 19th of November 2005
 .br
 .B
-20:20
-Which is 8 PM of the current day
+"-af -A 20:20"
+Which is 20 minutes past 8 PM of the current day
 .br
 .B
-2-00:08
-Which is 8 past noon, the second day of the current month
+"-af -A 2-00:08"
+Which is 8 minutes past noon, the second day of the current month
 .br
 .B
-2/2-14:59
+"-af -A 2/2-14:59"
 Which is 1 to 3 PM, the 2nd of February in the current year
 .RE
 .PP
@@ -1225,8 +1225,8 @@ This option first purpose was at restoration time when using an isolated catalog
 -aefd, --alter=extract-from-database
 In this mode of data restoration, the argument given to -x option should point to a dar_manager database. This is almost equivalent to use dar_manager's -r option at the difference that there is only one process and all
 dar options given on command line are available to each backup/archive referred in the database that will be used for this restoration. Dar_manager was
-designed to restore few files then extended to directories, but passing the fileset scope to restore between process is not that efficient. With -aefd
-option better performance is provided to restore the whole dataset referred from a set of full, incremental and/or differential backups referred in a dar_manager database.
+designed to restore few files then has been extended to a directory tree, but passing the fileset scope to restore between process is not that efficient. With -aefd
+option better performance is provided to restore the whole dataset referred from a set of full, incremental and/or differential backups referred in a dar_manager database. See also "-af -A <date>" option to limit the restoration to the status data had before a given date.
 .RS
 .PP
 with -aefd restoration mode, it is possible to restore in the state at a given date by mean of -af and -A options. By default, the most recent state available is restored for all entries. File filtering mechanism can also be used to restore only certain files and directories, instead of all that were present at the latest or given date state.
