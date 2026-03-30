@@ -177,8 +177,9 @@
 	    encryption)
 	  </li>
 	  <li>
-	    <a href="http://rhash.sourceforge.net">librhash</a> provides whirlpool
-	    hash algorithm
+	    <a href="http://rhash.sourceforge.net">librhash</a> was used to provides whirlpool
+	    hash algorithm for release before version 2.9.0. Since then, the whirlpool
+	    implementation relies on libgcrypt.
 	  </li>
 	</ul>
 
@@ -361,7 +362,8 @@
 	     whirlpool hash support
 	    </th>
 	    <td>
-	      librhash headers and library
+	      librhash headers and library for release older than 2.9.0,
+	      libgcrrypt headers and library since then.
 	    </td>
 	  </tr>
 	</table>
@@ -608,7 +610,7 @@
 	      whirlpool hash algorithm
 	    </th>
 	    <td>
-	      librhash-dev
+	      librhash-dev is no more needed for that, but libgcrypt-dev is instead
 	    </td>
 	    <td>
 	      ?
@@ -1035,13 +1037,6 @@
 	      </td>
 	      <td>
 		Disable linking with libssh, thus remote repository support using sftp will not be available
-	      </td>
-	    </tr>
-	    <tr>
-	      <td class=desc>--disable-librhash-linking
-	      </td>
-	      <td>
-		Disable linking with librhash, thus whirlpool hash will not be available
 	      </td>
 	    </tr>
 	    <tr>
