@@ -85,6 +85,8 @@ namespace libdar
 
 	void set_compression_block_size(const infinint & bs) { compr_bs = bs; };
 
+	void set_rsync_sig_magic(rsync_sig_magic val) { sig_magic = val; };
+
 	    // gettings
 
 	const archive_version & get_edition() const { return edition; };
@@ -104,6 +106,7 @@ namespace libdar
 	const infinint & get_iteration_count() const { return iteration_count; };
 	hash_algo get_kdf_hash() const { return kdf_hash; };
 	const infinint & get_compression_block_size() const { return compr_bs; };
+	rsync_sig_magic get_rsync_sig_magic() const { return sig_magic; };
 
 	    // display
 
@@ -131,6 +134,7 @@ namespace libdar
 	infinint iteration_count;///< used for key derivation
 	hash_algo kdf_hash;      ///< used for key derivation
 	infinint compr_bs;       ///< the compression block size (0 for legacy compression mode)
+	rsync_sig_magic sig_magic; ///< hash algo used to build rsync binary delta signatures
 
 	void nullifyptr() noexcept { crypted_key = nullptr; ref_layout = nullptr; };
 	void copy_from(const header_version & ref);
