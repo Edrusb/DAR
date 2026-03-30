@@ -546,6 +546,8 @@ namespace libdar
     {
 	switch(algo)
 	{
+	case rsync_sig_magic::none:
+	    throw SRC_BUG; // invalid value to create a binary signature
 	case rsync_sig_magic::md4:
 	    return RS_MD4_SIG_MAGIC;
 	case rsync_sig_magic::blake2:

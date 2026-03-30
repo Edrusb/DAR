@@ -88,9 +88,10 @@ namespace libdar
 
     enum class rsync_sig_magic
     {
-	md4,
-	blake2,
-	rk_blake2
+	none,      ///< no signature will be created
+	md4,       ///< signature created using md4 hash
+	blake2,    ///< signature created using blake2 hash
+	rk_blake2  ///< signature created using RabinKarp rollsum and blake2 hash
     };
 
     	/// convert hash value to human readable string
