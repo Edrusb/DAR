@@ -5,6 +5,10 @@ from 2.8.x to 2.9.0
 - added support for encrypted dar_manager databases
   (see dar_manager's -K options and eventually -L option for non-default
   behavior regarding dar_manager key provisionning).
+- adding blake2s-512 and sha3-512 hash algorithms
+- remove depencency on librhash as ligcrypt now provides whirlpool hash
+  algorithms and we already use this library for a lot of cryptographic
+  stuffs.
 
 from 2.8.4 to 2.8.5
 - fixing bug of one hour shift in non-daylight saving months for
