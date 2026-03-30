@@ -127,9 +127,6 @@ namespace libdar
 	/// \return true if provided string matches a valid rsync_sig_magic name and return the corresponding value in argument
     extern bool string_to_rsync_sig_magic(const std::string & arg, rsync_sig_magic & val);
 
-	/// provide the corresponding rsync_sig_magic value used within librsync
-    extern U_I rsync_sig_magic_to_librsync(rsync_sig_magic algo);
-
 	/// convert rsync_sig_magic to unsigned char
 
 	/// \note this is used to store the rsync_sig_magic value in archive

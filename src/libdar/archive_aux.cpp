@@ -223,22 +223,6 @@ namespace libdar
 	return true;
     }
 
-    U_I rsync_sig_magic_to_librsync(rsync_sig_magic algo)
-    {
-	switch(algo)
-	{
-	case rsync_sig_magic::md4:
-	    return RS_MD4_SIG_MAGIC;
-	case rsync_sig_magic::blake2:
-	    return RS_BLAKE2_SIG_MAGIC;
-	case rsync_sig_magic::rk_blake2:
-	    return RS_RK_BLAKE2_SIG_MAGIC;
-	default:
-	    throw SRC_BUG;
-	}
-    }
-
-
     unsigned char rsync_sig_magic_to_char(rsync_sig_magic algo)
     {
 	switch(algo)

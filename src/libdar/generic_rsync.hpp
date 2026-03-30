@@ -38,6 +38,7 @@ extern "C"
 
 #include "generic_file.hpp"
 #include "erreurs.hpp"
+#include "archive_aux.hpp"
 
 namespace libdar
 {
@@ -57,9 +58,11 @@ namespace libdar
 	    /// computed. The file signature is output to signature_storage
 	    /// \param[in] signature_storage is write only mode generic_file
 	    /// \param[in] signature_block_size the block len to use to build the signature
+	    /// \param[in] sig_magic hashing algorithm used to build signature
 	    /// \param[in] below is read only to fetch data from
 	generic_rsync(generic_file *signature_storage,
 		      U_I signature_block_size,
+		      rsync_sig_magic sig_magic,
 		      generic_file *below);
 
 	    /// constructor for "delta" operation (builds a patch data)
@@ -157,6 +160,13 @@ namespace libdar
 			  U_I & avail_out);
 	void free_job();
 	void send_eof();
+
+#if LIBRSYNC_AVAILABLE
+
+	    /// provide the corresponding rsync_sig_magic value used within librsync
+	static rs_magic_number rsync_sig_magic_to_librsync(rsync_sig_magic algo);
+
+#endif
     };
 
 	/// @}

@@ -53,10 +53,13 @@ using namespace std;
 namespace libdar
 {
 
+
+
 	// signature creation
 
     generic_rsync::generic_rsync(generic_file *signature_storage,
 				 U_I signature_block_size,
+				 rsync_sig_magic sig_magic,
 				 generic_file *below): generic_file(gf_read_only)
     {
 #if LIBRSYNC_AVAILABLE
@@ -84,13 +87,7 @@ namespace libdar
 	    initial = true;
 	    patching_completed = false; // not used in sign mode
 	    data_crc = nullptr;
-#ifdef RS_DEFAULT_STRONG_LEN
-	    job = rs_sig_begin(signature_block_size, RS_DEFAULT_STRONG_LEN);
-#else
-		// should use RS_BLAKE2_SIG_MAGIC in place of RS_MD4_SIG_MAGIC
-		// but not compatible with librsync < 1.0
-	    job = rs_sig_begin(signature_block_size, 0, RS_MD4_SIG_MAGIC);
-#endif
+	    job = rs_sig_begin(signature_block_size, 0, rsync_sig_magic_to_librsync(sig_magic));
 	}
 	catch(...)
 	{
@@ -541,6 +538,26 @@ namespace libdar
 	}
 	while(working_size > 0 && !finished);
     }
+
+
+#if LIBRSYNC_AVAILABLE
+
+    rs_magic_number generic_rsync::rsync_sig_magic_to_librsync(rsync_sig_magic algo)
+    {
+	switch(algo)
+	{
+	case rsync_sig_magic::md4:
+	    return RS_MD4_SIG_MAGIC;
+	case rsync_sig_magic::blake2:
+	    return RS_BLAKE2_SIG_MAGIC;
+	case rsync_sig_magic::rk_blake2:
+	    return RS_RK_BLAKE2_SIG_MAGIC;
+	default:
+	    throw SRC_BUG;
+	}
+    }
+#endif
+
 
 } // end of namespace
 
