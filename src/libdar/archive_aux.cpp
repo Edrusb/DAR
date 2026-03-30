@@ -32,6 +32,9 @@ extern "C"
 #if HAVE_STRINGS_H
 #include <strings.h>
 #endif
+#if HAVE_LIBRSYNC_H
+#include <librsync.h>
+#endif
 }
 
 #include "archive_aux.hpp"
@@ -192,6 +195,78 @@ namespace libdar
     }
 
 
+    std::string rsync_sig_magic_to_string(rsync_sig_magic algo)
+    {
+	switch(algo)
+	{
+	case rsync_sig_magic::md4:
+	    return "md4";
+	case rsync_sig_magic::blake2:
+	    return "blake2";
+	case rsync_sig_magic::rk_blake2:
+	    return "rk_blake2";
+	default:
+	    throw SRC_BUG;
+	}
+    }
 
+    bool string_to_rsync_sig_magic(const std::string & arg, rsync_sig_magic & val)
+    {
+	if(strcasecmp(arg.c_str(), "md4") == 0)
+	    val = rsync_sig_magic::md4;
+	else if(strcasecmp(arg.c_str(), "blake2") == 0)
+	    val = rsync_sig_magic::blake2;
+	else if(strcasecmp(arg.c_str(), "rk_blake2") == 0)
+	    val = rsync_sig_magic::rk_blake2;
+	else
+	    return false;
+	return true;
+    }
+
+    U_I rsync_sig_magic_to_librsync(rsync_sig_magic algo)
+    {
+	switch(algo)
+	{
+	case rsync_sig_magic::md4:
+	    return RS_MD4_SIG_MAGIC;
+	case rsync_sig_magic::blake2:
+	    return RS_BLAKE2_SIG_MAGIC;
+	case rsync_sig_magic::rk_blake2:
+	    return RS_RK_BLAKE2_SIG_MAGIC;
+	default:
+	    throw SRC_BUG;
+	}
+    }
+
+
+    unsigned char rsync_sig_magic_to_char(rsync_sig_magic algo)
+    {
+	switch(algo)
+	{
+	case rsync_sig_magic::md4:
+	    return '4';
+	case rsync_sig_magic::blake2:
+	    return 'B';
+	case rsync_sig_magic::rk_blake2:
+	    return 'R';
+	default:
+	    throw SRC_BUG;
+	}
+    }
+
+    rsync_sig_magic char_to_rsync_sig_magic(unsigned char arg)
+    {
+	switch(arg)
+	{
+	case '4':
+	    return rsync_sig_magic::md4;
+	case 'B':
+	    return rsync_sig_magic::blake2;
+	case 'R':
+	    return rsync_sig_magic::rk_blake2;
+	default:
+	    throw SRC_BUG;
+	}
+    }
 
 } // end of namespace

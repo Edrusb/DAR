@@ -86,6 +86,13 @@ namespace libdar
 	blake2b_512 ///< BLAKE2b-512 hash algorithm
     };
 
+    enum class rsync_sig_magic
+    {
+	md4,
+	blake2,
+	rk_blake2
+    };
+
     	/// convert hash value to human readable string
     extern std::string hash_algo_to_string(hash_algo algo);
 
@@ -107,6 +114,32 @@ namespace libdar
 	/// \note throw Erange exception if provided char is invalid
     extern hash_algo char_to_hash_algo(unsigned char arg);
 
+
+
+
+	/// convert rsync_sig_magic algo to human readable string
+    extern std::string rsync_sig_magic_to_string(rsync_sig_magic algo);
+
+	/// convert string to rsync_sig_magic
+
+	/// \param[in] arg string to cast to a rsync_sig_magic value
+	/// \param[out] val is set to the corresponding rsync_sig_magic if the function returns true
+	/// \return true if provided string matches a valid rsync_sig_magic name and return the corresponding value in argument
+    extern bool string_to_rsync_sig_magic(const std::string & arg, rsync_sig_magic & val);
+
+	/// provide the corresponding rsync_sig_magic value used within librsync
+    extern U_I rsync_sig_magic_to_librsync(rsync_sig_magic algo);
+
+	/// convert rsync_sig_magic to unsigned char
+
+	/// \note this is used to store the rsync_sig_magic value in archive
+    extern unsigned char rsync_sig_magic_to_char(rsync_sig_magic algo);
+
+
+	/// convert an unsigned char to its corresponding rsync_sig_magic value
+
+	/// \note call used to fetch the rsync_sig_magic value stored in an archive
+    extern rsync_sig_magic char_to_rsync_sig_magic(unsigned char arg);
 
 
 	/// @}
