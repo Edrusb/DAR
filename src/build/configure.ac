@@ -2373,9 +2373,6 @@ AS_IF(
 #  						#include <argon2.h>
 #  						#endif
 #
-#  						#if HAVE_RHASH_H
-#  						#include <rhash.h>
-#  						#endif
 #                                               }
 #
 #  					      /* C++ included files */
@@ -2565,13 +2562,6 @@ AS_IF(
 #  			       if(1)
 #  			       {
 #  			          signed int err = argon2id_hash_raw(100, 100, 1, "", 0, "", 0, (void*)"", 0);
-#  			       }
-#  			       #endif
-#
-#  			       #if RHASH_AVAILABLE
-#  			       if(1)
-#  			       {
-#  			          rhash rhash_ctxt = rhash_init(RHASH_WHIRLPOOL);
 #  			       }
 #  			       #endif
 #
@@ -2873,7 +2863,7 @@ else
 fi
 
 printf "   Whirlpool hash algorithm   : "
-if [ "$local_rhash" = "yes" ] ; then
+if [ "$local_crypto" = "yes" ] ; then
   echo "YES"
 else
   echo "NO"
