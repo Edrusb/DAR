@@ -364,7 +364,14 @@ namespace libdar
 
 	bool whirlpool_hash() noexcept
 	{
-#if RHASH_AVAILABLE
+		// since release 2.9.0
+		// whirlpool implementation
+		// relies on libgcrypt.
+		// libhash was used before
+		// because libgcrypt did not
+		// implemented this algorithm
+		// in the past.
+#if CRYPTO_AVAILABLE
 	    return true;
 #else
 	    return false;

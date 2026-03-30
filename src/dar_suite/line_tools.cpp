@@ -1469,7 +1469,7 @@ void line_tools_display_features(user_interaction & dialog)
 		      curl_version.c_str());
 	dialog.printf(gettext("   SFTP repositories (libssh)   : %s"), YES_NO(compile_time::sftp_repository()));
 	dialog.printf(gettext("   argon2 hashing (libargon2)   : %s"), YES_NO(compile_time::libargon2()));
-	dialog.printf(gettext("   Whirlpool hashing (librhash) : %s"), YES_NO(compile_time::whirlpool_hash()));
+	dialog.printf(gettext("   Whirlpool hashing (libgcrypt): %s"), YES_NO(compile_time::whirlpool_hash()));
     }
     catch(...)
     {
