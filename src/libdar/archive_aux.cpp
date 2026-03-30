@@ -113,6 +113,9 @@ namespace libdar
 	    break;
 	case hash_algo::argon2:
 	    throw SRC_BUG; // not a gcrypt_hash
+	case hash_algo::whirlpool:
+	    hash_gcrypt = GCRY_MD_WHIRLPOOL;
+	    break;
 	default:
 	    throw SRC_BUG;
 	}

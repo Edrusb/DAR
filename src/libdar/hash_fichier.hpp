@@ -40,10 +40,6 @@ extern "C"
 #endif
 #include <gcrypt.h>
 #endif
-
-#if HAVE_RHASH_H
-#include <rhash.h>
-#endif
 }
 
 #include <string>
@@ -129,9 +125,6 @@ namespace libdar
 	bool only_hash; ///< if set, avoids copying data to file, only compute hash (debugging purpose)
 #if CRYPTO_AVAILABLE
 	gcry_md_hd_t hash_handle;
-#endif
-#if RHASH_AVAILABLE
-	rhash rhash_ctxt;
 #endif
 	std::string ref_filename;
 	U_I hash_gcrypt;

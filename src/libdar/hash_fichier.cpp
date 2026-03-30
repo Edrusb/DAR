@@ -62,6 +62,7 @@ namespace libdar
 	case hash_algo::md5:
 	case hash_algo::sha1:
 	case hash_algo::sha512:
+	case hash_algo::whirlpool:
 #if CRYPTO_AVAILABLE
 	    gcry_error_t err;
 
@@ -88,19 +89,6 @@ namespace libdar
 
 	case hash_algo::argon2:
 	    throw SRC_BUG;
-
-	case hash_algo::whirlpool:
-#if RHASH_AVAILABLE
-	    rhash_ctxt = rhash_init(RHASH_WHIRLPOOL);
-	    if(rhash_ctxt == nullptr)
-		throw Erange("hash_fichier::hash_fichier",
-			     tools_printf(gettext("Error while initializing hash structure using librhash: %s"),
-					  tools_strerror_r(errno).c_str()));
-#else
-	    throw Ecompilation(tools_printf(gettext("Missing %s hash algorithm support (which is provided using librhash)"),
-					    hash_algo_to_string(algo).c_str()));
-#endif
-	    break;
 
 	default:
 	    throw SRC_BUG;
@@ -142,6 +130,7 @@ namespace libdar
 	case hash_algo::md5:
 	case hash_algo::sha1:
 	case hash_algo::sha512:
+	case hash_algo::whirlpool:
 #if CRYPTO_AVAILABLE
 	    gcry_md_write(hash_handle, (const void *)a, size);
 #else
@@ -150,17 +139,7 @@ namespace libdar
 	    break;
 	case hash_algo::argon2:
 	    throw SRC_BUG;
-	case hash_algo::whirlpool:
-#if RHASH_AVAILABLE
-	    if(rhash_update(rhash_ctxt, (const void *)a, size) != 0)
-		throw Erange("hash_fichier::fichier_global_inherited_write",
-			     tools_printf(gettext("Error updating %s hash with new data: %s"),
-					  hash_algo_to_string(algor).c_str(),
-					  tools_strerror_r(errno).c_str()));
-#else
-	    throw SRC_BUG;
-#endif
-	    break;
+
 	default:
 	    throw SRC_BUG;
 	}
@@ -185,6 +164,7 @@ namespace libdar
 	    case hash_algo::md5:
 	    case hash_algo::sha1:
 	    case hash_algo::sha512:
+	    case hash_algo::whirlpool:
 #if CRYPTO_AVAILABLE
 		gcry_md_write(hash_handle, (const void *)a, read);
 
@@ -194,17 +174,7 @@ namespace libdar
 		break;
 	    case hash_algo::argon2:
 		throw SRC_BUG;
-	    case hash_algo::whirlpool:
-#if RHASH_AVAILABLE
-		if(rhash_update(rhash_ctxt, (const void *)a, size) != 0)
-		    throw Erange("hash_fichier::fichier_global_inherited_write",
-				 tools_printf(gettext("Error adding updating %s hash with new data: %s"),
-					      hash_algo_to_string(algor).c_str(),
-					      tools_strerror_r(errno).c_str()));
-#else
-		throw SRC_BUG;
-#endif
-		break;
+
 	    default:
 		throw SRC_BUG;
 	    }
@@ -234,6 +204,7 @@ namespace libdar
 		case hash_algo::md5:
 		case hash_algo::sha1:
 		case hash_algo::sha512:
+		case hash_algo::whirlpool:
 #if CRYPTO_AVAILABLE
 			// first we obtain the hash result;
 		    digest = gcry_md_read(hash_handle, hash_gcrypt);
@@ -244,19 +215,6 @@ namespace libdar
 		    break;
 		case hash_algo::argon2:
 		    throw SRC_BUG;
-
-		case hash_algo::whirlpool:
-#if RHASH_AVAILABLE
-		    digest_size = rhash_get_digest_size(RHASH_WHIRLPOOL);
-		    digest = new (nothrow) unsigned char[digest_size];
-		    if(digest == nullptr)
-			throw Ememory("hash_fichier::inherited_terminate");
-		    if(rhash_print((char *)digest, rhash_ctxt, RHASH_WHIRLPOOL, RHPR_RAW) != digest_size)
-			throw SRC_BUG;
-#else
-		    throw SRC_BUG;
-#endif
-		    break;
 		default:
 		    throw SRC_BUG;
 		}
@@ -276,15 +234,12 @@ namespace libdar
 		case hash_algo::md5:
 		case hash_algo::sha1:
 		case hash_algo::sha512:
+		case hash_algo::whirlpool:
 #if CRYPTO_AVAILABLE
 		    gcry_md_close(hash_handle);
 #endif
 		    break;
 		case hash_algo::argon2:
-		    break;
-		case hash_algo::whirlpool:
-		    if(digest != nullptr)
-			delete [] digest;
 		    break;
 		default:
 		    break;
@@ -299,15 +254,12 @@ namespace libdar
 	    case hash_algo::md5:
 	    case hash_algo::sha1:
 	    case hash_algo::sha512:
+	    case hash_algo::whirlpool:
 #if CRYPTO_AVAILABLE
 		gcry_md_close(hash_handle);
 #endif
 		break;
 	    case hash_algo::argon2:
-		break;
-	    case hash_algo::whirlpool:
-		if(digest != nullptr)
-		    delete [] digest;
 		break;
 	    default:
 		break;
