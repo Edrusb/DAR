@@ -63,6 +63,8 @@ namespace libdar
 	case hash_algo::sha1:
 	case hash_algo::sha512:
 	case hash_algo::whirlpool:
+	case hash_algo::sha3_512:
+	case hash_algo::blake2b_512:
 #if CRYPTO_AVAILABLE
 	    gcry_error_t err;
 
@@ -131,6 +133,8 @@ namespace libdar
 	case hash_algo::sha1:
 	case hash_algo::sha512:
 	case hash_algo::whirlpool:
+	case hash_algo::sha3_512:
+	case hash_algo::blake2b_512:
 #if CRYPTO_AVAILABLE
 	    gcry_md_write(hash_handle, (const void *)a, size);
 #else
@@ -165,6 +169,8 @@ namespace libdar
 	    case hash_algo::sha1:
 	    case hash_algo::sha512:
 	    case hash_algo::whirlpool:
+	    case hash_algo::sha3_512:
+	    case hash_algo::blake2b_512:
 #if CRYPTO_AVAILABLE
 		gcry_md_write(hash_handle, (const void *)a, read);
 
@@ -205,6 +211,8 @@ namespace libdar
 		case hash_algo::sha1:
 		case hash_algo::sha512:
 		case hash_algo::whirlpool:
+		case hash_algo::sha3_512:
+		case hash_algo::blake2b_512:
 #if CRYPTO_AVAILABLE
 			// first we obtain the hash result;
 		    digest = gcry_md_read(hash_handle, hash_gcrypt);
@@ -235,6 +243,8 @@ namespace libdar
 		case hash_algo::sha1:
 		case hash_algo::sha512:
 		case hash_algo::whirlpool:
+		case hash_algo::sha3_512:
+		case hash_algo::blake2b_512:
 #if CRYPTO_AVAILABLE
 		    gcry_md_close(hash_handle);
 #endif
@@ -255,6 +265,8 @@ namespace libdar
 	    case hash_algo::sha1:
 	    case hash_algo::sha512:
 	    case hash_algo::whirlpool:
+	    case hash_algo::sha3_512:
+	    case hash_algo::blake2b_512:
 #if CRYPTO_AVAILABLE
 		gcry_md_close(hash_handle);
 #endif

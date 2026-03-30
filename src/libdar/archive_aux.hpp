@@ -76,12 +76,14 @@ namespace libdar
 
     enum class hash_algo
     {
-	none,     ///< no hashing algorithm
-	md5,      ///< MD5 algorithm
-	sha1,     ///< SHA1 algorithm
-	sha512,   ///< SHA-512 algorithm
-	argon2,   ///< argon2 hash algorithm
-	whirlpool ///< whirlpool hash algorithm
+	none,       ///< no hashing algorithm
+	md5,        ///< MD5 algorithm
+	sha1,       ///< SHA1 algorithm
+	sha512,     ///< SHA-512 algorithm
+	argon2,     ///< argon2 hash algorithm
+	whirlpool,  ///< whirlpool hash algorithm
+	sha3_512,   ///< SHA3-512 hash algorihtm
+	blake2b_512 ///< BLAKE2b-512 hash algorithm
     };
 
     	/// convert hash value to human readable string
