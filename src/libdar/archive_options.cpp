@@ -914,6 +914,7 @@ namespace libdar
 	x_delta_mask = ref.x_delta_mask->clone();
 	has_delta_mask_been_set = ref.has_delta_mask_been_set;
 	x_delta_sig_min_size = ref.x_delta_sig_min_size;
+	x_sig_block_len = ref.x_sig_block_len;
 	x_iteration_count = ref.x_iteration_count;
 	x_kdf_hash = ref.x_kdf_hash;
 	x_repair_mode = ref.x_repair_mode;
@@ -954,6 +955,7 @@ namespace libdar
 	x_delta_sig_min_size = std::move(ref.x_delta_sig_min_size);
 	x_iteration_count = std::move(ref.x_iteration_count);
 	x_kdf_hash = std::move(ref.x_kdf_hash);
+	x_sig_block_len = std::move(ref.x_sig_block_len);
 	x_repair_mode = std::move(ref.x_repair_mode);
     }
 
