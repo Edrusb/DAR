@@ -896,6 +896,7 @@ namespace libdar
 	x_delta_mask = ref.x_delta_mask->clone();
 	has_delta_mask_been_set = ref.has_delta_mask_been_set;
 	x_delta_sig_min_size = ref.x_delta_sig_min_size;
+	x_sig_block_len = ref.x_sig_block_len;
 	x_iteration_count = ref.x_iteration_count;
 	x_kdf_hash = ref.x_kdf_hash;
     }
@@ -935,6 +936,7 @@ namespace libdar
 	x_delta_sig_min_size = move(ref.x_delta_sig_min_size);
 	x_iteration_count = move(ref.x_iteration_count);
 	x_kdf_hash = move(ref.x_kdf_hash);
+	x_sig_block_len = std::move(ref.x_sig_block_len);
     }
 
     void archive_options_isolate::nullifyptr() noexcept
