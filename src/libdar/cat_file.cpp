@@ -633,6 +633,20 @@ namespace libdar
 				delete delta;
 				throw;
 			    }
+
+			    if(delta_sig != nullptr)
+				delta_sig->set_sig_magic(sig_magic);
+			    else
+			    {
+				cat_file* me = const_cast<cat_file*>(this);
+
+				if(me == nullptr)
+				    throw SRC_BUG;
+
+				me->delta_sig = new (nothrow) cat_delta_signature(sig_magic);
+				if(me->delta_sig == nullptr)
+				    throw Ememory("cat_file");
+			    }
 			}
 
 			if(delta_ref)
@@ -1272,7 +1286,8 @@ namespace libdar
 	    switch(status)
 	    {
 	    case from_path:
-		delta_sig = new (nothrow) cat_delta_signature();
+		delta_sig = new (nothrow) cat_delta_signature(rsync_sig_magic::none);
+		    // the has algo will be set while calling get_data()
 		break;
 	    case from_cat:
 		ptr = get_read_cat_layer(get_small_read());

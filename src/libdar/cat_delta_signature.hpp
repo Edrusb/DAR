@@ -180,6 +180,9 @@ namespace libdar
 	    /// variante used when the delta_signature object will only contain CRCs (no delta signature)
 	void set_sig() { delta_sig_size = 0; delta_sig_offset = 0; sig_block_len = 0; sig.reset(); };
 
+	    /// set or rather change the hash algo information
+	void set_sig_magic(rsync_sig_magic hash) { sig_magic = hash; };
+
 	    /// write down the data eventually with sequential read mark followed by delta sig metadata
 
 	    /// \note ver is only used to know which version to use for reading the data, but it is
