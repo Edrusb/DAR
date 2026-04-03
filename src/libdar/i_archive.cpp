@@ -560,6 +560,7 @@ namespace libdar
 				   options.get_iteration_count(),
 				   options.get_kdf_hash(),
 				   options.get_sig_block_len(),
+				   options.get_sig_magic(),
 				   options.get_never_resave_uncompressed(),
 				   progressive_report);
 		exploitable = false;
@@ -800,6 +801,7 @@ namespace libdar
 				 options.get_iteration_count(),
 				 options.get_kdf_hash(),
 				 options.get_sig_block_len(),
+				 options.get_sig_magic(),
 				 options.get_never_resave_uncompressed(),
 				 st_ptr);
 
@@ -968,6 +970,7 @@ namespace libdar
 			     options_repair.get_iteration_count(),
 			     options_repair.get_kdf_hash(),
 			     delta_sig_block_size(), // sig block size is not used for repairing, build_delta_sig is set to false above
+			     rsync_sig_magic::none,  // not used neither for repairing
 			     false,               // (never_resave_uncompressed) this has not importance as we keep data compressed
 			     st_ptr);             // statistics
 
@@ -1737,7 +1740,8 @@ namespace libdar
 						   options.get_has_delta_mask_been_set(),
 						   options.get_delta_mask(),
 						   options.get_delta_sig_min_size(),
-						   options.get_sig_block_len());
+						   options.get_sig_block_len(),
+						   options.get_sig_magic());
 		}
 		else
 			// we drop the delta signature as they will never be used
@@ -2141,6 +2145,7 @@ namespace libdar
 						const infinint & iteration_count,
 						hash_algo kdf_hash,
 						const delta_sig_block_size & sig_block_len,
+						rsync_sig_magic sig_magic,
 						bool never_resave_uncompressed,
 						statistics * progressive_report)
     {
@@ -2305,6 +2310,7 @@ namespace libdar
 			 iteration_count,
 			 kdf_hash,
 			 sig_block_len,
+			 sig_magic,
 			 never_resave_uncompressed,
 			 st_ptr);
 
@@ -2384,6 +2390,7 @@ namespace libdar
 					      const infinint & iteration_count,
 					      hash_algo kdf_hash,
 					      const delta_sig_block_size & sig_block_len,
+					      rsync_sig_magic sig_magic,
 					      bool never_resave_uncompressed,
 					      statistics * st_ptr)
     {
@@ -2598,6 +2605,7 @@ namespace libdar
 					      ignored_symlinks,
 					      mod_data_detect,
 					      sig_block_len,
+					      sig_magic,
 					      never_resave_uncompressed,
 					      sequential_read);
 				// build_delta_sig is not used for archive creation it is always implied when delta_signature is set
@@ -2665,6 +2673,7 @@ namespace libdar
 				     delta_sig_min_size,
 				     delta_mask,
 				     sig_block_len,
+				     sig_magic,
 				     never_resave_uncompressed);
 			break;
 		    case oper_repair:
@@ -2714,6 +2723,7 @@ namespace libdar
 					       thr_cancel,
 					       true,
 					       delta_sig_block_size(), // we will not recalculate delta signature upon repairing
+					       sig_magic,
 					       never_resave_uncompressed);
 
 				// at this step, cat (the current archive's catalogue) is still empty

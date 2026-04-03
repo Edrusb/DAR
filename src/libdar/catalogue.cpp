@@ -1073,7 +1073,8 @@ namespace libdar
 					      bool build,
 					      const mask & delta_mask,
 					      const infinint & delta_sig_min_size,
-					      const delta_sig_block_size & signature_block_size)
+					      const delta_sig_block_size & signature_block_size,
+					      rsync_sig_magic for_created_sig)
     {
 	const cat_entree *ent = nullptr;
 	const cat_file *ent_file = nullptr;
@@ -1193,7 +1194,12 @@ namespace libdar
 			    switch(e_file->get_saved_status())
 			    {
 			    case saved_status::saved:
-				data = e_file->get_data(cat_file::plain, mem, block_len, nullptr, checksum);
+				data = e_file->get_data(cat_file::plain,
+							mem,
+							for_created_sig,
+							block_len,
+							nullptr,
+							checksum);
 
 				if(data == nullptr)
 				    throw SRC_BUG;

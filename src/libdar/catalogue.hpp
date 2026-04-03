@@ -257,7 +257,8 @@ namespace libdar
 				       bool build,
 				       const mask & delta_mask,
 				       const infinint & delta_sig_min_size,
-				       const delta_sig_block_size & signature_block_size);
+				       const delta_sig_block_size & signature_block_size,
+				       rsync_sig_magic for_created_sig);
 
 	    /// remove delta signature from the catalogue object as if they had never been calculated
 	void drop_delta_signatures();

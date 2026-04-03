@@ -110,6 +110,7 @@ namespace libdar
 				  const std::set<std::string> & ignored_symlinks,
 				  modified_data_detection mod_data_detect,
 				  const delta_sig_block_size & delta_sig_block_len,
+				  rsync_sig_magic sig_magic,
 				  bool never_resave_uncompressed,
 				  bool ref_read_in_seq_mode);
 
@@ -173,6 +174,7 @@ namespace libdar
 			     const infinint & delta_sig_min_size,
 			     const mask & delta_mask,
 			     const delta_sig_block_size & signature_block_size,
+			     rsync_sig_magic sig_magic,
 			     bool never_resave_uncompressed);
 
 
@@ -231,6 +233,7 @@ namespace libdar
 				   thread_cancellation & thr_cancel,
 				   bool repair_mode,
 				   const delta_sig_block_size & signature_block_size,
+				   rsync_sig_magic sig_magic,
 				   bool never_resave_uncompressed);
 
 

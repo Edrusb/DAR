@@ -116,6 +116,7 @@ void go_sig(const string & src_file,
 				      false);
     generic_rsync go(&res,
 		     RS_DEFAULT_BLOCK_LEN,
+		     rsync_sig_magic::blake2,
 		     &src);
     fichier_local control = fichier_local(ui,
 					  src_file + ".bak",

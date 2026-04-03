@@ -50,6 +50,8 @@ namespace libdar
 {
     class archive; // needed to be able to use pointer on archive object.
 
+    inline void rsync_magic_check(rsync_sig_magic val);
+
 
 	/////////////////////////////////////////////////////////
 	////////////// OPTIONS FOR OPENNING AN ARCHIVE //////////
@@ -584,6 +586,9 @@ namespace libdar
 	    /// block size to use to build delta signatures
 	void set_sig_block_len(delta_sig_block_size val) { val.check(); x_sig_block_len = val; };
 
+	    /// signature hash algorithm to use
+	void set_sig_magic(rsync_sig_magic sig_magic) { rsync_magic_check(sig_magic); x_sig_magic = sig_magic; };
+
 	    /// whether to automatically zeroing negative dates read from the filesystem (just warn, don't ask whether to pursue)
 	void set_auto_zeroing_neg_dates(bool val) { x_auto_zeroing_neg_dates = val; };
 
@@ -672,6 +677,7 @@ namespace libdar
 	bool get_has_delta_mask_been_set() const { return has_delta_mask_been_set; };
 	const infinint & get_delta_sig_min_size() const { return x_delta_sig_min_size; };
 	delta_sig_block_size get_sig_block_len() const { return x_sig_block_len; };
+	rsync_sig_magic get_sig_magic() const { return x_sig_magic; };
 	bool get_auto_zeroing_neg_dates() const { return x_auto_zeroing_neg_dates; };
 	const std::set<std::string> & get_ignored_as_symlink() const { return x_ignored_as_symlink; };
 	modified_data_detection get_modified_data_detection() const { return x_modified_data_detection; };
@@ -744,6 +750,7 @@ namespace libdar
 	bool has_delta_mask_been_set;
 	infinint x_delta_sig_min_size;
 	delta_sig_block_size x_sig_block_len;
+	rsync_sig_magic x_sig_magic;
 	bool x_auto_zeroing_neg_dates;
 	std::set<std::string> x_ignored_as_symlink;
 	modified_data_detection x_modified_data_detection;
@@ -917,6 +924,9 @@ namespace libdar
 	    /// block size to use to build delta signatures
 	void set_sig_block_len(delta_sig_block_size val) { val.check(); x_sig_block_len = val; };
 
+	    /// signature hash algorithm to use
+	void set_sig_magic(rsync_sig_magic sig_magic) { rsync_magic_check(sig_magic); x_sig_magic = sig_magic; };
+
 	    /// key derivation
 	void set_iteration_count(const infinint & val) { x_iteration_count = val; };
 
@@ -961,6 +971,7 @@ namespace libdar
 	bool get_has_delta_mask_been_set() const { return has_delta_mask_been_set; };
 	const infinint & get_delta_sig_min_size() const { return x_delta_sig_min_size; };
 	delta_sig_block_size get_sig_block_len() const { return x_sig_block_len; };
+	rsync_sig_magic get_sig_magic() const { return x_sig_magic; };
 	const infinint & get_iteration_count() const { return x_iteration_count; };
 	hash_algo get_kdf_hash() const { return x_kdf_hash; };
 	bool get_repair_mode() const { return x_repair_mode; };
@@ -997,6 +1008,7 @@ namespace libdar
 	bool has_delta_mask_been_set;
 	infinint x_delta_sig_min_size;
 	delta_sig_block_size x_sig_block_len;
+	rsync_sig_magic x_sig_magic;
 	infinint x_iteration_count;
 	hash_algo x_kdf_hash;
 	bool x_repair_mode;
@@ -1215,6 +1227,9 @@ namespace libdar
 	    /// block size to use to build delta signatures
 	void set_sig_block_len(delta_sig_block_size val) { val.check(); x_sig_block_len = val; };
 
+	    /// signature hash algorithm to use
+	void set_sig_magic(rsync_sig_magic sig_magic) { rsync_magic_check(sig_magic); x_sig_magic = sig_magic; };
+
 	    /// key derivation
 	void set_iteration_count(const infinint & val) { x_iteration_count = val; };
 
@@ -1274,6 +1289,7 @@ namespace libdar
 	bool get_has_delta_mask_been_set() const { return has_delta_mask_been_set; };
 	const infinint & get_delta_sig_min_size() const { return x_delta_sig_min_size; };
 	delta_sig_block_size get_sig_block_len() const { return x_sig_block_len; };
+	rsync_sig_magic get_sig_magic() const { return x_sig_magic; };
 	const infinint & get_iteration_count() const { return x_iteration_count; };
 	hash_algo get_kdf_hash() const { return x_kdf_hash; };
 	bool get_never_resave_uncompressed() const { return x_never_resave_uncompressed; };
@@ -1325,6 +1341,7 @@ namespace libdar
 	bool has_delta_mask_been_set;
 	infinint x_delta_sig_min_size;
 	delta_sig_block_size x_sig_block_len;
+	rsync_sig_magic x_sig_magic;
 	infinint x_iteration_count;
 	hash_algo x_kdf_hash;
 	bool x_never_resave_uncompressed;
@@ -2028,6 +2045,12 @@ namespace libdar
 	void copy_from(const archive_options_repair & ref);
 	void move_from(archive_options_repair && ref) noexcept;
     };
+
+    inline void rsync_magic_check(rsync_sig_magic val)
+    {
+	if(val == rsync_sig_magic::none)
+	    throw Erange("rsync_magic_check", gettext("Invalid hash for binary delta signature"));
+    }
 
 	/// @}
 

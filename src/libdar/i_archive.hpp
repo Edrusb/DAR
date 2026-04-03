@@ -316,6 +316,7 @@ namespace libdar
 				const infinint & iteration_count,
 				hash_algo kdf_hash,
 				const delta_sig_block_size & sig_block_len,
+				rsync_sig_magic sig_magic,
 				bool never_resave_uncompressed,
 				statistics * progressive_report);
 
@@ -392,8 +393,9 @@ namespace libdar
 			      const infinint & iteration_count, ///< for key derivation
 			      hash_algo kdf_hash,               ///< hash used for key derivation
 			      const delta_sig_block_size & sign_block_len, ///< block len for signature
+			      rsync_sig_magic sig_magic,        ///< hash to used when binary delta signature have to be created
 			      bool never_resave_uncompressed,   ///< avoid trying resaving uncompressed when compression ratio was bad
-			      statistics * st_ptr             ///< statistics must not be nullptr !
+			      statistics * st_ptr               ///< statistics must not be nullptr !
 	    );
 
 	void disable_natural_destruction();

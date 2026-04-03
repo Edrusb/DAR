@@ -84,6 +84,7 @@ namespace libdar
 			   set<string> ignored_as_symlink, ///< list of file to ignore as symlink and fetch the proper mtime
 			   bool repair_mode,         ///< if set, try to fix CRC and size problem flagging such fixed files as dirty
 			   U_I signature_block_size, ///< block size of delta signatures
+			   rsync_sig_magic sig_magic, ///< hash to use to build binary delta signatures
 			   bool never_resave_uncompressed);
 
     static bool save_ea(const shared_ptr<user_interaction> & dialog,
@@ -158,6 +159,7 @@ namespace libdar
 				     const cat_file * ref_file,
 				     const pile_descriptor & pdesc,
 				     U_I signature_block_size,
+				     rsync_sig_magic sig_magic,
 				     bool info_details,
 				     bool display_treated,
 				     const catalogue & cat);
@@ -585,6 +587,7 @@ namespace libdar
 			   const set<string> & ignored_symlinks,
 			   modified_data_detection mod_data_detect,
 			   const delta_sig_block_size & delta_sig_block_len,
+			   rsync_sig_magic sig_magic,
 			   bool never_resave_uncompressed,
 			   bool ref_read_in_seq_mode)
     {
@@ -961,6 +964,7 @@ namespace libdar
 						       ignored_symlinks,
 						       false,
 						       sig_bl,
+						       sig_magic,
 						       never_resave_uncompressed))
 					    st.incr_tooold(); // counting a new dirty file in archive
 
@@ -1728,6 +1732,7 @@ namespace libdar
 		      const infinint & delta_sig_min_size,
 		      const mask & delta_mask,
 		      const delta_sig_block_size & signature_block_size,
+		      const rsync_sig_magic sig_magic,
 		      bool never_resave_uncompressed)
     {
 	crit_action *decr = nullptr; // will point to a locally allocated crit_action
@@ -1794,6 +1799,7 @@ namespace libdar
 			   thr_cancel,
 			   false,
 			   signature_block_size,
+			   sig_magic,
 			   never_resave_uncompressed);
     }
 
@@ -2712,6 +2718,7 @@ namespace libdar
 			    thread_cancellation & thr_cancel,
 			    bool repair_mode,
 			    const delta_sig_block_size & signature_block_size,
+			    rsync_sig_magic sig_magic,
 			    bool never_resave_uncompressed)
     {
 	compression stock_algo = pdesc.compr->get_algo();
@@ -2911,6 +2918,7 @@ namespace libdar
 				   set<string>(), // empty list for ignored_as_symlink
 				   repair_mode,
 				   sig_bl,
+				   sig_magic,
 				   never_resave_uncompressed))
 
 			throw SRC_BUG;
@@ -3105,6 +3113,7 @@ namespace libdar
 			   set<string> ignored_as_symlink,
 			   bool repair_mode,
 			   U_I signature_block_size,
+			   rsync_sig_magic sig_magic,
 			   bool never_resave_uncompressed)
     {
 	bool ret = true;
@@ -3195,6 +3204,7 @@ namespace libdar
 					 ref_fic,
 					 pdesc,
 					 signature_block_size,
+					 sig_magic,
 					 info_details,
 					 display_treated,
 					 cat);
@@ -3272,7 +3282,11 @@ namespace libdar
 					delta_sig.reset(new (nothrow) memory_file());
 					if(!delta_sig)
 					    throw Ememory("saved_inode");
-					source = fic->get_data(cat_file::normal, delta_sig, signature_block_size, shared_ptr<memory_file>());
+					source = fic->get_data(cat_file::normal,
+							       delta_sig,
+							       sig_magic,
+							       signature_block_size,
+							       shared_ptr<memory_file>());
 					if(display_treated)
 					    dialog->message(tools_printf(gettext("building delta signature with block size of %d bytes"), signature_block_size));
 				    }
@@ -3294,10 +3308,20 @@ namespace libdar
 				    }
 
 				    if(fic->get_sparse_file_detection_read()) // source file already holds a sparse_file structure
-					source = fic->get_data(cat_file::plain, delta_sig, signature_block_size, delta_sig_ref, & result_crc);
+					source = fic->get_data(cat_file::plain,
+							       delta_sig,
+							       sig_magic,
+							       signature_block_size,
+							       delta_sig_ref,
+							       & result_crc);
 					// we must hide the holes for it can be redetected
 				    else
-					source = fic->get_data(cat_file::normal, delta_sig, signature_block_size, delta_sig_ref, & result_crc);
+					source = fic->get_data(cat_file::normal,
+							       delta_sig,
+							       sig_magic,
+							       signature_block_size,
+							       delta_sig_ref,
+							       & result_crc);
 				    break;
 				case cat_file::plain:
 				    throw SRC_BUG; // save_inode must never be called with this value
@@ -4654,6 +4678,7 @@ namespace libdar
 				     const cat_file * ref_file,
 				     const pile_descriptor & pdesc,
 				     U_I signature_block_size,
+				     rsync_sig_magic sig_magic,
 				     bool info_details,
 				     bool display_treated,
 				     const catalogue & cat)
@@ -4714,7 +4739,11 @@ namespace libdar
 				if(!sig)
 				    throw Ememory("filtre_sauvegarde");
 
-				data = e_file->get_data(cat_file::normal, sig, block_size, nullptr);
+				data = e_file->get_data(cat_file::normal,
+							sig,
+							sig_magic,
+							block_size,
+							nullptr);
 				if(data == nullptr)
 				    throw Ememory("filtre_sauvegarde");
 				data->copy_to(trou_noir, crc_size, patch_sig_crc);
