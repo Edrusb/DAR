@@ -215,11 +215,6 @@ namespace libdar
 	    return false;
     }
 
-    void cat_delta_signature::set_patch_base_crc(const crc & c)
-    {
-	throw SRC_BUG; // no more used since format 11.2
-    }
-
     bool cat_delta_signature::get_patch_result_crc(const crc * & c) const
     {
 	if(patch_result_check != nullptr)

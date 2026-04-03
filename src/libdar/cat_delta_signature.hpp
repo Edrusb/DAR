@@ -201,9 +201,6 @@ namespace libdar
 	    /// returns the CRC of the file to base the patch on, for s_delta objects
 	bool get_patch_base_crc(const crc * & c) const;
 
-	    /// set the reference CRC of the file to base the patch on, for s_detla objects
-	void set_patch_base_crc(const crc & c);
-
 	    /// returns whether the object has a CRC corresponding to data (for s_saved, s_delta, and when delta signature is present)
 	bool has_patch_result_crc() const { return patch_result_check != nullptr; };
 
