@@ -535,7 +535,7 @@ namespace libdar
 	    compr_bs.dump(f);
 
 	    // we always write sig_magic (since archive version 12.0)
-	tmp = rsync_sig_to_char(sig_magic);
+	tmp = rsync_sig_magic_to_char(sig_magic);
 	f.write(&tmp, sizeof(tmp));
 
 	ctrl = f.get_crc();
