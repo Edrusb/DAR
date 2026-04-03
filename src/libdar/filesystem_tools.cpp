@@ -521,7 +521,11 @@ namespace libdar
 
                     // obtaining current file and calculating its CRC
 
-                current = existing.get_data(cat_file::plain, nullptr, 0, nullptr);
+                current = existing.get_data(cat_file::plain,
+					    nullptr,
+					    rsync_sig_magic::none,
+					    0,
+					    nullptr);
                 if(current == nullptr)
                     throw SRC_BUG;
                 else
@@ -545,7 +549,11 @@ namespace libdar
 
                     // obtaining the patch data
 
-                delta = patcher.get_data(cat_file::plain, nullptr, 0, nullptr);
+                delta = patcher.get_data(cat_file::plain,
+					 nullptr,
+					 rsync_sig_magic::none,
+					 0,
+					 nullptr);
                 if(delta == nullptr)
                     throw SRC_BUG;
                 else

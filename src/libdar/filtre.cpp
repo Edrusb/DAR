@@ -1486,7 +1486,11 @@ namespace libdar
 
 				    do
 				    {
-					generic_file *dat = e_file->get_data(cat_file::normal, nullptr, 0, nullptr);
+					generic_file *dat = e_file->get_data(cat_file::normal,
+									     nullptr,
+									     rsync_sig_magic::none,
+									     0,
+									     nullptr);
 					if(dat == nullptr)
 					    throw Erange("filtre_test", gettext("Can't read saved data."));
 
@@ -3256,7 +3260,11 @@ namespace libdar
 				case cat_file::keep_compressed:
 				    if(fic->get_compression_algo_read() != fic->get_compression_algo_write())
 					keep_mode = cat_file::keep_hole;
-				    source = fic->get_data(keep_mode, nullptr, signature_block_size, nullptr);
+				    source = fic->get_data(keep_mode,
+							   nullptr,
+							   rsync_sig_magic::none,
+							   signature_block_size,
+							   nullptr);
 				    break;
 				case cat_file::keep_hole:
 				    if(delta_signature && !fic->get_sparse_file_detection_read())
@@ -3269,7 +3277,11 @@ namespace libdar
 					    dialog->message(tools_printf(gettext("building delta signature with block size of %d bytes"), signature_block_size));
 				    }
 				    else
-					source = fic->get_data(keep_mode, nullptr, signature_block_size, nullptr);
+					source = fic->get_data(keep_mode,
+							       nullptr,
+							       rsync_sig_magic::none,
+							       signature_block_size,
+							       nullptr);
 				    break;
 				case cat_file::normal:
 				    if(delta_signature)
