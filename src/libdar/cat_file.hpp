@@ -100,6 +100,7 @@ namespace libdar
 
 	    /// \param[in] mode whether to return compressed, with hole or plain file
 	    /// \param[in,out] delta_sig_mem if not nullptr, write to that file the delta signature of the file
+	    /// \param[in] sig_magic hash algo to use for signature creation (used only if delta_sig_mem is not nullptr
 	    /// \param[in] signature_block_size is the block size to use to build the signature (passed to librsync as is)
 	    /// \param[in] delta_ref if not nullptr, use the provided signature to generate a delta binary patch
 	    /// \param[in] checksum if not null will set *checsum to the address of a newly allocated crc object
@@ -112,6 +113,7 @@ namespace libdar
 	    /// file data, then the delta binary is computed.
         virtual generic_file *get_data(get_data_mode mode,
 				       std::shared_ptr<memory_file> delta_sig_mem,
+				       rsync_sig_magic sig_magic,
 				       U_I signature_block_size,
 				       std::shared_ptr<memory_file> delta_ref,
 				       const crc **checksum = nullptr) const;
@@ -175,6 +177,14 @@ namespace libdar
 	    /// either read_delta_signature_metadata() or read_delta_signature() *and* if sequential read mode is used
 	    /// this call will always report false, even if delta signature can be available from filesystem/archive
 	bool has_delta_signature_available() const { return delta_sig != nullptr && delta_sig->can_obtain_sig(); };
+
+
+	    /// return the signature hash used if available
+
+	    /// \param[out] val the signature hash when the method returns true
+	    /// \return false if no signature hash is available, true else and set
+	    /// the argument to the used hash
+	bool has_delta_sig_magic(rsync_sig_magic & val) const;
 
 
 	    /// returns whether the object has a base patch CRC (s_delta status objects)

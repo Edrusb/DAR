@@ -498,6 +498,7 @@ namespace libdar
 
     generic_file *cat_file::get_data(get_data_mode mode,
 				     shared_ptr<memory_file> delta_sig_mem,
+				     rsync_sig_magic sig_magic,
 				     U_I signature_block_size,
 				     shared_ptr<memory_file> delta_ref,
 				     const crc **checksum) const
@@ -617,7 +618,10 @@ namespace libdar
 
 			if(delta_sig_mem)
 			{
-			    generic_rsync *delta = new (nothrow) generic_rsync(delta_sig_mem.get(), signature_block_size, data->top());
+			    generic_rsync *delta = new (nothrow) generic_rsync(delta_sig_mem.get(),
+									       signature_block_size,
+									       sig_magic,
+									       data->top());
 			    if(delta == nullptr)
 				throw Ememory("cat_file::get_data");
 			    try
@@ -778,7 +782,10 @@ namespace libdar
 
 			    if(delta_sig_mem)
 			    {
-				generic_rsync *delta = new (nothrow) generic_rsync(delta_sig_mem.get(), signature_block_size, parent);
+				generic_rsync *delta = new (nothrow) generic_rsync(delta_sig_mem.get(),
+										   signature_block_size,
+										   sig_magic,
+										   parent);
 				if(delta == nullptr)
 				    throw Ememory("cat_file::get_data");
 				try
@@ -833,6 +840,7 @@ namespace libdar
 				{
 				    to_be_patched = in_place->get_data(cat_file::plain,
 								       unused,
+								       rsync_sig_magic::none,
 								       0,
 								       unused,
 								       nullptr);
@@ -1127,6 +1135,17 @@ namespace libdar
 	}
 	else
 	    return false;
+    }
+
+    bool cat_file::has_delta_sig_magic(rsync_sig_magic & val) const
+    {
+	if(delta_sig == nullptr)
+	    return false;
+	else
+	{
+	    val = delta_sig->get_sig_magic();
+	    return true;
+	}
     }
 
     bool cat_file::has_patch_base_crc() const
@@ -1506,12 +1525,20 @@ namespace libdar
 	{
 		// compare file content and CRC
 
-	    generic_file *me = get_data(normal, nullptr, 0, nullptr);
+	    generic_file *me = get_data(normal,
+					nullptr,
+					rsync_sig_magic::none,
+					0,
+					nullptr);
 	    if(me == nullptr)
 		throw SRC_BUG;
 	    try
 	    {
-		generic_file *you = f_other->get_data(normal, nullptr, 0, nullptr);
+		generic_file *you = f_other->get_data(normal,
+						      nullptr,
+						      rsync_sig_magic::none,
+						      0,
+						      nullptr);
 		if(you == nullptr)
 		    throw SRC_BUG;
 		    // requesting read_ahead for the peer object
@@ -1610,6 +1637,7 @@ namespace libdar
 		null_file trash = gf_write_only;
 		generic_file *data;
 		U_I block_len;
+		rsync_sig_magic sig_magic = rsync_sig_magic::none;
 
 		if(!sig_you)
 		    throw Ememory("cat_file::sub_compare_internal");
@@ -1618,7 +1646,17 @@ namespace libdar
 		if(!sig_me)
 		    throw SRC_BUG;
 
-		data = f_other->get_data(normal, sig_you, block_len, shared_ptr<memory_file>());
+		if(!has_delta_sig_magic(sig_magic))
+		    throw SRC_BUG;
+
+		if(sig_magic == rsync_sig_magic::none)
+		    throw SRC_BUG;
+
+		data = f_other->get_data(normal,
+					 sig_you,
+					 sig_magic, // using the same hash as ours
+					 block_len,
+					 shared_ptr<memory_file>());
 
 		if(data == nullptr)
 		    throw SRC_BUG;
@@ -1682,7 +1720,11 @@ namespace libdar
 		if(my_crc == nullptr)
 		    throw SRC_BUG;
 
-		generic_file *you = f_other->get_data(normal, nullptr, 0, nullptr);
+		generic_file *you = f_other->get_data(normal,
+						      nullptr,
+						      rsync_sig_magic::none,
+						      0,
+						      nullptr);
 		if(you == nullptr)
 		    throw SRC_BUG;
 
