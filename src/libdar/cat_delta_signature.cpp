@@ -57,11 +57,11 @@ namespace libdar
 	{
 	    if(ver < archive_version(11,2))
 		patch_base_check = create_crc_from_file(*src);
-		// starting format 10.2 the patch base check
+		// starting format 11.2 the patch base check
 		// has been moved before the delta patch,
 		// while this cat_delta_structure stays written
 		// after the delta patch and its CRC
-		// To patch_base_check is since then set
+		// The patch_base_check is since then set
 		// calling dump_patch_base_crc()
 	    else
 	    {
@@ -71,6 +71,17 @@ namespace libdar
 		    patch_base_check = nullptr;
 		}
 	    }
+
+	    if(ver < archive_version(12,0))
+		sig_magic = rsync_sig_magic::md4;
+	    else
+	    {
+		unsigned char tmp;
+
+		src->read((char*)(&tmp), 1);
+		sig_magic = char_to_rsync_sig_magic(tmp);
+	    }
+
 	    delta_sig_size.read(*src);
 
 	    if(!delta_sig_size.is_zero())
@@ -139,17 +150,8 @@ namespace libdar
 
 	if(sequential_mode)
 	{
-		//if(!has_patch_base_crc())
-		// throw SRC_BUG;
-		// patch_base_check->dump(f);
-		///// since format 11.2 we do not save patch_base_crc
-		///// has been moved to cat_file
-		///// to be saved before the delta patch and
-		///// allow patching a file when reading a backup
-		///// in sequential mode
-		///// the field is still present in this class
-		///// for backward compatibility with older format
-
+	    unsigned char tmp = rsync_sig_magic_to_char(sig_magic);
+	    f.write((char*)(&tmp), 1);
 	    delta_sig_size.dump(f);
 	}
 
@@ -191,12 +193,9 @@ namespace libdar
 
     void cat_delta_signature::dump_metadata(generic_file & f) const
     {
-	    // if(!has_patch_base_crc())
-	    // throw SRC_BUG;
-	    // patch_base_check->dump(f);
-	    ///// patch_base_check has moved to cat_file
-	    ///// since format 11.2
+	unsigned char tmp = rsync_sig_magic_to_char(sig_magic);
 
+	f.write((char*)(&tmp), 1);
 	delta_sig_size.dump(f);
 	if(!delta_sig_size.is_zero())
 	    delta_sig_offset.dump(f);
@@ -247,6 +246,7 @@ namespace libdar
     void cat_delta_signature::init() noexcept
     {
 	patch_base_check = nullptr;
+	sig_magic = rsync_sig_magic::none;
 	delta_sig_size = 0;
 	delta_sig_offset = 0;
 	sig.reset();
@@ -259,6 +259,7 @@ namespace libdar
 
     void cat_delta_signature::copy_from(const cat_delta_signature & ref)
     {
+	sig_magic = ref.sig_magic;
 	delta_sig_offset = ref.delta_sig_offset;
 	delta_sig_size = ref.delta_sig_size;
 	sig = ref.sig;
@@ -285,6 +286,7 @@ namespace libdar
 
     void cat_delta_signature::move_from(cat_delta_signature && ref) noexcept
     {
+	sig_magic = std::move(ref.sig_magic);
 	delta_sig_offset = std::move(ref.delta_sig_offset);
 	delta_sig_size = std::move(ref.delta_sig_size);
 

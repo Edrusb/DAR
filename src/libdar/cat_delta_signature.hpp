@@ -36,6 +36,7 @@ extern "C"
 #include "crc.hpp"
 #include "proto_compressor.hpp"
 #include "archive_version.hpp"
+#include "archive_aux.hpp"
 
 #include <memory>
 
@@ -48,18 +49,18 @@ namespace libdar
 	// Datastructure in archive (DATA+METADATA)
 	//
 	//    SEQUENTIAL MODE - in the core of the archive
-	// +------+------+-----------+--------------+----------+--------+
-	// | base | sig  | sig block |sig data      | data CRC | result |
-	// | CRC  | size | len (if   |(if size > 0) |    if    |  CRC   |
-	// | (*)  |      | size > 0) |              | size > 0 |        |
-	// +------+------+-----------+--------------+----------+--------+
+	// xxxxxxxx +------+------+-----------+--------------+----------+--------+
+	// x base x | sign | sig  | sig block |sig data      | data CRC | result |
+	// x CRC  x | hash | size | len (if   |(if size > 0) |    if    |  CRC   |
+	// x (*)  x | (**) |      | size > 0) |              | size > 0 |        |
+	// xxxxxxxx +------+------+-----------+--------------+----------+--------+
 	//
 	//    DIRECT MODE - in catalogue at end of archive (METADATA)
-	// +------+------+---------------+--------+
-	// | base | sig  | sig offset    | result |
-	// | CRC  | size | (if size > 0) |  CRC   |
-	// | (*)  |      |               |        |
-	// +------+------+---------------+--------+
+	// xxxxxxxx +------+------+---------------+--------+
+	// x base x | sign | sig  | sig offset    | result |
+	// x CRC  x | hash | size | (if size > 0) |  CRC   |
+	// x (*)  x | (**) |      |               |        |
+	// xxxxxxxx +------+------+---------------+--------+
 	//
 	//    DIRECT MODE - in the core of the archive (DATA)
 	// +-----------+---------------+----------+
@@ -76,6 +77,8 @@ namespace libdar
 	//
 	// (*) base_CRC has been moved to cat_file structure since format 11,2
 	//     in order to read this field before the delta patch in sequential read mode
+	//
+	// (**) since archive format 12.0
 	//
 	// this structure is used for all cat_file inode that have
 	// either a delta signature or contain a delta patch (s_delta status)
@@ -109,7 +112,7 @@ namespace libdar
 	cat_delta_signature(generic_file *f, proto_compressor* c);
 
 	    /// constructor to write an object to filesytem/backup (using dump_* methods later on)
-	cat_delta_signature() { init(); };
+	cat_delta_signature(rsync_sig_magic algo) { init(); sig_magic = algo; };
 
 	    /// copy constructor
 	cat_delta_signature(const cat_delta_signature & ref) { init(); copy_from(ref); };
@@ -136,8 +139,12 @@ namespace libdar
 	    /// thing which is done transparently by obtain_sig() when in direct access mode
 	void read(bool sequential_read, const archive_version & ver);
 
-	    /// the cat_delta_signature structure can only hold CRC without delta_signature, this call gives the situation about that point
+	    /// the cat_delta_signature structure can only hold CRC without delta_signature,
+	    /// this call gives the situation about that point
 	bool can_obtain_sig() const { return !delta_sig_size.is_zero(); };
+
+	    /// give the hash algo used for the delta_signature
+	rsync_sig_magic get_sig_magic() const { return sig_magic; };
 
 	    /// provide a memory_file object which the caller has the duty to destroy after use
 
@@ -208,6 +215,7 @@ namespace libdar
 
     private:
 	crc *patch_base_check;      ///< associated CRC for the file this signature has been computed on, moved to cat_file since format 11.2, still need for older formats
+	rsync_sig_magic sig_magic;  ///< signature hash used
 	infinint delta_sig_size;    ///< size of the data to setup "sig" (set to zero when reading in sequential mode, sig is then setup on-fly)
 	infinint delta_sig_offset;  ///< where to read sig_block_len followed by delta_sig_size bytes of data from which to setup "sig"
 	    ///\note delta_sig_offset is set to zero when read in sequential mode, sig is setup on-fly
