@@ -388,6 +388,7 @@ namespace libdar
 	if(tmp_file != nullptr)
 	{
 	    const crc *crc_tmp = nullptr;
+	    rsync_sig_magic sig_magic;
 
 	    ent.set_file_size(tmp_file->get_size());
 	    ent.set_is_sparse_file(tmp_file->get_sparse_file_detection_read());
@@ -407,7 +408,10 @@ namespace libdar
 		tmp_file->read_delta_signature_metadata();
 		tmp_file->drop_delta_signature_data();
 	    }
-	    ent.set_delta_sig(tmp_file->has_delta_signature_available());
+	    if(tmp_file->has_delta_sig_magic(sig_magic))
+		ent.set_delta_sig(sig_magic);
+	    else
+		ent.set_delta_sig(rsync_sig_magic::none);
 	    if(tmp_file->has_patch_base_crc() && tmp_file->get_patch_base_crc(crc_tmp) && crc_tmp != nullptr)
 		ent.set_delta_patch_base_crc(*crc_tmp);
 	    if(tmp_file->has_patch_result_crc() && tmp_file->get_patch_result_crc(crc_tmp) && crc_tmp != nullptr)

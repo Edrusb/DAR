@@ -40,6 +40,7 @@
 #include "cat_status.hpp"
 #include "ea.hpp"
 #include "fsa_family.hpp"
+#include "archive_aux.hpp"
 
 namespace libdar
 {
@@ -154,7 +155,9 @@ namespace libdar
 	    /// field to me set by libdar, this operation has a additional cost in
 	    /// storage and computation
 	const range & get_slices() const { return slices; };
-	bool has_delta_signature() const { return delta_sig; };
+	bool has_delta_signature() const { return delta_sig != rsync_sig_magic::none; };
+	bool has_delta_signature(rsync_sig_magic & sig_magic) const;
+
 	std::string get_delta_flag() const;
 
 
@@ -255,7 +258,7 @@ namespace libdar
 	void set_major(int val) { major = val; };
 	void set_minor(int val) { minor = val; };
 	void set_slices(const range & sl) { slices = sl; };
-	void set_delta_sig(bool val) { delta_sig = val; };
+	void set_delta_sig(rsync_sig_magic val) { delta_sig = val; };
 	void set_archive_offset_for_data(const infinint & val) { offset_for_data = val; };
 	void set_storage_size_for_data(const infinint & val) { storage_size_for_data = val; };
 	void set_archive_offset_for_EA(const infinint & val) { offset_for_EA = val; };
@@ -295,7 +298,7 @@ namespace libdar
 	int major;
 	int minor;
 	range slices;
-	bool delta_sig;
+	rsync_sig_magic delta_sig;
 	infinint offset_for_data;
 	infinint storage_size_for_data;
 	infinint offset_for_EA;

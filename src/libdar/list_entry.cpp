@@ -339,7 +339,7 @@ namespace libdar
 	major = 0;
 	minor = 0;
 	slices.clear();
-	delta_sig = false;
+	delta_sig = rsync_sig_magic::none;
 	offset_for_data = 0;
 	storage_size_for_data = 0;
 	offset_for_EA = 0;
