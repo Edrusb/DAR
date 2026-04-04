@@ -156,7 +156,7 @@ namespace libdar
 	    /// storage and computation
 	const range & get_slices() const { return slices; };
 	bool has_delta_signature() const { return delta_sig != rsync_sig_magic::none; };
-	bool has_delta_signature(rsync_sig_magic & sig_magic) const;
+	bool has_delta_signature(rsync_sig_magic & val) const { val = delta_sig; return has_delta_signature(); };
 
 	std::string get_delta_flag() const;
 

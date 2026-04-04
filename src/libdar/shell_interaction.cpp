@@ -845,6 +845,7 @@ namespace libdar
 		string crc_tmp;
 		string crc_patch_base;
 		string crc_patch_result;
+		rsync_sig_magic sig_magic;
 
 		if(!entry.is_file() || !entry.is_sparse())
 		{
@@ -874,7 +875,10 @@ namespace libdar
 			stored = "";
 
 		    chksum = entry.get_data_crc();
-		    delta_sig = yes_no(entry.has_delta_signature());
+		    if(entry.has_delta_signature(sig_magic))
+			delta_sig = rsync_sig_magic_to_string(sig_magic);
+		    else
+			delta_sig = yes_no(false);
 		    chkbasesum = entry.get_delta_patch_base_crc();
 		    chkresultsum = entry.get_delta_patch_result_crc();
 

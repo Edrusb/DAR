@@ -212,10 +212,22 @@ namespace libdar
 	    return "[-]";
 	else
 	{
-	    if(has_delta_signature())
-		return "[D]";
-	    else
+	    rsync_sig_magic tmp;
+
+	    has_delta_signature(tmp);
+	    switch(tmp)
+	    {
+	    case rsync_sig_magic::none:
 		return "[ ]";
+	    case rsync_sig_magic::md4:
+		return "[D]";
+	    case rsync_sig_magic::blake2:
+		return "[B]";
+	    case rsync_sig_magic::rk_blake2:
+		return "[R]";
+	    default:
+		throw SRC_BUG;
+	    }
 	}
     }
 
