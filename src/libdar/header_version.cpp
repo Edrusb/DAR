@@ -82,7 +82,6 @@ namespace libdar
 	salt = "";
 	compr_bs = 0;
 	has_kdf_params = false;
-	sig_magic = rsync_sig_magic::md4; // this was the fallback value before release 2.9.0
     }
 
     void header_version::read(generic_file & f, user_interaction & dialog, bool lax_mode)
@@ -372,16 +371,6 @@ namespace libdar
 	else
 	    compr_bs = 0;
 
-	if(edition >= 12)
-	{
-	    if(f.read(&tmp, 1) == 1)
-		sig_magic = char_to_rsync_sig_magic(tmp);
-	    else
-		throw Erange("header_version::read", gettext("Reached End of File while reading archive header_version data structure"));
-	}
-	else
-	    sig_magic = rsync_sig_magic::md4;
-
 	ctrl = f.get_crc();
 	if(ctrl == nullptr)
 	    throw SRC_BUG;
@@ -534,10 +523,6 @@ namespace libdar
 	if(compr_bs > 0)
 	    compr_bs.dump(f);
 
-	    // we always write sig_magic (since archive version 12.0)
-	tmp = rsync_sig_magic_to_char(sig_magic);
-	f.write(&tmp, sizeof(tmp));
-
 	ctrl = f.get_crc();
 	if(ctrl == nullptr)
 	    throw SRC_BUG;
@@ -603,14 +588,6 @@ namespace libdar
 	    dialog.printf(gettext("KDF hash algorithm                   : %S"), &hashing);
 	    dialog.printf(gettext("Salt size                            : %d byte%c"), salt.size(), salt.size() > 1 ? 's' : ' ');
 	}
-	if(edition >= 12)
-	{
-	    if(sig_magic != rsync_sig_magic::none)
-		dialog.printf(gettext("Binary hash signature                : %s"), rsync_sig_magic_to_string(sig_magic));
-	}
-	    // else nothing show as the hash used was not stored in the archive header
-	    // and the hash used depended at archive creation time from the available
-	    // algorithm (librsync version dependency)
     }
 
     void header_version::clear()
@@ -628,7 +605,6 @@ namespace libdar
 	iteration_count = PRE_FORMAT_10_ITERATION;
 	kdf_hash = hash_algo::sha1;
 	compr_bs = 0;
-	sig_magic = rsync_sig_magic::none;
     }
 
     void header_version::copy_from(const header_version & ref)
@@ -662,7 +638,6 @@ namespace libdar
 	iteration_count = ref.iteration_count;
 	kdf_hash = ref.kdf_hash;
 	compr_bs = ref.compr_bs;
-	sig_magic = ref.sig_magic;
     }
 
     void header_version::move_from(header_version && ref) noexcept
@@ -682,7 +657,6 @@ namespace libdar
 	iteration_count = std::move(ref.iteration_count);
 	kdf_hash = std::move(ref.kdf_hash);
 	compr_bs = std::move(ref.compr_bs);
-	sig_magic = std::move(ref.sig_magic);
     }
 
     void header_version::detruit()
