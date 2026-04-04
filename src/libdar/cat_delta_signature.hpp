@@ -175,10 +175,12 @@ namespace libdar
 
 	    /// \note sig_block_size is an additional information about the block size used to setup the signature,
 	    /// this is not the size of the signature!
-	void set_sig(const std::shared_ptr<memory_file> & ptr, U_I sig_block_size);
+	void set_sig(rsync_sig_magic magic,
+		     const std::shared_ptr<memory_file> & ptr,
+		     U_I sig_block_size);
 
 	    /// variante used when the delta_signature object will only contain CRCs (no delta signature)
-	void set_sig() { delta_sig_size = 0; delta_sig_offset = 0; sig_block_len = 0; sig.reset(); };
+	void set_sig() { sig_magic = rsync_sig_magic::none; delta_sig_size = 0; delta_sig_offset = 0; sig_block_len = 0; sig.reset(); };
 
 	    /// set or rather change the hash algo information
 	void set_sig_magic(rsync_sig_magic hash) { sig_magic = hash; };

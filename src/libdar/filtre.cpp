@@ -84,7 +84,7 @@ namespace libdar
 			   set<string> ignored_as_symlink, ///< list of file to ignore as symlink and fetch the proper mtime
 			   bool repair_mode,         ///< if set, try to fix CRC and size problem flagging such fixed files as dirty
 			   U_I signature_block_size, ///< block size of delta signatures
-			   rsync_sig_magic sig_magic, ///< hash to use to build binary delta signatures
+			   rsync_sig_magic def_sig_magic, ///< hash to use to build binary delta signatures
 			   bool never_resave_uncompressed);
 
     static bool save_ea(const shared_ptr<user_interaction> & dialog,
@@ -159,7 +159,7 @@ namespace libdar
 				     const cat_file * ref_file,
 				     const pile_descriptor & pdesc,
 				     U_I signature_block_size,
-				     rsync_sig_magic sig_magic,
+				     rsync_sig_magic def_sig_magic,
 				     bool info_details,
 				     bool display_treated,
 				     const catalogue & cat);
@@ -1426,6 +1426,7 @@ namespace libdar
 	thread_cancellation thr_cancel;
 	string perimeter;
 	shared_ptr<memory_file> delta_sig;
+	rsync_sig_magic sig_magic;
 	U_I sig_block_len;
 
 	if(!dialog)
@@ -1586,7 +1587,7 @@ namespace libdar
 				{
 					// reading the delta signature
 
-				    e_file->read_delta_signature(delta_sig, sig_block_len);
+				    e_file->read_delta_signature(sig_magic, delta_sig, sig_block_len);
 				    if(delta_sig)
 					delta_sig.reset();
 
@@ -3113,7 +3114,7 @@ namespace libdar
 			   set<string> ignored_as_symlink,
 			   bool repair_mode,
 			   U_I signature_block_size,
-			   rsync_sig_magic sig_magic,
+			   rsync_sig_magic def_sig_magic,
 			   bool never_resave_uncompressed)
     {
 	bool ret = true;
@@ -3127,6 +3128,7 @@ namespace libdar
 	bool resave_uncompressed = false; // per file status (while never_resave_uncompressed arg is global to the whole operation)
 	infinint rewinder; // we skip back here if data must be saved uncompressed
 	shared_ptr<memory_file> delta_sig_ref; // holds the delta_signature that will be used as reference for delta patch later on
+	rsync_sig_magic sig_magic_ref;         // holds the sig_magic used for reference inode
 	U_I sig_ref_block_len;
 	const crc *result_crc = nullptr;
 
@@ -3159,7 +3161,7 @@ namespace libdar
 
 			// fetching the delta signature to base the patch on
 
-		    ref_fic->read_delta_signature(delta_sig_ref, sig_ref_block_len);
+		    ref_fic->read_delta_signature(sig_magic_ref, delta_sig_ref, sig_ref_block_len);
 		    if(!delta_sig_ref)
 			throw SRC_BUG;
 
@@ -3204,7 +3206,7 @@ namespace libdar
 					 ref_fic,
 					 pdesc,
 					 signature_block_size,
-					 sig_magic,
+					 def_sig_magic,
 					 info_details,
 					 display_treated,
 					 cat);
@@ -3248,6 +3250,7 @@ namespace libdar
 		if(fic != nullptr)
 		{
 		    shared_ptr<memory_file> delta_sig;
+		    rsync_sig_magic sig_magic = def_sig_magic;
 
 		    if(sem != nullptr)
 			sem->raise(info_quoi, ino, true);
@@ -3810,7 +3813,7 @@ namespace libdar
 					{
 						// merging context, signature not calculated here but already existing: we need to transfer it
 					    if(fic->has_delta_signature_available() || repair_mode)
-						fic->read_delta_signature(delta_sig, block_size);
+						fic->read_delta_signature(sig_magic, delta_sig, block_size);
 						// overriden block_size by the value of the signature
 						// we have just read. As we won't recalculate it, in the present
 						// case, we have to properly record its block size
@@ -3859,7 +3862,7 @@ namespace libdar
 				    try
 				    {
 					if(delta_sig)
-					    fic->dump_delta_signature(delta_sig, block_size, *(pdesc.compr), pdesc.esc != nullptr);
+					    fic->dump_delta_signature(sig_magic, delta_sig, block_size, *(pdesc.compr), pdesc.esc != nullptr);
 					else
 					    fic->dump_delta_signature(*(pdesc.compr), pdesc.esc != nullptr);
 				    }
@@ -4678,7 +4681,7 @@ namespace libdar
 				     const cat_file * ref_file,
 				     const pile_descriptor & pdesc,
 				     U_I signature_block_size,
-				     rsync_sig_magic sig_magic,
+				     rsync_sig_magic def_sig_magic,
 				     bool info_details,
 				     bool display_treated,
 				     const catalogue & cat)
@@ -4686,6 +4689,7 @@ namespace libdar
 	if(e_file != nullptr
 	   && e_file->has_delta_signature_structure())
 	{
+	    rsync_sig_magic sig_magic = def_sig_magic;
 	    shared_ptr<memory_file> sig;
 	    U_I block_size = signature_block_size;
 
@@ -4699,7 +4703,7 @@ namespace libdar
 
 		    if(ref_file->has_delta_signature_available())
 		    {
-			ref_file->read_delta_signature(sig, block_size);
+			ref_file->read_delta_signature(sig_magic, sig, block_size);
 			    // overwriting block size to fit the block
 			    // size used to create this signature
 			if(!sig)
@@ -4776,14 +4780,14 @@ namespace libdar
 		    {
 			if(e_file->get_saved_status() == saved_status::delta)
 			    throw SRC_BUG;
-			e_file->read_delta_signature(sig, block_size);
+			e_file->read_delta_signature(sig_magic, sig, block_size);
 		    }
 		}
 
 		cat.pre_add_delta_sig(&pdesc);
 		pdesc.compr->suspend_compression();
 		if(sig)
-		    e_file->dump_delta_signature(sig, block_size, *(pdesc.compr), pdesc.esc != nullptr);
+		    e_file->dump_delta_signature(sig_magic, sig, block_size, *(pdesc.compr), pdesc.esc != nullptr);
 		else
 		    e_file->dump_delta_signature(*(pdesc.compr), pdesc.esc != nullptr);
 	    }

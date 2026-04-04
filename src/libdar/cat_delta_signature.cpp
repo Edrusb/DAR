@@ -123,10 +123,13 @@ namespace libdar
 	return sig;
     }
 
-    void cat_delta_signature::set_sig(const std::shared_ptr<memory_file> & ptr, U_I sig_block_size)
+    void cat_delta_signature::set_sig(rsync_sig_magic magic,
+				      const std::shared_ptr<memory_file> & ptr,
+				      U_I sig_block_size)
     {
 	if(!ptr)
 	    throw SRC_BUG;
+	sig_magic = magic;
 	sig = ptr;
 	delta_sig_size = sig->size();
 	if(delta_sig_size.is_zero())

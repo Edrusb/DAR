@@ -210,7 +210,7 @@ namespace libdar
 	    /// prepare the object to receive a delta signature structure
 	void will_have_delta_signature_structure();
 
-	    /// prepare the object to receive a delta signature structure including delta signature
+	    /// prepare the object to receive a delta signature structure including a delta signature data
 
 	    /// this calls will lead an to error if the delta_signature is written to archive or used while only CRC info
 	    /// has been set (= metadata of delta signature) but no delta signature data has read from the archive or
@@ -219,11 +219,15 @@ namespace libdar
 
 	    /// write down to archive the given delta signature
 
+	    /// \param[in] sig_magic hash algo used to build the signature (informational only)
 	    /// \param[in] sig is the signature to dump
 	    /// \param[in] sign_block_size block size to used to build the delta signature
 	    /// \param[in] where is the location where to write down the signature
 	    /// \param[in] small if set to true drop down additional information to allow sequential reading mode
-	void dump_delta_signature(std::shared_ptr<memory_file> & sig, U_I sign_block_size, generic_file & where, bool small) const;
+	void dump_delta_signature(rsync_sig_magic sig_magic,
+				  std::shared_ptr<memory_file> & sig,
+				  U_I sign_block_size,
+				  generic_file & where, bool small) const;
 
 	    /// variant of dump_delta_signature when just CRC have to be dumped
 	void dump_delta_signature(generic_file & where, bool small) const;
@@ -236,11 +240,13 @@ namespace libdar
 
 	    /// fetch the delta signature from the archive
 
+	    /// \param[out] sig_magic hash algo used to build the delta signature
 	    /// \param[out] delta_sig is either nullptr or points to a shared memory_file
 	    /// containing the delta signature.
 	    /// \param[out] block_len is the block size that has been used to build the signature
 	    /// \note nullptr is returned if the delta_signature only contains CRCs
-	void read_delta_signature(std::shared_ptr<memory_file> & delta_sig,
+	void read_delta_signature(rsync_sig_magic & sig_magic,
+				  std::shared_ptr<memory_file> & delta_sig,
 				  U_I & block_len) const;
 
 	    /// drop the delta signature from memory (will not more be posible to be read, using read_delta_signature)

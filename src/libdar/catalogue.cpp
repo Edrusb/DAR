@@ -1143,12 +1143,13 @@ namespace libdar
 			&& e_file->get_size() >= delta_sig_min_size))
 		    {
 			shared_ptr<memory_file> sig_ptr;
+			rsync_sig_magic read_magic;
 
-			ent_file->read_delta_signature(sig_ptr, block_len);
+			ent_file->read_delta_signature(read_magic, sig_ptr, block_len);
 			try
 			{
 			    if(sig_ptr)
-				e_file->dump_delta_signature(sig_ptr, block_len, *(destination.compr), false);
+				e_file->dump_delta_signature(read_magic, sig_ptr, block_len, *(destination.compr), false);
 			    else
 				e_file->dump_delta_signature(*(destination.compr), false);
 			}
@@ -1170,7 +1171,7 @@ namespace libdar
 			else
 			    e_file->clear_delta_signature_structure();
 		}
-		else // no delta signature found we may have to calculate them
+		else // no delta signature found we may have to calculate it
 		{
 		    if(build
 		       && delta_mask.is_covered(juillet.get_string())
@@ -1232,7 +1233,7 @@ namespace libdar
 				e_file->will_have_delta_signature_available();
 				e_file->set_patch_base_crc(*my_crc);
 				e_file->set_patch_result_crc(*my_crc);
-				e_file->dump_delta_signature(mem, block_len, *(destination.compr), false);
+				e_file->dump_delta_signature(for_created_sig, mem, block_len, *(destination.compr), false);
 				e_file->drop_delta_signature_data(); // now the data has been written to archive we can free up memory
 				break;
 			    case saved_status::fake:

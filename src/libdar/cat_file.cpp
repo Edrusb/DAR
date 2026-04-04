@@ -1316,14 +1316,20 @@ namespace libdar
 	delta_sig->will_have_signature();
     }
 
-    void cat_file::dump_delta_signature(shared_ptr<memory_file> & sig, U_I sig_block_size, generic_file & where, bool small) const
+    void cat_file::dump_delta_signature(rsync_sig_magic sig_magic,
+					shared_ptr<memory_file> & sig,
+					U_I sig_block_size,
+					generic_file & where,
+					bool small) const
     {
 	infinint crc_size;
 
 	if(delta_sig == nullptr)
 	    throw SRC_BUG;
 
-	const_cast<cat_delta_signature *>(delta_sig)->set_sig(sig, sig_block_size);
+	const_cast<cat_delta_signature *>(delta_sig)->set_sig(sig_magic,
+							      sig,
+							      sig_block_size);
 	delta_sig->dump_data(where, small, read_ver);
     }
 
@@ -1403,11 +1409,13 @@ namespace libdar
 	}
     }
 
-    void cat_file::read_delta_signature(shared_ptr<memory_file> & delta_sig_ret,
+    void cat_file::read_delta_signature(rsync_sig_magic & sig_magic,
+					shared_ptr<memory_file> & delta_sig_ret,
 					U_I & block_len) const
     {
 	read_delta_signature_metadata();
 
+	sig_magic = delta_sig->get_sig_magic();
 	if(delta_sig->can_obtain_sig())
 	    delta_sig_ret = delta_sig->obtain_sig(read_ver);
 	else
@@ -1433,14 +1441,19 @@ namespace libdar
 	shared_ptr<memory_file> sig_you;
 	U_I my_sig_block_len;
 	U_I your_sig_block_len;
+	rsync_sig_magic my_magic;
+	rsync_sig_magic your_magic;
 
-	read_delta_signature(sig_me, my_sig_block_len);
-	ref.read_delta_signature(sig_you, your_sig_block_len);
+	read_delta_signature(my_magic, sig_me, my_sig_block_len);
+	ref.read_delta_signature(your_magic, sig_you, your_sig_block_len);
 
 	if(!sig_me)
 	    throw SRC_BUG;
 	if(!sig_you)
 	    throw SRC_BUG;
+
+	if(my_magic != your_magic)
+	    return false;
 
 	if(my_sig_block_len != your_sig_block_len)
 	    return false;
@@ -1657,11 +1670,8 @@ namespace libdar
 		if(!sig_you)
 		    throw Ememory("cat_file::sub_compare_internal");
 
-		read_delta_signature(sig_me, block_len);
+		read_delta_signature(sig_magic, sig_me, block_len);
 		if(!sig_me)
-		    throw SRC_BUG;
-
-		if(!has_delta_sig_magic(sig_magic))
 		    throw SRC_BUG;
 
 		if(sig_magic == rsync_sig_magic::none)
