@@ -90,7 +90,10 @@ namespace libdar
 	    /// generic_file
 	void copy_to_without_skip(bool mode) { copy_to_no_skip = mode; };
 
+	    /// whether a hole has been read/written between the beginning and current offset
 	bool has_seen_hole() const { return seen_hole; };
+
+	    /// whether a escaped zeroed byte sequence has been read/written between the beginning and the current offset
 	bool has_escaped_data() const { return data_escaped; };
 
 	    /// copies data of the current object using holes to the given
@@ -147,7 +150,7 @@ namespace libdar
 	bool escape_write;       ///< whether to behave like an escape object when writing down data
 	bool escape_read;        ///< whether to behave like an escape object when reading out data
 	bool copy_to_no_skip;    ///< whether to hide holes by zeored bytes in the copy_to() methods
-	bool seen_hole;          ///< whether a hole has been seen or this is a plain file so far
+	bool seen_hole;          ///< whether a hole has been seen or this is a plain file from the begin to current offset (valid in read and write modes)
 	bool data_escaped;       ///< whether some data has been escaped to not collide with a mark (may occur even when no hole is met)
 
 	    /// write down the amount of byte zero not yet written.
