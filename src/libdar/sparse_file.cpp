@@ -99,6 +99,122 @@ namespace libdar
 	min_hole_size = hole_size; // setting back min_hole_size to its value
     }
 
+    void sparse_file::copy_to(generic_file &ref, const infinint & crc_size, crc * & value)
+    {
+	char buffer[BUFFER_SIZE];
+	S_I lu;
+	bool loop = true;
+	bool last_is_skip = false;
+
+	if(is_terminated())
+	    throw SRC_BUG;
+
+	if(!crc_size.is_zero())
+	{
+	    value = create_crc_from_size(crc_size);
+	    if(value == nullptr)
+		throw SRC_BUG;
+	}
+	else
+	    value = nullptr;
+
+	try
+	{
+	    do
+	    {
+		lu = escape::inherited_read(buffer, BUFFER_SIZE);
+		if(has_escaped_data_since_last_skip())
+		    data_escaped = true;
+
+		if(lu > 0)
+		{
+		    if(!crc_size.is_zero())
+			value->compute(offset, buffer, lu);
+		    ref.write(buffer, lu);
+		    offset += lu;
+		    last_is_skip = false;
+		}
+		else // lu == 0
+		    if(next_to_read_is_mark(seqt_file))
+		    {
+			if(!skip_to_next_mark(seqt_file, false))
+			    throw SRC_BUG;
+			else
+			{
+			    read_as_escape(true);
+			    try
+			    {
+				zero_count.read(*this);
+			    }
+			    catch(...)
+			    {
+				read_as_escape(false);
+				zero_count = 0;
+				throw;
+			    }
+			    read_as_escape(false);
+
+			    if(copy_to_no_skip)
+			    {
+				while(!zero_count.is_zero())
+				{
+				    U_I to_write = 0;
+				    zero_count.unstack(to_write);
+				    while(to_write > 0)
+				    {
+					U_I min = to_write > SPARSE_FIXED_ZEROED_BLOCK ? SPARSE_FIXED_ZEROED_BLOCK : to_write;
+
+					ref.write((const char *)zeroed_field, min);
+					to_write -= min;
+				    }
+				}
+			    }
+			    else  // using skip to restore hole into the copied-to generic_file
+			    {
+				offset += zero_count;
+				zero_count = 0;
+				if(!ref.skip(offset))
+				    throw Erange("sparse_file::copy_to", gettext("Cannot skip forward to restore a hole"));
+				last_is_skip = true;
+				seen_hole = true;
+			    }
+			}
+		    }
+		    else // reached EOF ?
+		    {
+			sequence_type m;
+
+			if(next_to_read_is_which_mark(m)) // this is not EOF, but unused mark is present
+			    if(m == seqt_file)
+				throw SRC_BUG; // should have been reported above by next_to_read_is_mark(seqt_file)
+			    else
+				throw Erange("sparse_file::copy", gettext("Data corruption or unknown sparse_file mark found in file's data"));
+			else // Yes, this is the EOF
+			{
+			    if(last_is_skip)
+			    {
+				(void)ref.skip_relative(-1);
+				ref.write((const char *)&zeroed_field, 1);
+			    }
+			    loop = false;
+			}
+		    }
+	    }
+	    while(loop);
+	}
+	catch(...)
+	{
+	    if(value != nullptr)
+	    {
+		delete value;
+		value = nullptr;
+	    }
+	    throw;
+	}
+    }
+
+
+
     infinint sparse_file::get_position() const
     {
 	if(is_terminated())
@@ -222,121 +338,6 @@ namespace libdar
 	}
 	return lu;
     }
-
-    void sparse_file::copy_to(generic_file &ref, const infinint & crc_size, crc * & value)
-    {
-	char buffer[BUFFER_SIZE];
-	S_I lu;
-	bool loop = true;
-	bool last_is_skip = false;
-
-	if(is_terminated())
-	    throw SRC_BUG;
-
-	if(!crc_size.is_zero())
-	{
-	    value = create_crc_from_size(crc_size);
-	    if(value == nullptr)
-		throw SRC_BUG;
-	}
-	else
-	    value = nullptr;
-
-	try
-	{
-	    do
-	    {
-		lu = escape::inherited_read(buffer, BUFFER_SIZE);
-		if(has_escaped_data_since_last_skip())
-		    data_escaped = true;
-
-		if(lu > 0)
-		{
-		    if(!crc_size.is_zero())
-			value->compute(offset, buffer, lu);
-		    ref.write(buffer, lu);
-		    offset += lu;
-		    last_is_skip = false;
-		}
-		else // lu == 0
-		    if(next_to_read_is_mark(seqt_file))
-		    {
-			if(!skip_to_next_mark(seqt_file, false))
-			    throw SRC_BUG;
-			else
-			{
-			    read_as_escape(true);
-			    try
-			    {
-				zero_count.read(*this);
-			    }
-			    catch(...)
-			    {
-				read_as_escape(false);
-				zero_count = 0;
-				throw;
-			    }
-			    read_as_escape(false);
-
-			    if(copy_to_no_skip)
-			    {
-				while(!zero_count.is_zero())
-				{
-				    U_I to_write = 0;
-				    zero_count.unstack(to_write);
-				    while(to_write > 0)
-				    {
-					U_I min = to_write > SPARSE_FIXED_ZEROED_BLOCK ? SPARSE_FIXED_ZEROED_BLOCK : to_write;
-
-					ref.write((const char *)zeroed_field, min);
-					to_write -= min;
-				    }
-				}
-			    }
-			    else  // using skip to restore hole into the copied-to generic_file
-			    {
-				offset += zero_count;
-				zero_count = 0;
-				if(!ref.skip(offset))
-				    throw Erange("sparse_file::copy_to", gettext("Cannot skip forward to restore a hole"));
-				last_is_skip = true;
-				seen_hole = true;
-			    }
-			}
-		    }
-		    else // reached EOF ?
-		    {
-			sequence_type m;
-
-			if(next_to_read_is_which_mark(m)) // this is not EOF, but unused mark is present
-			    if(m == seqt_file)
-				throw SRC_BUG; // should have been reported above by next_to_read_is_mark(seqt_file)
-			    else
-				throw Erange("sparse_file::copy", gettext("Data corruption or unknown sparse_file mark found in file's data"));
-			else // Yes, this is the EOF
-			{
-			    if(last_is_skip)
-			    {
-				(void)ref.skip_relative(-1);
-				ref.write((const char *)&zeroed_field, 1);
-			    }
-			    loop = false;
-			}
-		    }
-	    }
-	    while(loop);
-	}
-	catch(...)
-	{
-	    if(value != nullptr)
-	    {
-		delete value;
-		value = nullptr;
-	    }
-	    throw;
-	}
-    }
-
 
     void sparse_file::inherited_write(const char *a, U_I size)
     {
