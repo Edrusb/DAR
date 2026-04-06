@@ -63,6 +63,7 @@ namespace libdar
 	virtual bool truncatable(const infinint & pos) const override { return true; };
 	virtual infinint get_position() const  override { if(is_terminated()) throw SRC_BUG; return position; };
 
+	void change_mode(gf_mode mode) { set_mode(mode); /* inherited from generic_file */ };
 
     protected:
 
