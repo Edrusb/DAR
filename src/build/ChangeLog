@@ -20,6 +20,8 @@ from 2.7.20 to 2.7.21
    as "un-modified" (only metadata saved).
  - fixed one field lack of initialization in archive_options_isolate
    classes copy and move constructors.
+ - fixing bug that could occur while more bytes are read than availables
+   leading to endless loop (never observed/reported so far but good to fix)
 
 from 2.7.19 to 2.7.20
 - fixed bug leading dar in sequential-read mode not to completely check
