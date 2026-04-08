@@ -309,7 +309,7 @@ namespace libdar
             if(tmp == 0)
                 size.unstack(tmp);
         }
-        while(tmp > 0);
+        while(tmp > 0 && delta != 0);
 
         return wrote;
     }
