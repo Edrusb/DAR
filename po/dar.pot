@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: dar 2.7.20\n"
+"Project-Id-Version: dar 2.7.21.RC2\n"
 "Report-Msgid-Bugs-To: https://github.com/Edrusb/DAR/issues\n"
-"POT-Creation-Date: 2026-03-18 19:36+0100\n"
+"POT-Creation-Date: 2026-04-08 15:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1063,191 +1063,191 @@ msgstr ""
 msgid "Invalid number: "
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1187
+#: src/dar_suite/line_tools.cpp:1186
 msgid "date before 1970 is not allowed"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1192
+#: src/dar_suite/line_tools.cpp:1191
 msgid "Incorrect month"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1197
+#: src/dar_suite/line_tools.cpp:1196
 msgid "Incorrect day of month"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1202
+#: src/dar_suite/line_tools.cpp:1201
 msgid "Incorrect hour"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1207
+#: src/dar_suite/line_tools.cpp:1206
 msgid "Incorrect minute"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1212
+#: src/dar_suite/line_tools.cpp:1211
 msgid "Incorrect second"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1216
+#: src/dar_suite/line_tools.cpp:1215
 msgid "Bad formatted date expression"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1331
+#: src/dar_suite/line_tools.cpp:1330
 msgid "Given date must be in the past"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1347
+#: src/dar_suite/line_tools.cpp:1346
 #, c-format
 msgid "   gzip compression (libz)      : %s"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1348
+#: src/dar_suite/line_tools.cpp:1347
 #, c-format
 msgid "   bzip2 compression (libbzip2) : %s"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1349
+#: src/dar_suite/line_tools.cpp:1348
 #, c-format
 msgid "   lzo compression (liblzo2)    : %s"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1350
+#: src/dar_suite/line_tools.cpp:1349
 #, c-format
 msgid "   xz compression (liblzma)     : %s"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1351
+#: src/dar_suite/line_tools.cpp:1350
 #, c-format
 msgid "   zstd compression (libzstd)   : %s"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1352
+#: src/dar_suite/line_tools.cpp:1351
 #, c-format
 msgid "   lz4 compression (liblz4)     : %s"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1353
+#: src/dar_suite/line_tools.cpp:1352
 #, c-format
 msgid "   Strong encryption (libgcrypt): %s"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1354
+#: src/dar_suite/line_tools.cpp:1353
 #, c-format
 msgid "   Public key ciphers (gpgme)   : %s"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1355
+#: src/dar_suite/line_tools.cpp:1354
 #, c-format
 msgid "   Extended Attributes support  : %s"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1356
+#: src/dar_suite/line_tools.cpp:1355
 #, c-format
 msgid "   Large files support (> 2GB)  : %s"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1357
+#: src/dar_suite/line_tools.cpp:1356
 #, c-format
 msgid "   ext2fs NODUMP flag support   : %s"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1359
+#: src/dar_suite/line_tools.cpp:1358
 #, c-format
 msgid "   Integer size used            : unlimited"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1361
+#: src/dar_suite/line_tools.cpp:1360
 #, c-format
 msgid "   Integer size used            : %d bits"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1362
+#: src/dar_suite/line_tools.cpp:1361
 #, c-format
 msgid "   Thread safe support          : %s"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1363
+#: src/dar_suite/line_tools.cpp:1362
 #, c-format
 msgid "   Furtive read mode support    : %s"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1364
+#: src/dar_suite/line_tools.cpp:1363
 #, c-format
 msgid "   Linux ext2/3/4 FSA support   : %s"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1365
+#: src/dar_suite/line_tools.cpp:1364
 #, c-format
 msgid "   Mac OS X HFS+ FSA support    : %s"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1366
+#: src/dar_suite/line_tools.cpp:1365
 #, c-format
 msgid "   Linux statx() support        : %s"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1371
+#: src/dar_suite/line_tools.cpp:1370
 msgid "big"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1374
+#: src/dar_suite/line_tools.cpp:1373
 msgid "little"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1377
+#: src/dar_suite/line_tools.cpp:1376
 msgid "error!"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1382
+#: src/dar_suite/line_tools.cpp:1381
 #, c-format
 msgid "   Detected system/CPU endian   : %s"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1383
+#: src/dar_suite/line_tools.cpp:1382
 #, c-format
 msgid "   Posix fadvise support        : %s"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1384
+#: src/dar_suite/line_tools.cpp:1383
 #, c-format
 msgid "   Large dir. speed optimi.     : %s"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1394
+#: src/dar_suite/line_tools.cpp:1393
 #, c-format
 msgid "   Timestamp read accuracy      : %S"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1404
+#: src/dar_suite/line_tools.cpp:1403
 #, c-format
 msgid "   Timestamp write accuracy     : %S"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1405
+#: src/dar_suite/line_tools.cpp:1404
 #, c-format
 msgid "   Restores dates of symlinks   : %s"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1410
+#: src/dar_suite/line_tools.cpp:1409
 #, c-format
 msgid "   Multiple threads (libthreads): %s %s"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1411
+#: src/dar_suite/line_tools.cpp:1410
 #, c-format
 msgid "   Delta compression (librsync) : %s"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1416
+#: src/dar_suite/line_tools.cpp:1415
 #, c-format
 msgid "   Remote repository (libcurl)  : %s %s"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1417
+#: src/dar_suite/line_tools.cpp:1416
 #, c-format
 msgid "   argon2 hashing (libargon2)   : %s"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1476 src/dar_suite/line_tools.cpp:1505
+#: src/dar_suite/line_tools.cpp:1475 src/dar_suite/line_tools.cpp:1504
 #, c-format
 msgid ""
 "Warning, no archive exist with \"%S\" as basename, however a slice part of "
@@ -1255,7 +1255,7 @@ msgid ""
 "occurred and using that basename instead"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1485
+#: src/dar_suite/line_tools.cpp:1484
 #, c-format
 msgid ""
 "Warning, the provided basename \"%S\" may lead to confusion as it looks like "
@@ -1263,29 +1263,29 @@ msgid ""
 "want to change the basename accordingly?"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1491
+#: src/dar_suite/line_tools.cpp:1490
 #, c-format
 msgid "OK, keeping %S as basename"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1539
+#: src/dar_suite/line_tools.cpp:1538
 #, c-format
 msgid "Auto detecting min-digits to be %i"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1568 src/libdar/tools.cpp:2119
+#: src/dar_suite/line_tools.cpp:1567 src/libdar/tools.cpp:2119
 msgid "Cannot get full path of current working directory: "
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1683
+#: src/dar_suite/line_tools.cpp:1682
 msgid "Error while fetching hostname: "
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1750
+#: src/dar_suite/line_tools.cpp:1749
 msgid "unknown name give for delta signature block len function"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1778
+#: src/dar_suite/line_tools.cpp:1777
 #, c-format
 msgid ""
 "%s does not name a compression \"[algorithm][:][level]\" , like for examples "
@@ -1293,19 +1293,19 @@ msgid ""
 "review the man page about -z option"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1795 src/dar_suite/line_tools.cpp:1811
+#: src/dar_suite/line_tools.cpp:1794 src/dar_suite/line_tools.cpp:1810
 msgid "Compression level must be between 1 and 9, included"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1820
+#: src/dar_suite/line_tools.cpp:1819
 msgid "Compression block size too large for this operating system"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1823
+#: src/dar_suite/line_tools.cpp:1822
 msgid "invalid argument given for compression scheme"
 msgstr ""
 
-#: src/dar_suite/line_tools.cpp:1910 src/dar_suite/line_tools.cpp:1918
+#: src/dar_suite/line_tools.cpp:1909 src/dar_suite/line_tools.cpp:1917
 #, c-format
 msgid "Error met while retrieving current time: %S"
 msgstr ""
@@ -5604,19 +5604,19 @@ msgstr ""
 msgid "Writing to a read only generic_file"
 msgstr ""
 
-#: src/libdar/generic_file.cpp:348
+#: src/libdar/generic_file.cpp:349
 msgid "Cannot compare files in write only mode"
 msgstr ""
 
-#: src/libdar/generic_file.cpp:435
+#: src/libdar/generic_file.cpp:436
 msgid "Cannot truncate a read-only generic_file"
 msgstr ""
 
-#: src/libdar/generic_file.cpp:446
+#: src/libdar/generic_file.cpp:447
 msgid "Cannot sync write on a read-only generic_file"
 msgstr ""
 
-#: src/libdar/generic_file.cpp:457
+#: src/libdar/generic_file.cpp:458
 msgid "Cannot flush read a write-only generic_file"
 msgstr ""
 
@@ -6843,19 +6843,19 @@ msgstr ""
 msgid "Error, catalogue of reference has not been provided"
 msgstr ""
 
-#: src/libdar/archive_options.cpp:490 src/libdar/archive_options.cpp:1811
+#: src/libdar/archive_options.cpp:490 src/libdar/archive_options.cpp:1813
 #: src/libdar/fichier_local.cpp:436
 msgid "Furtive read mode"
 msgstr ""
 
 #: src/libdar/archive_options.cpp:546 src/libdar/archive_options.cpp:853
-#: src/libdar/archive_options.cpp:1144 src/libdar/archive_options.cpp:2086
+#: src/libdar/archive_options.cpp:1146 src/libdar/archive_options.cpp:2088
 msgid ""
 "argon2 hash algorithm is only used for key derivation function, it is not "
 "adapted to file or slice hashing"
 msgstr ""
 
-#: src/libdar/archive_options.cpp:1599 src/libdar/archive_options.cpp:1606
+#: src/libdar/archive_options.cpp:1601 src/libdar/archive_options.cpp:1608
 msgid "No mask available"
 msgstr ""
 
