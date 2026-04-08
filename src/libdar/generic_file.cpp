@@ -262,7 +262,8 @@ namespace libdar
 
         while(wrote < size && lu > 0)
         {
-            pas = size > BUFFER_SIZE ? BUFFER_SIZE : size;
+	    lu = size - wrote; // temporarily using lu for the next line:
+            pas = lu > BUFFER_SIZE ? BUFFER_SIZE : lu;
 	    try
 	    {
 		lu = read(buffer, pas);
