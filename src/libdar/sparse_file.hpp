@@ -105,7 +105,7 @@ namespace libdar
 	    /// is created by sparse_file in write_only mode (thus when one is writing
 	    /// data to a sparse_file object, the underlying generic_file get a mix of
 	    /// normal data and hole (number of zeroed bytes to skip to reach next normal data)
-	    /// leading to only restore the data not equal to zero (passed a certain
+	    /// leading to only write to "ref" the data not equal to zero (passed a certain
 	    /// amount of contiguous zeroed bytes).
 	virtual void copy_to(generic_file & ref) override { crc *tmp = nullptr; copy_to(ref, 0, tmp); if(tmp != nullptr) throw SRC_BUG; };
 
@@ -115,10 +115,10 @@ namespace libdar
 	virtual void copy_to(generic_file & ref, const infinint & crc_size, crc * & value) override;
 
 	    // indirectly inherited from generic_file
-	virtual bool skippable(skippability direction, const infinint & amount) override { return false; };
-	virtual bool skip(const infinint & pos) override { if(pos != offset) throw Efeature("skip in sparse_file"); else return true; };
-	virtual bool skip_to_eof() override { throw Efeature("skip in sparse_file"); };
-	virtual bool skip_relative(S_I x) override { if(x != 0) throw Efeature("skip in sparse_file"); return true; };
+	virtual bool skippable(skippability direction, const infinint & amount) override;
+	virtual bool skip(const infinint & pos) override;
+	virtual bool skip_to_eof() override;
+	virtual bool skip_relative(S_I x) override;
 	virtual infinint get_position() const override;
 
     protected:
@@ -140,7 +140,7 @@ namespace libdar
 
     private:
 	static bool initialized; ///< whether static field "zeroed_field" has been initialized
-        static unsigned char zeroed_field[SPARSE_FIXED_ZEROED_BLOCK]; ///< read-only, used when the sequence of zeros is too short for a hole
+        static unsigned char zeroed_field[SPARSE_FIXED_ZEROED_BLOCK]; ///< read-only (copy_to() method), used when the sequence of zeros is too short for a hole
 
 	enum { normal, hole } mode; ///< wether we are currently reading/writing a hole or normal data
 	infinint zero_count;     ///< number of zeroed byte pending in the current hole
@@ -150,8 +150,9 @@ namespace libdar
 	bool escape_write;       ///< whether to behave like an escape object when writing down data
 	bool escape_read;        ///< whether to behave like an escape object when reading out data
 	bool copy_to_no_skip;    ///< whether to hide holes by zeored bytes in the copy_to() methods
-	bool seen_hole;          ///< whether a hole has been seen or this is a plain file from the begin to current offset (valid in read and write modes)
+	bool seen_hole;          ///< whether a hole has been created (added tape mark) or restored (using skip in the target file)
 	bool data_escaped;       ///< whether some data has been escaped to not collide with a mark (may occur even when no hole is met)
+	infinint before_holes;   ///< offset of the first hole (when seen_hole is true) used to avoid skipping back to zero and read forward before the hole
 
 	    /// write down the amount of byte zero not yet written.
 	    /// which may be normal zeros or hole depending on their amount

@@ -52,6 +52,7 @@ extern "C"
 #endif
 
 #include "crc.hpp"
+#include "null_file.hpp"
 
 using namespace std;
 
@@ -69,7 +70,8 @@ namespace libdar
 			     const infinint & hole_size)
 	: escape(below, std::set<sequence_type>()),
 	  zero_count(0),
-	  offset(0)
+	  offset(0),
+	  min_hole_size(hole_size)
     {
 	    // change the escape sequences fixed part to not collide with a possible underlying (the "below" object or below this "below" object) escape object
 	change_fixed_escape_sequence(ESCAPE_FIXED_SEQUENCE_SPARSE_FILE);
@@ -91,7 +93,8 @@ namespace libdar
 	if(below == nullptr)
 	    throw SRC_BUG;
 
-	min_hole_size = hole_size;
+	    // min_hole_size as been set to hole_size previously
+	    // now trying to drain its value to a U_I for better perf
 	UI_min_hole_size = 0;
 	min_hole_size.unstack(UI_min_hole_size);
 	if(!min_hole_size.is_zero()) // hole size is larger than maximum buffer
@@ -120,6 +123,10 @@ namespace libdar
 
 	try
 	{
+	    if(!escape::skip(0))
+		throw SRC_BUG;
+	    seen_hole = false;
+
 	    do
 	    {
 		lu = escape::inherited_read(buffer, BUFFER_SIZE);
@@ -154,6 +161,12 @@ namespace libdar
 			    }
 			    read_as_escape(false);
 
+			    if(! seen_hole)
+			    {
+				seen_hole = true;
+				before_holes = offset;
+			    }
+
 			    if(copy_to_no_skip)
 			    {
 				while(!zero_count.is_zero())
@@ -176,7 +189,6 @@ namespace libdar
 				if(!ref.skip(offset))
 				    throw Erange("sparse_file::copy_to", gettext("Cannot skip forward to restore a hole"));
 				last_is_skip = true;
-				seen_hole = true;
 			    }
 			}
 		    }
@@ -213,7 +225,139 @@ namespace libdar
 	}
     }
 
+    bool sparse_file::skippable(skippability direction, const infinint & amount)
+    {
+	switch(get_mode())
+	{
+	case gf_read_only:
+	    switch(direction)
+	    {
+	    case skip_forward:
+		return escape::skippable(direction, amount);
+	    case skip_backward:
+		if(amount <= get_position())
+		{
+			// when skipping backward, "amount" may be
+			// much larger than the underlying offset
+			// because of holes read so far.
+			// In that case we check whether skipping to
+			// offset zero is possible
+		    if(amount <= escape::get_position())
+			return escape::skippable(direction, amount);
+		    else
+			return escape::skippable(direction, escape::get_position());
+		}
+		else
+		    return false;
+	    default:
+		throw SRC_BUG;
+	    }
+	    break;
+	default:
+	    return false;
+	}
+    }
 
+    bool sparse_file::skip(const infinint & pos)
+    {
+	bool ret = false;
+
+	switch(get_mode())
+	{
+	case gf_read_only:
+	    if(pos < get_position())
+	    {
+		if(! seen_hole
+		   || pos <= before_holes)
+		{
+		    ret = escape::skip(pos);
+		    if(ret)
+		    {
+			offset = pos;
+			mode = normal;
+			zero_count = 0;
+		    }
+		}
+		else // we need to skip to the beginning and sequentially read the data
+		{
+		    ret = escape::skip(before_holes);
+		    if(ret)
+		    {
+			offset = before_holes;
+			mode = normal;
+			zero_count = 0;
+
+			ret = skip(pos);
+			    // we replaced a backward skip
+			    // by a forward skip operation
+			    // (recursive call)
+		    }
+		}
+	    }
+	    else // forward skip needed
+	    {
+		    // sequentially reading the data up to the requested offset
+
+		if(seen_hole
+		    && pos <= before_holes)
+		{
+		    ret = escape::skip(pos);
+		    if(ret)
+		    {
+			offset = pos;
+			mode = normal;
+			zero_count = 0;
+		    }
+		}
+		else
+		{
+		    null_file dest(gf_write_only);
+		    infinint amount = pos - get_position();
+		    infinint val;
+		    if(! amount.is_zero())
+			val = generic_file::copy_to(dest, amount);
+			// else val stays equal to zero which is fine
+		    ret = (amount == val);
+		}
+	    }
+	    break;
+	case gf_read_write:
+	    throw Efeature("skip on read-write sparse-file object");
+	case gf_write_only:
+	    throw Efeature("skip on write-only sparse-file object");
+	default:
+	    throw SRC_BUG;
+	}
+
+	return ret;
+    }
+
+    bool sparse_file::skip_to_eof()
+    {
+	null_file dest(gf_write_only);
+	bool original_copy_to_mode = copy_to_no_skip;
+
+	copy_to_no_skip = false; // to get a faster operation
+	copy_to(dest);
+	copy_to_no_skip = original_copy_to_mode;
+
+	return true;
+    }
+
+    bool sparse_file::skip_relative(S_I x)
+    {
+	if(x < 0)
+	{
+	    infinint tmp = -x;
+
+	    if(tmp > get_position())
+		return false;
+	    else
+		return skip(get_position() - tmp);
+	}
+	else
+	    return skip(get_position() + x);
+    }
 
     infinint sparse_file::get_position() const
     {
@@ -287,7 +431,11 @@ namespace libdar
 				throw;
 			    }
 			    read_as_escape(false);
-			    seen_hole = true;
+			    if(!seen_hole)
+			    {
+				before_holes = offset;
+				seen_hole = true;
+			    }
 			    offset += zero_count;
 			}
 			else
@@ -493,6 +641,7 @@ namespace libdar
 	escape_read = false;
 	seen_hole = false;
 	data_escaped = false;
+	before_holes = 0;
     }
 
 
