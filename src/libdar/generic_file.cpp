@@ -252,7 +252,8 @@ namespace libdar
 
         while(wrote < size && lu > 0)
         {
-            pas = size > BUFFER_SIZE ? BUFFER_SIZE : size;
+	    lu = size - wrote; // temporarily using lu for the next line:
+            pas = lu > BUFFER_SIZE ? BUFFER_SIZE : lu;
 	    try
 	    {
 		lu = read(buffer, pas);
@@ -298,7 +299,7 @@ namespace libdar
             if(tmp == 0)
                 size.unstack(tmp);
         }
-        while(tmp > 0);
+        while(tmp > 0 && delta != 0);
 
         return wrote;
     }
