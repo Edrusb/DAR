@@ -49,7 +49,7 @@
 namespace libdar
 {
 	/// default values for set_delta_signature(true)
-    constexpr const rsync_sig_magic default_sig_magic = rsync_sig_magic::blake2;
+    constexpr const rsync_sig_magic default_sig_magic = rsync_sig_magic::rk_blake2;
 
 
     class archive; // needed to be able to use pointer on archive object.
