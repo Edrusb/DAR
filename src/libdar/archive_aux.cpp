@@ -206,7 +206,7 @@ namespace libdar
 	case rsync_sig_magic::blake2:
 	    return "blake2";
 	case rsync_sig_magic::rk_blake2:
-	    return "rk_blake2";
+	    return "rk-blake2";
 	default:
 	    throw SRC_BUG;
 	}
@@ -218,7 +218,7 @@ namespace libdar
 	    val = rsync_sig_magic::md4;
 	else if(strcasecmp(arg.c_str(), "blake2") == 0)
 	    val = rsync_sig_magic::blake2;
-	else if(strcasecmp(arg.c_str(), "rk_blake2") == 0)
+	else if(strcasecmp(arg.c_str(), "rk-blake2") == 0)
 	    val = rsync_sig_magic::rk_blake2;
 	else
 	    return false;
