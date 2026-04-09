@@ -82,7 +82,6 @@ extern "C"
 
 #define DEFAULT_CRYPTO_SIZE 10240
 
-
 using namespace std;
 using namespace libdar;
 struct pre_mask
@@ -308,7 +307,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
     p.scope = all_fsa_families();
     p.multi_threaded_crypto = 0;
     p.multi_threaded_compress = 0;
-    p.delta_sig = false;
+    p.delta_sig = rsync_sig_magic::none;
     p.delta_mask = nullptr;
     p.delta_diff = true;
     p.delta_sig_min_size = 0; //< if zero is not modified, we will used the default value from libdar
@@ -627,7 +626,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
 		dialog->message(gettext("-< and -> options are useless with -y option"));
 	    if(p.ea_name_for_exclusion != "")
 		dialog->message(gettext("-5 option is useless with -y option"));
-	    if(p.delta_sig || !p.delta_diff)
+	    if(p.delta_sig != rsync_sig_magic::none || !p.delta_diff)
 		dialog->message(gettext("-8 option is useless with -y option"));
 	    if(rec.path_delta_include_exclude.size() > 0)
 		dialog->message(gettext("-{ and -} options are useless with -y option"));
@@ -2064,7 +2063,7 @@ static bool get_args_recursive(recursive_param & rec,
 		if(optarg == nullptr)
                     throw Erange("get_args", tools_printf(gettext("Missing argument to --delta"), char(lu)));
 		if(strcasecmp(optarg, "sig") == 0)
-		    p.delta_sig = true;
+		    p.delta_sig = libdar::default_sig_magic;
 		else if(strcasecmp(optarg, "no-patch") == 0)
 		    p.delta_diff = false;
 		else if(strncasecmp(optarg,"sig:",4) == 0)
@@ -2123,10 +2122,19 @@ static bool get_args_recursive(recursive_param & rec,
 			    ++it;
 			}
 
+			    // eventually reading the hash function
+			if(it != splitted.end())
+			{
+			    if(! libdar::string_to_rsync_sig_magic(*it, p.delta_sig)
+			       || p.delta_sig == rsync_sig_magic::none)
+				throw Erange("get_args", tools_printf(gettext("Invalid hash string in delta signature specification: %s"), it->c_str()));
+			    ++it;
+			}
+			else
+			    p.delta_sig = default_sig_magic;
+
 			if(it != splitted.end())
 			    throw Erange("get_args", tools_printf(gettext(INVALID_BS_FUNC), gettext("unexpected extra argument in string")));
-
-			p.delta_sig = true;
 		    }
 		}
 		else

@@ -155,7 +155,7 @@ struct line_param
     fsa_scope scope;              ///< FSA scope to consider for the operation
     U_I multi_threaded_crypto;    ///< number of crypto worker threads (requires libthreadar)
     U_I multi_threaded_compress;  ///< number of compress worker threads (requires libthreadar and per block compression)
-    bool delta_sig;               ///< whether to calculate rsync signature of files
+    rsync_sig_magic delta_sig;    ///< whether to calculate rsync signature of files and which hash to use
     mask *delta_mask;             ///< which file to calculate delta sig when not using the default mask
     bool delta_diff;              ///< whether to save binary diff or whole file's data during a differential backup
     infinint delta_sig_min_size;  ///< size below which to never calculate delta signatures

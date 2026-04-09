@@ -375,7 +375,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    create_options.clear();
 		    if(arch)
 		    {
-			if(!param.delta_sig && !param.delta_diff)
+			if(param.delta_sig == rsync_sig_magic::none && !param.delta_diff)
 				// we may need to copy delta_sig
 				// from the archive of reference
 				// to the resulting archive so we
@@ -760,7 +760,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		if(!arch)
 		    throw Ememory("little_main");
 
-		if(!param.delta_sig)
+		if(param.delta_sig == rsync_sig_magic::none)
 		    arch->drop_all_filedescriptors(param.isolation_repair);
 
 		line_tools_crypto_split_algo_pass(param.pass,
