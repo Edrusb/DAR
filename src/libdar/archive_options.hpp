@@ -48,9 +48,11 @@
 
 namespace libdar
 {
-    class archive; // needed to be able to use pointer on archive object.
+	/// default values for set_delta_signature(true)
+    constexpr const rsync_sig_magic default_sig_magic = rsync_sig_magic::blake2;
 
-    inline void rsync_magic_check(rsync_sig_magic val);
+
+    class archive; // needed to be able to use pointer on archive object.
 
 
 	/////////////////////////////////////////////////////////
@@ -572,8 +574,11 @@ namespace libdar
 	    /// \note this requires delta signature to be present in the archive of reference
 	void set_delta_diff(bool val) { if(val && !compile_time::librsync()) throw Ecompilation("librsync"); x_delta_diff = val; };
 
-	    /// whether signature to base binary delta on the future has to be calculated and stored beside saved files
-	void set_delta_signature(bool val) { x_delta_signature = val; };
+	    ///whether binary delta signature has to be calculated and stored beside saved data and which hash algo to use to build them
+	void set_delta_signature(rsync_sig_magic sig_magic) { x_delta_signature = sig_magic; };
+
+	    /// this call is only here for API backward compatibility but should stay for long
+	void set_delta_signature(bool val) { set_delta_signature(val ? default_sig_magic : rsync_sig_magic::none); };
 
 	    /// whether to derogate to defaut delta file consideration while calculation delta signatures
 	void set_delta_mask(const mask & delta_mask);
@@ -585,9 +590,6 @@ namespace libdar
 
 	    /// block size to use to build delta signatures
 	void set_sig_block_len(delta_sig_block_size val) { val.check(); x_sig_block_len = val; };
-
-	    /// signature hash algorithm to use
-	void set_sig_magic(rsync_sig_magic sig_magic) { rsync_magic_check(sig_magic); x_sig_magic = sig_magic; };
 
 	    /// whether to automatically zeroing negative dates read from the filesystem (just warn, don't ask whether to pursue)
 	void set_auto_zeroing_neg_dates(bool val) { x_auto_zeroing_neg_dates = val; };
@@ -672,12 +674,12 @@ namespace libdar
 	U_I get_multi_threaded_crypto() const { return x_multi_threaded_crypto; };
 	U_I get_multi_threaded_compress() const { return x_multi_threaded_compress; };
 	bool get_delta_diff() const { return x_delta_diff; };
-	bool get_delta_signature() const { return x_delta_signature; };
+	bool get_delta_signature() const { return x_delta_signature != rsync_sig_magic::none; };
+	rsync_sig_magic get_sig_magic() const { return x_delta_signature; };
 	const mask & get_delta_mask() const { return *x_delta_mask; }
 	bool get_has_delta_mask_been_set() const { return has_delta_mask_been_set; };
 	const infinint & get_delta_sig_min_size() const { return x_delta_sig_min_size; };
 	delta_sig_block_size get_sig_block_len() const { return x_sig_block_len; };
-	rsync_sig_magic get_sig_magic() const { return x_sig_magic; };
 	bool get_auto_zeroing_neg_dates() const { return x_auto_zeroing_neg_dates; };
 	const std::set<std::string> & get_ignored_as_symlink() const { return x_ignored_as_symlink; };
 	modified_data_detection get_modified_data_detection() const { return x_modified_data_detection; };
@@ -745,12 +747,11 @@ namespace libdar
 	U_I x_multi_threaded_crypto;
 	U_I x_multi_threaded_compress;
 	bool x_delta_diff;
-	bool x_delta_signature;
+	rsync_sig_magic x_delta_signature;
 	mask *x_delta_mask;
 	bool has_delta_mask_been_set;
 	infinint x_delta_sig_min_size;
 	delta_sig_block_size x_sig_block_len;
-	rsync_sig_magic x_sig_magic;
 	bool x_auto_zeroing_neg_dates;
 	std::set<std::string> x_ignored_as_symlink;
 	modified_data_detection x_modified_data_detection;
@@ -902,13 +903,19 @@ namespace libdar
 	    /// how much thread libdar will use for compression (need libthreadar too and compression_block_size > 0)
 	void set_multi_threaded_compress(U_I num) { x_multi_threaded_compress = num; };
 
+	    ///whether binary delta signature has to be calculated and stored beside saved data and which hash algo to use to build them
 
-	    /// whether signature to base binary delta on, has to be transfered from the source to the isolated catalogue and sotred beside saved files inode information
-	void set_delta_signature(bool val) { x_delta_signature = val; };
+	    /// \note the provided hash is only used when computing new signature, existing one get copied and keep their original hash
+	    /// algorithm. But if rsync_sig_magic::none is provided, no new signature calculated nor transfered to the isolated catalogue
+	    /// See also set_delta_mask() below.
+	void set_delta_signature(rsync_sig_magic sig_magic) { x_delta_signature = sig_magic; };
+
+	    /// this call is only here for API backward compatibility but should stay for long
+	void set_delta_signature(bool val) { set_delta_signature(val ? default_sig_magic : rsync_sig_magic::none); };
 
 	    /// whether to derogate from the current existing binary delta signatures and drop/recalculate for file that do not have delta signatures
 
-	    /// \note if only set_delta_signature() is called, and set_delta_mask() is not called, delta signature are just transmitted to isolated catalogue from the source
+	    /// \note if only set_delta_signature(true) is called and set_delta_mask() is not called, delta signature are just transmitted to isolated catalogue from the source
 	    /// archive. File without delta sig will not have delta sig on the isolated catalog, file with delta sign will have their delta sig copied to the isolated
 	    /// catalogue. Using set_delta_mask() let dar reconsider this delta sig transfer and lead libdar to drop delta sig if file does not match the mask and have a
 	    /// delta sig, have the delta sig transfered if it match the mask and already have a delta sig, recompute the delta sig if the file has no delta sig in the source
@@ -923,9 +930,6 @@ namespace libdar
 
 	    /// block size to use to build delta signatures
 	void set_sig_block_len(delta_sig_block_size val) { val.check(); x_sig_block_len = val; };
-
-	    /// signature hash algorithm to use
-	void set_sig_magic(rsync_sig_magic sig_magic) { rsync_magic_check(sig_magic); x_sig_magic = sig_magic; };
 
 	    /// key derivation
 	void set_iteration_count(const infinint & val) { x_iteration_count = val; };
@@ -966,12 +970,12 @@ namespace libdar
 	const std::shared_ptr<entrepot> & get_entrepot() const { return x_entrepot; };
 	U_I get_multi_threaded_crypto() const { return x_multi_threaded_crypto; };
 	U_I get_multi_threaded_compress() const { return x_multi_threaded_compress; };
-	bool get_delta_signature() const { return x_delta_signature; };
+	bool get_delta_signature() const { return x_delta_signature != rsync_sig_magic::none; };
+	rsync_sig_magic get_sig_magic() const { return x_delta_signature; };
 	const mask & get_delta_mask() const { return *x_delta_mask; }
 	bool get_has_delta_mask_been_set() const { return has_delta_mask_been_set; };
 	const infinint & get_delta_sig_min_size() const { return x_delta_sig_min_size; };
 	delta_sig_block_size get_sig_block_len() const { return x_sig_block_len; };
-	rsync_sig_magic get_sig_magic() const { return x_sig_magic; };
 	const infinint & get_iteration_count() const { return x_iteration_count; };
 	hash_algo get_kdf_hash() const { return x_kdf_hash; };
 	bool get_repair_mode() const { return x_repair_mode; };
@@ -1003,12 +1007,11 @@ namespace libdar
 	std::shared_ptr<entrepot> x_entrepot;
 	U_I x_multi_threaded_crypto;
 	U_I x_multi_threaded_compress;
-	bool x_delta_signature;
+	rsync_sig_magic x_delta_signature;
 	mask *x_delta_mask;
 	bool has_delta_mask_been_set;
 	infinint x_delta_sig_min_size;
 	delta_sig_block_size x_sig_block_len;
-	rsync_sig_magic x_sig_magic;
 	infinint x_iteration_count;
 	hash_algo x_kdf_hash;
 	bool x_repair_mode;
@@ -1209,12 +1212,20 @@ namespace libdar
 	    /// how much thread libdar will use for compression (need libthreadar too and compression_block_size > 0)
 	void set_multi_threaded_compress(U_I num) { x_multi_threaded_compress = num; };
 
-	    /// whether signature to base binary delta on the future has to be calculated and stored beside saved files
-	    /// \note the default is true, which lead to preserve delta signature over merging, but not to calculate new ones
+	    ///whether binary delta signature has to be calculated and stored beside saved data and which hash algo to use to build them
+
+	    /// \note the default is to set the default hash, which lead to preserve delta signature over merging, but not to calculate new ones
 	    /// unless a mask is given to set_delta_mask() in which case signature are dropped / preserved / added in regard to
 	    /// this mask. If set_delta_signature() is false, providing a mask has no effect, no signature will be transfered nor
 	    /// calculated in the resulting merged archive.
-	void set_delta_signature(bool val) { x_delta_signature = val; };
+	    /// \note unless rsync_sig_magic::none which disable delta sig in the merged backu (all existing signature are dropped)
+	    /// the provided is only used for newly created signature. Existing signature are copied and keep the hash they have been
+	    /// built with.
+	void set_delta_signature(rsync_sig_magic sig_magic) { x_delta_signature = sig_magic; };
+
+	    /// this call is only here for API backward compatibility but should stay for long
+	void set_delta_signature(bool val) { set_delta_signature(val ? default_sig_magic : rsync_sig_magic::none); };
+
 
 	    /// whether to derogate to defaut delta file consideration while calculation delta signatures
 	void set_delta_mask(const mask & delta_mask);
@@ -1226,9 +1237,6 @@ namespace libdar
 
 	    /// block size to use to build delta signatures
 	void set_sig_block_len(delta_sig_block_size val) { val.check(); x_sig_block_len = val; };
-
-	    /// signature hash algorithm to use
-	void set_sig_magic(rsync_sig_magic sig_magic) { rsync_magic_check(sig_magic); x_sig_magic = sig_magic; };
 
 	    /// key derivation
 	void set_iteration_count(const infinint & val) { x_iteration_count = val; };
@@ -1284,12 +1292,12 @@ namespace libdar
 	const fsa_scope & get_fsa_scope() const { return x_scope; };
 	U_I get_multi_threaded_crypto() const { return x_multi_threaded_crypto; };
 	U_I get_multi_threaded_compress() const { return x_multi_threaded_compress; };
-	bool get_delta_signature() const { return x_delta_signature; };
+	bool get_delta_signature() const { return x_delta_signature != rsync_sig_magic::none; };
+	rsync_sig_magic get_sig_magic() const { return x_delta_signature; };
 	const mask & get_delta_mask() const { return *x_delta_mask; }
 	bool get_has_delta_mask_been_set() const { return has_delta_mask_been_set; };
 	const infinint & get_delta_sig_min_size() const { return x_delta_sig_min_size; };
 	delta_sig_block_size get_sig_block_len() const { return x_sig_block_len; };
-	rsync_sig_magic get_sig_magic() const { return x_sig_magic; };
 	const infinint & get_iteration_count() const { return x_iteration_count; };
 	hash_algo get_kdf_hash() const { return x_kdf_hash; };
 	bool get_never_resave_uncompressed() const { return x_never_resave_uncompressed; };
@@ -1336,12 +1344,11 @@ namespace libdar
 	fsa_scope x_scope;
 	U_I x_multi_threaded_crypto;
 	U_I x_multi_threaded_compress;
-	bool x_delta_signature;
+	rsync_sig_magic x_delta_signature;
 	mask *x_delta_mask;
 	bool has_delta_mask_been_set;
 	infinint x_delta_sig_min_size;
 	delta_sig_block_size x_sig_block_len;
-	rsync_sig_magic x_sig_magic;
 	infinint x_iteration_count;
 	hash_algo x_kdf_hash;
 	bool x_never_resave_uncompressed;
@@ -2045,12 +2052,6 @@ namespace libdar
 	void copy_from(const archive_options_repair & ref);
 	void move_from(archive_options_repair && ref) noexcept;
     };
-
-    inline void rsync_magic_check(rsync_sig_magic val)
-    {
-	if(val == rsync_sig_magic::none)
-	    throw Erange("rsync_magic_check", gettext("Invalid hash for binary delta signature"));
-    }
 
 	/// @}
 

@@ -46,7 +46,6 @@ namespace libdar
     static const crit_constant_action default_crit_action = crit_constant_action(data_preserve, EA_preserve);
     static const string default_user_comment = "N/A";
     static const U_32 default_delta_sig_min_size = 10240;
-    static const rsync_sig_magic default_sig_magic = rsync_sig_magic::blake2;
 
 	// some local helper functions
 
@@ -382,7 +381,7 @@ namespace libdar
 	    x_multi_threaded_crypto = 2;
 	    x_multi_threaded_compress = 1;
 	    x_delta_diff = true;
-	    x_delta_signature = false;
+	    x_delta_signature = rsync_sig_magic::none;
 	    has_delta_mask_been_set = false;
 	    x_delta_sig_min_size = default_delta_sig_min_size;
 	    x_auto_zeroing_neg_dates = false;
@@ -399,7 +398,6 @@ namespace libdar
 		x_iteration_count = default_iteration_count;
 	    }
 	    x_sig_block_len.reset();
-	    x_sig_magic = default_sig_magic;
 	    x_never_resave_uncompressed = false;
 	}
 	catch(...)
@@ -670,7 +668,6 @@ namespace libdar
 	x_iteration_count = ref.x_iteration_count;
 	x_kdf_hash = ref.x_kdf_hash;
 	x_sig_block_len = ref.x_sig_block_len;
-	x_sig_magic = ref.x_sig_magic;
 	x_never_resave_uncompressed = ref.x_never_resave_uncompressed;
     }
 
@@ -745,7 +742,6 @@ namespace libdar
 	x_iteration_count = std::move(ref.x_iteration_count);
 	x_kdf_hash = std::move(ref.x_kdf_hash);
 	x_sig_block_len = std::move(ref.x_sig_block_len);
-	x_sig_magic = std::move(ref.x_sig_magic);
 	x_never_resave_uncompressed = std::move(ref.x_never_resave_uncompressed);
     }
 
@@ -816,7 +812,7 @@ namespace libdar
 		throw Ememory("archive_options_isolate::clear");
 	    x_multi_threaded_crypto = 2;
 	    x_multi_threaded_compress = 1;
-	    x_delta_signature = false;
+	    x_delta_signature = rsync_sig_magic::none;
 	    archive_option_clean_mask(x_delta_mask);
 	    has_delta_mask_been_set = false;
 	    x_delta_sig_min_size = default_delta_sig_min_size;
@@ -831,7 +827,6 @@ namespace libdar
 		x_iteration_count = default_iteration_count;
 	    }
 	    x_sig_block_len.reset();
-	    x_sig_magic = default_sig_magic;
 	    x_repair_mode = false;
 	}
 	catch(...)
@@ -916,7 +911,6 @@ namespace libdar
 	has_delta_mask_been_set = ref.has_delta_mask_been_set;
 	x_delta_sig_min_size = ref.x_delta_sig_min_size;
 	x_sig_block_len = ref.x_sig_block_len;
-	x_sig_magic = ref.x_sig_magic;
 	x_iteration_count = ref.x_iteration_count;
 	x_kdf_hash = ref.x_kdf_hash;
 	x_repair_mode = ref.x_repair_mode;
@@ -958,7 +952,6 @@ namespace libdar
 	x_iteration_count = std::move(ref.x_iteration_count);
 	x_kdf_hash = std::move(ref.x_kdf_hash);
 	x_sig_block_len = std::move(ref.x_sig_block_len);
-	x_sig_magic = std::move(ref.x_sig_magic);
 	x_repair_mode = std::move(ref.x_repair_mode);
     }
 
@@ -1025,7 +1018,7 @@ namespace libdar
 	    x_scope = all_fsa_families();
 	    x_multi_threaded_crypto = 2;
 	    x_multi_threaded_compress = 1;
-	    x_delta_signature = true;
+	    x_delta_signature = default_sig_magic;
 	    has_delta_mask_been_set = false;
 	    x_delta_sig_min_size = default_delta_sig_min_size;
 	    if(compile_time::libargon2())
@@ -1039,7 +1032,6 @@ namespace libdar
 		x_iteration_count = default_iteration_count;
 	    }
 	    x_sig_block_len.reset();
-	    x_sig_magic = default_sig_magic;
 	    x_never_resave_uncompressed = false;
 	}
 	catch(...)
@@ -1262,7 +1254,6 @@ namespace libdar
 	    x_iteration_count = ref.x_iteration_count;
 	    x_kdf_hash = ref.x_kdf_hash;
 	    x_sig_block_len = ref.x_sig_block_len;
-	    x_sig_magic = ref.x_sig_magic;
 	    x_never_resave_uncompressed = ref.x_never_resave_uncompressed;
 	}
 	catch(...)
@@ -1323,7 +1314,6 @@ namespace libdar
 	x_iteration_count = std::move(ref.x_iteration_count);
 	x_kdf_hash = std::move(ref.x_kdf_hash);
 	x_sig_block_len = std::move(ref.x_sig_block_len);
-	x_sig_magic = std::move(ref.x_sig_magic);
 	x_never_resave_uncompressed = std::move(ref.x_never_resave_uncompressed);
     }
 
