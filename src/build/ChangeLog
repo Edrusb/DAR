@@ -9,6 +9,9 @@ from 2.8.x to 2.9.0
 - remove depencency on librhash as ligcrypt now provides whirlpool hash
   algorithms and we already use this library for a lot of cryptographic
   stuffs.
+- add blake2 and rabinKarp-blake2 hash algorithms to build binary delta
+  signatures (archive_options_{create|isolate|merge}::set_delta_signature()
+  overloaded methods in API and '--delta sig:...' enhancement in CLI.
 
 from 2.8.4 to 2.8.5
 - fixing bug of one hour shift in non-daylight saving months for
