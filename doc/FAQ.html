@@ -92,7 +92,7 @@
 	<a href="#tapes">How to use dar with tapes (like LTO tapes)?</a><br/>
 	<a href="#Smallfiles">Why dar does not compress small files toghether for better compression ratio?</a><br/>
 	<a href="#truncated">What to do when a backup was interrupted?</a><br/>
-
+	<a href="#onlyneededslices">How to get dar only asking for the very minimum and needed slices when restoring data?</a><br/>
       </div>
     </div>
 
@@ -362,17 +362,17 @@
       <p>
 	DAR provides seven commands:
       </p>
-      <dl>
-	<dd><code>-c</code> to create a new backup</dd>
-	<dd><code>-x</code> to extract files from a given backup</dd>
-	<dd><code>-l</code> to list the contents of a given backup</dd>
-	<dd><code>-d</code> to compare the contents of a backup with filesystem</dd>
-	<dd><code>-t</code> to test the internal coherence of a given backup</dd>
-	<dd><code>-C</code> to isolate a backup (extract its contents to a usually small file) or make a snapshot of the current filesystem</dd>
-	<dd><code>-+</code> to merge two backups in one or create a sub
-	  backup from one or two other ones</dd>
-	<dd><code>-y</code> to repair a backup</dd>
-      </dl>
+      <ul>
+	<li><code>-c</code> to create a new backup</li>
+	<li><code>-x</code> to extract files from a given backup</li>
+	<li><code>-l</code> to list the contents of a given backup</li>
+	<li><code>-d</code> to compare the contents of a backup with filesystem</li>
+	<li><code>-t</code> to test the internal coherence of a given backup</li>
+	<li><code>-C</code> to isolate a backup (extract its contents to a usually small file) or make a snapshot of the current filesystem</li>
+	<li><code>-+</code> to merge two backups in one or create a sub
+	  backup from one or two other ones</li>
+	<li><code>-y</code> to repair a backup</li>
+      </ul>
       <p>
 	For each command listed above, here follows the available options (those marked OK):
       </p>
@@ -2875,9 +2875,9 @@
 	<table class=center>
 	  <tr>
             <th>compression level<br/>for lzop</th>
-            <th>algorithm for dar</th>
+            <th>algorithm to use for dar</th>
             <th>compression level<br/>for dar</th>
-            <th>lzo algorith used</th>
+            <th>liblzo2 algorithm name</th>
 	  </tr>
 	  <tr>
             <td>1</td>
@@ -2931,7 +2931,7 @@
             <td>lzo1x_1</td>
 	  </tr>
 	  <tr>
-            <td>-<br/>
+            <td>N/A<br/>
             </td>
             <td>lzo<br/>
             </td>
@@ -2940,7 +2940,7 @@
             <td>lzo1x_999</td>
 	  </tr>
 	  <tr>
-            <td>-<br/>
+            <td>N/A<br/>
             </td>
             <td>lzo<br/>
             </td>
@@ -2949,7 +2949,7 @@
             <td>lzo1x_999</td>
 	  </tr>
 	  <tr>
-            <td>-<br/>
+            <td>N/A<br/>
             </td>
             <td>lzo<br/>
             </td>
@@ -2958,7 +2958,7 @@
             <td>lzo1x_999</td>
 	  </tr>
 	  <tr>
-            <td>-<br/>
+            <td>N/A<br/>
             </td>
             <td>lzo<br/>
             </td>
@@ -2967,7 +2967,7 @@
             <td>lzo1x_999</td>
 	  </tr>
 	  <tr>
-            <td>-<br/>
+            <td>N/A<br/>
             </td>
             <td>lzo<br/>
             </td>
@@ -2976,7 +2976,7 @@
             <td>lzo1x_999</td>
 	  </tr>
 	  <tr>
-            <td>-<br/>
+            <td>N/A<br/>
             </td>
             <td>lzo<br/>
             </td>
@@ -3685,115 +3685,183 @@
 	    gain than expected. Also look at the <a href="Notes.html#archive_structure">Dar Archive Structure</a> to
 	    see how it could fit or if not, what part should be redesigned and how.
 	  </p>
-	  </p>
 	</li>
-</ol>
+      </ol>
+      <p/>
 
-<a name="truncated"><b>What to do when a backup was interrupted?</b></a><br/>
+      <a name="truncated"><b>What to do when a backup was interrupted?</b></a><br/>
 
-<p>
-  There are different results of a backup interruption: If this was by mean of CTRL-C or
-  by a OS shutdown, there is a lot of chances dar could have the time to properly close the archive,
-  so you obtain a well structured dar backup or archive, ready for use.
-  It can then be used as reference for a differential backup to continue the backup process, and you
-  don't need to through away the interrupted archive, which saves you the time spent to get so far.
-  <br/>
-  But what if the interruption occured due to a <b>power outage</b> or <b>lack of disk space</b>?
-  This is what we will have a look at here.
-</p>
+      <p>
+	There are different results of a backup interruption: If this was by mean of CTRL-C or
+	by a OS shutdown, there is a lot of chances dar could have the time to properly close the archive,
+	so you obtain a well structured dar backup or archive, ready for use.
+	It can then be used as reference for a differential backup to continue the backup process, and you
+	don't need to through away the interrupted archive, which saves you the time spent to get so far.
+	<br/>
+	But what if the interruption occured due to a <b>power outage</b> or <b>lack of disk space</b>?
+	This is what we will have a look at here.
+      </p>
 
-<p>
-  In such condition you get a truncated archive: it is missing the table of content at its end: the so called "catalogue" (= catalog).
-  Unless you have used the <code>-at</code> option <u>which is not recommended</u> as it removes metadata redundancy in the archive, you should not have
-  to through away and restart from scratch your backup, as we can use this redundancy to rebuild the "catalogue".
-</p>
+      <p>
+	In such condition you get a truncated archive: it is missing the table of content at its end: the so called "catalogue" (= catalog).
+	Unless you have used the <code>-at</code> option <u>which is not recommended</u> as it removes metadata redundancy in the archive, you should not have
+	to through away and restart from scratch your backup, as we can use this redundancy to rebuild the "catalogue".
+      </p>
 
-<p>
-  But first just reminding you that, thanks to this metadata redundancy, the truncated archive is still usable, using the <code>--sequential-read</code> option.
-  You can thus still list its content, restore data, and so on. But of course, don't be alarmed: you will get an error at the end of
-  the operation as dar will look for a catalogue "tape mark" at the end of this operation, mark that has not been written to the archive.
-</p>
+      <p>
+	But first just reminding you that, thanks to this metadata redundancy, the truncated archive is still usable, using the <code>--sequential-read</code> option.
+	You can thus still list its content, restore data, and so on. But of course, don't be alarmed: you will get an error at the end of
+	the operation as dar will look for a catalogue "tape mark" at the end of this operation, mark that has not been written to the archive.
+      </p>
 
-<code class=block>
-  dar -t some/other/path/truncated --sequential-read [other options...]
+      <code class=block>
+	dar -t some/other/path/truncated --sequential-read [other options...]
 
-  dar -x some/other/path/truncated --sequential-read -R /where/to/restore [other options...]
+	dar -x some/other/path/truncated --sequential-read -R /where/to/restore [other options...]
 
-</code>
+      </code>
 
-<p>
-  ... but doing that way is slow as dar reads sequentially the whole backup (like what tar does on tar archives).
-  Dar cannot jump directly to the files to restore as it miss the "catalogue". Hopefully such truncated archive/backup is also repairable.
-  Repairing the backup is done this way:
-</p>
+      <p>
+	... but doing that way is slow as dar reads sequentially the whole backup (like what tar does on tar archives).
+	Dar cannot jump directly to the files to restore as it miss the "catalogue". Hopefully such truncated archive/backup is also repairable.
+	Repairing the backup is done this way:
+      </p>
 
-<code class=block>
-  dar --add-missing-catalogue some/path/repaired -A some/other/path/truncated [other options...]
+      <code class=block>
+	dar --add-missing-catalogue some/path/repaired -A some/other/path/truncated [other options...]
 
-  # and as always: test your backup!!!
-  dar -t some/path/repaired
+	# and as always: test your backup!!!
+	dar -t some/path/repaired
 
-  # now, your can are free to remove the old truncated backup... it is no more needed
-  rm some/other/path/truncated.*.dar
+	# now, your can are free to remove the old truncated backup... it is no more needed
+	rm some/other/path/truncated.*.dar
 
-</code>
+      </code>
 
-<p>
-  The repairing process does not touch the truncated archive, but creates a new "repaired" backup. If you used slicing and want to keep
-  that for the repaired backup, the 'other options' should specify it (with -s and -S options). Same thing if you want encryption.
-  Compression is kept the same so there and there is no available option to change it at repairing time.
-</p>
+      <p>
+	The repairing process does not touch the truncated archive, but creates a new "repaired" backup. If you used slicing and want to keep
+	that for the repaired backup, the 'other options' should specify it (with -s and -S options). Same thing if you want encryption.
+	Compression is kept the same so there and there is no available option to change it at repairing time.
+      </p>
 
-<p>
-  Ok the drawback is that it leads you to copy possibly a lot of data.
-</p>
+      <p>
+	Ok the drawback is that it leads you to copy possibly a lot of data.
+      </p>
 
-</p>
-<b>As an alternative</b> to the archive repairing, an isolated catalogue can be created from the truncated backup:
-</p>
+      </p>
+      <b>As an alternative</b> to the archive repairing, an isolated catalogue can be created from the truncated backup:
+      </p>
 
-<code class=block>
-  dar -C some/path/isolated_cat -A some/other/path/truncated --alter=repair [other options...]
+      <code class=block>
+	dar -C some/path/isolated_cat -A some/other/path/truncated --alter=repair [other options...]
 
-</code>
+      </code>
 
-<p>
-  Here the 'other options' are usually compression, eventually encryption. Slicing is also possible but
-  as an isolated catalogue is usually small this is rarely used in that context. The <code>--alter=repair</code>
-  (or its short version <code>-arep</code>) is mandatory here for the isolation to succeed, as the source
-  archive is truncated which would lead the operation to fail.
-  Once this is done you can now test, compare, extract the backup with the assistance
-  of this isolated catalogue:
-</p>
+      <p>
+	Here the 'other options' are usually compression, eventually encryption. Slicing is also possible but
+	as an isolated catalogue is usually small this is rarely used in that context. The <code>--alter=repair</code>
+	(or its short version <code>-arep</code>) is mandatory here for the isolation to succeed, as the source
+	archive is truncated which would lead the operation to fail.
+	Once this is done you can now test, compare, extract the backup with the assistance
+	of this isolated catalogue:
+      </p>
 
-<code class=block>
-  dar -t some/other/path/truncated -A some/path/isolated_cat -affs [other options...]
-  dar -d some/other/path/truncated -A some/path/isolated_cat -affs -R /path/to/compare/to [other options...]
-  dar -x some/other/path/truncated -A some/path/isolated_cat -affs -R /path/where/to/restore [other options...]
+      <code class=block>
+	dar -t some/other/path/truncated -A some/path/isolated_cat -affs [other options...]
+	dar -d some/other/path/truncated -A some/path/isolated_cat -affs -R /path/to/compare/to [other options...]
+	dar -x some/other/path/truncated -A some/path/isolated_cat -affs -R /path/where/to/restore [other options...]
 
-</code>
+      </code>
 
-<p>
-  Here the <code>-affs</code> option (which long version is <code>--alter=force-first-slice</code> is necessary
-  for dar not try to read the archive format version at the end of the truncated backup, but at the beginning where a copy
-  has been dropped. Then dar reads the table of content (the "catalogue") from the <code>isolated_cat</code>
-  so you can now have very quick operations when in concerns only a few files spread along the backup/archive.
-</p>
+      <p>
+	Here the <code>-affs</code> option (which long version is <code>--alter=force-first-slice</code> is necessary
+	for dar not try to read the archive format version at the end of the truncated backup, but at the beginning where a copy
+	has been dropped. Then dar reads the table of content (the "catalogue") from the <code>isolated_cat</code>
+	so you can now have very quick operations when in concerns only a few files spread along the backup/archive.
+      </p>
 
-<p>
-  Of course if you want to list the backup content or use this backup as reference for a differential backup
-  you only need the isolated catalog:
+      <p>
+	Of course if you want to list the backup content or use this backup as reference for a differential backup
+	you only need the isolated catalog:
 
-</p>
+      </p>
 
-<code class=block>
-  dar -l some/path/isolated_cat [other options...]
+      <code class=block>
+	dar -l some/path/isolated_cat [other options...]
 
-  dar -c some/new/backup -A some/path/isolated_cat -R /path/to/backup [other options...]
+	dar -c some/new/backup -A some/path/isolated_cat -R /path/to/backup [other options...]
 
-</code>
+      </code>
+
+      <br/>
 
 
-</div>
-</body>
+      <a name="onlyneededslices"><b>How to get dar only asking for the very minimum and needed slices when restoring data?</b></a><br/>
+
+      <p>
+	Dar follows different steps when reading a backup:
+      </p>
+      <ol>
+	<li>Dar reads the <b>slice header</b> of the first slice asked to properly convert from <i>slice</i> + <i>offset
+	  in slice</i> to absolute offset in the archive, which is the information used inside
+	  the <i>catalogue</i> (= table of content) to locate data, EA, and so forth. For subsequent slices
+	  requested, Dar checks the slice header coherence with what was read initially.
+	</li>
+	<li>
+	  Dar fetchs the <b>archive header/trailer</b>; it is located at the very end of the archive (and also at
+	  the very beginning of the archive, unless the -at option has been set at creation time).
+	  In the archive header, Dar finds the <b>archive format</b> which define the version to follow to read the rest of the
+	  archive. By default in direct access mode (the default mode), this header/trailer is fetched
+	  at the end of the archive. In sequential-read mode this is obviously the copy located at the
+	  very beginning of the archive that is fetched. The previous step (reading the slice
+	  header) is thus perfomed while openning the either last slice or the first slice (unless --al option is set
+	  for last-chance-recovery mode).
+	</li>
+	<li>
+	  Dar then reads the <b>catalogue</b> of the archive, located at the end of the archive,
+	  which means in the last slice only, if this one is large enough. In sequential read mode, this information
+	  is found interlaced with the data all along the archive (sort of in-line catalogue), and is read
+	  sequentially just in time.
+	</li>
+	<li>
+	  Then dar fetches the requested data and EA at the given archive offset
+	</li>
+      </ol>
+
+      <p>
+	As such providing an isolated catalogue while reading an archive in direct-mode (by mean of <b>-A option</b>)
+	removes the third step but Dar still need to fetch the <i>archive header</i> to know following which
+	<i>archive format</i> the archive is structured. Thus dar still ask the last slice to get this information.
+	But The <b>-affs option</b>, leads dar to fetch the <i>archive header</i> located instead at the beginning of the archive.
+      </p>
+
+      <p>
+	If the first slice has been chosen very small (200 bytes for example), it remove the penalty of loading
+	from tape or remote storage, other possibly very large slices when they are not directly linked with the data and EA asked to be restored.
+      </p>
+
+      <p>
+	As illustration, here is how one could create a backup and an isolated catalogue
+	(add any option that make sense, like encryption, binary delta, filtering, and so forth):
+      </p>
+
+      <code class=block>
+	dar -c backup -R /some/path -s 10G -S 200 -z
+	dar -C cat_backup -A backup -z
+
+	# this can also be performed at once:
+	dar -c backup -R /some/path -s 10G -S 200 -z --on-fly-isolate cat_backup
+      </code>
+
+      <p>
+	Then having only the <i>backup.1.dar</i> and <i>cat_backup.1.dar</i> files on local disk,
+	Dar will only request the large 10G slices that are needed to restore the requested file's
+	data, when using this syntax:
+      </p>
+
+      <code class=block>
+	dar -x backup -A cat_backup -affs -R /some/place -g some/file
+      </code>
+    </div>
+  </body>
 </html>
