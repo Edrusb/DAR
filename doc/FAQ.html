@@ -92,6 +92,7 @@
 	<a href="#tapes">How to use dar with tapes (like LTO tapes)?</a><br/>
 	<a href="#Smallfiles">Why dar does not compress small files toghether for better compression ratio?</a><br/>
 	<a href="#truncated">What to do when a backup was interrupted?</a><br/>
+	<a href="#onlyneededslices">How to get dar only asking for the very minimum and needed slices when restoring data?</a><br/>
       </div>
     </div>
 
@@ -3792,7 +3793,75 @@
 
       </code>
 
+      <br/>
 
+
+      <a name="onlyneededslices"><b>How to get dar only asking for the very minimum and needed slices when restoring data?</b></a><br/>
+
+      <p>
+	Dar follows different steps when reading a backup:
+      </p>
+      <ol>
+	<li>Dar reads the <b>slice header</b> of the first slice asked to properly convert from <i>slice</i> + <i>offset
+	  in slice</i> to absolute offset in the archive, which is the information used inside
+	  the <i>catalogue</i> (= table of content) to locate data, EA, and so forth. For subsequent slices
+	  requested, Dar checks the slice header coherence with what was read initially.
+	</li>
+	<li>
+	  Dar fetchs the <b>archive header/trailer</b>; it is located at the very end of the archive (and also at
+	  the very beginning of the archive, unless the -at option has been set at creation time).
+	  In the archive header, Dar finds the <b>archive format</b> which define the version to follow to read the rest of the
+	  archive. By default in direct access mode (the default mode), this header/trailer is fetched
+	  at the end of the archive. In sequential-read mode this is obviously the copy located at the
+	  very beginning of the archive that is fetched. The previous step (reading the slice
+	  header) is thus perfomed while openning the either last slice or the first slice (unless --al option is set
+	  for last-chance-recovery mode).
+	</li>
+	<li>
+	  Dar then reads the <b>catalogue</b> of the archive, located at the end of the archive,
+	  which means in the last slice only, if this one is large enough. In sequential read mode, this information
+	  is found interlaced with the data all along the archive (sort of in-line catalogue), and is read
+	  sequentially just in time.
+	</li>
+	<li>
+	  Then dar fetches the requested data and EA at the given archive offset
+	</li>
+      </ol>
+
+      <p>
+	As such providing an isolated catalogue while reading an archive in direct-mode (by mean of <b>-A option</b>)
+	removes the third step but Dar still need to fetch the <i>archive header</i> to know following which
+	<i>archive format</i> the archive is structured. Thus dar still ask the last slice to get this information.
+	But The <b>-affs option</b>, leads dar to fetch the <i>archive header</i> located instead at the beginning of the archive.
+      </p>
+
+      <p>
+	If the first slice has been chosen very small (200 bytes for example), it remove the penalty of loading
+	from tape or remote storage, other possibly very large slices when they are not directly linked with the data and EA asked to be restored.
+      </p>
+
+      <p>
+	As illustration, here is how one could create a backup and an isolated catalogue
+	(add any option that make sense, like encryption, binary delta, filtering, and so forth):
+      </p>
+
+      <code class=block>
+	dar -c backup -R /some/path -s 10G -S 200 -z
+	dar -C cat_backup -A backup -z
+
+	# this can also be performed at once:
+	dar -c backup -R /some/path -s 10G -S 200 -z --on-fly-isolate cat_backup
+      </code>
+
+      <p>
+	Then having only the <i>backup.1.dar</i> and <i>cat_backup.1.dar</i> files on local disk,
+	Dar will only request the large 10G slices that are needed to restore the requested file's
+	data, when using this syntax:
+      </p>
+
+      <code class=block>
+	dar -x backup -A cat_backup -affs -R /some/place -g some/file
+      </code>
     </div>
   </body>
 </html>
