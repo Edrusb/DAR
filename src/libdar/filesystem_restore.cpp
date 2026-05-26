@@ -404,7 +404,7 @@ namespace libdar
 
 			    // 7 - setting the linux immutable flag if present
 
-			if(has_fsa_saved)
+			if(has_fsa_saved && !empty)
 			{
 			    const filesystem_specific_attribute_list * fsa = x_ino->get_fsa();
 			    if(fsa == nullptr)
