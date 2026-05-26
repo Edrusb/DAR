@@ -113,7 +113,6 @@ namespace libdar
 				       base,
 				       extension,
 				       entrep,
-				       true,
 				       min_digits,
 				       false,
 				       false,

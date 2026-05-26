@@ -521,13 +521,20 @@ namespace libdar
 						  basename,
 						  extension,
 						  where,
-						  by_the_end, // not openned by the end in sequential read mode
 						  min_digits,
 						  sequential_read,
 						  lax,
 						  execute);
 		if(tmp_sar != nullptr)
+		{
+			// not openned by the end in sequential read mode
+		    if(by_the_end)
+			tmp_sar->skip_to_eof();
+		    else
+			tmp_sar->skip(0);
+
 		    sl = tmp_sar->get_slicing();
+		}
 	    }
 
 	    if(tmp == nullptr)

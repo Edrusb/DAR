@@ -64,7 +64,6 @@ namespace libdar
 	    /// the ".<slice numer>.extension" to form a filename
 	    /// \param[in] extension is the extension of slice's filenames
 	    /// \param[in] where defines where to store or where are stored slices
-	    /// \param[in] by_the_end if true dar will try to open the slice set starting from
 	    /// the last slice else it will try starting from the first
 	    /// \param[in] x_min_digits is the minimum number of digits the slices number is
 	    /// stored with in the filename
@@ -73,18 +72,10 @@ namespace libdar
 	    /// lead the operation to fail
 	    /// \param[in] execute is the command to execute before trying to open each slice
 	    /// for reading
-	    /// \note if by_the_end is set to true, the last slice must have extended slice
-	    /// header that contain informations about
-	    /// the first slice size (used starting archive format "08"), Else, the slice size
-	    /// is not possible to open as the offset
-	    /// of the data cannot be determined. If slice header is too old the sar class will
-	    /// fallback openning the first slice and
-	    /// directly get the first slice.
-        sar(const std::shared_ptr<user_interaction> & dialog,
+	sar(const std::shared_ptr<user_interaction> & dialog,
 	    const std::string & base_name,
 	    const std::string & extension,
 	    const std::shared_ptr<entrepot> & where,
-	    bool by_the_end,
 	    const infinint & x_min_digits,
 	    bool sequential_read,
 	    bool lax = false,
@@ -227,21 +218,20 @@ namespace libdar
 	bool seq_read;               ///< whether sequential read has been requested
 	thread_cancellation thr;     ///< used to know whether to ask the user or assume negative answer to allow proper archive terminatio
 
-        bool skip_forward(U_I x);                    ///< skip forward in sar global contents
-        bool skip_backward(U_I x);                   ///< skip backward in sar global contents
+	bool skip_forward(U_I x);                    ///< skip forward in sar global contents
+	bool skip_backward(U_I x);                   ///< skip backward in sar global contents
         void close_file(bool terminal);              ///< close current openned file, adding (in write mode only) a terminal mark (last slice) or not
-        void open_readonly(const std::string & fic,  ///< open file of name "fic" for read only
-			   const infinint &num,      ///< "num" is the slice number
-			   bool bytheend             ///< whether to position the read cursor at the beginning or the end of the file
+	void open_readonly(const std::string & fic,  ///< open file of name "fic" for read only
+			   const infinint &num       ///< "num" is the slice number
+
 	    );
-        void open_writeonly(const std::string & fic, ///< open file of name "filename" for write only
-			    const infinint &num,     ///< "num" is the slice number
-			    bool bytheend            ///< whether to overwrite or to append data to be written to the file
+	void open_writeonly(const std::string & fic, ///< open file of name "filename" for write only
+			    const infinint &num      ///< "num" is the slice number
 	    );
-        void open_file_init();                       ///< initialize some of_* fields
-        void open_file(infinint num, bool bytheend); ///< close current slice and open the slice 'num'
+	void open_file_init();                       ///< initialize some of_* fields
+	void open_file(infinint num); ///< close current slice and open the slice 'num'
         void set_offset(infinint offset);            ///< skip to current slice relative offset
-        void open_last_file(bool bytheend);          ///< open the last slice, ask the user, test, until last slice available
+        void open_last_file();                       ///< open the last slice, ask the user, test, until last slice available
 	bool is_current_eof_a_normal_end_of_slice() const;  ///< return true if current reading position is at end of slice
 	infinint bytes_still_to_read_in_slice() const;  ///< returns the number of bytes expected before the end of slice
         header make_write_header(const infinint &num, char flag);

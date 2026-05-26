@@ -59,7 +59,6 @@ namespace libdar
 					    basename,
 					    extension,
 					    entrep_src,
-					    false,
 					    min_digits,
 					    false,
 					    false,
