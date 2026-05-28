@@ -294,10 +294,22 @@ namespace libdar
 	if(is_terminated())
 	    throw SRC_BUG;
 
-        if(! of_current.is_zero() && get_position() == pos)
-            return true; // no need to skip
+	if(of_current.is_zero())
+	{
+		// we need to fetch the slicing information
+		// for that the only slice that we can be sure
+		// to exist is the first, so we fetch the slicing
+		// information from there.
+	    open_file(1);
+	}
+	else
+	{
+	    if(get_position() == pos)
+		return true; // no need to skip
+	}
 
 	to_read_ahead = 0;
+
 
             ///////////////////////////
             // determination of the file to go and its offset to seek in
@@ -321,7 +333,7 @@ namespace libdar
             try
             {
                 open_file(dest_file);
-                set_offset(offset);
+		set_offset(offset);
                 file_offset = offset;
                 return true;
             }
@@ -1452,7 +1464,7 @@ namespace libdar
 	    if(of_max_seen < num)
 		of_max_seen = num;
 	    file_offset = num == 1 ? slicing.first_slice_header : slicing.other_slice_header;
-	    if(num == of_current + 1 && !to_read_ahead.is_zero())
+	    if(!of_current.is_zero() && num == of_current + 1 && !to_read_ahead.is_zero())
 	    {
 		of_current = num;
 		inherited_read_ahead(to_read_ahead);
