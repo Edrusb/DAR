@@ -147,7 +147,7 @@ namespace libdar
         virtual infinint get_position() const override;
 
             // informational routines
-	const slice_layout & get_slicing() const { return slicing; };
+	const slice_layout & get_slicing() const { fetch_slicing(); return slicing; };
         bool get_total_file_number(infinint &num) const { num = of_last_file_num; return of_last_file_known; };
         bool get_last_file_size(infinint &num) const { num = of_last_file_size; return of_last_file_known; };
 
@@ -158,21 +158,21 @@ namespace libdar
 	void enable_natural_destruction() { natural_destruction = true; };
 
 	    // true if sar's header is from an old archive format (<= "07")
-	virtual bool is_an_old_start_end_archive() const override { return slicing.older_sar_than_v8; };
+	virtual bool is_an_old_start_end_archive() const override { fetch_slicing(); return slicing.older_sar_than_v8; };
 
 	    // return the internal_name used to link slices toghether
-	const label & get_internal_name_used() const { return of_internal_name; };
+	const label & get_internal_name_used() const { fetch_slicing(); return of_internal_name; };
 
 	    // return the data_name used to link slices toghether
-	virtual const label & get_data_name() const override { return of_data_name; };
+	virtual const label & get_data_name() const override { fetch_slicing(); return of_data_name; };
 
 	const std::shared_ptr<entrepot> & get_entrepot() const { return entr; };
 
 	    /// get the first slice header
-	const infinint & get_first_slice_header_size() const { return slicing.first_slice_header; };
+	const infinint & get_first_slice_header_size() const { fetch_slicing(); return slicing.first_slice_header; };
 
 	    /// get the non first slice header
-	const infinint & get_non_first_slice_header_size() const { return slicing.other_slice_header; };
+	const infinint & get_non_first_slice_header_size() const { fetch_slicing(); return slicing.other_slice_header; };
 
     protected :
 	virtual void inherited_read_ahead(const infinint & amount) override;
@@ -235,6 +235,7 @@ namespace libdar
 	bool is_current_eof_a_normal_end_of_slice() const;  ///< return true if current reading position is at end of slice
 	infinint bytes_still_to_read_in_slice() const;  ///< returns the number of bytes expected before the end of slice
         header make_write_header(const infinint &num, char flag);
+	void fetch_slicing() const;
 
             // function to lauch the eventually existing command to execute after/before each slice
         void hook_execute(const infinint &num);

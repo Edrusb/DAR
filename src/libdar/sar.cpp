@@ -1558,6 +1558,20 @@ namespace libdar
         return hh;
     }
 
+    void sar::fetch_slicing() const
+    {
+	if(of_current.is_zero())
+	{
+	    sar* me = const_cast<sar*>(this);
+	    if(me == nullptr)
+		throw SRC_BUG;
+	    else
+		me->skip(0);
+		// this will trigger the fetch of the slice
+		// header from the first slice
+	}
+    }
+
     void sar::hook_execute(const infinint &num)
     {
         if(hook != "" && natural_destruction)
