@@ -1037,6 +1037,7 @@ namespace libdar
 		    of_fd->skip_to_eof();
 		    of_fd->skip_relative(-1);
 		    of_fd->read(&end_flag, 1); // reading the last char of the slice
+		    of_fd->skip(current_pos);  // seeking back right after the slice header
 
 		    switch(end_flag)
 		    {
@@ -1058,17 +1059,14 @@ namespace libdar
 			break;
 		    }
 		}
-		else
+		else // in sequential read we must not skip backward so we cannot read the flag located at end of file
 		{
 		    h.get_set_flag() = flag_type_non_terminal;
 			// to pass the following sanity checks
 			// and be coherent (we do not know
 			// wether this is the last slice of the
-			// backup or not at this point in time
+			// backup or not at this point in time)
 		}
-
-		    // seeking back right after the slice header
-		of_fd->skip(current_pos);
 	    }
 	    else // old slice without flag at end of slice
 	    {
@@ -1375,14 +1373,6 @@ namespace libdar
 	    }
 	    throw;
 	}
-
-	of_fd->skip_to_eof();
-	    // we seek at then end of the slice
-	    // which means appending data to it,
-	    // or this is an brand-new empty slice.
-	    // if overwriting is needed, a skip()
-	    // should be issued right after this call
-	    // and before calling sar::write().
     }
 
     void sar::open_file_init()
@@ -1407,7 +1397,22 @@ namespace libdar
 	    {
 	    case gf_read_only:
 		close_file(false);
-		open_readonly(display, num);
+		try
+		{
+		    open_readonly(display, num);
+		}
+		catch(Erange & e)
+		{
+		    if(slicing.first_slice_header.is_zero() && num != 1)
+		    {
+			string tmp = e.get_message();
+			get_ui().printf(gettext("Error met while opening the last slice: %S. Trying to open the archive using the first slice..."), &tmp);
+			open_file(1);
+			open_readonly(display, num);
+		    }
+		    else // we propagate the exception
+			throw;
+		}
 		break;
 	    case gf_write_only:
 	    case gf_read_write:
