@@ -139,6 +139,31 @@ AC_CHECK_HEADERS([fcntl.h netinet/in.h arpa/inet.h stdint.h stdlib.h string.h sy
 
 AC_SYS_LARGEFILE
 
+AC_RUN_IFELSE([AC_LANG_PROGRAM(
+		[[ extern "C"
+		  {
+		  # if HAVE_SYS_TYPES_H
+		  #include <sys/types.h>
+		  #endif
+		  }
+		]],
+		[[
+		  off_t var = 0;
+
+		  if(sizeof(var) >= 8)
+		    return 0; // large file support
+		  else
+		    return 1; // no large file support
+		]])
+	      ],
+	      [
+	        local_large_file=yes
+		AC_DEFINE(LARGE_FILE_SUPPORT, 1, [large file (> 2GB) is supported by the OS and libdar])
+	      ],
+	      [
+	        local_large_file=no
+              ])
+
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_C_INLINE
@@ -2783,7 +2808,7 @@ else
 fi
 
 printf "   Large files support (> 2GB): "
-if [ ! -z "$ac_cv_sys_file_offset_bits" -o ! -z "$ac_cv_sys_large_files" ] ; then
+if [ "$local_large_file" = "yes" ] ; then
   echo "YES"
 else
   echo "NO"
