@@ -55,7 +55,7 @@ namespace libdar
 
 	bool largefile() noexcept
 	{
-#if defined( _FILE_OFFSET_BITS ) ||  defined( _LARGE_FILES )
+#ifdef LARGE_FILE_SUPPORT
 	    return true;
 #else
 	    return sizeof(off_t) > 4;
