@@ -62,7 +62,6 @@ namespace libdar
 					    min_digits,
 					    false,
 					    nullptr,
-					    0,
 					    false,
 					    execute);
 	source.reset(tmp_sar);

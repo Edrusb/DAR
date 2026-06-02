@@ -85,7 +85,6 @@ namespace libdar
 	    const infinint & x_min_digits,
 	    bool sequential_read,
 	    header* header_from_external,
-	    U_I all_slices_header_size,
 	    bool lax = false,
 	    const std::string & execute = "");
 
@@ -245,8 +244,7 @@ namespace libdar
         header make_write_header(const infinint &num, char flag);
 	void fetch_slicing() const;
 	bool check_header(header & ref,               ///< check header compatibility with other slices and record it as reference first slice opened
-			  const std::string & fic,    ///< must be either an empty string when the header is provided from an isolated catalogue or slice filename it has been fetched from
-			  U_I all_slice_header_size); ///< slice header size stored in isolated catalogue (fic != ""), ignored in other context
+			  const std::string & fic);   ///< must be either an empty string when the header is provided from an isolated catalogue or slice filename it has been fetched from
             // function to lauch the eventually existing command to execute after/before each slice
         void hook_execute(const infinint &num);
     };

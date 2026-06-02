@@ -126,7 +126,6 @@ namespace libdar
 	     const infinint & x_min_digits,
 	     bool sequential_read,
 	     header* header_from_external,
-	     U_I all_slices_header_size,
 	     bool x_lax,
 	     const string & execute) : generic_file(gf_read_only), mem_ui(dialog)
     {
@@ -153,7 +152,7 @@ namespace libdar
 	    throw SRC_BUG;
 
 	if(header_from_external != nullptr)
-	    if(! check_header(*header_from_external, "", all_slices_header_size))
+	    if(! check_header(*header_from_external, ""))
 		throw Erange("sar::sar", gettext("Invalid external slice header obtained"));
     }
 
@@ -924,7 +923,7 @@ namespace libdar
 	    if(h.is_old_header() && slicing.first_slice_header.is_zero() && num != 1)
 		throw Erange("sar::open_readonly", gettext("This is an old archive, it can only be opened starting by the first slice"));
 
-	    if(! check_header(h, fic, 0))
+	    if(! check_header(h, fic))
 		continue; // restart the while loop
 
 		// checking the flag
@@ -1491,15 +1490,20 @@ namespace libdar
 	}
     }
 
-    bool sar::check_header(header & h, const string & fic, U_I all_slices_header_size)
+    bool sar::check_header(header & h, const string & fic)
     {
 	bool external = fic.empty(); // header is not obtained while openning a slice (and of_fd might be nullptr)
+	infinint header_size;
+	bool has_header_size = h.get_common_slice_header_size(header_size);
 
 	if(external && h.is_old_header())
 	    throw Erange("sar::check_header", gettext("slice layout of an old archive stored in an isolated catalog cannot be used to avoid openning the first or last slice of the archive"));
 
-	if(external && all_slices_header_size < header::min_size())
-	    throw SRC_BUG; // when giving an external header, the all_slice_header_size should be valid
+	if(has_header_size && header_size < header::min_size())
+	    throw SRC_BUG; // invalid slice header
+
+	if(external && ! has_header_size)
+	    throw SRC_BUG; // header size should be set in header for externally provided headers
 
 	if(!external && of_fd == nullptr)
 	    throw SRC_BUG; // when not external the slice should be opened and of_fd set to it
@@ -1593,7 +1597,7 @@ namespace libdar
 		}
 
 		if(external)
-		    slicing.first_slice_header = all_slices_header_size;
+		    slicing.first_slice_header = header_size;
 		else
 		    slicing.first_slice_header = of_fd->get_position();
 		slicing.other_slice_header = h.is_old_header() ? header::min_size() : slicing.first_slice_header;

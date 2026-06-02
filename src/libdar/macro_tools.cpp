@@ -524,7 +524,6 @@ namespace libdar
 						  min_digits,
 						  sequential_read,
 						  nullptr,
-						  0,
 						  lax,
 						  execute);
 		if(tmp_sar != nullptr)
