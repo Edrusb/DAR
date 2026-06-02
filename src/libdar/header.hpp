@@ -34,6 +34,7 @@
 #include "user_interaction.hpp"
 #include "tlv_list.hpp"
 #include "label.hpp"
+#include "slice_layout.hpp"
 
 namespace libdar
 {
@@ -69,10 +70,10 @@ namespace libdar
 
         header();
         header(const header & ref) { copy_from(ref); };
-	header(header && ref) noexcept { nullifyptr(); move_from(std::move(ref)); };
-        header & operator = (const header & ref) { free_pointers(); copy_from(ref); return *this; };
+	header(header && ref) noexcept { move_from(std::move(ref)); };
+        header & operator = (const header & ref) { copy_from(ref); return *this; };
 	header & operator = (header && ref) noexcept { move_from(std::move(ref)); return *this; };
-	~header() { free_pointers(); };
+	~header() = default;
 
 	    // global methods
 
@@ -100,28 +101,24 @@ namespace libdar
 
 	bool get_first_slice_size(infinint & size) const;
 	void set_first_slice_size(const infinint & size);
-	void unset_first_slice_size() { if(first_size != nullptr) { delete first_size; first_size = nullptr; } };
+	void unset_first_slice_size() { sly.first_size = 0; };
 
 	bool get_slice_size(infinint & size) const;
 	void set_slice_size(const infinint & size);
-	void unset_slice_size() { if(slice_size != nullptr) { delete slice_size; slice_size = nullptr; } };
+	void unset_slice_size() { sly.other_size = 0; };
 
-	bool is_old_header() const { return old_header; };
-	void set_format_07_compatibility() { old_header = true; };
+	bool is_old_header() const { return sly.older_sar_than_v8; };
+	void set_format_07_compatibility() { sly.older_sar_than_v8 = true; };
 
     private:
         magic_number magic;    ///< constant string for all Dar archives
         label internal_name;   ///< constant string for all slices of a given archive (computed based on date and pid)
 	label data_name;       ///< constant string for a set of data (constant with dar_xform, used to link isolated catalogue to its original data)
         char flag;             ///< whether slice is the last of the archive or not
-        infinint *first_size;  ///< size of the first slice
-	infinint *slice_size;  ///< size of slices (except first slice if specified else and last if not fulfilled)
-	bool old_header;       ///< true if the header has been read from an old archive (before release 2.4.0, format 07 and below) and if true when writing, create an old slice header (compatible with format 07).
+	slice_layout sly;      ///< slicing information
 
-	void nullifyptr() noexcept { first_size = slice_size = nullptr; };
         void copy_from(const header & ref);
 	void move_from(header && ref) noexcept;
-	void free_pointers();
 	void fill_from(user_interaction & ui, const tlv_list & list);
 	tlv_list build_tlv_list(user_interaction & ui) const;
     };

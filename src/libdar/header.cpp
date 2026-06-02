@@ -82,9 +82,7 @@ namespace libdar
 	internal_name.clear();
 	data_name.clear();
         flag = '\0';
-	first_size = nullptr;
-	slice_size = nullptr;
-	old_header = false;
+	sly.clear();
     }
 
     void header::read(user_interaction & ui, generic_file & f, bool lax)
@@ -94,8 +92,7 @@ namespace libdar
 	char extension;
 	fichier_global *f_fic = dynamic_cast<fichier_global *>(&f);
 
-	free_pointers();
-	old_header = false;
+	sly.clear();
         if(f.read((char *)&tmp, sizeof(magic_number)) != sizeof(magic_number))
 	    throw Erange("header::read", gettext("Reached end of file while reading slice header"));
         magic = ntohl(tmp);
@@ -117,55 +114,35 @@ namespace libdar
         case extension_none:
 	    if(f_fic != nullptr)
 	    {
-		slice_size = new (nothrow) infinint(f_fic->get_size());
-		if(slice_size == nullptr)
+		sly.other_size = f_fic->get_size();
+		if(sly.other_size.is_zero())
 		{
 		    if(!lax)
-			throw Ememory("header::read");
+			throw Erange("header::read", gettext("Invalide slice size"));
 		    else
-		    {
 			ui.message(gettext("LAX MODE: slice size is not possible to read, (lack of virtual memory?), continuing anyway..."));
-			slice_size = new (nothrow) infinint(0);
-			if(slice_size == nullptr)
-			    throw Ememory("header::read");
-		    }
+
 			// this extension was used in archives before release 2.4.0
-			// when the first slice had the same size of the following ones
-			// the slice size of all slices if thus the one of the first which
-			// was learnt by getting the size of the file
-			// this works also for single sliced archives.
+			// when the first slice had the same size of the following ones.
+			// The slice size of all slices was thus the one of the first which
+			// was learnt by getting the size of the file.
+			// This works also for single sliced archives.
 		}
 	    }
-	    old_header = true;
+	    sly.older_sar_than_v8 = true;
             break;
         case extension_size:
-	    slice_size = new (nothrow) infinint(f);
-	    if(slice_size == nullptr)
-	    {
-		if(!lax)
-		    throw Ememory("header::read");
-		else
-		{
-		    ui.message(gettext("LAX MODE: slice size is not possible to read, (lack of virtual memory?), continuing anyway..."));
-		    slice_size = new (nothrow) infinint(0);
-		    if(slice_size == nullptr)
-			throw Ememory("header::read");
-		}
-	    }
+	    sly.other_size.read(f);
 	    if(f_fic != nullptr)
 	    {
-		first_size = new (nothrow) infinint(f_fic->get_size());
-		if(first_size == nullptr)
+		sly.first_size = f_fic->get_size();
+		if(sly.first_size.is_zero())
 		{
 		    if(!lax)
-			throw Ememory("header::read");
+			throw Erange("header::read", gettext("Invalide first slice size"));
 		    else
-		    {
 			ui.message(gettext("LAX MODE: first slice size is not possible to read, (lack of virtual memory?), continuing anyway..."));
-			first_size = new (nothrow) infinint(0);
-			if(first_size == nullptr)
-			    throw Ememory("header::read");
-		    }
+
 			// note: the "extension_size" extension was used in archives before release 2.4.0
 			// this option was only used in the first slice and contained the size of slices (not of the first slice)
 			// when the first slice had a different size. This way, reading the size of the current file gives
@@ -174,20 +151,16 @@ namespace libdar
 	    }
 	    else
 		if(!lax)
-		    throw Erange("header::read", gettext("Archive format older than \"08\" (release 2.4.0) cannot be read through a single pipe. It only can be read using dar_slave or normal plain file (slice)"));
+		    throw Erange("header::read", gettext("Archive format older than \"08\" (release 2.4.0) cannot be read through a single pipe. It only can be read using dar_slave or as normal plain files (slices)"));
 		else
 		    ui.message(gettext("LAX MODE: first slice size is not possible to read, continuing anyway..."));
-	    old_header = true;
+	    sly.older_sar_than_v8 = true;
             break;
 	case extension_tlv:
 	    tempo.read(f);        // read the list of TLV stored in the header
 	    fill_from(ui, tempo); // from the TLV list, set the different fields of the current header object
-	    if(slice_size == nullptr && f_fic != nullptr)
-	    {
-		slice_size = new (nothrow) infinint(f_fic->get_size());
-		if(slice_size == nullptr)
-		    throw Ememory("header::read");
-	    }
+	    if(sly.other_size.is_zero() && f_fic != nullptr)
+		sly.other_size = f_fic->get_size();
 	    break;
         default:
 	    if(!lax)
@@ -195,9 +168,7 @@ namespace libdar
 	    else
 	    {
 		ui.message(gettext("LAX MODE: Unknown data in slice header, ignoring and continuing"));
-		slice_size = new (nothrow) infinint(0);
-		if(slice_size == nullptr)
-		    throw Ememory("header::read");
+		sly.other_size = 0;
 	    }
         }
 	if(data_name.is_cleared())
@@ -213,13 +184,13 @@ namespace libdar
         f.write((char *)&tmp, sizeof(magic));
         internal_name.dump(f);
         f.write(&flag, 1);
-	if(old_header)
+	if(sly.older_sar_than_v8)
 	{
-	    if(first_size != nullptr && slice_size != nullptr && *first_size != *slice_size)
+	    if(sly.first_size != sly.other_size)
 	    {
 		tmp_ext[0] = extension_size;
 		f.write(tmp_ext, 1);
-		slice_size->dump(f);
+		sly.other_size.dump(f);
 	    }
 	    else
 	    {
@@ -236,9 +207,9 @@ namespace libdar
 
     bool header::get_first_slice_size(infinint & size) const
     {
-	if(first_size != nullptr)
+	if(! sly.first_size.is_zero())
 	{
-	    size = *first_size;
+	    size = sly.first_size;
 	    return true;
 	}
 	else
@@ -247,20 +218,14 @@ namespace libdar
 
     void header::set_first_slice_size(const infinint & size)
     {
-	if(first_size == nullptr)
-	{
-	    first_size = new (nothrow) infinint();
-	    if(first_size == nullptr)
-		throw Ememory("header::set_first_file_size");
-	}
-	*first_size = size;
+	sly.first_size = size;
     }
 
     bool header::get_slice_size(infinint & size) const
     {
-	if(slice_size != nullptr)
+	if(! sly.other_size.is_zero())
 	{
-	    size = *slice_size;
+	    size = sly.other_size;
 	    return true;
 	}
 	else
@@ -269,14 +234,7 @@ namespace libdar
 
     void header::set_slice_size(const infinint & size)
     {
-	if(slice_size == nullptr)
-	{
-	    slice_size = new (nothrow) infinint();
-	    if(slice_size == nullptr)
-		throw Ememory("header::set_slice_size");
-	}
-
-	*slice_size = size;
+	sly.other_size = size;
     }
 
 
@@ -286,34 +244,7 @@ namespace libdar
         internal_name = ref.internal_name;
  	data_name = ref.data_name;
         flag = ref.flag;
-	first_size = nullptr;
-	slice_size = nullptr;
-
-	try
-	{
-	    if(ref.first_size != nullptr)
-	    {
-		first_size = new (nothrow) infinint();
-		if(first_size == nullptr)
-		    throw Ememory("header::copy_from");
-		*first_size = *ref.first_size;
-	    }
-
-	    if(ref.slice_size != nullptr)
-	    {
-		slice_size = new (nothrow) infinint();
-		if(slice_size == nullptr)
-		    throw Ememory("header::copy_from");
-		*slice_size = *ref.slice_size;
-	    }
-
-	    old_header = ref.old_header;
-	}
-	catch(...)
-	{
-	    free_pointers();
-	    throw;
-	}
+	sly = ref.sly;
     }
 
     void header::move_from(header && ref) noexcept
@@ -322,48 +253,26 @@ namespace libdar
 	internal_name = std::move(ref.internal_name);
 	data_name = std::move(ref.data_name);
 	flag = std::move(ref.flag);
-	swap(first_size, ref.first_size);
-	swap(slice_size, ref.slice_size);
-	old_header = std::move(ref.old_header);
-    }
-
-    void header::free_pointers()
-    {
-	if(first_size != nullptr)
-	{
-	    delete first_size;
-	    first_size = nullptr;
-	}
-
-	if(slice_size != nullptr)
-	{
-	    delete slice_size;
-	    slice_size = nullptr;
-	}
+	sly = std::move(ref.sly);
     }
 
     void header::fill_from(user_interaction & ui, const tlv_list & extension)
     {
 	U_I taille = extension.size();
 
-	free_pointers();
+	sly.first_size = 0;
+	sly.other_size = 0;
 	for(U_I index = 0; index < taille; ++index)
 	{
 	    switch(extension[index].get_type())
 	    {
 	    case tlv_first_size:
-		first_size = new (nothrow) infinint();
-		if(first_size == nullptr)
-		    throw Ememory("header::fill_from");
 		extension[index].skip(0);
-		first_size->read(extension[index]);
+		sly.first_size.read(extension[index]);
 		break;
 	    case tlv_size:
-		slice_size = new (nothrow) infinint();
-		if(slice_size == nullptr)
-		    throw Ememory("header::fill_from");
 		extension[index].skip(0);
-		slice_size->read(extension[index]);
+		sly.other_size.read(extension[index]);
 		break;
 	    case tlv_data_name:
 		try
@@ -387,18 +296,18 @@ namespace libdar
 	tlv_list ret;
 	tlv tmp;
 
-	if(first_size != nullptr)
+	if(! sly.first_size.is_zero())
 	{
 	    tmp.reset();
-	    first_size->dump(tmp);
+	    sly.first_size.dump(tmp);
 	    tmp.set_type(tlv_first_size);
 	    ret.add(tmp);
 	}
 
-	if(slice_size != nullptr)
+	if(! sly.other_size.is_zero())
 	{
 	    tmp.reset();
-	    slice_size->dump(tmp);
+	    sly.other_size.dump(tmp);
 	    tmp.set_type(tlv_size);
 	    ret.add(tmp);
 	}
