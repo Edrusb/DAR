@@ -2,13 +2,12 @@ from 2.8.5 to 2.8.6
 - fixing bug met when restoring backup in dry-run mode (--empty option)
   where dar inappropriately tries to set filesystem specific attributes
   to files while they have not been restored, leading to error message.
-- Changed the way the configure script report to dar/libdar whether the
-  support for large files (>2GB) is available, this was necessary using
-  autoconf-2.72, the older method was using cached variables which has
+- Changed the way the configure script reports to dar/libdar whether the
+  support for large files (>2GB) is available. This was necessary using
+  autoconf-2.72: the older method was using cached variables which has
   been removed and that were not considered part of the official API
-  autoconf provides. This is a compile-time and informational change
-  only, this does not impact already compiled binaries nor the way dar
-  behaves.
+  autoconf provides. This change  does not impact already packaged
+  source code nor the way dar behaves (display only issue).
 
 from 2.8.4 to 2.8.5
 - fixing bug of one-hour-shift in non-daylight saving months for
