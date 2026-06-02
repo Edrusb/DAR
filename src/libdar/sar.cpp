@@ -125,6 +125,8 @@ namespace libdar
 	     const shared_ptr<entrepot> & where,
 	     const infinint & x_min_digits,
 	     bool sequential_read,
+	     header* header_from_external,
+	     U_I all_slices_header_size,
 	     bool x_lax,
 	     const string & execute) : generic_file(gf_read_only), mem_ui(dialog)
     {
@@ -149,6 +151,10 @@ namespace libdar
 
 	if(!entr)
 	    throw SRC_BUG;
+
+	if(header_from_external != nullptr)
+	    if(! check_header(*header_from_external, "", all_slices_header_size))
+		throw Erange("sar::sar", gettext("Invalid external slice header obtained"));
     }
 
     sar::sar(const shared_ptr<user_interaction> & dialog,
@@ -915,118 +921,14 @@ namespace libdar
 		    get_ui().message(tools_printf(gettext("LAX MODE: %S has a bad or corrupted header, trying to guess original values and continuing if possible"), &fic));
             }
 
-                // checking against the magic number
-                //
-            if(h.get_set_magic() != SAUV_MAGIC_NUMBER)
-            {
-		if(!lax)
-		{
-		    close_file(false);
-		    get_ui().pause(tools_printf(gettext("%S is not a valid file (wrong magic number), please provide the good file."), &fic));
-		    continue;
-		}
-		else
-		    get_ui().message(tools_printf(gettext("LAX MODE: In spite of its name, %S does not appear to be a dar slice, assuming a data corruption took place and continuing"), &fic));
-            }
-
 	    if(h.is_old_header() && slicing.first_slice_header.is_zero() && num != 1)
 		throw Erange("sar::open_readonly", gettext("This is an old archive, it can only be opened starting by the first slice"));
 
-                // checking the ownership of the set of file (= slice of the same archive or not)
-                //
-            if(slicing.first_slice_header.is_zero()) // this is the first time we open a slice for this archive, we don't even know the slices size
-            {
-                of_internal_name = h.get_set_internal_name();
-		of_data_name = h.get_set_data_name();
-                try
-                {
-		    if(!h.get_slice_size(slicing.other_size))
-		    {
-			if(!lax)
-			    throw SRC_BUG;  // slice size should be known or determined by header class
-			else
-			    slicing.other_size = 0;
-		    }
-		    if(!h.get_first_slice_size(slicing.first_size))
-			slicing.first_size = slicing.other_size;
+	    if(! check_header(h, fic, 0))
+		continue; // restart the while loop
 
-		    if(lax && (slicing.first_size.is_zero() || slicing.other_size.is_zero()))
-		    {
-			try
-			{
-			    infinint tmp_num = 0;
-			    string answ;
-
-			    get_ui().pause(gettext("LAX MODE: Due to probable data corruption, dar could not determine the correct size of slices in this archive. For recent archive, this information is duplicated in each slice, do you want to try opening another slice to get this value if present?"));
-
-			    do
-			    {
-				answ = get_ui().get_string(gettext("LAX MODE: Please provide the slice number to read: "), true);
-				try
-				{
-				    deci tmp = answ;
-				    tmp_num = tmp.computer();
-				}
-				catch(Edeci &e)
-				{
-				    get_ui().message(gettext("LAX MODE: Please provide an strictly positive integer number"));
-				    tmp_num = 0;
-				}
-			    }
-			    while(tmp_num.is_zero());
-
-			    get_ui().printf(gettext("LAX MODE: opening slice %i to read its slice header"), &tmp_num);
-			    open_file(tmp_num);
-			    get_ui().printf(gettext("LAX MODE: closing slice %i, header properly fetched"), &tmp_num);
-			    close_file(false);
-			    continue;
-			}
-			catch(Euser_abort & e)
-			{
-			    get_ui().message(gettext("LAX MODE: In spite of a the absence of a known slice size, continuing anyway"));
-			}
-		    }
-
-                    slicing.first_slice_header = of_fd->get_position();
-		    slicing.other_slice_header = h.is_old_header() ? header::min_size() : slicing.first_slice_header;
-		    if(slicing.first_slice_header >= slicing.first_size && !lax)
-		    {
-			if(! seq_read || ! slicing.first_size.is_zero() || slicing.first_size != slicing.other_size)
-			    throw Erange("sar::sar", gettext("Incoherent slice header: First slice size too small"));
-		    }
-		    if(slicing.other_slice_header >= slicing.other_size && !lax)
-		    {
-			if( ! seq_read || ! slicing.other_size.is_zero())
-			    throw Erange("sar::sar", gettext("incoherent slice header: Slice size too small"));
-		    }
-		    slicing.older_sar_than_v8 = h.is_old_header();
-                }
-                catch(Erange & e)
-                {
-                    close_file(false);
-                    get_ui().pause(tools_printf(gettext("Error opening %S : "), &fic) + e.get_message() + gettext(" . Retry ?"));
-                    continue;
-                }
-            }
-            else
-	    {
-                if(of_internal_name != h.get_set_internal_name())
-                {
-		    if(!lax)
-		    {
-			close_file(false);
-			get_ui().pause(fic + gettext(" is a slice from another backup, please provide the correct slice."));
-			continue;
-		    }
-		    else
-		    {
-			get_ui().message(gettext("LAX MODE: internal name of the slice leads dar to consider it is not member of the same archive. Assuming data corruption occurred and relying on the filename of this slice as proof of its membership to the archive"));
-		    }
-                }
-	    }
-
-                // checking the flag
-                //
+		// checking the flag
+		//
 	    if(h.get_set_flag() == flag_type_located_at_end_of_slice)
 	    {
 		infinint current_pos = of_fd->get_position();
@@ -1076,9 +978,9 @@ namespace libdar
 		    // case of this if/else test.
 	    }
 
-            switch(h.get_set_flag())
+	    switch(h.get_set_flag())
 	    {
-            case flag_type_terminal:
+	    case flag_type_terminal:
 		if(of_last_file_known)
 		{
 		    if(of_last_file_num != num)
@@ -1103,10 +1005,10 @@ namespace libdar
 		    of_last_file_num = num;
 		    of_last_file_size = of_fd->get_size();
 		}
-                break;
-            case flag_type_non_terminal:
-                break;
-            default:
+		break;
+	    case flag_type_non_terminal:
+		break;
+	    default:
 		if(!lax)
 		{
 		    close_file(false);
@@ -1141,8 +1043,8 @@ namespace libdar
 			get_ui().message(gettext("LAX MODE: Slice flag corrupted, but a slice of higher number has been seen, thus the header flag was surely not indicating this slice as the last of the archive. Continuing"));
 			h.get_set_flag() = flag_type_non_terminal;
 		    }
-            }
-            of_flag = h.get_set_flag();
+	    }
+	    of_flag = h.get_set_flag();
 	    if(lax)
 	    {
 		infinint tmp;
@@ -1587,6 +1489,166 @@ namespace libdar
 		// this will trigger the fetch of the slice
 		// header from the first slice
 	}
+    }
+
+    bool sar::check_header(header & h, const string & fic, U_I all_slices_header_size)
+    {
+	bool external = fic.empty(); // header is not obtained while openning a slice (and of_fd might be nullptr)
+
+	if(external && h.is_old_header())
+	    throw Erange("sar::check_header", gettext("slice layout of an old archive stored in an isolated catalog cannot be used to avoid openning the first or last slice of the archive"));
+
+	if(external && all_slices_header_size < header::min_size())
+	    throw SRC_BUG; // when giving an external header, the all_slice_header_size should be valid
+
+	if(!external && of_fd == nullptr)
+	    throw SRC_BUG; // when not external the slice should be opened and of_fd set to it
+
+	    // checking against the magic number
+	    //
+	if(h.get_set_magic() != SAUV_MAGIC_NUMBER)
+	{
+	    if(!lax)
+	    {
+		close_file(false);
+		if(external)
+		    throw Erange("sar::check_header", tools_printf(gettext("Invalid header from isolated catalog, try not using the help of an isolated to open this archive.")));
+		else
+		{
+		    get_ui().pause(tools_printf(gettext("%S is not a valid file (wrong magic number), please provide the good file."), &fic));
+		    return false;
+		}
+	    }
+	    else
+	    {
+		if(external)
+		    get_ui().message(tools_printf(gettext("LAX MODE: the slice header found in the isolated catalog is corrupted, ignoring it and continuing without slice information stored in the isolated catalog")));
+		else
+		    get_ui().message(tools_printf(gettext("LAX MODE: In spite of its name, %S does not appear to be a dar slice, assuming a data corruption took place and continuing"), &fic));
+	    }
+	}
+
+	    // checking the ownership of the set of file (= slice of the same archive or not)
+	    //
+	if(slicing.first_slice_header.is_zero()) // this is the first time we open a slice for this archive, we don't even know the slices size
+	{
+	    of_internal_name = h.get_set_internal_name();
+	    of_data_name = h.get_set_data_name();
+	    try
+	    {
+		if(!h.get_slice_size(slicing.other_size))
+		{
+		    if(!lax)
+			throw SRC_BUG;  // slice size should be known or determined by header class
+		    else
+			slicing.other_size = 0;
+		}
+		if(!h.get_first_slice_size(slicing.first_size))
+		    slicing.first_size = slicing.other_size;
+
+
+		if(external)
+		{
+		    if(slicing.first_size.is_zero() || slicing.other_size.is_zero())
+			throw Erange("sar::check_header", "Invalid external slice header obtained");
+		}
+		else
+		{
+		    if(lax && (slicing.first_size.is_zero() || slicing.other_size.is_zero()))
+		    {
+			try
+			{
+			    infinint tmp_num = 0;
+			    string answ;
+
+			    get_ui().pause(gettext("LAX MODE: Due to probable data corruption, dar could not determine the correct size of slices in this archive. For recent archive, this information is duplicated in each slice, do you want to try opening another slice to get this value if present?"));
+
+			    do
+			    {
+				answ = get_ui().get_string(gettext("LAX MODE: Please provide the slice number to read: "), true);
+				try
+				{
+				    deci tmp = answ;
+				    tmp_num = tmp.computer();
+				}
+				catch(Edeci &e)
+				{
+				    get_ui().message(gettext("LAX MODE: Please provide an strictly positive integer number"));
+				    tmp_num = 0;
+				}
+			    }
+			    while(tmp_num.is_zero());
+
+			    get_ui().printf(gettext("LAX MODE: opening slice %i to read its slice header"), &tmp_num);
+			    open_file(tmp_num);
+			    get_ui().printf(gettext("LAX MODE: closing slice %i, header properly fetched"), &tmp_num);
+			    close_file(false);
+			    return false;
+			}
+			catch(Euser_abort & e)
+			{
+			    get_ui().message(gettext("LAX MODE: In spite of a the absence of a known slice size, continuing anyway"));
+			}
+		    }
+		}
+
+		if(external)
+		    slicing.first_slice_header = all_slices_header_size;
+		else
+		    slicing.first_slice_header = of_fd->get_position();
+		slicing.other_slice_header = h.is_old_header() ? header::min_size() : slicing.first_slice_header;
+
+		if(slicing.first_slice_header >= slicing.first_size && !lax)
+		{
+		    if(external
+		       || ! seq_read
+		       || ! slicing.first_size.is_zero()
+		       || slicing.first_size != slicing.other_size)
+			throw Erange("sar::sar", gettext("Incoherent slice header: First slice size too small"));
+		}
+
+		if(slicing.other_slice_header >= slicing.other_size && !lax)
+		{
+		    if(external
+		       || ! seq_read
+		       || ! slicing.other_size.is_zero())
+			throw Erange("sar::sar", gettext("incoherent slice header: Slice size too small"));
+		}
+		slicing.older_sar_than_v8 = h.is_old_header();
+	    }
+	    catch(Erange & e)
+	    {
+		if(external)
+		    throw;
+		else
+		{
+		    close_file(false);
+		    get_ui().pause(tools_printf(gettext("Error opening %S : "), &fic) + e.get_message() + gettext(" . Retry ?"));
+		    return false;
+		}
+	    }
+	}
+	else // not the first time we see a slice of that archive
+	{
+	    if(external)
+		throw SRC_BUG; // external header should be the first met by the sar object
+
+	    if(of_internal_name != h.get_set_internal_name())
+	    {
+		if(!lax)
+		{
+		    close_file(false);
+		    get_ui().pause(fic + gettext(" is a slice from another backup, please provide the correct slice."));
+		    return false;
+		}
+		else
+		{
+		    get_ui().message(gettext("LAX MODE: internal name of the slice leads dar to consider it is not member of the same archive. Assuming data corruption occurred and relying on the filename of this slice as proof of its membership to the archive"));
+		}
+	    }
+	}
+
+	return true;
     }
 
     void sar::hook_execute(const infinint &num)

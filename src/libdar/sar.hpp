@@ -68,6 +68,12 @@ namespace libdar
 	    /// \param[in] x_min_digits is the minimum number of digits the slices number is
 	    /// stored with in the filename
 	    /// \param[in] sequential_read to be set to true for sequential reading
+	    /// \param[in] header_from_external, if not nullptr, use the provided slice header
+	    /// instead of the information available from the archive slices. This avoids having to read
+	    /// the first or last slice first, though all slice read should have the same slice header
+	    /// as the one provided from external (isolated catalogue)
+	    /// \param[in] all_slices_header_size common size of all header size in slices of the archive when
+	    /// an external header is provided (header_from_external != nullptr), else this parameter is ignored
 	    /// \param[in] lax if set to true will try workaround problems that would otherwise
 	    /// lead the operation to fail
 	    /// \param[in] execute is the command to execute before trying to open each slice
@@ -78,6 +84,8 @@ namespace libdar
 	    const std::shared_ptr<entrepot> & where,
 	    const infinint & x_min_digits,
 	    bool sequential_read,
+	    header* header_from_external,
+	    U_I all_slices_header_size,
 	    bool lax = false,
 	    const std::string & execute = "");
 
@@ -236,7 +244,9 @@ namespace libdar
 	infinint bytes_still_to_read_in_slice() const;  ///< returns the number of bytes expected before the end of slice
         header make_write_header(const infinint &num, char flag);
 	void fetch_slicing() const;
-
+	bool check_header(header & ref,               ///< check header compatibility with other slices and record it as reference first slice opened
+			  const std::string & fic,    ///< must be either an empty string when the header is provided from an isolated catalogue or slice filename it has been fetched from
+			  U_I all_slice_header_size); ///< slice header size stored in isolated catalogue (fic != ""), ignored in other context
             // function to lauch the eventually existing command to execute after/before each slice
         void hook_execute(const infinint &num);
     };
