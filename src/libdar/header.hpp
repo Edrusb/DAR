@@ -78,7 +78,9 @@ namespace libdar
 	    // global methods
 
         void read(user_interaction & ui, generic_file & f, bool lax = false );
-        void write(user_interaction &, generic_file & f) const;
+        void write(user_interaction &,  ///< user interaction for messages when necessary
+		   generic_file & f,    ///< where to write down the header
+		   bool with_header_size = false) const; ///< whether to also write down the slice header size info
 
 	    /// minimal size of a header in an archive
 
@@ -110,6 +112,10 @@ namespace libdar
 	bool is_old_header() const { return sly.older_sar_than_v8; };
 	void set_format_07_compatibility() { sly.older_sar_than_v8 = true; };
 
+	bool get_common_slice_header_size(infinint & size) const;
+	void set_common_slice_header_sze(const infinint & size);
+	void unset_common_slice_header_sze() { sly.other_slice_header = 0; };
+
     private:
         magic_number magic;    ///< constant string for all Dar archives
         label internal_name;   ///< constant string for all slices of a given archive (computed based on date and pid)
@@ -120,7 +126,7 @@ namespace libdar
         void copy_from(const header & ref);
 	void move_from(header && ref) noexcept;
 	void fill_from(user_interaction & ui, const tlv_list & list);
-	tlv_list build_tlv_list(user_interaction & ui) const;
+	tlv_list build_tlv_list(user_interaction & ui, bool with_header_size) const;
     };
 
 	/// @}

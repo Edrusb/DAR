@@ -68,6 +68,7 @@ namespace libdar
 	tlv_size = 1,             ///< TLV gives the size of slices (infinint)
 	tlv_first_size = 2,       ///< TLV gives the size of first slice (infinint)
 	tlv_data_name = 3,        ///< TLV gives the name of the data set
+	tlv_header_size = 4,      ///< TLV gives the common slice header size (of archive format > 07), feature introduces with archive format 12
 	tlv_reserved = 65535      ///< TLV reserved if 16 bits type space is exhausted to signal a new (larger type storage, to be implemented of course)
     };
 
@@ -173,9 +174,14 @@ namespace libdar
         }
 	if(data_name.is_cleared())
 	    data_name = internal_name;
+
+	if(sly.other_slice_header.is_zero())
+	    sly.other_slice_header = f.get_position();
     }
 
-    void header::write(user_interaction & ui, generic_file & f) const
+    void header::write(user_interaction & ui,
+		       generic_file & f,
+		       bool with_header_size) const
     {
         magic_number tmp;
 	char tmp_ext[] = { extension_tlv, '\0' };
@@ -201,7 +207,7 @@ namespace libdar
 	else
 	{
 	    f.write(tmp_ext, 1); // since release 2.4.0, tlv is always used to store optional information
-	    build_tlv_list(ui).dump(f);
+	    build_tlv_list(ui, with_header_size).dump(f);
 	}
     }
 
@@ -237,6 +243,31 @@ namespace libdar
 	sly.other_size = size;
     }
 
+
+    bool header::get_common_slice_header_size(infinint & size) const
+    {
+	if(sly.older_sar_than_v8)
+	    return false;
+
+	if(sly.other_slice_header.is_zero())
+	    return false;
+	else
+	{
+	    size = sly.other_slice_header;
+	    return true;
+	}
+    }
+
+    void header::set_common_slice_header_sze(const infinint & size)
+    {
+	if(sly.older_sar_than_v8)
+	    throw SRC_BUG;
+	    // archive format 07 and older may have
+	    // different header size between first and
+	    // other slices
+
+	sly.other_slice_header = size;
+    }
 
     void header::copy_from(const header & ref)
     {
@@ -291,7 +322,7 @@ namespace libdar
 	}
     }
 
-    tlv_list header::build_tlv_list(user_interaction & ui) const
+    tlv_list header::build_tlv_list(user_interaction & ui, bool with_header_size) const
     {
 	tlv_list ret;
 	tlv tmp;
@@ -309,6 +340,14 @@ namespace libdar
 	    tmp.reset();
 	    sly.other_size.dump(tmp);
 	    tmp.set_type(tlv_size);
+	    ret.add(tmp);
+	}
+
+	if(with_header_size && ! sly.other_slice_header.is_zero() && ! sly.older_sar_than_v8)
+	{
+	    tmp.reset();
+	    sly.other_slice_header.dump(tmp);
+	    tmp.set_type(tlv_header_size);
 	    ret.add(tmp);
 	}
 
