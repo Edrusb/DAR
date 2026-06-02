@@ -98,6 +98,7 @@ namespace libdar
 	    infinint second_terminateur_offset = 0;
 	    infinint ref_second_terminateur_offset = 0;
 	    header_version ref_ver;
+	    pile ref_stack;
 	    pile_descriptor pdesc;
 	    list<signator> tmp1_signatories;
 	    list<signator> tmp2_signatories;
@@ -108,48 +109,9 @@ namespace libdar
 
 	    try
 	    {
-		if(info_details)
-		    dialog->printf(gettext("Opening archive %s ..."), basename.c_str());
-
-		    // we open the main archive to get the different layers (level1, scram and level2).
-		macro_tools_open_archive(get_pointer(),
-					 where,
-					 basename,
-					 options.get_slice_min_digits(),
-					 extension,
-					 options.get_crypto_algo(),
-					 live_pass,
-					 live_crypto_bs,
-					 stack,
-					 ver,
-					 options.get_input_pipe(),
-					 options.get_output_pipe(),
-					 options.get_execute(),
-					 second_terminateur_offset,
-					 options.get_lax(),
-					 options.is_external_catalogue_set(),
-					 options.get_sequential_read(),
-					 options.get_info_details(),
-					 gnupg_signed,
-					 slices,
-					 options.get_multi_threaded_crypto(),
-					 options.get_multi_threaded_compress(),
-					 options.get_header_only(),
-					 options.get_silent(),
-					 options.get_force_first_slice());
-
-		if(options.get_header_only())
-		{
-		    ver.display(get_ui());
-		    throw Erange("archive::i_archive::achive",
-				 gettext("header only mode asked"));
-		}
-
-		pdesc = pile_descriptor(&stack);
 
 		if(options.is_external_catalogue_set())
 		{
-		    pile ref_stack;
 		    shared_ptr<entrepot> ref_where = options.get_ref_entrepot();
 		    if(ref_where == nullptr)
 			throw Ememory("archive::i_archive::archive");
@@ -225,6 +187,49 @@ namespace libdar
 			throw;
 		    }
 		    ref_where.reset();
+		}
+
+		if(info_details)
+		    dialog->printf(gettext("Opening archive %s ..."), basename.c_str());
+
+		    // we open the main archive to get the different layers (level1, scram and level2).
+		macro_tools_open_archive(get_pointer(),
+					 where,
+					 basename,
+					 options.get_slice_min_digits(),
+					 extension,
+					 options.get_crypto_algo(),
+					 live_pass,
+					 live_crypto_bs,
+					 stack,
+					 ver,
+					 options.get_input_pipe(),
+					 options.get_output_pipe(),
+					 options.get_execute(),
+					 second_terminateur_offset,
+					 options.get_lax(),
+					 options.is_external_catalogue_set(),
+					 options.get_sequential_read(),
+					 options.get_info_details(),
+					 gnupg_signed,
+					 slices,
+					 options.get_multi_threaded_crypto(),
+					 options.get_multi_threaded_compress(),
+					 options.get_header_only(),
+					 options.get_silent(),
+					 options.get_force_first_slice());
+
+		if(options.get_header_only())
+		{
+		    ver.display(get_ui());
+		    throw Erange("archive::i_archive::achive",
+				 gettext("header only mode asked"));
+		}
+
+		pdesc = pile_descriptor(&stack);
+
+		if(options.is_external_catalogue_set())
+		{
 
 			// fetching the catalogue in the archive of reference, making it pointing on the main archive layers.
 
