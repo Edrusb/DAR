@@ -77,15 +77,6 @@ namespace libdar
 	/******************* HEADER datastructure ********************/
 	/*************************************************************/
 
-    header::header()
-    {
-        magic = 0;
-	internal_name.clear();
-	data_name.clear();
-        flag = '\0';
-	sly.clear();
-    }
-
     void header::read(user_interaction & ui, generic_file & f, bool lax)
     {
         magic_number tmp;
@@ -211,6 +202,15 @@ namespace libdar
 	}
     }
 
+    void header::clear()
+    {
+	magic = 0;
+	internal_name.clear();
+	data_name.clear();
+	flag = '\0';
+	sly.clear();
+    }
+
     bool header::get_first_slice_size(infinint & size) const
     {
 	if(! sly.first_size.is_zero())
@@ -258,7 +258,7 @@ namespace libdar
 	}
     }
 
-    void header::set_common_slice_header_sze(const infinint & size)
+    void header::set_common_slice_header_size(const infinint & size)
     {
 	if(sly.older_sar_than_v8)
 	    throw SRC_BUG;

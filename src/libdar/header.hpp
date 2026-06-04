@@ -68,7 +68,7 @@ namespace libdar
     public:
 	    // constructors & Co.
 
-        header();
+        header() { clear(); };
         header(const header & ref) { copy_from(ref); };
 	header(header && ref) noexcept { move_from(std::move(ref)); };
         header & operator = (const header & ref) { copy_from(ref); return *this; };
@@ -81,6 +81,10 @@ namespace libdar
         void write(user_interaction &,  ///< user interaction for messages when necessary
 		   generic_file & f,    ///< where to write down the header
 		   bool with_header_size = false) const; ///< whether to also write down the slice header size info
+
+
+	    /// resets the object
+	void clear();
 
 	    /// minimal size of a header in an archive
 
@@ -113,7 +117,7 @@ namespace libdar
 	void set_format_07_compatibility() { sly.older_sar_than_v8 = true; };
 
 	bool get_common_slice_header_size(infinint & size) const;
-	void set_common_slice_header_sze(const infinint & size);
+	void set_common_slice_header_size(const infinint & size);
 	void unset_common_slice_header_sze() { sly.other_slice_header = 0; };
 
 	bool get_first_slice_header_size(infinint & size) const;
