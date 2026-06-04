@@ -116,6 +116,10 @@ namespace libdar
 	void set_common_slice_header_sze(const infinint & size);
 	void unset_common_slice_header_sze() { sly.other_slice_header = 0; };
 
+	bool get_first_slice_header_size(infinint & size) const;
+	void set_first_slice_header_size(const infinint & size);
+	void unset_first_slice_header_size() { sly.first_slice_header = 0; };
+
     private:
         magic_number magic;    ///< constant string for all Dar archives
         label internal_name;   ///< constant string for all slices of a given archive (computed based on date and pid)

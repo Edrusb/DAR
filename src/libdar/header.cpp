@@ -269,6 +269,32 @@ namespace libdar
 	sly.other_slice_header = size;
     }
 
+    bool header::get_first_slice_header_size(infinint & size) const
+    {
+	if(sly.older_sar_than_v8)
+	    return false;
+
+	if(sly.first_slice_header.is_zero())
+	    return false;
+	else
+	{
+	    size = sly.first_slice_header;
+	    return true;
+	}
+    }
+
+    void header::set_first_slice_header_size(const infinint & size)
+    {
+	if(sly.older_sar_than_v8)
+	    throw SRC_BUG;
+	    // archive format 07 and older may have
+	    // different header size between first and
+	    // other slices
+
+	sly.first_slice_header = size;
+    }
+
+
     void header::copy_from(const header & ref)
     {
         magic = ref.magic;
