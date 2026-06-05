@@ -42,10 +42,18 @@ namespace libdar
 	/// bit in the future. This last bit (0x01) has been reserved to flag that the
 	/// bit field had a extra byte to take into account. By extension, the 0x0100 bit
 	/// has been reserved to scale beyond 2 bytes or 14 different possible bits.
-	/// In consequence, you cannot set or unset a bitfield having one of its byte
-	/// with its least significant bit set (0x01, 0x0100, 0x1000,...).
+	/// In consequence, you cannot set or unset a bitfield having its byte most
+	/// significant byte set to 0x01 and the others equal to zero (0x01, 0x0100, 0x010000,...).
 	/// the use a meaning of each bit is left outside of this class to ease this
 	/// class reuse in other context if the need arises in the future.
+
+	/// \note on implementation. This class holds a bitfield
+	/// for each byte, the less significant bit is is reserved and cannot be used
+	/// by the user. When writing down this bit field (little endian order), all bytes
+	/// except the last get their 0x01 bit set. When reading the bytes string
+	/// byte after byte, the reading stops after the read byte has not the 0x01 bit
+	/// set.
+
     class header_flags
     {
     public:
