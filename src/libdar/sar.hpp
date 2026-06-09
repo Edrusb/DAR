@@ -84,7 +84,7 @@ namespace libdar
 	    const std::shared_ptr<entrepot> & where,
 	    const infinint & x_min_digits,
 	    bool sequential_read,
-	    header* header_from_external,
+	    const header* header_from_external,
 	    bool lax = false,
 	    const std::string & execute = "");
 
@@ -154,7 +154,7 @@ namespace libdar
         virtual infinint get_position() const override;
 
             // informational routines
-	const slice_layout & get_slicing() const { fetch_slicing(); return slicing; };
+	const slice_layout & get_slicing() const { fetch_slicing(); return slicing.get_slice_layout(); };
         bool get_total_file_number(infinint &num) const { num = of_last_file_num; return of_last_file_known; };
         bool get_last_file_size(infinint &num) const { num = of_last_file_size; return of_last_file_known; };
 
@@ -165,21 +165,24 @@ namespace libdar
 	void enable_natural_destruction() { natural_destruction = true; };
 
 	    // true if sar's header is from an old archive format (<= "07")
-	virtual bool is_an_old_start_end_archive() const override { fetch_slicing(); return slicing.older_sar_than_v8; };
+	virtual bool is_an_old_start_end_archive() const override { fetch_slicing(); return slicing.is_old_header(); };
 
 	    // return the internal_name used to link slices toghether
-	const label & get_internal_name_used() const { fetch_slicing(); return of_internal_name; };
+	const label & get_internal_name_used() const { fetch_slicing(); return slicing.get_internal_name(); };
 
 	    // return the data_name used to link slices toghether
-	virtual const label & get_data_name() const override { fetch_slicing(); return of_data_name; };
+	virtual const label & get_data_name() const override { fetch_slicing(); return slicing.get_data_name(); };
 
 	const std::shared_ptr<entrepot> & get_entrepot() const { return entr; };
 
 	    /// get the first slice header
-	const infinint & get_first_slice_header_size() const { fetch_slicing(); return slicing.first_slice_header; };
+	const infinint & get_first_slice_header_size() const { fetch_slicing(); return slicing.get_first_slice_header_size(); };
 
 	    /// get the non first slice header
-	const infinint & get_non_first_slice_header_size() const { fetch_slicing(); return slicing.other_slice_header; };
+	const infinint & get_non_first_slice_header_size() const { fetch_slicing(); return slicing.get_common_slice_header_size(); };
+
+	    /// get a reference to the slice header
+	const header & get_slice_header() const { return slicing; };
 
     protected :
 	virtual void inherited_read_ahead(const infinint & amount) override;
@@ -195,7 +198,7 @@ namespace libdar
         std::string base;            ///< archive base name
 	std::string ext;             ///< archive extension
         std::string hook;            ///< command line to execute between slices
-	slice_layout slicing;        ///< slice layout
+	header slicing;              ///< slice layout
         infinint file_offset;        ///< current reading/writing position in the current slice (relative to the whole slice file, including headers)
 	hash_algo hash;              ///< whether to build a hashing when creating slices, and if so, which algorithm to use
 	infinint min_digits;         ///< minimum number of digits the slices number is stored with in the filename
@@ -208,12 +211,9 @@ namespace libdar
         bool of_last_file_known;     ///< whether the T terminal slice has been met
         infinint of_last_file_num;   ///< number of the last slice (if met)
         infinint of_last_file_size;  ///< size of the last slice (if met)
-        label of_internal_name;      ///< internal name shared in all slice header
-	label of_data_name;          ///< internal name linked to data (transparent to dar_xform and used by isolated catalogue as reference)
 	bool force_perm;             ///< true if any future slice has its permission to be set explicitely
 	U_I perm;                    ///< if force_perm is true, value to use for slice permission
         fichier_global *of_fd;       ///< file object currently openned
-        char of_flag;                ///< flags of the open file
         bool initial;                ///< do not launch hook command-line during sar initialization
             // these are the option flags
         bool opt_warn_overwrite;     ///<  a warning must be issued before overwriting a slice
@@ -243,7 +243,7 @@ namespace libdar
 	infinint bytes_still_to_read_in_slice() const;  ///< returns the number of bytes expected before the end of slice
         header make_write_header(const infinint &num, char flag);
 	void fetch_slicing() const;
-	bool check_header(header & ref,               ///< check header compatibility with other slices and record it as reference first slice opened
+	bool check_header(const header & ref,         ///< check header compatibility with other slices and record it as reference first slice opened
 			  const std::string & fic);   ///< must be either an empty string when the header is provided from an isolated catalogue or slice filename it has been fetched from
             // function to lauch the eventually existing command to execute after/before each slice
         void hook_execute(const infinint &num);
