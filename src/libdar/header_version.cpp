@@ -45,18 +45,26 @@ namespace libdar
     	    // FLAG VALUES
 
 	    // flags of the historical bytes (oldest), read/wrote last (or alone if no extra bits are set)
-    static constexpr U_I FLAG_SAVED_EA_ROOT = 0x80;       ///< no more used since version "05"
-    static constexpr U_I FLAG_SAVED_EA_USER = 0x40;       ///< no more used since version "05"
-    static constexpr U_I FLAG_SCRAMBLED     = 0x20;       ///< scrambled or strong encryption used
-    static constexpr U_I FLAG_SEQUENCE_MARK = 0x10;       ///< escape sequence marks present for sequential reading
-    static constexpr U_I FLAG_INITIAL_OFFSET = 0x08;      ///< whether the header contains the initial offset (size of clear data before encrypted)
+    static constexpr U_I FLAG_SAVED_EA_ROOT   = 0x80;     ///< no more used since version "05"
+    static constexpr U_I FLAG_SAVED_EA_USER   = 0x40;     ///< no more used since version "05"
+    static constexpr U_I FLAG_SCRAMBLED       = 0x20;     ///< scrambled or strong encryption used
+    static constexpr U_I FLAG_SEQUENCE_MARK   = 0x10;     ///< escape sequence marks present for sequential reading
+    static constexpr U_I FLAG_INITIAL_OFFSET  = 0x08;     ///< whether the header contains the initial offset (size of clear data before encrypted)
     static constexpr U_I FLAG_HAS_CRYPTED_KEY = 0x04;     ///< the header contains a symmetrical key encrypted with asymmetrical algorithm
     static constexpr U_I FLAG_HAS_REF_SLICING = 0x02;     ///< the header contains the slicing information of the archive of reference (used for isolated catalogue)
-    static constexpr U_I FLAG_IS_RESERVED_1 = 0x01;       ///< this flag is reserved meaning two bytes length bitfield
-    static constexpr U_I FLAG_IS_RESERVED_2 = 0x0100;     ///< reserved for future use
-    static constexpr U_I FLAG_ARCHIVE_IS_SIGNED = 0x0200; ///< archive is signed
-    static constexpr U_I FLAG_HAS_KDF_PARAM = 0x0400;     ///< archive header contains salt and non default interaction count
+    static constexpr U_I FLAG_IS_RESERVED_1   = 0x01;     ///< this flag is reserved meaning two bytes length bitfield (see class header_flags)
+
+    static constexpr U_I FLAG_HAS_REF_HEADER  = 0x8000;   ///< whether the header contains ref slice header (extends/replace REF_SLICING option starting format 12)
+	// 0x4000
+	// 0X2000
+	// 0x1000
     static constexpr U_I FLAG_HAS_COMPRESS_BS = 0x0800;   ///< archive header contains a compression block size (else it is assumed equal to zero)
+    static constexpr U_I FLAG_HAS_KDF_PARAM   = 0x0400;   ///< archive header contains salt and non default interaction count
+    static constexpr U_I FLAG_ARCHIVE_IS_SIGNED = 0x0200; ///< archive is signed
+    static constexpr U_I FLAG_IS_RESERVED_2   = 0x0100;   ///< reserved for extension see class header_flags
+
+    static constexpr U_I FLAG_IS_RESERVED_3   = 0x010000; ///< reserved for extension see class header_flags
+
 	// when adding a new flag, all_flags_known() must be updated to pass sanity checks
 
     static const U_I HEADER_CRC_SIZE = 2; ///< CRC width (deprecated, now only used when reading old archives)
@@ -67,21 +75,9 @@ namespace libdar
 	//
 
 
-    header_version::header_version()
+    header_version::header_version(): crypted_key(nullptr)
     {
-	algo_zip = compression::none;
-	cmd_line = "";
-	initial_offset = 0;
-	sym = crypto_algo::none;
-	crypted_key = nullptr;
-	ref_layout = nullptr;
-	ciphered = false;
-	arch_signed = false;
-	iteration_count = PRE_FORMAT_10_ITERATION;
-	kdf_hash = hash_algo::sha1; // used by default
-	salt = "";
-	compr_bs = 0;
-	has_kdf_params = false;
+	clear();
     }
 
     void header_version::read(generic_file & f, user_interaction & dialog, bool lax_mode)
@@ -274,29 +270,58 @@ namespace libdar
 		throw Erange("header_version::read", gettext("Missing data for encrypted symmetrical key"));
 	}
 
-	if(flag.is_set(FLAG_HAS_REF_SLICING))
+	if(flag.is_set(FLAG_HAS_REF_SLICING) || flag.is_set(FLAG_HAS_REF_HEADER))
 	{
+	    if(flag.is_set(FLAG_HAS_REF_HEADER) && flag.is_set(FLAG_HAS_REF_SLICING))
+		throw Erange("header_version::read", gettext("Conflicting slice-layout and slice-header flags in header/trailer version, probable data corruption occured"));
+
 	    try
 	    {
-		if(ref_layout == nullptr)
-		    ref_layout = new (nothrow) slice_layout();
-		if(ref_layout == nullptr)
-		    throw Ememory("header_version::read");
-		ref_layout->read(f);
+		if(!ref_header)
+		{
+		    ref_header.reset(new (nothrow) header());
+		    if(!ref_header)
+			throw Ememory("header_version::read");
+		}
+		ref_header->clear();
+
+		if(flag.is_set(FLAG_HAS_REF_SLICING))
+		{
+		    slice_layout layout;
+
+		    layout.read(f);
+		    only_slice_layout = true;
+
+		    ref_header->set_first_slice_size(layout.first_size);
+		    ref_header->set_slice_size(layout.other_size);
+		    ref_header->set_first_slice_header_size(layout.first_slice_header);
+		    ref_header->set_common_slice_header_size(layout.other_slice_header);
+		    if(layout.older_sar_than_v8)
+			ref_header->set_format_07_compatibility();
+		}
+		else // REF_HEADER
+		{
+		    ref_header->read(dialog, f, lax_mode);
+		    only_slice_layout = false;
+		}
 	    }
 	    catch(Egeneric & e)
 	    {
 		if(lax_mode)
 		{
 		    dialog.message(gettext("Error met while reading archive of reference slicing layout, ignoring this field and continuing"));
-		    clear_slice_layout();
+		    ref_header.reset();
+		    only_slice_layout = false;
 		}
 		else
 		    throw;
 	    }
 	}
 	else
-	    clear_slice_layout();
+	{
+	    ref_header.reset();
+	    only_slice_layout = false;
+	}
 
 	arch_signed = flag.is_set(FLAG_ARCHIVE_IS_SIGNED);
 
@@ -443,7 +468,7 @@ namespace libdar
 	    delete ctrl;
     }
 
-    void header_version::write(generic_file &f) const
+    void header_version::write(generic_file &f, user_interaction & dialog) const
     {
 	crc *ctrl = nullptr;
 	char tmp;
@@ -457,8 +482,8 @@ namespace libdar
 	if(crypted_key != nullptr)
 	    flag.set_bits(FLAG_HAS_CRYPTED_KEY);
 
-	if(ref_layout != nullptr)
-	    flag.set_bits(FLAG_HAS_REF_SLICING);
+	if(ref_header)
+	    flag.set_bits(FLAG_HAS_REF_HEADER);
 
 	if(has_tape_marks)
 	    flag.set_bits(FLAG_SEQUENCE_MARK);
@@ -506,8 +531,25 @@ namespace libdar
 	    crypted_key->copy_to(f);
 	}
 
-	if(ref_layout != nullptr)
-	    ref_layout->write(f);
+	if(ref_header)
+	{
+	    if(only_slice_layout)
+		throw SRC_BUG;
+		// object read from an archive
+		// and having slice_layout should
+		// not have to be written back to
+		// a new archive.
+	    ref_header->write(dialog, f, true);
+		// we write down the slice header too
+		// as this is not at the location of a slice
+		// header but inside the archive trailer/header
+		// of an archive which reference has this
+		// slice header. This way, it will be
+		// able to feed it to the sar layer to
+		// be able to properly locate slice of a particular
+		// offset without having first to open the
+		// first or the last slice
+	}
 
 	if(salt.size() > 0)
 	{
@@ -565,6 +607,17 @@ namespace libdar
 	    return gettext("none");
     }
 
+    const header *header_version::get_slice_header() const
+    {
+	if(only_slice_layout)
+	    return nullptr;
+	else
+	    if(ref_header)
+		return ref_header.get();
+	    else
+		return nullptr;
+    }
+
     void header_version::display(user_interaction & dialog) const
     {
 	string algo = compression2string(get_compression_algo());
@@ -598,10 +651,13 @@ namespace libdar
 	initial_offset = 0;
 	sym = crypto_algo::none;
 	clear_crypted_key();
-	clear_slice_layout();
+	ref_header.reset();
+	only_slice_layout = false;
 	has_tape_marks = false;
 	ciphered = false;
 	arch_signed = false;
+	has_kdf_params = false;
+	salt = "";
 	iteration_count = PRE_FORMAT_10_ITERATION;
 	kdf_hash = hash_algo::sha1;
 	compr_bs = 0;
@@ -622,14 +678,19 @@ namespace libdar
 	}
 	else
 	    crypted_key = nullptr;
-	if(ref.ref_layout != nullptr)
+
+	if(ref.ref_header)
 	{
-	    ref_layout = new (nothrow) slice_layout(*ref.ref_layout);
-	    if(ref_layout == nullptr)
+	    header* tmp = new (nothrow) header(*ref_header);
+	    if(tmp == nullptr)
 		throw Ememory("header_version::copy_from");
+	    else
+		ref_header.reset(tmp);
 	}
 	else
-	    ref_layout = nullptr;
+	    ref_header.reset();
+
+	only_slice_layout = ref.only_slice_layout;
 	has_tape_marks = ref.has_tape_marks;
 	ciphered = ref.ciphered;
 	arch_signed = ref.arch_signed;
@@ -648,7 +709,8 @@ namespace libdar
 	initial_offset = std::move(ref.initial_offset);
 	sym = std::move(ref.sym);
 	swap(crypted_key, ref.crypted_key);
-	swap(ref_layout, ref.ref_layout);
+	ref_header = std::move(ref.ref_header);
+	only_slice_layout = std::move(ref.only_slice_layout);
 	has_tape_marks = std::move(ref.has_tape_marks);
 	ciphered = std::move(ref.ciphered);
 	arch_signed = std::move(ref.arch_signed);
@@ -662,7 +724,7 @@ namespace libdar
     void header_version::detruit()
     {
 	clear_crypted_key();
-	clear_slice_layout();
+	ref_header.reset();
     }
 
     static bool all_flags_known(header_flags flag)
@@ -679,6 +741,7 @@ namespace libdar
 	bf |= FLAG_ARCHIVE_IS_SIGNED;
 	bf |= FLAG_HAS_KDF_PARAM;
 	bf |= FLAG_HAS_COMPRESS_BS;
+	bf |= FLAG_HAS_REF_HEADER;
 	flag.unset_bits(bf);
 
 	return flag.is_all_cleared();

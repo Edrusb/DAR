@@ -26,6 +26,8 @@
 #ifndef HEADER_VERSION_HPP
 #define HEADER_VERSION_HPP
 
+#include <memory>
+
 #include "../my_config.h"
 #include "infinint.hpp"
 #include "generic_file.hpp"
@@ -36,6 +38,7 @@
 #include "user_interaction.hpp"
 #include "memory_file.hpp"
 #include "archive_aux.hpp"
+#include "header.hpp"
 
 namespace libdar
 {
@@ -58,7 +61,7 @@ namespace libdar
         void read(generic_file &f, user_interaction & dialog, bool lax_mode);
 
 	    /// write down the object to the archive (as header if wrote at the beginning of the archive, as trailer is at the end)
-        void write(generic_file &f) const;
+        void write(generic_file &f, user_interaction & dialog) const;
 
 	    // settings
 
@@ -72,9 +75,12 @@ namespace libdar
 	void set_crypted_key(memory_file *key) { if(key == nullptr) throw SRC_BUG; clear_crypted_key(); crypted_key = key; };
 	void clear_crypted_key() { if(crypted_key != nullptr) { delete crypted_key; crypted_key = nullptr; } };
 
-	    /// the object pointed to by layout is passed under the responsibility of this header_version object
-	void set_slice_layout(slice_layout *layout) { if(layout == nullptr) throw SRC_BUG; clear_slice_layout(); ref_layout = layout; };
-	void clear_slice_layout() { if(ref_layout != nullptr) { delete ref_layout; ref_layout = nullptr; } };
+	    /// the provided header object will be stored dump with the header version
+
+	    /// \note it is used to record the archive format and slicing layout of the archive of reference when it is present
+	    /// \note this replaces and extends the set_slice_layout() as a slice layout is embedded in a header object
+	void set_slice_header(std::unique_ptr<header> & ptr) { ref_header = std::move(ptr); only_slice_layout = false; };
+	void clear_slice_header() { ref_header.reset(); };
 
 	void set_tape_marks(bool presence) { has_tape_marks = presence; };
 	void set_signed(bool is_signed) { arch_signed = is_signed; };
@@ -99,7 +105,7 @@ namespace libdar
 	std::string get_sym_crypto_name() const;
 	std::string get_asym_crypto_name() const;
 	memory_file *get_crypted_key() const { return crypted_key; };
-	const slice_layout *get_slice_layout() const { return ref_layout; };
+	const header *get_slice_header() const;
 	bool get_tape_marks() const { return has_tape_marks; };
 	const std::string & get_salt() const { return salt; };
 	const infinint & get_iteration_count() const { return iteration_count; };
@@ -122,7 +128,8 @@ namespace libdar
 	    // has to be set to zero when it is unknown, in that case this field is not dump to archive
 	crypto_algo sym;         ///< strong encryption algorithm used for symmetrical encryption
 	memory_file *crypted_key;///< optional field containing the asymmetrically ciphered key used for strong encryption ciphering
-	slice_layout *ref_layout;///< optional field used in isolated catalogues to record the slicing layout of their archive of reference
+	std::unique_ptr<header> ref_header; ///< optional field used in isolated catalogues to record the archive format and slicing layout of their archive of reference
+	bool only_slice_layout;  ///< whether ref_header only has slice_layout information
 	bool has_tape_marks;     ///< whether the archive contains tape marks aka escape marks aka sequence marks
 
 	bool ciphered;           ///< whether the archive is ciphered, even if we do not know its crypto algorithm (old archives)
@@ -133,7 +140,7 @@ namespace libdar
 	hash_algo kdf_hash;      ///< used for key derivation
 	infinint compr_bs;       ///< the compression block size (0 for legacy compression mode)
 
-	void nullifyptr() noexcept { crypted_key = nullptr; ref_layout = nullptr; };
+	void nullifyptr() noexcept { crypted_key = nullptr; ref_header.reset(); };
 	void copy_from(const header_version & ref);
 	void move_from(header_version && ref) noexcept;
 	void detruit();
