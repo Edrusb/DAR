@@ -69,15 +69,17 @@ namespace libdar
 	    // constructors & Co.
 
         header() { clear(); };
-        header(const header & ref) { copy_from(ref); };
-	header(header && ref) noexcept { move_from(std::move(ref)); };
-        header & operator = (const header & ref) { copy_from(ref); return *this; };
-	header & operator = (header && ref) noexcept { move_from(std::move(ref)); return *this; };
+        header(const header & ref) = default;
+	header(header && ref) noexcept = default;
+        header & operator = (const header & ref) = default;
+	header & operator = (header && ref) noexcept = default;
 	~header() = default;
 
 	    // global methods
 
-        void read(user_interaction & ui, generic_file & f, bool lax = false );
+        void read(user_interaction & ui,
+		  generic_file & f,
+		  bool lax = false);
         void write(user_interaction &,  ///< user interaction for messages when necessary
 		   generic_file & f,    ///< where to write down the header
 		   bool with_header_size = false) const; ///< whether to also write down the slice header size info
@@ -100,29 +102,36 @@ namespace libdar
 
 	    // fields access methods
 
-	magic_number & get_set_magic() { return magic; };
-	label & get_set_internal_name() { return internal_name; };
-	char & get_set_flag() { return flag; };
-	label & get_set_data_name() { return data_name; };
+	const magic_number & get_magic() const { return magic; };
+	void set_magic(const magic_number & ref) { magic = ref; };
 
-	bool get_first_slice_size(infinint & size) const;
-	void set_first_slice_size(const infinint & size);
-	void unset_first_slice_size() { sly.first_size = 0; };
+	const label & get_internal_name() const { return internal_name; };
+	void set_internal_name(const label & ref) { internal_name = ref; };
 
-	bool get_slice_size(infinint & size) const;
-	void set_slice_size(const infinint & size);
-	void unset_slice_size() { sly.other_size = 0; };
+	const char & get_flag() const { return flag; };
+	void set_flag(const char & ref) { flag = ref; };
+
+	const label & get_data_name() const { return data_name; };
+	void set_data_name(const label & ref) { data_name = ref; };
+
+	const infinint & get_first_slice_size() const { return sly.first_size; };
+	void set_first_slice_size(const infinint & size) { sly.first_size = size; };
+
+	const infinint & get_slice_size() const { return sly.other_size; };
+	void set_slice_size(const infinint & size) { sly.other_size = size; };
 
 	bool is_old_header() const { return sly.older_sar_than_v8; };
-	void set_format_07_compatibility() { sly.older_sar_than_v8 = true; };
+	void set_format_07_compatibility(bool val = true) { sly.older_sar_than_v8 = val; };
 
-	bool get_common_slice_header_size(infinint & size) const;
-	void set_common_slice_header_size(const infinint & size);
-	void unset_common_slice_header_sze() { sly.other_slice_header = 0; };
+	const infinint & get_common_slice_header_size() const { return sly.other_slice_header; };
+	void set_common_slice_header_size(const infinint & size) { sly.other_slice_header = size; };
 
-	bool get_first_slice_header_size(infinint & size) const;
-	void set_first_slice_header_size(const infinint & size);
-	void unset_first_slice_header_size() { sly.first_slice_header = 0; };
+	const infinint & get_first_slice_header_size() const { return sly.first_slice_header; };
+	void set_first_slice_header_size(const infinint & size) { sly.first_slice_header = size; };
+
+	const slice_layout & get_slice_layout() const { return sly; };
+
+	bool has_header_tlv() const { return header_tlv; };
 
     private:
         magic_number magic;    ///< constant string for all Dar archives
@@ -130,9 +139,8 @@ namespace libdar
 	label data_name;       ///< constant string for a set of data (constant with dar_xform, used to link isolated catalogue to its original data)
         char flag;             ///< whether slice is the last of the archive or not
 	slice_layout sly;      ///< slicing information
+	bool header_tlv;       ///< whether the header contains information on header sizes
 
-        void copy_from(const header & ref);
-	void move_from(header && ref) noexcept;
 	void fill_from(user_interaction & ui, const tlv_list & list);
 	tlv_list build_tlv_list(user_interaction & ui, bool with_header_size) const;
     };

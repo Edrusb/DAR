@@ -77,14 +77,17 @@ namespace libdar
 	/******************* HEADER datastructure ********************/
 	/*************************************************************/
 
-    void header::read(user_interaction & ui, generic_file & f, bool lax)
+    void header::read(user_interaction & ui,
+		      generic_file & f,
+		      bool lax)
     {
         magic_number tmp;
 	tlv_list tempo;
 	char extension;
 	fichier_global *f_fic = dynamic_cast<fichier_global *>(&f);
 
-	sly.clear();
+	clear();
+
         if(f.read((char *)&tmp, sizeof(magic_number)) != sizeof(magic_number))
 	    throw Erange("header::read", gettext("Reached end of file while reading slice header"));
         magic = ntohl(tmp);
@@ -100,7 +103,9 @@ namespace libdar
 	    throw Erange("header::read", gettext("Reached end of file while reading slice header"));
         if(f.read(&extension, 1) != 1)
 	    throw Erange("header::read", gettext("Reached end of file while reading slice header"));
+
 	data_name.clear();
+
         switch(extension)
         {
         case extension_none:
@@ -120,7 +125,22 @@ namespace libdar
 			// was learnt by getting the size of the file.
 			// This works also for single sliced archives.
 		}
+		else
+		{
+		    sly.first_size = 0;
+			// header not the first slice or no
+			// specific size for the first slice
+		}
 	    }
+	    else // not reading from a file (but read from a pipe, for example)
+	    {
+		sly.other_size = 0; // means single sliced archive
+		sly.first_size = 0; // means non-specific size for the first slice
+	    }
+
+	    sly.other_slice_header = min_size();
+	    sly.first_slice_header = 0; // unknown slice header size of the first slice
+
 	    sly.older_sar_than_v8 = true;
             break;
         case extension_size:
@@ -142,17 +162,45 @@ namespace libdar
 		}
 	    }
 	    else
+	    {
 		if(!lax)
 		    throw Erange("header::read", gettext("Archive format older than \"08\" (release 2.4.0) cannot be read through a single pipe. It only can be read using dar_slave or as normal plain files (slices)"));
 		else
+		{
 		    ui.message(gettext("LAX MODE: first slice size is not possible to read, continuing anyway..."));
+		    sly.first_size = 0; // no specific size for the first slice as we assume we read a single sliced archive
+		}
+	    }
+
+	    sly.first_slice_header = f.get_position();
+	    sly.other_slice_header = min_size();
+	    if(sly.first_slice_header < min_size())
+		throw Erange("header::read", gettext("Invalid first slice header size for a slice of format 07 or older"));
+
 	    sly.older_sar_than_v8 = true;
             break;
 	case extension_tlv:
+	    sly.first_size = 0;
+	    sly.other_size = 0;
+	    sly.other_slice_header = 0; // we be eventually set from tlv
+	    sly.first_slice_header = 0; // we be eventually set from tlv
+
 	    tempo.read(f);        // read the list of TLV stored in the header
 	    fill_from(ui, tempo); // from the TLV list, set the different fields of the current header object
+
 	    if(sly.other_size.is_zero() && f_fic != nullptr)
 		sly.other_size = f_fic->get_size();
+
+	    if(sly.other_slice_header.is_zero())
+		sly.other_slice_header = f.get_position();
+
+	    if(sly.other_slice_header < min_size())
+		throw Erange("header::read", gettext("Invalid slice header size for a slice of format 08 or more recent (below minimum)"));
+
+	    sly.first_slice_header = sly.other_slice_header;
+		// in format >= 08 all slice have the exact same header (and this header size).
+
+	    sly.older_sar_than_v8 = false;
 	    break;
         default:
 	    if(!lax)
@@ -163,11 +211,12 @@ namespace libdar
 		sly.other_size = 0;
 	    }
         }
+
 	if(data_name.is_cleared())
 	    data_name = internal_name;
 
-	if(sly.other_slice_header.is_zero())
-	    sly.other_slice_header = f.get_position();
+
+
     }
 
     void header::write(user_interaction & ui,
@@ -209,108 +258,7 @@ namespace libdar
 	data_name.clear();
 	flag = '\0';
 	sly.clear();
-    }
-
-    bool header::get_first_slice_size(infinint & size) const
-    {
-	if(! sly.first_size.is_zero())
-	{
-	    size = sly.first_size;
-	    return true;
-	}
-	else
-	    return false;
-    }
-
-    void header::set_first_slice_size(const infinint & size)
-    {
-	sly.first_size = size;
-    }
-
-    bool header::get_slice_size(infinint & size) const
-    {
-	if(! sly.other_size.is_zero())
-	{
-	    size = sly.other_size;
-	    return true;
-	}
-	else
-	    return false;
-    }
-
-    void header::set_slice_size(const infinint & size)
-    {
-	sly.other_size = size;
-    }
-
-
-    bool header::get_common_slice_header_size(infinint & size) const
-    {
-	if(sly.older_sar_than_v8)
-	    return false;
-
-	if(sly.other_slice_header.is_zero())
-	    return false;
-	else
-	{
-	    size = sly.other_slice_header;
-	    return true;
-	}
-    }
-
-    void header::set_common_slice_header_size(const infinint & size)
-    {
-	if(sly.older_sar_than_v8)
-	    throw SRC_BUG;
-	    // archive format 07 and older may have
-	    // different header size between first and
-	    // other slices
-
-	sly.other_slice_header = size;
-    }
-
-    bool header::get_first_slice_header_size(infinint & size) const
-    {
-	if(sly.older_sar_than_v8)
-	    return false;
-
-	if(sly.first_slice_header.is_zero())
-	    return false;
-	else
-	{
-	    size = sly.first_slice_header;
-	    return true;
-	}
-    }
-
-    void header::set_first_slice_header_size(const infinint & size)
-    {
-	if(sly.older_sar_than_v8)
-	    throw SRC_BUG;
-	    // archive format 07 and older may have
-	    // different header size between first and
-	    // other slices
-
-	sly.first_slice_header = size;
-    }
-
-
-    void header::copy_from(const header & ref)
-    {
-        magic = ref.magic;
-        internal_name = ref.internal_name;
- 	data_name = ref.data_name;
-        flag = ref.flag;
-	sly = ref.sly;
-    }
-
-    void header::move_from(header && ref) noexcept
-    {
-	magic = std::move(ref.magic);
-	internal_name = std::move(ref.internal_name);
-	data_name = std::move(ref.data_name);
-	flag = std::move(ref.flag);
-	sly = std::move(ref.sly);
+	header_tlv = false;
     }
 
     void header::fill_from(user_interaction & ui, const tlv_list & extension)
@@ -342,6 +290,12 @@ namespace libdar
 		    throw Erange("header::fill_from", gettext("incomplete data set name found in a slice header"));
 		}
 		break;
+	    case tlv_header_size:
+		extension[index].skip(0);
+		sly.other_slice_header.read(extension[index]);
+		sly.first_slice_header = sly.other_slice_header;
+		header_tlv = true;
+		break;
 	    default:
 		ui.pause(tools_printf(gettext("Unknown entry found in slice header (type = %d), option not supported. The archive you are reading may have been generated by a more recent version of libdar, ignore this entry and continue anyway?"), extension[index].get_type()));
 	    }
@@ -371,6 +325,8 @@ namespace libdar
 
 	if(with_header_size && ! sly.other_slice_header.is_zero() && ! sly.older_sar_than_v8)
 	{
+	    if(sly.other_slice_header != sly.first_slice_header)
+		throw SRC_BUG;
 	    tmp.reset();
 	    sly.other_slice_header.dump(tmp);
 	    tmp.set_type(tlv_header_size);
