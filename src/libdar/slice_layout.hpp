@@ -52,8 +52,8 @@ namespace libdar
 	    // field still exposed (slice_layout was a struct before being a class)
 	    // we keep these fields as is for now
 
-	infinint first_size;         ///< size of the first slice
-	infinint other_size;         ///< maximum size of other slices
+	infinint first_size;         ///< size of the first slice (0 if first slice size has the same size as other slices)
+	infinint other_size;         ///< maximum size of other slices (0 for non-limited slice / single sliced archive)
 	infinint first_slice_header; ///< size of the slice header in the first slice
 	infinint other_slice_header; ///< size of the slice header in the other slices
 	bool older_sar_than_v8;      ///< true if the archive format is older than version 8
