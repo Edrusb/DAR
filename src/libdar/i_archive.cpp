@@ -102,6 +102,7 @@ namespace libdar
 	    pile_descriptor pdesc;
 	    list<signator> tmp1_signatories;
 	    list<signator> tmp2_signatories;
+	    std::unique_ptr<header> ref_slice_header;
 
 	    lax_read_mode = options.get_lax();
 	    sequential_read = options.get_sequential_read(); // updating the archive object's field
@@ -119,13 +120,15 @@ namespace libdar
 		    if(info_details)
 			dialog->printf(gettext("Opening the archive of reference %s to retreive the isolated catalog ... "), options.get_ref_basename().c_str());
 
+		    ref_slice_header.reset(new (nothrow) header());
+		    if(!ref_slice_header)
+			throw Ememory("achive::i_archive::i_archive");
 
 		    try
 		    {
 			ref_where->set_location(options.get_ref_path());
 			try
 			{
-			    slice_layout ignored;
 			    secu_string live_ref_pass = options.get_ref_crypto_pass();
 			    U_32 live_ref_crypto_bs = options.get_ref_crypto_size();
 
@@ -154,7 +157,8 @@ namespace libdar
 						     false, // sequential_read is never used to retreive the isolated catalogue (well, that's possible and easy to add this feature), see later ...
 						     options.get_info_details(),
 						     tmp1_signatories,
-						     ignored,
+						     *ref_slice_header, // we fetch ref_slice_header to be used when opening the main archive
+						     nullptr,
 						     options.get_multi_threaded_crypto(),
 						     options.get_multi_threaded_compress(),
 						     false,
@@ -212,7 +216,8 @@ namespace libdar
 					 options.get_sequential_read(),
 					 options.get_info_details(),
 					 gnupg_signed,
-					 slices,
+					 slice_header,  // slice_header is set from here
+					 ref_slice_header.get(), // may set to null when no external cat is used
 					 options.get_multi_threaded_crypto(),
 					 options.get_multi_threaded_compress(),
 					 options.get_header_only(),
@@ -857,7 +862,7 @@ namespace libdar
 	lax_read_mode = false;
 	sequential_read = false;
 	    // gnupg_signed is not used while creating an archive
-	    // slices will be set by op_create_in_sub()
+	    // slices_header will be set by op_create_in_sub()
 	    // local_cat_size not used while creating an archive
 
 	    ////
@@ -1668,7 +1673,7 @@ namespace libdar
 	    header_version isol_ver;
 	    label isol_data_name;
 	    label internal_name;
-	    slice_layout isol_slices; // this field is not used here, but necessary to call macro_tools_create_layers()
+	    header isol_slices; // this field is not used here, but necessary to call macro_tools_create_layers()
 
 	    if(!exploitable && options.get_delta_signature())
 		throw Erange("archive::i_archive::op_isolate", gettext("Isolation with delta signature is not possible on a just created archive (on-fly isolation)"));
@@ -1685,7 +1690,7 @@ namespace libdar
 				      layers,
 				      isol_ver,
 				      isol_slices,
-				      &slices, // giving our slice_layout as reference to be stored in the archive header/trailer
+				      &slice_header, // giving our slice_layout as reference to be stored in the archive header/trailer
 				      sauv_path_t,
 				      filename,
 				      extension,
@@ -1913,7 +1918,7 @@ namespace libdar
 	    if(tmp_ptr == nullptr)
 		throw SRC_BUG;
 
-	    tmp_ptr->set_list_entry(&slices, fetch_ea, ent);
+	    tmp_ptr->set_list_entry(&(slice_header.get_slice_layout()), fetch_ea, ent);
 
 		// fill a new entry in the table
 	    ret.push_back(ent);
@@ -2000,7 +2005,7 @@ namespace libdar
 
     bool archive::i_archive::get_catalogue_slice_layout(slice_layout & slicing) const
     {
-	slicing = slices;
+	slicing = slice_header.get_slice_layout();
 	    // by default we use the slice layout of the current archive,
 	    // this is modified if the current archive is an isolated catalogue
 	    // in archive format 9 or greater, then we use the slice layout contained
@@ -2009,9 +2014,9 @@ namespace libdar
 
 	if(only_contains_an_isolated_catalogue())
 	{
-	    if(ver.get_slice_layout() != nullptr)
+	    if(ver.get_slice_header() != nullptr)
 	    {
-		slicing = *ver.get_slice_layout();
+		slicing = ver.get_slice_header()->get_slice_layout();
 		return true;
 	    }
 	    else // no slicing of the archive of reference stored in this isolated catalogue's header/trailer
@@ -2429,8 +2434,8 @@ namespace libdar
 		macro_tools_create_layers(get_pointer(),
 					  stack, // this object field is set!
 					  ver,   // this object field is set!
-					  slices,// this object field is set!
-					  nullptr,  // no slicing reference stored in archive header/trailer
+					  slice_header,// this object field is set!
+					  nullptr, // no slicing reference stored in archive header/trailer
 					  sauv_path_t,
 					  filename,
 					  extension,
@@ -2841,7 +2846,7 @@ namespace libdar
     {
 	stack.clear();
 	gnupg_signed.clear();
-	slices.clear();
+	slice_header.clear();
 	ver.clear_crypted_key();
 	if(cat != nullptr)
 	{

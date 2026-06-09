@@ -123,7 +123,8 @@ namespace libdar
 					 bool sequential_read, ///< whether to use the escape sequence (if present) to get archive contents and proceed to sequential reading
 					 bool info_details,    ///< be or not verbose about the archive openning
 					 std::list<signator> & gnupg_signed, ///< list of existing signature found for that archive (valid or not)
-					 slice_layout & sl,    ///< slicing layout of the archive (read from sar header if present)
+					 header & sl_header,    ///< slicing header of the archive (read from "level1" object)
+					 const header* ref_header, ///< use the provided header to avoid reading a slice to fetch it
 					 U_I multi_threaded_crypto,  ///< number of worker thread to run for cryptography
 					 U_I multi_threaded_compress,  ///< number of worker threads to compress/decompress (need compression_block_size > 0)
 					 bool header_only,     ///< if true, stop the process before openning the encryption layer
@@ -180,7 +181,7 @@ namespace libdar
 	/// \param[out] layers the resulting stack of generic_file layers ready for use
 	/// \param[out] ver the archive "header/trailer" to be dropped at beginning and end of archive
 	/// \param[out] slicing slicing layout of the created archive (resulting from sar layers if present according to the provided first/file_size provided below)
-	/// \param[in]  ref_slicing if not nullptr the pointed to slicing_layout will be stored in the header/trailer version of the archive
+	/// \param[in]  ref_header if not nullptr the pointed to slice header will be stored in the header/trailer version of the archive
 	/// \param[in]  sauv_path_t where to create the archive
 	/// \param[in]  filename archive base name
 	/// \param[in]  extension archive extension
@@ -237,8 +238,8 @@ namespace libdar
     extern void macro_tools_create_layers(const std::shared_ptr<user_interaction> & dialog,
 					  pile & layers,
 					  header_version & ver,
-					  slice_layout & slicing,
-					  const slice_layout *ref_slicing,
+					  header & slicing,
+					  const header* ref_header,
 					  const std::shared_ptr<entrepot> & sauv_path_t,
 					  const std::string & filename,
 					  const std::string & extension,

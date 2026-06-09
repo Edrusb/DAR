@@ -415,7 +415,8 @@ namespace libdar
 				  bool sequential_read,
 				  bool info_details,
 				  list<signator> & gnupg_signed,
-				  slice_layout & sl,
+				  header & sl_header,
+				  const header* ref_header,
 				  U_I multi_threaded_crypto,
 				  U_I multi_threaded_compress,
 				  bool header_only,
@@ -453,8 +454,7 @@ namespace libdar
 #else
 	stack.ignore_read_ahead(true);
 #endif
-	sl.first_size = 0;
-	sl.other_size = 0; // we will change that only if sar object is used
+	sl_header.clear();
 
 	try
 	{
@@ -523,7 +523,7 @@ namespace libdar
 						  where,
 						  min_digits,
 						  sequential_read,
-						  nullptr,
+						  ref_header,
 						  lax,
 						  execute);
 		if(tmp_sar != nullptr)
@@ -534,7 +534,7 @@ namespace libdar
 		    else
 			tmp_sar->skip(0);
 
-		    sl = tmp_sar->get_slicing();
+		    sl_header = tmp_sar->get_slice_header();
 		}
 	    }
 
@@ -1068,8 +1068,8 @@ namespace libdar
     void macro_tools_create_layers(const shared_ptr<user_interaction> & dialog,
 				   pile & layers,
 				   header_version & ver,
-				   slice_layout & slicing,
-				   const slice_layout *ref_slicing,
+				   header & slicing,
+				   const header* ref_header,
 				   const shared_ptr<entrepot> & sauv_path_t,
 				   const string & filename,
 				   const string & extension,
@@ -1200,7 +1200,7 @@ namespace libdar
 							  execute);
 
 			if(tmp_sar != nullptr)
-			    slicing = tmp_sar->get_slicing();
+			    slicing = tmp_sar->get_slice_header();
 		    }
 
 
@@ -1479,25 +1479,18 @@ namespace libdar
 		ver.set_compression_block_size(compression_block_size);
 
 
-		if(ref_slicing != nullptr)
+		if(ref_header != nullptr)
 		{
-		    slice_layout *tmp = new (nothrow) slice_layout(*ref_slicing);
-		    if(tmp == nullptr)
+		    unique_ptr<header> utmp;
+
+		    utmp.reset(new (nothrow) header(*ref_header));
+		    if(!utmp)
 			throw Ememory("macro_tools_create_layers");
-		    try
-		    {
-			ver.set_slice_layout(tmp);
-			tmp = nullptr; // now tmp is managed by ver
-		    }
-		    catch(...)
-		    {
-			if(tmp != nullptr)
-			    delete tmp;
-			throw;
-		    }
+
+		    ver.set_slice_header(utmp);
 		}
 		else
-		    ver.clear_slice_layout();
+		    ver.clear_slice_header();
 
 		    // we drop the header at the beginning of the archive in any case (to be able to
 		    // know whether sequential reading is possible or not, and if sequential reading
@@ -1508,7 +1501,9 @@ namespace libdar
 		if(info_details)
 		    dialog->message(gettext("Writing down the archive header..."));
 		if(level1 != nullptr)
-		    ver.write(*level1); // we write to the level1 which is just below the encryption layer, thus the header is wrote unciphered
+		    ver.write(*level1, *dialog);
+		    // we write to the level1 which is just below the encryption layer,
+		    // thus the header is wrote unciphered
 		else
 		    throw SRC_BUG;
 
@@ -1852,7 +1847,7 @@ namespace libdar
 	if(info_details)
 	    dialog->message(gettext("Writing down archive trailer..."));
 	coord.set_catalogue_start(layers.get_position());
-	ver.write(layers);
+	ver.write(layers, *dialog);
 
 	if(info_details)
 	    dialog->message(gettext("Writing down the second archive terminator..."));

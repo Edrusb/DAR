@@ -488,20 +488,20 @@ namespace libdar
 	{
 	case gf_read_only:
 	    tete.read(get_ui(), *reference);
-	    if(tete.get_set_flag() == flag_type_non_terminal)
+	    if(tete.get_flag() == flag_type_non_terminal)
 		throw Erange("trivial_sar::trivial_sar", gettext("This archive has slices and is not possible to read from a pipe"));
 		// if flag is flag_type_located_at_end_of_slice, we will warn at end of slice
 	    offset = reference->get_position();
-	    of_data_name = tete.get_set_data_name();
+	    of_data_name = tete.get_data_name();
 	    old_sar = tete.is_old_header();
 	    cur_pos = 0;
 	    break;
 	case gf_write_only:
 	case gf_read_write:
-	    tete.get_set_magic() = SAUV_MAGIC_NUMBER;
-	    tete.get_set_internal_name() = internal_name;
-	    tete.get_set_flag() = flag_type_terminal;
-	    tete.get_set_data_name() = of_data_name;
+	    tete.set_magic(SAUV_MAGIC_NUMBER);
+	    tete.set_internal_name(internal_name);
+	    tete.set_flag(flag_type_terminal);
+	    tete.set_data_name(of_data_name);
 	    if(old_sar)
 		tete.set_format_07_compatibility();
 	    tete.write(get_ui(), *reference);
