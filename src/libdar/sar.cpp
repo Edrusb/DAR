@@ -1554,7 +1554,7 @@ namespace libdar
 		slicing.set_common_slice_header_size(h.get_common_slice_header_size());
 
 	    if(h.get_first_slice_header_size().is_zero())
-		slicing.set_first_slice_header_size(slicing.get_ommon_slice_header_size());
+		slicing.set_first_slice_header_size(slicing.get_common_slice_header_size());
 	    else
 		slicing.set_first_slice_header_size(h.get_first_slice_header_size());
 
