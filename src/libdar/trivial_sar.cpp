@@ -493,7 +493,7 @@ namespace libdar
 		// if flag is flag_type_located_at_end_of_slice, we will warn at end of slice
 	    offset = reference->get_position();
 	    of_data_name = tete.get_data_name();
-	    old_sar = tete.is_old_header();
+	    old_sar = tete.get_format_07_compatibility();
 	    cur_pos = 0;
 	    break;
 	case gf_write_only:

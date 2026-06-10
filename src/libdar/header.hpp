@@ -120,7 +120,7 @@ namespace libdar
 	const infinint & get_slice_size() const { return sly.other_size; };
 	void set_slice_size(const infinint & size) { sly.other_size = size; };
 
-	bool is_old_header() const { return sly.older_sar_than_v8; };
+	bool get_format_07_compatibility() const { return sly.older_sar_than_v8; };
 	void set_format_07_compatibility(bool val = true) { sly.older_sar_than_v8 = val; };
 
 	const infinint & get_common_slice_header_size() const { return sly.other_slice_header; };

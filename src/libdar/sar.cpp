@@ -280,12 +280,12 @@ namespace libdar
 	    if(of_current == 1)
 		return (file_offset
 			+ amount
-			+ (slicing.is_old_header() ? 0 : 1))
+			+ (slicing.get_format_07_compatibility() ? 0 : 1))
 		    < slicing.get_first_slice_size();
 	    else
 		return (file_offset
 			+ amount
-			+ (slicing.is_old_header() ? 0 : 1))
+			+ (slicing.get_format_07_compatibility() ? 0 : 1))
 		    < slicing.get_slice_size();
 	default:
 	    throw SRC_BUG;
@@ -364,7 +364,7 @@ namespace libdar
 	switch(get_mode())
 	{
 	case gf_read_only:
-	    if(!slicing.is_old_header())
+	    if(!slicing.get_format_07_compatibility())
 		of_fd->skip_relative(-1);
 	    file_offset = of_fd->get_position();
 	    set_offset(file_offset);
@@ -409,7 +409,7 @@ namespace libdar
     {
         infinint number = of_current;
         infinint offset = file_offset + x;
-	infinint delta = slicing.is_old_header() ? 0 : 1; // one byte less per slice with archive format >= 8
+	infinint delta = slicing.get_format_07_compatibility() ? 0 : 1; // one byte less per slice with archive format >= 8
 
 	if(is_terminated())
 	    throw SRC_BUG;
@@ -446,7 +446,7 @@ namespace libdar
         infinint number = of_current;
         infinint offset = file_offset;
         infinint offset_neg = x;
-	infinint delta = slicing.is_old_header() ? 0 : 1; // one byte less per slice with archive format >= 8
+	infinint delta = slicing.get_format_07_compatibility() ? 0 : 1; // one byte less per slice with archive format >= 8
 
 	if(is_terminated())
 	    throw SRC_BUG;
@@ -540,7 +540,7 @@ namespace libdar
 
     infinint sar::get_position() const
     {
-	infinint delta = slicing.is_old_header() ? 0 : 1; // one byte less per slice with archive format >= 8
+	infinint delta = slicing.get_format_07_compatibility() ? 0 : 1; // one byte less per slice with archive format >= 8
 
 	if(of_current.is_zero())
 	{
@@ -581,7 +581,7 @@ namespace libdar
 	else
 	    avail_in_slice = slicing.get_slice_size();
 	avail_in_slice -= file_offset;
-	avail_in_slice -= (slicing.is_old_header() ? 0 : 1);
+	avail_in_slice -= (slicing.get_format_07_compatibility() ? 0 : 1);
 
 	if(avail_in_slice > amount)
 	{
@@ -592,7 +592,7 @@ namespace libdar
 	else
 	{
 	    if(of_fd != nullptr)
-		of_fd->read_ahead(avail_in_slice + (slicing.is_old_header() ? 0 : 1));
+		of_fd->read_ahead(avail_in_slice + (slicing.get_format_07_compatibility() ? 0 : 1));
 	    to_read_ahead = amount - avail_in_slice;
 	}
     }
@@ -613,7 +613,7 @@ namespace libdar
 	    if(of_fd != nullptr)
 	    {
 		tmp = of_fd->read(a+lu, sz-lu);
-		if(!slicing.is_old_header())
+		if(!slicing.get_format_07_compatibility())
 		{
 			// we must avoir reading the terminal flag
 			// when we reach an end of slice
@@ -741,7 +741,7 @@ namespace libdar
     {
         infinint max_at_once;
         U_I tmp_wrote;
-	U_I trailer_size = slicing.is_old_header() ? 0 : 1;
+	U_I trailer_size = slicing.get_format_07_compatibility() ? 0 : 1;
 
 	if(of_current.is_zero())
 	    skip(0);
@@ -780,7 +780,7 @@ namespace libdar
 	    char flag = terminal ? flag_type_terminal : flag_type_non_terminal;
 	    if(get_mode() == gf_read_write || get_mode() == gf_write_only)
 	    {
-		if(slicing.is_old_header())
+		if(slicing.get_format_07_compatibility())
 		{
 		    header h = make_write_header(of_current, terminal ? flag_type_terminal : flag_type_non_terminal);
 		    of_fd->skip(0);
@@ -925,7 +925,7 @@ namespace libdar
 		    get_ui().message(tools_printf(gettext("LAX MODE: %S has a bad or corrupted header, trying to guess original values and continuing if possible"), &fic));
             }
 
-	    if(h.is_old_header() && slicing.get_first_slice_header_size().is_zero() && num != 1)
+	    if(h.get_format_07_compatibility() && slicing.get_first_slice_header_size().is_zero() && num != 1)
 		throw Erange("sar::open_readonly", gettext("This is an old archive, it can only be opened starting by the first slice"));
 
 	    if(! check_header(h, fic))
@@ -1461,7 +1461,7 @@ namespace libdar
         hh.set_internal_name(slicing.get_internal_name());
 	hh.set_data_name(slicing.get_data_name());
         hh.set_flag(flag);
-	if(slicing.is_old_header())
+	if(slicing.get_format_07_compatibility())
 	{
 	    if(num == 1)
 	    {
@@ -1501,7 +1501,7 @@ namespace libdar
     {
 	bool external = fic.empty(); // header is not obtained while openning a slice (and of_fd might be nullptr)
 
-	if(external && h.is_old_header())
+	if(external && h.get_format_07_compatibility())
 	    throw Erange("sar::check_header", gettext("slice layout of an old archive stored in an isolated catalog cannot be used to avoid openning the first or last slice of the archive"));
 
 	if(h.get_common_slice_header_size() < header::min_size())
@@ -1628,7 +1628,7 @@ namespace libdar
 		       || ! slicing.get_slice_size().is_zero())
 			throw Erange("sar::sar", gettext("incoherent slice header: Slice size too small"));
 		}
-		slicing.set_format_07_compatibility(h.is_old_header());
+		slicing.set_format_07_compatibility(h.get_format_07_compatibility());
 	    }
 	    catch(Erange & e)
 	    {
@@ -1697,7 +1697,7 @@ namespace libdar
 
     bool sar::is_current_eof_a_normal_end_of_slice() const
     {
-	infinint delta = slicing.is_old_header() ? 0 : 1; // one byte less per slice with archive format >= 8
+	infinint delta = slicing.get_format_07_compatibility() ? 0 : 1; // one byte less per slice with archive format >= 8
 
 	if(of_last_file_known && of_last_file_num == of_current) // we are in the last slice, thus eof may occur at any place
 	    return true;
@@ -1712,7 +1712,7 @@ namespace libdar
 
     infinint sar::bytes_still_to_read_in_slice() const
     {
-	infinint delta = slicing.is_old_header() ? 0 : 1; // one byte less per slice with archive format >= 8
+	infinint delta = slicing.get_format_07_compatibility() ? 0 : 1; // one byte less per slice with archive format >= 8
 
 	if(of_last_file_known && of_last_file_num == of_current)
 	    throw SRC_BUG; // cannot figure out the expected slice size of the last slice of the archive

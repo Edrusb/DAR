@@ -165,7 +165,7 @@ namespace libdar
 	void enable_natural_destruction() { natural_destruction = true; };
 
 	    // true if sar's header is from an old archive format (<= "07")
-	virtual bool is_an_old_start_end_archive() const override { fetch_slicing(); return slicing.is_old_header(); };
+	virtual bool is_an_old_start_end_archive() const override { fetch_slicing(); return slicing.get_format_07_compatibility(); };
 
 	    // return the internal_name used to link slices toghether
 	const label & get_internal_name_used() const { fetch_slicing(); return slicing.get_internal_name(); };
