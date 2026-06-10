@@ -267,6 +267,60 @@ namespace libdar
 	header_tlv = false;
     }
 
+    void header::check_validity(user_interaction & dialog,
+				const infinint & slice_num,
+				bool initial) const
+    {
+	bool external = slice_num.is_zero();
+
+	    // old format related checks
+
+	if(get_format_07_compatibility() && initial && slice_num != 1)
+	    throw Erange("header::check_validity", gettext("This is an old archive, it can only be opened starting by the first slice"));
+
+	    // external related checks
+
+	if(external && get_format_07_compatibility())
+	    throw Erange("header::check_validity", gettext("slice layout of an old archive stored in an isolated catalog cannot be used to avoid openning the first or last slice of the archive"));
+
+	if(external && ! has_header_tlv())
+	    throw Erange("header::check_validity", gettext("Corrupted external slice header: missing header size tlv"));
+
+	if(external && ! initial)
+	    throw SRC_BUG;
+
+	    // checking against the magic number
+	    //
+	if(get_magic() != SAUV_MAGIC_NUMBER)
+	    throw Erange("sar::check_header", tools_printf(gettext("not a valid dar file (wrong magic number), please provide the good file.")));
+
+	    // sanity checks on slice sizes and header slice sizes
+
+	if(get_common_slice_header_size() < min_size())
+		throw Erange("header::check_validity", gettext("Incoherent slice header: header size too small"));
+
+	if(get_slice_size() <= get_common_slice_header_size())
+	    throw Erange("header::check_validity", gettext("Incoherent slice header: slice size too small"));
+
+	if(slice_num == 1 || !get_format_07_compatibility())
+	{
+		// for non initial slice, the size of the first slice and first slice header size
+		// may be unknown (slice > 1 with format <= 07) and would be set both to zero
+
+	    if(get_first_slice_size() < min_size())
+		throw Erange("header::check_validity", gettext("Incoherent slice header: first slice header size too small"));
+
+	    if(get_first_slice_size() <= get_first_slice_header_size())
+		throw Erange("header::check_validity", gettext("Incoherent slice header: First slice size too small"));
+	}
+    }
+
+    void header::check_same_slice_set(const header & ref) const
+    {
+	if(get_internal_name() != ref.get_internal_name())
+	    throw Erange("header::check_same_slice_set", gettext("this slice is from a different set of slices"));
+    }
+
     void header::fill_from(user_interaction & ui, const tlv_list & extension)
     {
 	U_I taille = extension.size();

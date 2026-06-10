@@ -88,6 +88,23 @@ namespace libdar
 	    /// resets the object
 	void clear();
 
+	    /// check is this is a valid first header to open
+
+	    /// \param[in] dialog for user interaction
+	    /// \param[in] slice_num slice number of the slic the header has been read from (set to zero for external slice header)
+	    /// \param[in] initial whether this is the first time a header is validated for this slice set
+	    /// \note throw Erange exception in case of invalidity
+	void check_validity(user_interaction & dialog,
+			    const infinint & slice_num,
+			    bool initial) const;
+
+
+	    /// check whether the given argument is part of the same slice set as current header
+
+	    /// \note throw exception in case not of the same slice set
+	void check_same_slice_set(const header & ref) const;
+
+
 	    /// minimal size of a header in an archive
 
 	    /// \return min size of a header once stored in an archive
