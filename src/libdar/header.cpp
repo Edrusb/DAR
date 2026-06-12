@@ -220,9 +220,6 @@ namespace libdar
 
 	if(data_name.is_cleared())
 	    data_name = internal_name;
-
-
-
     }
 
     void header::write(user_interaction & ui,
@@ -276,7 +273,7 @@ namespace libdar
 	    // old format related checks
 
 	if(get_format_07_compatibility() && initial && slice_num != 1)
-	    throw Erange("header::check_validity", gettext("This is an old archive, it can only be opened starting by the first slice"));
+	    throw Edata(gettext("This is an old archive, it can only be opened starting by the first slice"));
 
 	    // external related checks
 

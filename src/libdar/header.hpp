@@ -93,7 +93,7 @@ namespace libdar
 	    /// \param[in] dialog for user interaction
 	    /// \param[in] slice_num slice number of the slic the header has been read from (set to zero for external slice header)
 	    /// \param[in] initial whether this is the first time a header is validated for this slice set
-	    /// \note throw Erange exception in case of invalidity
+	    /// \note throw Erange exception in case of invalidity, Edata in case of old format needing different handling than current format
 	void check_validity(user_interaction & dialog,
 			    const infinint & slice_num,
 			    bool initial) const;

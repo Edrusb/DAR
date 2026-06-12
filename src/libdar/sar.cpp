@@ -1307,7 +1307,7 @@ namespace libdar
 		    open_readonly(display, num);
 		    initial = false;
 		}
-		catch(Erange & e)
+		catch(Edata & e)
 		{
 		    if(slicing.get_first_slice_header_size().is_zero() && num != 1)
 		    {
@@ -1560,8 +1560,7 @@ namespace libdar
 			return false;
 		    }
 		    else
-		    {
-		    }
+			throw;
 		}
 		else
 		{
