@@ -299,6 +299,27 @@ namespace libdar
 	if(get_slice_size() <= get_common_slice_header_size())
 	    throw Erange("header::check_validity", gettext("Incoherent slice header: slice size too small"));
 
+	if(get_format_07_compatibility())
+	{
+	    if(slice_num == 1)
+	    {
+		header* me = const_cast<header*>(this);
+
+		if(me == nullptr)
+		    throw SRC_BUG;
+
+		if(get_first_slice_size().is_zero())
+		    me->set_first_slice_size(get_slice_size());
+		    // the archive has not a specific size for the first slice
+		    // and is an old format.
+
+		if(get_first_slice_header_size().is_zero())
+		    me->set_first_slice_header_size(get_common_slice_header_size());
+	    }
+		// else the first_slice_size and first_slice_header
+		// is not known
+	}
+
 	if(slice_num == 1 || !get_format_07_compatibility())
 	{
 		// for non initial slice, the size of the first slice and first slice header size
