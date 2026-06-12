@@ -104,8 +104,9 @@ namespace libdar
 	crypto_algo get_sym_crypto_algo() const { return sym; };
 	std::string get_sym_crypto_name() const;
 	std::string get_asym_crypto_name() const;
-	memory_file *get_crypted_key() const { return crypted_key; };
-	const header *get_slice_header() const;
+	memory_file* get_crypted_key() const { return crypted_key; };
+	const header* get_slice_header() const;
+	const slice_layout* get_slice_layout() const;
 	bool get_tape_marks() const { return has_tape_marks; };
 	const std::string & get_salt() const { return salt; };
 	const infinint & get_iteration_count() const { return iteration_count; };

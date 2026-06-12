@@ -607,7 +607,7 @@ namespace libdar
 	    return gettext("none");
     }
 
-    const header *header_version::get_slice_header() const
+    const header* header_version::get_slice_header() const
     {
 	if(only_slice_layout)
 	    return nullptr;
@@ -616,6 +616,14 @@ namespace libdar
 		return ref_header.get();
 	    else
 		return nullptr;
+    }
+
+    const slice_layout* header_version::get_slice_layout() const
+    {
+	if(ref_header)
+	    return & ref_header->get_slice_layout();
+	else
+	    return nullptr;
     }
 
     void header_version::display(user_interaction & dialog) const

@@ -153,7 +153,7 @@ namespace libdar
 						     options.get_ref_execute(),
 						     ref_second_terminateur_offset,
 						     options.get_lax(),
-						     false, // has an external catalogue
+						     false, // has an external catalogue (here we open the external catalogue itself)
 						     false, // sequential_read is never used to retreive the isolated catalogue (well, that's possible and easy to add this feature), see later ...
 						     options.get_info_details(),
 						     tmp1_signatories,
@@ -2014,9 +2014,9 @@ namespace libdar
 
 	if(only_contains_an_isolated_catalogue())
 	{
-	    if(ver.get_slice_header() != nullptr)
+	    if(ver.get_slice_layout() != nullptr)
 	    {
-		slicing = ver.get_slice_header()->get_slice_layout();
+		slicing = *(ver.get_slice_layout());
 		return true;
 	    }
 	    else // no slicing of the archive of reference stored in this isolated catalogue's header/trailer
