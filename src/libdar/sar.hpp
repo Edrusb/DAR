@@ -199,6 +199,7 @@ namespace libdar
 	std::string ext;             ///< archive extension
         std::string hook;            ///< command line to execute between slices
 	header slicing;              ///< slice layout
+	bool slicing_set;            ///< whether slicing is known (external or read from a slice header)
         infinint file_offset;        ///< current reading/writing position in the current slice (relative to the whole slice file, including headers)
 	hash_algo hash;              ///< whether to build a hashing when creating slices, and if so, which algorithm to use
 	infinint min_digits;         ///< minimum number of digits the slices number is stored with in the filename
