@@ -102,7 +102,7 @@ namespace libdar
 	    pile_descriptor pdesc;
 	    list<signator> tmp1_signatories;
 	    list<signator> tmp2_signatories;
-	    std::unique_ptr<header> ref_slice_header;
+	    const header* ref_slice_header = nullptr;
 
 	    lax_read_mode = options.get_lax();
 	    sequential_read = options.get_sequential_read(); // updating the archive object's field
@@ -120,10 +120,6 @@ namespace libdar
 		    if(info_details)
 			dialog->printf(gettext("Opening the archive of reference %s to retreive the isolated catalog ... "), options.get_ref_basename().c_str());
 
-		    ref_slice_header.reset(new (nothrow) header());
-		    if(!ref_slice_header)
-			throw Ememory("achive::i_archive::i_archive");
-
 		    try
 		    {
 			ref_where->set_location(options.get_ref_path());
@@ -131,6 +127,7 @@ namespace libdar
 			{
 			    secu_string live_ref_pass = options.get_ref_crypto_pass();
 			    U_32 live_ref_crypto_bs = options.get_ref_crypto_size();
+			    header ignored;
 
 			    if(options.get_ref_basename() == "-")
 				throw Erange("archive::i_archive::archive", gettext("Reading the archive of reference from pipe or standard input is not possible"));
@@ -157,8 +154,8 @@ namespace libdar
 						     false, // sequential_read is never used to retreive the isolated catalogue (well, that's possible and easy to add this feature), see later ...
 						     options.get_info_details(),
 						     tmp1_signatories,
-						     *ref_slice_header, // we fetch ref_slice_header to be used when opening the main archive
-						     nullptr,
+						     ignored,  // we don't need to know the slice layout of the isolated catalogue
+						     nullptr,  // and we are not using an external header, of course here as we fetch it
 						     options.get_multi_threaded_crypto(),
 						     options.get_multi_threaded_compress(),
 						     false,
@@ -166,6 +163,11 @@ namespace libdar
 						     false);
 				// we do not compare the signatories of the archive of reference with the current archive
 				// for example the isolated catalogue might be unencrypted and thus not signed
+
+				// if the header_version contains a slice_layout (isolated catalogue since format 12)
+				// we record it and will pass it to open the main archive, below
+				// else ref_slice_header stays equal to nullptr
+			    ref_slice_header = ref_ver.get_slice_header();
 
 			}
 			catch(Euser_abort & e)
@@ -217,7 +219,7 @@ namespace libdar
 					 options.get_info_details(),
 					 gnupg_signed,
 					 slice_header,  // slice_header is set from here
-					 ref_slice_header.get(), // may set to null when no external cat is used
+					 ref_slice_header, // may be equal to null
 					 options.get_multi_threaded_crypto(),
 					 options.get_multi_threaded_compress(),
 					 options.get_header_only(),
