@@ -416,7 +416,7 @@ namespace libdar
 				  bool info_details,
 				  list<signator> & gnupg_signed,
 				  header & sl_header,
-				  const header* ref_header,
+				  const header_version* ref_header,
 				  U_I multi_threaded_crypto,
 				  U_I multi_threaded_compress,
 				  bool header_only,
@@ -430,6 +430,7 @@ namespace libdar
 	string salt;
 	bool by_the_end = ! sequential_read;
 	bool remote_repo = false;
+	const header* ref_slice_header = nullptr;
 
 #ifdef LIBCURL_AVAILABLE
 	remote_repo |= dynamic_cast<const entrepot_libcurl *>(where.get()) != nullptr;
@@ -515,18 +516,33 @@ namespace libdar
 	    else
 	    {
 		sar *tmp_sar = nullptr;
+
 		if(info_details)
 		    dialog->message(gettext("Opening the archive using the multi-slice abstraction layer..."));
+
+		if(ref_header != nullptr)
+		{
+		    ref_slice_header = ref_header->get_slice_header();
+		    if(info_details)
+		    {
+			if(ref_slice_header != nullptr)
+			    dialog->message(gettext("Using slice header from the isolated catalogue"));
+			else
+			    dialog->printf(gettext("No external slice layout available, will read the %s slice to fetch it"),
+					   by_the_end ? "last" : "first");
+		    }
+		}
+
 		tmp = tmp_sar = new (nothrow) sar(dialog,
 						  basename,
 						  extension,
 						  where,
 						  min_digits,
 						  sequential_read,
-						  ref_header,
+						  ref_slice_header,
 						  lax,
 						  execute);
-		if(tmp_sar != nullptr)
+		if(tmp_sar != nullptr && ref_header == nullptr)
 		{
 			// not openned by the end in sequential read mode
 		    if(by_the_end)
@@ -549,59 +565,65 @@ namespace libdar
 		tmp = nullptr;
 	    }
 
-
-		// ****** Reading the header version ************** //
-
-	    stack.find_first_from_top(tmp_ctxt);
-	    if(tmp_ctxt == nullptr)
-		throw SRC_BUG;
-	    else
-		if(tmp_ctxt->is_an_old_start_end_archive())
-		    by_the_end = false; // old archive format have only a header, no trailer
-
-	    second_terminateur_offset = 0;
-
-	    if(info_details)
+	    if(ref_header != nullptr)
 	    {
-		if(! by_the_end)
-		    dialog->message(gettext("Reading the archive header..."));
+		ver = *ref_header;
+	    }
+	    else
+	    {
+
+		    // ****** Reading the header version ************** //
+
+		stack.find_first_from_top(tmp_ctxt);
+		if(tmp_ctxt == nullptr)
+		    throw SRC_BUG;
 		else
-		    dialog->message(gettext("Reading the archive trailer..."));
-	    }
+		    if(tmp_ctxt->is_an_old_start_end_archive())
+			by_the_end = false; // old archive format have only a header, no trailer
 
-	    if(!by_the_end
-	       || stack.get_position().is_zero()) //< sar layer failed openning the last slice and fallen back openning the first slice
-		stack.skip(0);
-	    else
-	    {
-		terminateur term;
+		second_terminateur_offset = 0;
 
-		try
+		if(info_details)
 		{
-		    term.read_catalogue(stack, false, archive_format_supported_version);
-		    stack.skip(term.get_catalogue_start());
-		    second_terminateur_offset = term.get_catalogue_start();
-		}
-		catch(Erange & e)
-		{
-		    dialog->printf(gettext("Error while reading archive's header, this may be because this archive is an old encrypted archive or that data corruption took place, Assuming it is an old archive, we have to read the header at the beginning of the first slice..."));
-		    stack.skip(0);
-		}
-	    }
-
-	    ver.read(stack, *dialog, lax);
-
-	    if(second_terminateur_offset.is_zero() && by_the_end && ver.get_edition() > 7)
-		if(!has_external_cat)
-		{
-		    if(!lax)
-			throw Erange("macro_tools_open_archive",gettext("Found a correct archive header at the beginning of the archive, which does not stands to be an old archive, the end of the archive is corrupted and thus the catalogue is not readable, aborting. Either retry providing in addition an isolated catalogue of that archive to perform the operation, or try reading the archive in sequential mode or try in lax mode or, last chance, try both lax and sequential read mode at the same time"));
+		    if(! by_the_end)
+			dialog->message(gettext("Reading the archive header..."));
 		    else
-			dialog->pause(gettext("Found a correct archive header at the beginning of the archive, which does not stands to be an old archive, the end of the archive is thus corrupted. Without external catalogue provided and as we do not read the archive in sequential mode, there is very little chance to retreive something from this corrupted archive. Do we continue anyway ?"));
+			dialog->message(gettext("Reading the archive trailer..."));
 		}
 
-	    if(header_only)
-		return;
+		if(!by_the_end
+		   || stack.get_position().is_zero()) //< sar layer failed openning the last slice and fallen back openning the first slice
+		    stack.skip(0);
+		else
+		{
+		    terminateur term;
+
+		    try
+		    {
+			term.read_catalogue(stack, false, archive_format_supported_version);
+			stack.skip(term.get_catalogue_start());
+			second_terminateur_offset = term.get_catalogue_start();
+		    }
+		    catch(Erange & e)
+		    {
+			dialog->printf(gettext("Error while reading archive's header, this may be because this archive is an old encrypted archive or that data corruption took place, Assuming it is an old archive, we have to read the header at the beginning of the first slice..."));
+			stack.skip(0);
+		    }
+		}
+
+		ver.read(stack, *dialog, lax);
+		if(second_terminateur_offset.is_zero() && by_the_end && ver.get_edition() > 7)
+		    if(!has_external_cat)
+		    {
+			if(!lax)
+			    throw Erange("macro_tools_open_archive",gettext("Found a correct archive header at the beginning of the archive, which does not stands to be an old archive, the end of the archive is corrupted and thus the catalogue is not readable, aborting. Either retry providing in addition an isolated catalogue of that archive to perform the operation, or try reading the archive in sequential mode or try in lax mode or, last chance, try both lax and sequential read mode at the same time"));
+			else
+			    dialog->pause(gettext("Found a correct archive header at the beginning of the archive, which does not stands to be an old archive, the end of the archive is thus corrupted. Without external catalogue provided and as we do not read the archive in sequential mode, there is very little chance to retreive something from this corrupted archive. Do we continue anyway ?"));
+		    }
+
+		if(header_only)
+		    return;
+	    }
 
 		// *************  adding a tronc to hide last terminator and trailer_version ******* //
 

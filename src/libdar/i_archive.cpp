@@ -102,7 +102,7 @@ namespace libdar
 	    pile_descriptor pdesc;
 	    list<signator> tmp1_signatories;
 	    list<signator> tmp2_signatories;
-	    const header* ref_slice_header = nullptr;
+	    const header_version* ref_header = nullptr;
 
 	    lax_read_mode = options.get_lax();
 	    sequential_read = options.get_sequential_read(); // updating the archive object's field
@@ -167,7 +167,7 @@ namespace libdar
 				// if the header_version contains a slice_layout (isolated catalogue since format 12)
 				// we record it and will pass it to open the main archive, below
 				// else ref_slice_header stays equal to nullptr
-			    ref_slice_header = ref_ver.get_slice_header();
+			    ref_header = &ref_ver;
 
 			}
 			catch(Euser_abort & e)
@@ -219,7 +219,7 @@ namespace libdar
 					 options.get_info_details(),
 					 gnupg_signed,
 					 slice_header,  // slice_header is set from here
-					 ref_slice_header, // may be equal to null
+					 ref_header, // may be equal or be a header without slice layout info
 					 options.get_multi_threaded_crypto(),
 					 options.get_multi_threaded_compress(),
 					 options.get_header_only(),
