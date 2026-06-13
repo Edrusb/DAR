@@ -689,7 +689,7 @@ namespace libdar
 
 	if(ref.ref_header)
 	{
-	    header* tmp = new (nothrow) header(*ref_header);
+	    header* tmp = new (nothrow) header(*ref.ref_header);
 	    if(tmp == nullptr)
 		throw Ememory("header_version::copy_from");
 	    else
