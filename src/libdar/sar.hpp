@@ -199,7 +199,6 @@ namespace libdar
 	std::string ext;             ///< archive extension
         std::string hook;            ///< command line to execute between slices
 	header slicing;              ///< slice layout
-	bool slicing_set;            ///< whether slicing is known (external or read from a slice header)
         infinint file_offset;        ///< current reading/writing position in the current slice (relative to the whole slice file, including headers)
 	hash_algo hash;              ///< whether to build a hashing when creating slices, and if so, which algorithm to use
 	infinint min_digits;         ///< minimum number of digits the slices number is stored with in the filename
@@ -215,7 +214,7 @@ namespace libdar
 	bool force_perm;             ///< true if any future slice has its permission to be set explicitely
 	U_I perm;                    ///< if force_perm is true, value to use for slice permission
         fichier_global *of_fd;       ///< file object currently openned
-        bool initial;                ///< do not launch hook command-line during sar initialization
+        bool initial;                ///< do not launch hook command-line during sar initialization, also means slicing is known (externally given or read from a slice)
             // these are the option flags
         bool opt_warn_overwrite;     ///<  a warning must be issued before overwriting a slice
         bool opt_allow_overwrite;    ///< is slice overwriting allowed

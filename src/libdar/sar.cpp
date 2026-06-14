@@ -137,7 +137,6 @@ namespace libdar
         initial = true;
         hook = execute;
         set_info_status(CONTEXT_INIT);
-	slicing_set = false;
 	hash = hash_algo::none;
 	lax = x_lax;
 	min_digits = x_min_digits;
@@ -157,8 +156,7 @@ namespace libdar
 		throw Erange("sar::sar", gettext("Invalid external slice header obtained"));
 	    else
 	    {
-		slicing = *header_from_external;
-		slicing_set = true;
+		    // of_current stays equal to zero until a real skip is performed
 		file_offset = slicing.get_first_slice_header_size();
 		    // virtually seeking to the first byte of information
 		    // located right after the slice header (as by default
@@ -206,7 +204,6 @@ namespace libdar
         ext = extension;
         slicing.set_slice_size(file_size);
         slicing.set_first_slice_size(first_file_size);
-	slicing_set = true;
         hook = execute;
 	pause = x_pause;
 	hash = x_hash;
@@ -222,7 +219,6 @@ namespace libdar
 	slicing.set_internal_name(internal_name);
 	slicing.set_data_name(data_name);
 	slicing.set_format_07_compatibility(format_07_compatible);
-	slicing_set = true;
 
 	try
 	{
@@ -277,12 +273,12 @@ namespace libdar
 	if(hash != hash_algo::none)
 	    return false;
 
-	if(of_current.is_zero() && !slicing_set)
+	if(of_current.is_zero() && initial)
 	    skip(0);
 	    // this will trigger the fetch of the slice
 	    // header from the first slice
 
-	if(!slicing_set)
+	if(initial)
 	    throw SRC_BUG;
 
 	switch(direction)
@@ -315,7 +311,7 @@ namespace libdar
 	if(is_terminated())
 	    throw SRC_BUG;
 
-	if(!slicing_set)
+	if(initial)
 	{
 		// we need to fetch the slicing information
 		// for that the only slice that we can be sure
@@ -323,7 +319,7 @@ namespace libdar
 		// information from there.
 	    open_file(1);
 
-	    if(!slicing_set)
+	    if(initial)
 		throw SRC_BUG;
 	}
 	else
@@ -433,12 +429,12 @@ namespace libdar
 	if(is_terminated())
 	    throw SRC_BUG;
 
-	if(of_current.is_zero() && !slicing_set)
+	if(of_current.is_zero() && initial)
 	    skip(0);
 	    // this will trigger the fetch of the slice
 	    // header from the first slice
 
-	if(!slicing_set)
+	if(initial)
 	    throw SRC_BUG;
 
 	number = of_current;
@@ -476,12 +472,12 @@ namespace libdar
 	if(is_terminated())
 	    throw SRC_BUG;
 
-	if(of_current.is_zero() && !slicing_set)
+	if(of_current.is_zero() && initial)
 	    skip(0);
 	    // this will trigger the fetch of the slice
 	    // header from the first slice
 
-	if(!slicing_set)
+	if(initial)
 	    throw SRC_BUG;
 
 	number = of_current;
@@ -530,7 +526,7 @@ namespace libdar
 	infinint dest_file, offset;
 	infinint high_num;
 
-	if(of_current.is_zero() && !slicing_set)
+	if(of_current.is_zero() && initial)
 	{
 	    sar* me = const_cast<sar*>(this);
 	    if(me == nullptr)
@@ -540,7 +536,7 @@ namespace libdar
 	    // header from the first slice
 	}
 
-	if(!slicing_set)
+	if(initial)
 	    throw SRC_BUG;
 
 	    // locate the slice and relative offset where to cut
@@ -580,7 +576,7 @@ namespace libdar
     {
 	infinint delta;
 
-	if(of_current.is_zero() && !slicing_set)
+	if(of_current.is_zero() && initial)
 	{
 	    sar* me = const_cast<sar*>(this);
 	    if(me == nullptr)
@@ -589,7 +585,7 @@ namespace libdar
 		me->skip(0);
 		// this will trigger the fetch of the slice
 		// header from the first slice
-	    if(!slicing_set)
+	    if(initial)
 		throw SRC_BUG;
 	}
 
@@ -605,7 +601,7 @@ namespace libdar
 		+ (of_current-2)*(slicing.get_slice_size() - slicing.get_common_slice_header_size() - delta)
 		+ file_offset
 		- slicing.get_common_slice_header_size();
-        else // if of_current is null (but slicing_set) this is as if of_current was set to 1, which is what we need here
+        else // if of_current is null (but initial is false) this is as if of_current was set to 1, which is what we need here
             return file_offset - slicing.get_first_slice_header_size();
     }
 
@@ -613,12 +609,12 @@ namespace libdar
     {
 	infinint avail_in_slice;
 
-	if(of_current.is_zero() && !slicing_set)
+	if(of_current.is_zero() && initial)
 	    skip(0);
 	    // this will trigger the fetch of the slice
 	    // header from the first slice
 
-	if(!slicing_set)
+	if(initial)
 	    throw SRC_BUG;
 
 	if(of_current == 1)
@@ -731,12 +727,12 @@ namespace libdar
 	infinint dest_file, offset;
 	infinint high_num;
 
-	if(of_current.is_zero() && !slicing_set)
+	if(of_current.is_zero() && initial)
 	    skip(0);
 	    // this will trigger the fetch of the slice
 	    // header from the first slice
 
-	if(!slicing_set)
+	if(initial)
 	    throw SRC_BUG;
 
 
@@ -976,8 +972,6 @@ namespace libdar
 
 	    if(! check_header(h, fic, num))
 		continue; // restart the while loop
-	    else
-		slicing_set = true;
 
 		// checking the flag
 		//
@@ -1340,7 +1334,6 @@ namespace libdar
         slicing.set_first_slice_header_size(0); // means that the sizes have to be determined from file or wrote to file
 	slicing.set_common_slice_header_size(0);
 	slicing.set_format_07_compatibility(false); // will be set to true at header read time a bit further if necessary
-	slicing_set = false;
 	size_of_current = 0; // not used in write mode
     }
 
@@ -1357,7 +1350,6 @@ namespace libdar
 		try
 		{
 		    open_readonly(display, num);
-		    initial = false;
 		}
 		catch(Edata & e)
 		{
@@ -1534,7 +1526,7 @@ namespace libdar
 
     void sar::fetch_slicing() const
     {
-	if(!slicing_set)
+	if(initial)
 	{
 	    sar* me = const_cast<sar*>(this);
 	    if(me == nullptr)
@@ -1546,7 +1538,7 @@ namespace libdar
 		// skip() call or equivalent has been called
 		// so far
 
-	    if(!slicing_set)
+	    if(initial)
 		throw SRC_BUG;
 	}
     }
@@ -1631,6 +1623,7 @@ namespace libdar
 		// this is the first time we get a header (external or internal)
 		// we take it as reference compare to following ones we might have to read
 	    slicing = h;
+	    initial = false;
 
 	    if(h.get_first_slice_header_size().is_zero())
 		slicing.set_first_slice_header_size(slicing.get_common_slice_header_size());
