@@ -333,10 +333,15 @@ namespace libdar
 	}
     }
 
-    void header::check_same_slice_set(const header & ref) const
+    bool header::check_same_slice_set(const header & ref) const
     {
-	if(get_internal_name() != ref.get_internal_name())
-	    throw Erange("header::check_same_slice_set", gettext("this slice is from a different set of slices"));
+	return internal_name == ref.internal_name;
+    }
+
+
+    bool header::check_same_data_set(const header & ref) const
+    {
+	return data_name == ref.data_name;
     }
 
     void header::fill_from(user_interaction & ui, const tlv_list & extension)

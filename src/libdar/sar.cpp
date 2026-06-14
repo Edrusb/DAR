@@ -1640,16 +1640,19 @@ namespace libdar
 	}
 	else // not the first time we see a slice of that archive
 	{
-	    try
+	    if(! slicing.check_same_slice_set(h))
 	    {
-		slicing.check_same_slice_set(h);
-	    }
-	    catch(Erange & e)
-	    {
+		string mesg;
+
+		if(slicing.check_same_data_set(h))
+		    mesg = tools_printf(gettext("%s is a slice from another backup resulting of a dar_xform transformation of the expected backup, please use the slice of the original backup"), fic.c_str());
+		else
+		    mesg = tools_printf(gettext("%s is a slice from another backup, please provide the correct slice."), fic.c_str());
+
 		if(!lax)
 		{
 		    close_file(false);
-		    get_ui().pause(tools_printf(gettext("%s is a slice from another backup, please provide the correct slice."), fic.c_str()));
+		    get_ui().pause(mesg);
 		    return false;
 		}
 		else

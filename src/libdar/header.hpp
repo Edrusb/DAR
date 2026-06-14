@@ -100,9 +100,12 @@ namespace libdar
 
 
 	    /// check whether the given argument is part of the same slice set as current header
+	bool check_same_slice_set(const header & ref) const;
 
-	    /// \note throw exception in case not of the same slice set
-	void check_same_slice_set(const header & ref) const;
+	    /// check whether the given argument is par of an archive containing the same data set
+
+	    /// \note if dar_xform has been used, this check can succeed while check_same_slice_set() will fail
+	bool check_same_data_set(const header & ref) const;
 
 
 	    /// minimal size of a header in an archive
