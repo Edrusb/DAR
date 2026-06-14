@@ -19,6 +19,7 @@ a * alteration of operation		--alter	  argument:
 							    do-not-compare-symlink-mtime
 							    duc
 							    e[rase_ea]
+							    efd[extract-from-database]
 							    f[ixed-date]
 							    file-auth[entication]
 							    first-slice
@@ -28,6 +29,7 @@ a * alteration of operation		--alter	  argument:
 							    h[oles-recheck]
 							    header
 							    i[gnore-unknown-inode-type]
+							    iesh[ignore-external-slice-header]
 							    k[eep-compressed]
 							    l[axist]
 							    list-ea
@@ -46,7 +48,7 @@ a * alteration of operation		--alter	  argument:
 							    vc / verbose-libcurl
 							    y byte[s]
 							    z[eroing-negative-dates]
-							    efd[extract-from-database]
+
 b - terminal bell                       --bell
 c + create archive                      --create
 d + difference with filesystem          --diff

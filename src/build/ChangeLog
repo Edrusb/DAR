@@ -12,6 +12,13 @@ from 2.8.x to 2.9.0
 - add blake2 and rabinKarp-blake2 hash algorithms to build binary delta
   signatures (archive_options_{create|isolate|merge}::set_delta_signature()
   overloaded methods in API and '--delta sig:...' enhancement in CLI.
+- isolated catalogues now contains all informations necessary to read a
+  backup of reference without first reading any part of it. This means
+  that restoring data with the help of an isolated catalogue dar will no
+  more require the first or the last slice before the ones where is
+  located the data to restore.
+- added -aiesh option, to cope with dar_xform transformed backup when
+  read with the help of an isolated catalogue.
 
 from 2.8.5 to 2.8.6
 - fixing bug met when restoring backup in dry-run mode (--empty option)

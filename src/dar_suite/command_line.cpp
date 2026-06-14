@@ -330,6 +330,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
     p.fully_detailed_dates = false;
     p.isolation_repair = false;
     p.extract_from_database = false;
+    p.ignore_external_sh = false;
 
     if(!dialog)
 	throw SRC_BUG;
@@ -1693,6 +1694,8 @@ static bool get_args_recursive(recursive_param & rec,
 		    p.isolation_repair = true;
 		else if(strcasecmp("efd", optarg) == 0 || strcasecmp("extract-from-database", optarg) == 0)
 		    p.extract_from_database = true;
+		else if(strcasecmp("iesh", optarg) == 0 || strcasecmp("ignore-external-slice-header", optarg) == 0)
+		    p.ignore_external_sh = true;
 		else
                     throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext("Unknown argument given to -a : %s"), optarg));
                 break;

@@ -167,7 +167,8 @@ namespace libdar
 				// if the header_version contains a slice_layout (isolated catalogue since format 12)
 				// we record it and will pass it to open the main archive, below
 				// else ref_slice_header stays equal to nullptr
-			    ref_header = &ref_ver;
+			    if(! options.get_ignore_external_slice_header())
+				ref_header = &ref_ver;
 
 			}
 			catch(Euser_abort & e)

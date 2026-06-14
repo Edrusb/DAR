@@ -178,6 +178,7 @@ struct line_param
     bool fully_detailed_dates;    ///< whether to show subsecond value of dates
     bool isolation_repair;        ///< whether to try isolate content of a truncated archive
     bool extract_from_database;   ///< whether to extract from a dar_manager database or from a dar archive
+    bool ignore_external_sh;      ///< whether to ignore external slice header when reading a backup with the help of an isolated catalogue
 
 	// constructor for line_param
     line_param()

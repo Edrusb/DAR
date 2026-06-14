@@ -879,6 +879,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 			read_options.set_ref_entrepot(ref_repo);
 		    read_options.set_silent(param.quiet_crypto);
 		    read_options.set_force_first_slice(param.force_first_slice);
+		    read_options.set_ignore_external_slice_header(param.ignore_external_sh);
 		}
 
 		if(param.extract_from_database)
@@ -1032,6 +1033,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    if(ref_repo)
 			read_options.set_ref_entrepot(ref_repo);
 		    read_options.set_force_first_slice(param.force_first_slice);
+		    read_options.set_ignore_external_slice_header(param.ignore_external_sh);
 		}
 		arch.reset(new (nothrow) archive(dialog,
 						 *param.sauv_root,
@@ -1123,6 +1125,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    if(ref_repo)
 			read_options.set_ref_entrepot(ref_repo);
 		    read_options.set_force_first_slice(param.force_first_slice);
+		    read_options.set_ignore_external_slice_header(param.ignore_external_sh);
 		}
 		arch.reset(new (nothrow) archive(dialog,
 						 *param.sauv_root,

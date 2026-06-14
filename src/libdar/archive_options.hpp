@@ -222,6 +222,9 @@ namespace libdar
 	    /// defines the protocol to use to retrieve slices of the reference archive (where the external catalogue resides)
 	void set_ref_entrepot(const std::shared_ptr<entrepot> & entr) { if(!entr) throw Erange("archive_options_read::set_ref_entrepot", "null entrepot pointer given in argument"); x_ref_entrepot = entr; };
 
+	    /// whether to ignore the slice header of the archive of reference stored in the isolated catalogue
+	void set_ignore_external_slice_header(bool val) { x_ignore_external_slice_header = val; };
+
 
 	    /////////////////////////////////////////////////////////////////////
 	    // getting methods (mainly used inside libdar, but kept public and part of the API in the case it is needed)
@@ -256,6 +259,7 @@ namespace libdar
 	const std::string & get_ref_execute() const { return x_ref_execute; };
 	infinint get_ref_slice_min_digits() const { return x_ref_slice_min_digits; };
 	const std::shared_ptr<entrepot> & get_ref_entrepot() const { return x_ref_entrepot; };
+	bool get_ignore_external_slice_header() const { return x_ignore_external_slice_header; };
 
     private:
 	crypto_algo x_crypto;
@@ -287,6 +291,7 @@ namespace libdar
 	std::string x_ref_execute;
 	infinint x_ref_slice_min_digits;
 	std::shared_ptr<entrepot> x_ref_entrepot;
+	bool x_ignore_external_slice_header;
 
 	void copy_from(const archive_options_read & ref);
 	void move_from(archive_options_read && ref) noexcept;

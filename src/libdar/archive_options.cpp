@@ -148,6 +148,7 @@ namespace libdar
 	x_ref_entrepot = shared_ptr<entrepot>(new (nothrow) entrepot_local("", "", false)); // never using furtive_mode to read slices
 	if(!x_ref_entrepot)
 	    throw Ememory("archive_options_read::clear");
+	x_ignore_external_slice_header = false;
     }
 
     void archive_options_read::set_default_crypto_size()
@@ -236,6 +237,7 @@ namespace libdar
 	if(!ref.x_ref_entrepot)
 	    throw SRC_BUG;
 	x_ref_entrepot = ref.x_ref_entrepot;
+	x_ignore_external_slice_header = ref.x_ignore_external_slice_header;
     }
 
     void archive_options_read::move_from(archive_options_read && ref) noexcept
@@ -270,6 +272,7 @@ namespace libdar
 	x_ref_execute = std::move(ref.x_ref_execute);
 	x_ref_slice_min_digits = std::move(ref.x_ref_slice_min_digits);
 	x_ref_entrepot = std::move(ref.x_ref_entrepot);
+	x_ignore_external_slice_header = std::move(ref.x_ignore_external_slice_header);
     }
 
 
