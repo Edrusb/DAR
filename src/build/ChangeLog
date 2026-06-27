@@ -18,7 +18,8 @@ from 2.8.x to 2.9.0
   more require the first or the last slice before the ones where is
   located the data to restore.
 - added -aiesh option, to cope with dar_xform transformed backup when
-  read with the help of an isolated catalogue.
+  read with the help of an isolated catalogue since the slicing info is
+  of the backup is stored in the isolated catalogue.
 
 from 2.8.5 to 2.8.6
 - fixing bug met when restoring backup in dry-run mode (--empty option)
