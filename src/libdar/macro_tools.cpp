@@ -611,7 +611,15 @@ namespace libdar
 		    }
 		}
 
-		ver.read(stack, *dialog, lax);
+		    // we need to provide the top of the stack
+		    // and not the stack as a generic_file for
+		    // the header_version can properly detect
+		    // in which context it is read (pipe or not)
+		generic_file* stack_top = stack.top();
+		if(stack_top == nullptr)
+		    throw SRC_BUG;
+
+		ver.read(*stack_top, *dialog, lax);
 		if(second_terminateur_offset.is_zero() && by_the_end && ver.get_edition() > 7)
 		    if(!has_external_cat)
 		    {

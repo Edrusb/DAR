@@ -50,6 +50,7 @@ extern "C"
 #include "tlv_list.hpp"
 #include "tools.hpp"
 #include "fichier_global.hpp"
+#include "contextual.hpp"
 
 using namespace std;
 namespace libdar
@@ -84,7 +85,8 @@ namespace libdar
         magic_number tmp;
 	tlv_list tempo;
 	char extension;
-	fichier_global *f_fic = dynamic_cast<fichier_global *>(&f);
+	fichier_global *f_fic = dynamic_cast<fichier_global *>(&f); // we read a header from a slice header
+	contextual *f_sar = dynamic_cast<contextual *>(&f);         // we read an external slice header
 
 	clear();
 
@@ -132,7 +134,7 @@ namespace libdar
 			// specific size for the first slice
 		}
 	    }
-	    else // not reading from a file (but read from a pipe, for example)
+	    else // not reading from a file (but read from a pipe or reading an external header, for example)
 	    {
 		sly.other_size = 0; // means single sliced archive
 		sly.first_size = 0; // means non-specific size for the first slice
@@ -163,12 +165,17 @@ namespace libdar
 	    }
 	    else
 	    {
-		if(!lax)
-		    throw Erange("header::read", gettext("Archive format older than \"08\" (release 2.4.0) cannot be read through a single pipe. It only can be read using dar_slave or as normal plain files (slices)"));
-		else
+		if(f_sar != nullptr)
+		    throw Erange("header::read", gettext("Archive format older than \"08\" does not allow the use of an isolated catalog as backup of an internal one"));
+		else // nor header from a slice not external header
 		{
-		    ui.message(gettext("LAX MODE: first slice size is not possible to read, continuing anyway..."));
-		    sly.first_size = 0; // no specific size for the first slice as we assume we read a single sliced archive
+		    if(!lax)
+			throw Erange("header::read", gettext("Archive format older than \"08\" (release 2.4.0) cannot be read through a single pipe. It only can be read using dar_slave or as normal plain files (slices)"));
+		    else
+		    {
+			ui.message(gettext("LAX MODE: first slice size is not possible to read, continuing anyway..."));
+			sly.first_size = 0; // no specific size for the first slice as we assume we read a single sliced archive
+		    }
 		}
 	    }
 
