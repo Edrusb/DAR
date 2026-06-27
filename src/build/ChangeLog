@@ -8,6 +8,10 @@ from 2.8.5 to 2.8.6
   been removed and that were not considered part of the official API
   autoconf provides. This change  does not impact already packaged
   source code nor the way dar behaves (display only issue).
+- fixed bug in dar_xform met when resizing archive format older than 08
+  (release 2.4.0), leading to an wrong size of slices after the first one
+  and to an unreadable archive due to a wrong offset to find a given data
+  or metadata in the archive.
 
 from 2.8.4 to 2.8.5
 - fixing bug of one-hour-shift in non-daylight saving months for

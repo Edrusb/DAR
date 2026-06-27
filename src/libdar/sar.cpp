@@ -1314,7 +1314,12 @@ namespace libdar
 		slicing.first_slice_header = of_fd->get_position();
 		if(slicing.first_slice_header.is_zero())
 		    throw SRC_BUG;
-		slicing.other_slice_header = slicing.first_slice_header; // same header in all slice since release 2.4.0
+
+		if(slicing.older_sar_than_v8)
+		    slicing.other_slice_header = header::min_size();
+		else
+		    slicing.other_slice_header = slicing.first_slice_header; // same header in all slice since release 2.4.0
+
 		if(slicing.first_slice_header >= slicing.first_size)
 		    throw Erange("sar::sar", gettext("First slice size is too small to even just be able to drop the slice header"));
 		if(slicing.other_slice_header >= slicing.other_size)
