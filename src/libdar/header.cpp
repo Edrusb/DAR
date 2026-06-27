@@ -282,7 +282,7 @@ namespace libdar
 	    // external related checks
 
 	if(external && get_format_07_compatibility())
-	    throw Erange("header::check_validity", gettext("slice layout of an old archive stored in an isolated catalog cannot be used to avoid openning the first or last slice of the archive"));
+	    throw Erange("header::check_validity", gettext("slice layout of an old archive stored in an isolated catalog cannot be used to avoid openning the first or last slice of the archive, consider using the ignore external slice header option"));
 
 	if(external && ! has_header_tlv())
 	    throw Erange("header::check_validity", gettext("Corrupted external slice header: missing header size tlv"));

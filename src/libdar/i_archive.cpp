@@ -194,6 +194,9 @@ namespace libdar
 			throw;
 		    }
 		    ref_where.reset();
+
+		    if(info_details)
+			dialog->printf(gettext("Isolated catalog opened and ready for use"));
 		}
 
 		if(info_details)

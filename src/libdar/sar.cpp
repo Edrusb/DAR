@@ -1567,7 +1567,7 @@ namespace libdar
 
 	    if(external)
 	    {
-		e.prepend_message(gettext("Error analysing the external slice header"));
+		e.prepend_message(gettext("Error analysing the external slice header: "));
 		throw;
 	    }
 	    else

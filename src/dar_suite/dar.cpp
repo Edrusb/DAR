@@ -1225,7 +1225,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 	}
 	catch(Egeneric & e)
 	{
-	    dialog->message(tools_printf(gettext("Aborting due to exception: %s\nFinal memory cleanup"), e.get_message().c_str()));
+	    e.prepend_message(gettext("Final memory cleanup, aborting due to exception: "));
 	    throw;
 	}
 	catch(...)
