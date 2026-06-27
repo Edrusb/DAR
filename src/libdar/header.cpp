@@ -272,8 +272,12 @@ namespace libdar
 
 	    // old format related checks
 
-	if(get_format_07_compatibility() && initial && slice_num != 1)
+	if(get_format_07_compatibility() && initial && slice_num > 1)
 	    throw Edata(gettext("This is an old archive, it can only be opened starting by the first slice"));
+	    // if slice_num is zero, this means we're checking an external header
+	    // and we do not have any issue about the slice to start with
+	    // even for format <= 07 as we already have a full slice header
+	    // and will no read it from slices at this opening step.
 
 	    // external related checks
 
