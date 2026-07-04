@@ -64,7 +64,13 @@ namespace libdar
 	for(U_I i = 0; i < 3; ++i)
 	    tmp[i] = to_char(tmp[i]);
 
-	(void)f.write((char *)tmp, sizeof(tmp));
+	if(version >= 8)
+	    (void)f.write((char *)tmp, sizeof(tmp));
+	else
+	{
+	    tmp[2] = '\0';
+	    (void)f.write((char *)tmp, 3); // only 3 byte field before format 8
+	}
     }
 
 
