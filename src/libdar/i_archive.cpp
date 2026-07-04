@@ -168,7 +168,13 @@ namespace libdar
 				// we record it and will pass it to open the main archive, below
 				// else ref_slice_header stays equal to nullptr
 			    if(! options.get_ignore_external_slice_header())
-				ref_header = &ref_ver;
+				if(ref_ver.get_slice_header() != nullptr
+				   && ref_ver.get_ref_header_version() != nullptr)
+				    ref_header = &ref_ver;
+				// else ref_ver stays equal to nullptr
+				// leading the slice and header_version
+				// information to be read from the main
+				// archive (first or last slice)
 
 			}
 			catch(Euser_abort & e)
@@ -222,8 +228,8 @@ namespace libdar
 					 options.get_sequential_read(),
 					 options.get_info_details(),
 					 gnupg_signed,
-					 slice_header,  // slice_header is set from here
-					 ref_header, // may be equal or be a header without slice layout info
+					 slice_header,  // slice_header field is set from here
+					 ref_header, // may be nullptr or be a header without slice layout info
 					 options.get_multi_threaded_crypto(),
 					 options.get_multi_threaded_compress(),
 					 options.get_header_only(),
@@ -244,8 +250,11 @@ namespace libdar
 
 			// fetching the catalogue in the archive of reference, making it pointing on the main archive layers.
 
-		    ref_ver.set_compression_algo(ver.get_compression_algo());
 			// set the default compression to use to the one of the main archive
+			// it is only for backward compatibility (format 03) and is will be propagated down to cat_file objects
+			// as a default compression algorithm. It should be thus be the compression algo of the reference backup not
+			// the one of the used for the isolated catalogue.
+		    ref_ver.set_compression_algo(ver.get_compression_algo());
 
 		    if(info_details)
 			dialog->message(gettext("Loading isolated catalogue in memory..."));
@@ -1656,6 +1665,8 @@ namespace libdar
 					const string & extension,
 					const archive_options_isolate & options)
     {
+	const header_version* ref_version = &ver;
+	const header* ref_slicing = &slice_header;
 	shared_ptr<entrepot> sauv_path_t = options.get_entrepot();
 	if(sauv_path_t == nullptr)
 	    throw Ememory("archive::i_archive::archive");
@@ -1691,12 +1702,28 @@ namespace libdar
 	    while(isol_data_name == cat->get_data_name());
 	    internal_name = isol_data_name;
 
+	    if(ver.get_ref_header_version() == nullptr ^ ver.get_slice_header() == nullptr)
+		throw SRC_BUG;
+		// if not both are nullptr nor both non-nullptr, this is a bug.
+
+		// if we are an isolated catalogue, we provide
+		// the header version of the reference catalog
+		// not our own header_version, to avoid header_version
+		// recursive doing isolation of isolated catalogue
+	    if(ver.get_ref_header_version() != nullptr)
+		ref_version = ver.get_ref_header_version();
+
+		// same principle but applied to the slice header
+	    if(ver.get_slice_header() != nullptr)
+		ref_slicing = ver.get_slice_header();
+
 
 	    macro_tools_create_layers(get_pointer(),
 				      layers,
 				      isol_ver,
 				      isol_slices,
-				      &slice_header, // giving our slice_layout as reference to be stored in the archive header/trailer
+				      ref_slicing, // either our own slicing or the one stored as reference
+				      ref_version, // either points to ver or to ver's reference if it has one
 				      sauv_path_t,
 				      filename,
 				      extension,
@@ -2442,6 +2469,7 @@ namespace libdar
 					  ver,   // this object field is set!
 					  slice_header,// this object field is set!
 					  nullptr, // no slicing reference stored in archive header/trailer
+					  nullptr, // no header_version reference store in archive
 					  sauv_path_t,
 					  filename,
 					  extension,

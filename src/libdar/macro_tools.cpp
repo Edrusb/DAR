@@ -542,15 +542,20 @@ namespace libdar
 						  ref_slice_header,
 						  lax,
 						  execute);
-		if(tmp_sar != nullptr && ref_header == nullptr)
+		if(tmp_sar != nullptr)
 		{
-			// not openned by the end in sequential read mode
-		    if(by_the_end)
-			tmp_sar->skip_to_eof();
-		    else
-			tmp_sar->skip(0);
+		    if(ref_slice_header == nullptr)
+		    {
+			    // not openned by the end in sequential read mode
+			if(by_the_end)
+			    tmp_sar->skip_to_eof();
+			else
+			    tmp_sar->skip(0);
 
-		    sl_header = tmp_sar->get_slice_header();
+			sl_header = tmp_sar->get_slice_header();
+		    }
+		    else
+			sl_header = *ref_slice_header;
 		}
 	    }
 
@@ -565,10 +570,8 @@ namespace libdar
 		tmp = nullptr;
 	    }
 
-	    if(ref_header != nullptr)
-	    {
-		ver = *ref_header;
-	    }
+	    if(ref_header != nullptr && ref_header->get_ref_header_version() != nullptr)
+		ver = *(ref_header->get_ref_header_version());
 	    else
 	    {
 
@@ -1100,6 +1103,7 @@ namespace libdar
 				   header_version & ver,
 				   header & slicing,
 				   const header* ref_header,
+				   const header_version* ref_version,
 				   const shared_ptr<entrepot> & sauv_path_t,
 				   const string & filename,
 				   const string & extension,
@@ -1521,6 +1525,19 @@ namespace libdar
 		}
 		else
 		    ver.clear_slice_header();
+
+		if(ref_version != nullptr)
+		{
+		    unique_ptr<header_version> utmp;
+
+		    utmp.reset(new (nothrow) header_version(*ref_version));
+		    if(!utmp)
+			throw Ememory("macro_tools_create_layers");
+
+		    ver.set_ref_header_version(utmp);
+		}
+		else
+		    ver.clear_ref_header_version();
 
 		    // we drop the header at the beginning of the archive in any case (to be able to
 		    // know whether sequential reading is possible or not, and if sequential reading

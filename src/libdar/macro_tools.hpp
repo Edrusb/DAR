@@ -104,32 +104,32 @@ namespace libdar
 	/// \note _CLEAR is associated to the generic_thread below compressor else escape else
 	/// the cache or crypto_sym or scrambler which then has two Labels (_CLEAR and _UNCYPHERED)
 
-    extern void macro_tools_open_archive(const std::shared_ptr<user_interaction> & dialog, ///< for user interaction
-					 const std::shared_ptr<entrepot> & where,          ///< slices location
-                                         const std::string &basename,   ///< slice basename
-					 const infinint & min_digits,   ///< minimum digits for the slice number
-                                         const std::string &extension,  ///< slice extensions
-					 crypto_algo crypto,            ///< encryption algorithm (updated value from archive found in ver, below)
-                                         secu_string & pass,            ///< pass key for crypto/scrambling updated if interactivelay set
-					 U_32 & crypto_size,            ///< crypto block size, may be updated in a future implementation
-					 pile & stack,                  ///< the stack of generic_file resulting of the archive openning
-                                         header_version &ver,           ///< header read from raw data
-                                         const std::string &input_pipe, ///< named pipe for input when basename is "-" (dar_slave)
-                                         const std::string &output_pipe,       ///< named pipe for output when basename is "-" (dar_slave)
-                                         const std::string & execute,          ///< command to execute between slices
-					 infinint & second_terminateur_offset, ///< where to start looking for the second terminateur (set to zero if there is only one terminateur).
-					 bool lax,  ///< whether we skip&warn the usual verifications
-					 bool has_external_cat,    ///< true if the catalogue will not be read from the current archive (flag used in lax mode only)
-					 bool sequential_read, ///< whether to use the escape sequence (if present) to get archive contents and proceed to sequential reading
-					 bool info_details,    ///< be or not verbose about the archive openning
-					 std::list<signator> & gnupg_signed, ///< list of existing signature found for that archive (valid or not)
-					 header & sl_header,    ///< slicing header of the archive (read from "level1" object)
-					 const header_version* ref_header, ///< external header to be able to build the layers without reading any part of the archive
-					 U_I multi_threaded_crypto,  ///< number of worker thread to run for cryptography
-					 U_I multi_threaded_compress,  ///< number of worker threads to compress/decompress (need compression_block_size > 0)
-					 bool header_only,     ///< if true, stop the process before openning the encryption layer
-					 bool silent,          ///< do not display some informational messages of low importance
-					 bool force_read_first_slice   ///< except when using sequential read, libdar fetches slicing information from the last slice, setting this to true lead fetching this from the first slice. historically, historical behavior is "false". This only applies when using external catalogue (has_external_cat == true)
+    extern void macro_tools_open_archive(const std::shared_ptr<user_interaction> & dialog, ///< [in,out] for user interaction
+					 const std::shared_ptr<entrepot> & where,          ///< [in] slices location
+                                         const std::string &basename,          ///< [in] slice basename
+					 const infinint & min_digits,          ///< [in] minimum digits for the slice number
+                                         const std::string &extension,         ///< [in] slice extensions
+					 crypto_algo crypto,                   ///< [in] encryption algorithm (updated value from archive found in ver, below)
+                                         secu_string & pass,                   ///< [in] pass key for crypto/scrambling updated if interactivelay set
+					 U_32 & crypto_size,                   ///< [in] crypto block size, may be updated in a future implementation
+					 pile & stack,                         ///< [out] the stack of generic_file resulting of the archive openning
+                                         header_version &ver,                  ///< [out] header read from raw data (or copy of the ref_header provided below)
+                                         const std::string &input_pipe,        ///< [in] named pipe for input when basename is "-" (dar_slave)
+                                         const std::string &output_pipe,       ///< [in] named pipe for output when basename is "-" (dar_slave)
+                                         const std::string & execute,          ///< [in] command to execute between slices
+					 infinint & second_terminateur_offset, ///< [out] where to start looking for the second terminateur (set to zero if there is only one terminateur).
+					 bool lax,                             ///< [in] whether we skip&warn the usual verifications
+					 bool has_external_cat,                ///< [in] true if the catalogue will not be read from the current archive (flag used in lax mode only)
+					 bool sequential_read,                 ///< [in] whether to use the escape sequence (if present) to get archive contents and proceed to sequential reading
+					 bool info_details,                    ///< [in] be or not verbose about the archive openning
+					 std::list<signator> & gnupg_signed,   ///< [out] list of existing signature found for that archive (valid or not)
+					 header & sl_header,                   ///< [out] slicing header of the archive (read from "level1" object)
+					 const header_version* ref_header,     ///< [in] header of the archive of reference (or nullptr) containing external header_version and external slice_header to be able to build the layers without reading any part of the archive
+					 U_I multi_threaded_crypto,            ///< [in] number of worker thread to run for cryptography
+					 U_I multi_threaded_compress,          ///< [in] number of worker threads to compress/decompress (need compression_block_size > 0)
+					 bool header_only,                     ///< [in] if true, stop the process before openning the encryption layer
+					 bool silent,                          ///< [in] do not display some informational messages of low importance
+					 bool force_read_first_slice           ///< [in] except when using sequential read, libdar fetches slicing information from the last slice, setting this to true lead fetching this from the first slice. historically, historical behavior is "false". This only applies when using external catalogue (has_external_cat == true)
 	);
         // all allocated objects (ret1, ret2, scram), must be deleted when no more needed by the caller of this routine
 
@@ -240,6 +240,7 @@ namespace libdar
 					  header_version & ver,
 					  header & slicing,
 					  const header* ref_header,
+					  const header_version* ref_version,
 					  const std::shared_ptr<entrepot> & sauv_path_t,
 					  const std::string & filename,
 					  const std::string & extension,
