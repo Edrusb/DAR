@@ -436,6 +436,17 @@
 		whether the header/trailer contains the slice
 		layout of the archive of reference
 	      </li>
+	      <li>
+		whether the header/trailer contains a copy of the slice header of
+		the archive of reference (isolation context). If this field is
+		present it replaces the slice layout information as such field
+		is already present inside a slice header datastructure. [this
+		flag and corresponding field have been introduced in format 12]
+	      </li>
+	      <li>
+		whether the header/trailer contains a copy of the header version
+		of the archive of reference (introduced in format 12).
+	      </li>
               <li>
 		whether the archive has salt+iteration count+hash algo for
 		key derivation fonction (KDF)
@@ -459,7 +470,20 @@
 	  </li>
 	  <li>
 	    the slice layout of the backup of reference if the current archive
-	    is an isolated catalogue
+	    is an isolated catalogue, or a the complete slice header of the
+	    archive of reference since version 12.
+	  </li>
+	  <li>
+	    the header version of the backup of reference if the current archive
+	    is an isolated catalogue (since format 12). With the slice header of
+	    the archive of reference, this allows dar to create all layers (see
+	    Other Levels paragraph below) needed to open an backup without reading
+	    any single byte of it. Then at restoration time of a specific file, dar
+	    can directly fetch the needed data and only request the corresponding slices.
+	    Before format 12, dar had to fetch the slice header (reading the first or
+	    the last slice) to know the slice layout and be able to locate data among
+	    the slices of the backup, then the header_version (to known the arhive format and
+	    layers used at creation time).
 	  </li>
           <li>
 	    eventually, salt, iteration_count and hash algo for key
@@ -473,10 +497,13 @@
 	</ul>
 
 	<code class=block>
-	  +---------+------+---------------+------+--------+-------+----------+---------------+------------+------+------+-----------+-----+-------+
-	  | edition | algo | command line  | flag | initial| crypto| crypted  | gnupg crypted |  reference | salt | salt | iteration |hash | CRC   |
-	  |         |      |               |      | offset | algo  | key size | sym. key      |  slicing   | size | (KDF)| count(KDF)|(KDF)|       |
-	  +---------+------+---------------+------+--------+-------+----------+---------------+------------+------+------+-----------+-----+-------+
+	                                                           | *        |  *            | *               | *              | *    | *    | *         | *   |
+	  +---------+------+---------------+------+--------+-------+----------+---------------+-----------------+----------------+------+------+-----------+-----+-------+
+	  | edition | algo | command line  | flag | initial| crypto| crypted  | gnupg crypted |  reference      | reference      | salt | salt | iteration |hash | CRC   |
+	  |         |      |               |      | offset | algo  | key size | sym. key      |  slice header   | header version | size | (KDF)| count(KDF)|(KDF)|       |
+	  +---------+------+---------------+------+--------+-------+----------+---------------+-----------------+----------------+------+------+-----------+-----+-------+
+            * = optional fields
+
 	</code>
 
 	<p>
@@ -505,7 +532,7 @@
 	<p>
 	  <b>The isolation process:</b> At the end of archive creation, either read from filesystem (normal isolation) or just written to
 	  filesystem (on-fly isolation), the field <em>archive::i_archive::slices</em> holds the slice layout of the current archive. It has been
-	  read for the <em>sar</em> layer if the archive is sliced or is set to a default value if there is no <em>sar</em> layer and thus no slicing.
+	  read from the <em>sar</em> layer if the archive is sliced or is set to a default value if there is no <em>sar</em> layer and thus no slicing.
 	  The isolation process is defined in <em>archive::i_archive::op_isolate()</em>: it transmits the <em>slices</em> information to
 	  <em>macro_tools_create_layers()</em> which, in particular, uses it to setup the <em>header_version</em>. Once the layers are built
 	  by this routine, this <em>header_version</em> structure is written at the beginning of the archive (version header).
@@ -795,7 +822,7 @@
 	  <li>
 	    <p>
 	      The <b>sar</b> class which <b>s</b>egment <b>a</b>nd
-	      <b>r</b>eassmbles (perfoming thus the slicing)
+	      <b>r</b>eassembles (perfoming thus the slicing)
               follows the same principle:
               it transfers data wrote to it to several fichier
 	      [mening <i>file</i> in French] objects.
@@ -847,6 +874,10 @@
 	  <li>
 	    <p>
 	      class <b>memory_file</b> is used to store data in memory.
+	    </p>
+	  </li>
+	  <li>
+	    <p>
 	      <b>secu_memory_file</b> does the same but in secured memory (relying on
 	      <i>libgcrypt</i>. It is used to store sensible data like keys and passwords
 	    </p>
@@ -855,7 +886,7 @@
 	    <p>
 	      class <b>null_file</b> acts as the well known <code>/dev/null</code> block
 	      device of Unix system (drops all what is written to it and reads not data, like
-	      an empty file)
+	      an empty file) and is used for dry-run mode of operations.
 	    </p>
 	  </li>
 	  <li>
@@ -871,7 +902,7 @@
 	  </li>
 	</ul>
 	<p>
-          Here are below is an example of possible layer stacking libdar is using to address a particular combinaison of commands and options:
+          Here are below is an example of possible layer stacking which libdar is using to address a particular combinaison of commands and options:
 	</p>
 
 	<code class=block>
