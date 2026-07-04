@@ -124,7 +124,7 @@ namespace libdar
 					 bool info_details,    ///< be or not verbose about the archive openning
 					 std::list<signator> & gnupg_signed, ///< list of existing signature found for that archive (valid or not)
 					 header & sl_header,    ///< slicing header of the archive (read from "level1" object)
-					 const header_version* ref_header, ///< use the provided header to avoid reading a slice to fetch it
+					 const header_version* ref_header, ///< external header to be able to build the layers without reading any part of the archive
 					 U_I multi_threaded_crypto,  ///< number of worker thread to run for cryptography
 					 U_I multi_threaded_compress,  ///< number of worker threads to compress/decompress (need compression_block_size > 0)
 					 bool header_only,     ///< if true, stop the process before openning the encryption layer
