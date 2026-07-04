@@ -75,9 +75,9 @@ namespace libdar
 	void set_crypted_key(memory_file *key) { if(key == nullptr) throw SRC_BUG; clear_crypted_key(); crypted_key = key; };
 	void clear_crypted_key() { if(crypted_key != nullptr) { delete crypted_key; crypted_key = nullptr; } };
 
-	    /// the provided header object will be stored dump with the header version
+	    /// the provided header object will be dumped with the header version
 
-	    /// \note it is used to record the archive format and slicing layout of the archive of reference when it is present
+	    /// \note it is used to record the slice format and slicing layout of the archive of reference when it is present
 	    /// \note this replaces and extends the set_slice_layout() as a slice layout is embedded in a header object
 	void set_slice_header(std::unique_ptr<header> & ptr) { ref_header = std::move(ptr); only_slice_layout = false; };
 	void clear_slice_header() { ref_header.reset(); };
