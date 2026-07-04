@@ -74,6 +74,168 @@ namespace libdar
 
 	//
 
+    void header_version::set_kdf_hash(hash_algo algo)
+    {
+	if(algo == hash_algo::none)
+	    throw Erange("header_version::set_kdf_hash", gettext("invalid hash algorithm provided for key derivation function"));
+	kdf_hash = algo;
+	has_kdf_params = true;
+    }
+
+    string header_version::get_sym_crypto_name() const
+    {
+	if(get_edition() >= 9)
+	    return crypto_algo_2_string(get_sym_crypto_algo());
+	else
+	    return is_ciphered() ? gettext("yes") : gettext("no");
+    }
+
+    string header_version::get_asym_crypto_name() const
+    {
+	if((get_edition() >= 9)
+	   && (get_crypted_key() != nullptr))
+	    return "gnupg";
+	else
+	    return gettext("none");
+    }
+
+    const header* header_version::get_slice_header() const
+    {
+	if(only_slice_layout)
+	    return nullptr;
+	else
+	    if(ref_header)
+		return ref_header.get();
+	    else
+		return nullptr;
+    }
+
+    const slice_layout* header_version::get_slice_layout() const
+    {
+	if(ref_header)
+	    return & ref_header->get_slice_layout();
+	else
+	    return nullptr;
+    }
+
+    void header_version::display(user_interaction & dialog) const
+    {
+	string algo = compression2string(get_compression_algo());
+	string sym_str = get_sym_crypto_name();
+	string asym = get_asym_crypto_name();
+	string xsigned = is_signed() ? gettext("yes") : gettext("no");
+	string kdf_iter = deci(iteration_count).human();
+	string hashing = hash_algo_to_string(kdf_hash);
+
+	dialog.printf(gettext("Archive version format               : %s"), get_edition().display().c_str());
+	dialog.printf(gettext("Compression algorithm used           : %S"), &algo);
+	dialog.printf(gettext("Compression block size used          : %i"), &compr_bs);
+	dialog.printf(gettext("Symmetric key encryption used        : %S"), &sym_str);
+	dialog.printf(gettext("Asymmetric key encryption used       : %S"), &asym);
+	dialog.printf(gettext("Archive is signed                    : %S"), &xsigned);
+	dialog.printf(gettext("Sequential reading marks             : %s"), (get_tape_marks() ? gettext("present") : gettext("absent")));
+	dialog.printf(gettext("User comment                         : %S"), &(get_command_line()));
+	if(has_kdf_params)
+	{
+	    dialog.printf(gettext("KDF iteration count                  : %S"), &kdf_iter);
+	    dialog.printf(gettext("KDF hash algorithm                   : %S"), &hashing);
+	    dialog.printf(gettext("Salt size                            : %d byte%c"), salt.size(), salt.size() > 1 ? 's' : ' ');
+	}
+    }
+
+    void header_version::clear()
+    {
+	edition = archive_version();
+	algo_zip = compression::none;
+	cmd_line = "";
+	initial_offset = 0;
+	sym = crypto_algo::none;
+	clear_crypted_key();
+	ref_header.reset();
+	only_slice_layout = false;
+	has_tape_marks = false;
+	ciphered = false;
+	arch_signed = false;
+	has_kdf_params = false;
+	salt = "";
+	iteration_count = PRE_FORMAT_10_ITERATION;
+	kdf_hash = hash_algo::sha1;
+	compr_bs = 0;
+    }
+
+    void header_version::copy_from(const header_version & ref)
+    {
+	edition = ref.edition;
+	algo_zip = ref.algo_zip;
+	cmd_line = ref.cmd_line;
+	initial_offset = ref.initial_offset;
+	sym = ref.sym;
+	if(ref.crypted_key != nullptr)
+	{
+	    crypted_key = new (nothrow) memory_file(*ref.crypted_key);
+	    if(crypted_key == nullptr)
+		throw Ememory("header_version::copy_from");
+	}
+	else
+	    crypted_key = nullptr;
+
+	if(ref.ref_header)
+	{
+	    ref_header.reset(new (nothrow) header(*(ref.ref_header)));
+	    if(!ref_header)
+		throw Ememory("header_version::copy_from");
+	}
+	else
+	    ref_header.reset();
+
+	if(ref.ref_version)
+	{
+	    ref_version.reset(new (nothrow) header_version(*(ref.ref_version)));
+	    if(!ref_version)
+		throw Ememory("header_version::copy_from");
+	}
+	else
+	    ref_version.reset();
+
+	only_slice_layout = ref.only_slice_layout;
+	has_tape_marks = ref.has_tape_marks;
+	ciphered = ref.ciphered;
+	arch_signed = ref.arch_signed;
+	has_kdf_params = ref.has_kdf_params;
+	salt = ref.salt;
+	iteration_count = ref.iteration_count;
+	kdf_hash = ref.kdf_hash;
+	compr_bs = ref.compr_bs;
+    }
+
+    void header_version::move_from(header_version && ref) noexcept
+    {
+	edition = std::move(ref.edition);
+	algo_zip = std::move(ref.algo_zip);
+	cmd_line = std::move(ref.cmd_line);
+	initial_offset = std::move(ref.initial_offset);
+	sym = std::move(ref.sym);
+	swap(crypted_key, ref.crypted_key);
+	ref_header = std::move(ref.ref_header);
+	ref_version = std::move(ref.ref_version);
+	only_slice_layout = std::move(ref.only_slice_layout);
+	has_tape_marks = std::move(ref.has_tape_marks);
+	ciphered = std::move(ref.ciphered);
+	arch_signed = std::move(ref.arch_signed);
+	has_kdf_params = std::move(ref.has_kdf_params);
+	salt = std::move(ref.salt);
+	iteration_count = std::move(ref.iteration_count);
+	kdf_hash = std::move(ref.kdf_hash);
+	compr_bs = std::move(ref.compr_bs);
+    }
+
+    void header_version::detruit()
+    {
+	clear_crypted_key();
+	ref_header.reset();
+	ref_version.reset();
+    }
+
 
     header_version::header_version(): crypted_key(nullptr)
     {
@@ -625,167 +787,7 @@ namespace libdar
 	}
     }
 
-    void header_version::set_kdf_hash(hash_algo algo)
-    {
-	if(algo == hash_algo::none)
-	    throw Erange("header_version::set_kdf_hash", gettext("invalid hash algorithm provided for key derivation function"));
-	kdf_hash = algo;
-	has_kdf_params = true;
-    }
-
-    string header_version::get_sym_crypto_name() const
-    {
-	if(get_edition() >= 9)
-	    return crypto_algo_2_string(get_sym_crypto_algo());
-	else
-	    return is_ciphered() ? gettext("yes") : gettext("no");
-    }
-
-    string header_version::get_asym_crypto_name() const
-    {
-	if((get_edition() >= 9)
-	   && (get_crypted_key() != nullptr))
-	    return "gnupg";
-	else
-	    return gettext("none");
-    }
-
-    const header* header_version::get_slice_header() const
-    {
-	if(only_slice_layout)
-	    return nullptr;
-	else
-	    if(ref_header)
-		return ref_header.get();
-	    else
-		return nullptr;
-    }
-
-    const slice_layout* header_version::get_slice_layout() const
-    {
-	if(ref_header)
-	    return & ref_header->get_slice_layout();
-	else
-	    return nullptr;
-    }
-
-    void header_version::display(user_interaction & dialog) const
-    {
-	string algo = compression2string(get_compression_algo());
-	string sym_str = get_sym_crypto_name();
-	string asym = get_asym_crypto_name();
-	string xsigned = is_signed() ? gettext("yes") : gettext("no");
-	string kdf_iter = deci(iteration_count).human();
-	string hashing = hash_algo_to_string(kdf_hash);
-
-	dialog.printf(gettext("Archive version format               : %s"), get_edition().display().c_str());
-	dialog.printf(gettext("Compression algorithm used           : %S"), &algo);
-	dialog.printf(gettext("Compression block size used          : %i"), &compr_bs);
-	dialog.printf(gettext("Symmetric key encryption used        : %S"), &sym_str);
-	dialog.printf(gettext("Asymmetric key encryption used       : %S"), &asym);
-	dialog.printf(gettext("Archive is signed                    : %S"), &xsigned);
-	dialog.printf(gettext("Sequential reading marks             : %s"), (get_tape_marks() ? gettext("present") : gettext("absent")));
-	dialog.printf(gettext("User comment                         : %S"), &(get_command_line()));
-	if(has_kdf_params)
-	{
-	    dialog.printf(gettext("KDF iteration count                  : %S"), &kdf_iter);
-	    dialog.printf(gettext("KDF hash algorithm                   : %S"), &hashing);
-	    dialog.printf(gettext("Salt size                            : %d byte%c"), salt.size(), salt.size() > 1 ? 's' : ' ');
-	}
-    }
-
-    void header_version::clear()
-    {
-	edition = archive_version();
-	algo_zip = compression::none;
-	cmd_line = "";
-	initial_offset = 0;
-	sym = crypto_algo::none;
-	clear_crypted_key();
-	ref_header.reset();
-	only_slice_layout = false;
-	has_tape_marks = false;
-	ciphered = false;
-	arch_signed = false;
-	has_kdf_params = false;
-	salt = "";
-	iteration_count = PRE_FORMAT_10_ITERATION;
-	kdf_hash = hash_algo::sha1;
-	compr_bs = 0;
-    }
-
-    void header_version::copy_from(const header_version & ref)
-    {
-	edition = ref.edition;
-	algo_zip = ref.algo_zip;
-	cmd_line = ref.cmd_line;
-	initial_offset = ref.initial_offset;
-	sym = ref.sym;
-	if(ref.crypted_key != nullptr)
-	{
-	    crypted_key = new (nothrow) memory_file(*ref.crypted_key);
-	    if(crypted_key == nullptr)
-		throw Ememory("header_version::copy_from");
-	}
-	else
-	    crypted_key = nullptr;
-
-	if(ref.ref_header)
-	{
-	    ref_header.reset(new (nothrow) header(*(ref.ref_header)));
-	    if(!ref_header)
-		throw Ememory("header_version::copy_from");
-	}
-	else
-	    ref_header.reset();
-
-	if(ref.ref_version)
-	{
-	    ref_version.reset(new (nothrow) header_version(*(ref.ref_version)));
-	    if(!ref_version)
-		throw Ememory("header_version::copy_from");
-	}
-	else
-	    ref_version.reset();
-
-	only_slice_layout = ref.only_slice_layout;
-	has_tape_marks = ref.has_tape_marks;
-	ciphered = ref.ciphered;
-	arch_signed = ref.arch_signed;
-	has_kdf_params = ref.has_kdf_params;
-	salt = ref.salt;
-	iteration_count = ref.iteration_count;
-	kdf_hash = ref.kdf_hash;
-	compr_bs = ref.compr_bs;
-    }
-
-    void header_version::move_from(header_version && ref) noexcept
-    {
-	edition = std::move(ref.edition);
-	algo_zip = std::move(ref.algo_zip);
-	cmd_line = std::move(ref.cmd_line);
-	initial_offset = std::move(ref.initial_offset);
-	sym = std::move(ref.sym);
-	swap(crypted_key, ref.crypted_key);
-	ref_header = std::move(ref.ref_header);
-	ref_version = std::move(ref.ref_version);
-	only_slice_layout = std::move(ref.only_slice_layout);
-	has_tape_marks = std::move(ref.has_tape_marks);
-	ciphered = std::move(ref.ciphered);
-	arch_signed = std::move(ref.arch_signed);
-	has_kdf_params = std::move(ref.has_kdf_params);
-	salt = std::move(ref.salt);
-	iteration_count = std::move(ref.iteration_count);
-	kdf_hash = std::move(ref.kdf_hash);
-	compr_bs = std::move(ref.compr_bs);
-    }
-
-    void header_version::detruit()
-    {
-	clear_crypted_key();
-	ref_header.reset();
-	ref_version.reset();
-    }
+	//
 
     static bool all_flags_known(header_flags flag)
     {
