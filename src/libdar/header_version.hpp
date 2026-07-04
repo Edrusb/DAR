@@ -82,6 +82,17 @@ namespace libdar
 	void set_slice_header(std::unique_ptr<header> & ptr) { ref_header = std::move(ptr); only_slice_layout = false; };
 	void clear_slice_header() { ref_header.reset(); };
 
+	    /// the provided header_version object will be dumped with the current header version
+
+	    /// \note it is used to record the header_version and layers stack of the archive of reference
+	    /// in the context of an isolated catalogue. Having this information stored make possible to
+	    /// create the layers stack of the archive of reference without reading any part of its data.
+	    /// Having it stored so low in the stack of the archive of reference make it available very
+	    /// early in the reading process, in fact in the reference archive constructor before calling
+	    /// any reading operation when the use of an external catalogue is provided.
+	void set_ref_header_version(std::unique_ptr<header_version> & ptr) { ref_version = std::move(ptr); };
+	void clear_ref_header_version() { ref_version.reset(); };
+
 	void set_tape_marks(bool presence) { has_tape_marks = presence; };
 	void set_signed(bool is_signed) { arch_signed = is_signed; };
 
@@ -107,6 +118,7 @@ namespace libdar
 	memory_file* get_crypted_key() const { return crypted_key; };
 	const header* get_slice_header() const;
 	const slice_layout* get_slice_layout() const;
+	const header_version* get_ref_header_version() const { return ref_version.get(); };
 	bool get_tape_marks() const { return has_tape_marks; };
 	const std::string & get_salt() const { return salt; };
 	const infinint & get_iteration_count() const { return iteration_count; };
@@ -129,7 +141,8 @@ namespace libdar
 	    // has to be set to zero when it is unknown, in that case this field is not dump to archive
 	crypto_algo sym;         ///< strong encryption algorithm used for symmetrical encryption
 	memory_file *crypted_key;///< optional field containing the asymmetrically ciphered key used for strong encryption ciphering
-	std::unique_ptr<header> ref_header; ///< optional field used in isolated catalogues to record the archive format and slicing layout of their archive of reference
+	std::unique_ptr<header> ref_header; ///< optional field used in isolated catalogues to record the slice format and slicing layout of their archive of reference
+	std::unique_ptr<header_version> ref_version; ///< optional field used in isolated catalogues to record archive format and slice stack of the reference
 	bool only_slice_layout;  ///< whether ref_header only has slice_layout information
 	bool has_tape_marks;     ///< whether the archive contains tape marks aka escape marks aka sequence marks
 
@@ -141,7 +154,7 @@ namespace libdar
 	hash_algo kdf_hash;      ///< used for key derivation
 	infinint compr_bs;       ///< the compression block size (0 for legacy compression mode)
 
-	void nullifyptr() noexcept { crypted_key = nullptr; ref_header.reset(); };
+	void nullifyptr() noexcept { crypted_key = nullptr; ref_header.reset(); ref_version.reset(); };
 	void copy_from(const header_version & ref);
 	void move_from(header_version && ref) noexcept;
 	void detruit();

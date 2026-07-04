@@ -55,7 +55,7 @@ namespace libdar
     static constexpr U_I FLAG_IS_RESERVED_1   = 0x01;     ///< this flag is reserved meaning two bytes length bitfield (see class header_flags)
 
     static constexpr U_I FLAG_HAS_REF_HEADER  = 0x8000;   ///< whether the header contains ref slice header (extends/replace REF_SLICING option starting format 12)
-	// 0x4000
+    static constexpr U_I FLAG_HAS_REF_VERSION = 0x4000;   ///< whether the header contains ref header version (since format 12)
 	// 0X2000
 	// 0x1000
     static constexpr U_I FLAG_HAS_COMPRESS_BS = 0x0800;   ///< archive header contains a compression block size (else it is assumed equal to zero)
@@ -323,6 +323,20 @@ namespace libdar
 	    only_slice_layout = false;
 	}
 
+	if(flag.is_set(FLAG_HAS_REF_VERSION))
+	{
+	    ref_version.reset(new (nothrow) header_version());
+	    if(!ref_version)
+		throw Ememory("header_version::read");
+
+	    ref_version->read(f, dialog, lax_mode);
+
+	    if(ref_version->get_ref_header_version())
+		throw Erange("header_version::read", gettext("Unexpected recursively stored header_version, data corruption may have occurred"));
+	}
+	else
+	    ref_version.reset();
+
 	arch_signed = flag.is_set(FLAG_ARCHIVE_IS_SIGNED);
 
 	if(flag.is_set(FLAG_HAS_KDF_PARAM))
@@ -485,6 +499,9 @@ namespace libdar
 	if(ref_header)
 	    flag.set_bits(FLAG_HAS_REF_HEADER);
 
+	if(ref_version)
+	    flag.set_bits(FLAG_HAS_REF_VERSION);
+
 	if(has_tape_marks)
 	    flag.set_bits(FLAG_SEQUENCE_MARK);
 
@@ -549,6 +566,21 @@ namespace libdar
 		// be able to properly locate slice of a particular
 		// offset without having first to open the
 		// first or the last slice
+	}
+
+	if(ref_version)
+	{
+	    if(ref_version->get_ref_header_version())
+		throw SRC_BUG;
+		// we should not get to the point where
+		// the header_version of reference has
+		// also a header_version of reference.
+		// This would mean isolation of an isolated
+		// catalogue, and thise case should be
+		// handled by transferred the reference
+		// header_version to the secondary isolated
+		// catalogue.
+	    ref_version->write(f, dialog);
 	}
 
 	if(salt.size() > 0)
@@ -696,6 +728,15 @@ namespace libdar
 	else
 	    ref_header.reset();
 
+	if(ref.ref_version)
+	{
+	    ref_version.reset(new (nothrow) header_version(*(ref.ref_version)));
+	    if(!ref_version)
+		throw Ememory("header_version::copy_from");
+	}
+	else
+	    ref_version.reset();
+
 	only_slice_layout = ref.only_slice_layout;
 	has_tape_marks = ref.has_tape_marks;
 	ciphered = ref.ciphered;
@@ -716,6 +757,7 @@ namespace libdar
 	sym = std::move(ref.sym);
 	swap(crypted_key, ref.crypted_key);
 	ref_header = std::move(ref.ref_header);
+	ref_version = std::move(ref.ref_version);
 	only_slice_layout = std::move(ref.only_slice_layout);
 	has_tape_marks = std::move(ref.has_tape_marks);
 	ciphered = std::move(ref.ciphered);
@@ -731,6 +773,7 @@ namespace libdar
     {
 	clear_crypted_key();
 	ref_header.reset();
+	ref_version.reset();
     }
 
     static bool all_flags_known(header_flags flag)
@@ -744,6 +787,7 @@ namespace libdar
 	bf |= FLAG_INITIAL_OFFSET;
 	bf |= FLAG_HAS_CRYPTED_KEY;
 	bf |= FLAG_HAS_REF_SLICING;
+	bf |= FLAG_HAS_REF_VERSION;
 	bf |= FLAG_ARCHIVE_IS_SIGNED;
 	bf |= FLAG_HAS_KDF_PARAM;
 	bf |= FLAG_HAS_COMPRESS_BS;
