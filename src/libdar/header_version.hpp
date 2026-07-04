@@ -58,10 +58,10 @@ namespace libdar
 	~header_version() { detruit(); };
 
 	    /// read the header or trailer from the archive
-        void read(generic_file &f, user_interaction & dialog, bool lax_mode);
+        void read(generic_file &f, user_interaction & dialog, bool lax_mode) { inner_read(f, dialog, lax_mode, false); };
 
 	    /// write down the object to the archive (as header if wrote at the beginning of the archive, as trailer is at the end)
-        void write(generic_file &f, user_interaction & dialog) const;
+        void write(generic_file &f, user_interaction & dialog) const { inner_write(f, dialog, false); };
 
 	    // settings
 
@@ -158,6 +158,9 @@ namespace libdar
 	void copy_from(const header_version & ref);
 	void move_from(header_version && ref) noexcept;
 	void detruit();
+        void inner_read(generic_file &f, user_interaction & dialog, bool lax_mode, bool without_crc);
+        void inner_write(generic_file &f, user_interaction & dialog, bool without_crc) const;
+
 
 
 	static constexpr U_I PRE_FORMAT_10_ITERATION = 2000;   ///< fixed value used for key derivation before archive format 10

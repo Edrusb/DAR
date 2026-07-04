@@ -80,13 +80,15 @@ namespace libdar
 	clear();
     }
 
-    void header_version::read(generic_file & f, user_interaction & dialog, bool lax_mode)
+    void header_version::inner_read(generic_file & f, user_interaction & dialog, bool lax_mode, bool without_crc)
     {
 	crc *ctrl = nullptr;
 	char tmp;
         header_flags flag;
 
-	f.reset_crc(HEADER_CRC_SIZE);
+	if(!without_crc)
+	    f.reset_crc(HEADER_CRC_SIZE);
+
 	try
 	{
 	    edition.read(f);
@@ -329,7 +331,7 @@ namespace libdar
 	    if(!ref_version)
 		throw Ememory("header_version::read");
 
-	    ref_version->read(f, dialog, lax_mode);
+	    ref_version->inner_read(f, dialog, lax_mode, true);
 
 	    if(ref_version->get_ref_header_version())
 		throw Erange("header_version::read", gettext("Unexpected recursively stored header_version, data corruption may have occurred"));
@@ -410,9 +412,12 @@ namespace libdar
 	else
 	    compr_bs = 0;
 
-	ctrl = f.get_crc();
-	if(ctrl == nullptr)
-	    throw SRC_BUG;
+	if(! without_crc)
+	{
+	    ctrl = f.get_crc();
+	    if(ctrl == nullptr)
+		throw SRC_BUG;
+	}
 
 	try
 	{
@@ -424,7 +429,7 @@ namespace libdar
 		    throw Erange("header_version::read", gettext("Consistency check failed for archive header"));
 	    }
 
-	    if(edition > 7)
+	    if(edition > 7 && !without_crc)
 	    {
 		try
 		{
@@ -482,7 +487,7 @@ namespace libdar
 	    delete ctrl;
     }
 
-    void header_version::write(generic_file &f, user_interaction & dialog) const
+    void header_version::inner_write(generic_file &f, user_interaction & dialog, bool without_crc) const
     {
 	crc *ctrl = nullptr;
 	char tmp;
@@ -527,7 +532,9 @@ namespace libdar
 
 	    // writing down the data
 
-	f.reset_crc(HEADER_CRC_SIZE);
+	if(! without_crc)
+	    f.reset_crc(HEADER_CRC_SIZE);
+
 	edition.dump(f);
 	tmp = compression2char(algo_zip);
 	f.write(&tmp, sizeof(tmp));
@@ -580,7 +587,7 @@ namespace libdar
 		// handled by transferred the reference
 		// header_version to the secondary isolated
 		// catalogue.
-	    ref_version->write(f, dialog);
+	    ref_version->inner_write(f, dialog, true);
 	}
 
 	if(salt.size() > 0)
@@ -597,21 +604,25 @@ namespace libdar
 	if(compr_bs > 0)
 	    compr_bs.dump(f);
 
-	ctrl = f.get_crc();
-	if(ctrl == nullptr)
-	    throw SRC_BUG;
-	try
+	if(! without_crc)
 	{
-	    ctrl->dump(f);
-	}
-	catch(...)
-	{
+	    ctrl = f.get_crc();
+	    if(ctrl == nullptr)
+		throw SRC_BUG;
+
+	    try
+	    {
+		ctrl->dump(f);
+	    }
+	    catch(...)
+	    {
+		if(ctrl != nullptr)
+		    delete ctrl;
+		throw;
+	    }
 	    if(ctrl != nullptr)
 		delete ctrl;
-	    throw;
 	}
-	if(ctrl != nullptr)
-	    delete ctrl;
     }
 
     void header_version::set_kdf_hash(hash_algo algo)
