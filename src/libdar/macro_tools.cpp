@@ -570,6 +570,10 @@ namespace libdar
 		tmp = nullptr;
 	    }
 
+	    stack.find_first_from_top(tmp_ctxt);
+	    if(tmp_ctxt == nullptr)
+		throw SRC_BUG;
+
 	    if(ref_header != nullptr && ref_header->get_ref_header_version() != nullptr)
 		ver = *(ref_header->get_ref_header_version());
 	    else
@@ -577,12 +581,8 @@ namespace libdar
 
 		    // ****** Reading the header version ************** //
 
-		stack.find_first_from_top(tmp_ctxt);
-		if(tmp_ctxt == nullptr)
-		    throw SRC_BUG;
-		else
-		    if(tmp_ctxt->is_an_old_start_end_archive())
-			by_the_end = false; // old archive format have only a header, no trailer
+		if(tmp_ctxt->is_an_old_start_end_archive())
+		    by_the_end = false; // old archive format have only a header, no trailer
 
 		second_terminateur_offset = 0;
 
