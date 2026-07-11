@@ -1665,6 +1665,7 @@ namespace libdar
 					const archive_options_isolate & options)
     {
 	const header_version* ref_version = &ver;
+	infinint ref_second_terminateur_offset = second_term_offset;
 	infinint ref_second_term_offset = second_term_offset;
 	const header* ref_slicing = &slice_header;
 	shared_ptr<entrepot> sauv_path_t = options.get_entrepot();
@@ -1691,7 +1692,6 @@ namespace libdar
 	    label isol_data_name;
 	    label internal_name;
 	    header isol_slices; // this field is not used here, but necessary to call macro_tools_create_layers()
-	    infinint ref_second_terminateur_offset;
 
 	    if(!exploitable && options.get_delta_signature())
 		throw Erange("archive::i_archive::op_isolate", gettext("Isolation with delta signature is not possible on a just created archive (on-fly isolation)"));

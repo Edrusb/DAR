@@ -578,14 +578,7 @@ namespace libdar
 	    if(has_external_header)
 	    {
 		ver = *(ref_header->get_ref_header_version());
-		second_terminateur_offset = 0;
-		    // we do not know and do not need to know
-		    // where to fetch the internal catalog
-		    // which info is given by the second terminator.
-		    // Providing a external header implies
-		    // using an external catalogue, thus the used
-		    // catalogue will not be later loaded
-		    // from the current layers set/archive
+		second_terminateur_offset = ref_header->get_ref_second_terminateur_offset();
 	    }
 	    else
 	    {
