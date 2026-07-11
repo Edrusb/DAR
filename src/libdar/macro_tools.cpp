@@ -431,6 +431,7 @@ namespace libdar
 	bool by_the_end = ! sequential_read;
 	bool remote_repo = false;
 	const header* ref_slice_header = nullptr;
+	bool has_external_header = ref_header != nullptr && ref_header->get_ref_header_version() != nullptr;
 
 #ifdef LIBCURL_AVAILABLE
 	remote_repo |= dynamic_cast<const entrepot_libcurl *>(where.get()) != nullptr;
@@ -574,8 +575,18 @@ namespace libdar
 	    if(tmp_ctxt == nullptr)
 		throw SRC_BUG;
 
-	    if(ref_header != nullptr && ref_header->get_ref_header_version() != nullptr)
+	    if(has_external_header)
+	    {
 		ver = *(ref_header->get_ref_header_version());
+		second_terminateur_offset = 0;
+		    // we do not know and do not need to know
+		    // where to fetch the internal catalog
+		    // which info is given by the second terminator.
+		    // Providing a external header implies
+		    // using an external catalogue, thus the used
+		    // catalogue will not be later loaded
+		    // from the current layers set/archive
+	    }
 	    else
 	    {
 
@@ -767,12 +778,20 @@ namespace libdar
 		else
 		    tmp = tmp_tronco;
 
-		if(!second_terminateur_offset.is_zero()
-		   || tmp_ctxt->is_an_old_start_end_archive()) // we have openned the archive by the end
-		    tmp_tronco->get_ready_for_reading(ver.get_initial_offset());
+		if(! sequential_read)
+		    if(second_terminateur_offset.is_zero()
+		       && ! has_external_header)
+			tmp_tronco->get_ready_for_reading(&macro_tools_get_terminator_start,
+							  false);
+		    else
+			tmp_tronco->get_ready_for_reading(ver.get_initial_offset());
 		else // archive openned by the beginning
-		    tmp_tronco->get_ready_for_reading(&macro_tools_get_terminator_start,
-						      sequential_read);
+		    if(! has_external_header)
+			tmp_tronco->get_ready_for_reading(&macro_tools_get_terminator_start,
+							  true);
+		    else
+			tmp_tronco->get_ready_for_reading(ver.get_initial_offset());
+
 		break;
 	    default:
 		throw Erange("macro_tools_open_archive", gettext("Unknown encryption algorithm"));
