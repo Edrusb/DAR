@@ -95,7 +95,6 @@ namespace libdar
 
 	try
 	{
-	    infinint second_terminateur_offset = 0;
 	    infinint ref_second_terminateur_offset = 0;
 	    header_version ref_ver;
 	    pile ref_stack;
@@ -222,7 +221,7 @@ namespace libdar
 					 options.get_input_pipe(),
 					 options.get_output_pipe(),
 					 options.get_execute(),
-					 second_terminateur_offset,
+					 second_term_offset,       // here we setup the i_archive field
 					 options.get_lax(),
 					 options.is_external_catalogue_set(),
 					 options.get_sequential_read(),
