@@ -284,6 +284,7 @@ namespace libdar
 	/// \param[in] gnupg_signatories used to sign the catalog, use an empty vector to disable signning
 	/// \param[in] algo compression algorithm used
 	/// \param[in] empty dry-run execution (null_file at bottom of the stack)
+	/// \param[out] second_terminator_offset offset of the data that is never ciphered at end of archive
     extern void macro_tools_close_layers(const std::shared_ptr<user_interaction> & dialog,
 					 pile & layers,
 					 const header_version & ver,
@@ -293,7 +294,8 @@ namespace libdar
 					 compression algo,
 					 const std::vector<std::string> & gnupg_recipients,
 					 const std::vector<std::string> & gnupg_signatories,
-					 bool empty);
+					 bool empty,
+					 infinint & second_terminator_offset);
 
 
 	/// gives the location of data EA and FSA (when they are saved) of the object given in argument

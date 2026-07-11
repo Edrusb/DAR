@@ -1666,7 +1666,8 @@ namespace libdar
 				  compression algo,
 				  const vector<string> & gnupg_recipients,
 				  const vector<string> & gnupg_signatories,
-				  bool empty)
+				  bool empty,
+				  infinint & second_terminator_offset)
     {
 	terminateur coord;
 	pile_descriptor pdesc(&layers);
@@ -1912,7 +1913,8 @@ namespace libdar
 
 	if(info_details)
 	    dialog->message(gettext("Writing down archive trailer..."));
-	coord.set_catalogue_start(layers.get_position());
+	second_terminator_offset = layers.get_position();
+	coord.set_catalogue_start(second_terminator_offset);
 	ver.write(layers, *dialog);
 
 	if(info_details)
