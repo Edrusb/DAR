@@ -74,6 +74,14 @@ namespace libdar
 
 	//
 
+    void header_version::set_ref_header_version(std::unique_ptr<header_version> & ptr,
+						const infinint & ref_second_terminateur_offset)
+    {
+	ref_version = std::move(ptr);
+	ref_second_term_offset = ref_second_terminateur_offset;
+    }
+
+
     void header_version::set_kdf_hash(hash_algo algo)
     {
 	if(algo == hash_algo::none)
@@ -152,6 +160,7 @@ namespace libdar
 	sym = crypto_algo::none;
 	clear_crypted_key();
 	ref_header.reset();
+	ref_second_term_offset = 0;
 	only_slice_layout = false;
 	has_tape_marks = false;
 	ciphered = false;
@@ -184,9 +193,10 @@ namespace libdar
 	    ref_header.reset(new (nothrow) header(*(ref.ref_header)));
 	    if(!ref_header)
 		throw Ememory("header_version::copy_from");
+	    ref_second_term_offset = ref.ref_second_term_offset;
 	}
 	else
-	    ref_header.reset();
+	    clear_ref_header_version();
 
 	if(ref.ref_version)
 	{
@@ -218,6 +228,7 @@ namespace libdar
 	swap(crypted_key, ref.crypted_key);
 	ref_header = std::move(ref.ref_header);
 	ref_version = std::move(ref.ref_version);
+	ref_second_term_offset = std::move(ref.ref_second_term_offset);
 	only_slice_layout = std::move(ref.only_slice_layout);
 	has_tape_marks = std::move(ref.has_tape_marks);
 	ciphered = std::move(ref.ciphered);
@@ -494,12 +505,13 @@ namespace libdar
 		throw Ememory("header_version::read");
 
 	    ref_version->inner_read(f, dialog, lax_mode, true);
+	    ref_second_term_offset.read(f);
 
 	    if(ref_version->get_ref_header_version())
 		throw Erange("header_version::read", gettext("Unexpected recursively stored header_version, data corruption may have occurred"));
 	}
 	else
-	    ref_version.reset();
+	    clear_ref_header_version();
 
 	arch_signed = flag.is_set(FLAG_ARCHIVE_IS_SIGNED);
 
@@ -750,6 +762,7 @@ namespace libdar
 		// header_version to the secondary isolated
 		// catalogue.
 	    ref_version->inner_write(f, dialog, true);
+	    ref_second_term_offset.dump(f);
 	}
 
 	if(salt.size() > 0)

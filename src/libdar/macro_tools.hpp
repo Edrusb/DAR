@@ -182,6 +182,8 @@ namespace libdar
 	/// \param[out] ver the archive "header/trailer" to be dropped at beginning and end of archive
 	/// \param[out] slicing slicing layout of the created archive (resulting from sar layers if present according to the provided first/file_size provided below)
 	/// \param[in]  ref_header if not nullptr the pointed to slice header will be stored in the header/trailer version of the archive
+	/// \param[in]  ref_version if not nullptr the pointed to header_version will be stored in header/trailer as header of the reference archive (islotation context)
+	/// \paral[in]  ref_second_terminateur_offset if not null this offset will be stored in the header/trailer as offset of the reference archive (isolation context)
 	/// \param[in]  sauv_path_t where to create the archive
 	/// \param[in]  filename archive base name
 	/// \param[in]  extension archive extension
@@ -241,6 +243,7 @@ namespace libdar
 					  header & slicing,
 					  const header* ref_header,
 					  const header_version* ref_version,
+					  const infinint & ref_second_terminateur_offset,
 					  const std::shared_ptr<entrepot> & sauv_path_t,
 					  const std::string & filename,
 					  const std::string & extension,

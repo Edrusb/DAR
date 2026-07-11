@@ -310,7 +310,7 @@ namespace libdar
 								 ver,
 								 options.get_info_details(),
 								 local_cat_size,
-								 second_terminateur_offset,
+								 second_term_offset,
 								 tmp1_signatories,
 								 options.get_lax());
 			    if(!same_signatories(tmp1_signatories, gnupg_signed))
@@ -1665,6 +1665,7 @@ namespace libdar
 					const archive_options_isolate & options)
     {
 	const header_version* ref_version = &ver;
+	infinint ref_second_term_offset = second_term_offset;
 	const header* ref_slicing = &slice_header;
 	shared_ptr<entrepot> sauv_path_t = options.get_entrepot();
 	if(sauv_path_t == nullptr)
@@ -1711,7 +1712,10 @@ namespace libdar
 		// not our own header_version, to avoid header_version
 		// recursive doing isolation of isolated catalogue
 	    if(ver.get_ref_header_version() != nullptr)
+	    {
 		ref_version = ver.get_ref_header_version();
+		ref_second_term_offset = ver.get_ref_second_terminateur_offset();
+	    }
 
 		// same principle but applied to the slice header
 	    if(ver.get_slice_header() != nullptr)
@@ -1724,6 +1728,7 @@ namespace libdar
 				      isol_slices,
 				      ref_slicing, // either our own slicing or the one stored as reference
 				      ref_version, // either points to ver or to ver's reference if it has one
+				      ref_second_term_offset, // either points to our second_term or the one of reference
 				      sauv_path_t,
 				      filename,
 				      extension,
@@ -2471,6 +2476,7 @@ namespace libdar
 					  slice_header,// this object field is set!
 					  nullptr, // no slicing reference stored in archive header/trailer
 					  nullptr, // no header_version reference store in archive
+					  0,       // not used since previous arg is nullptr
 					  sauv_path_t,
 					  filename,
 					  extension,

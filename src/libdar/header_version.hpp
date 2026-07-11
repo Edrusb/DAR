@@ -86,12 +86,13 @@ namespace libdar
 
 	    /// \note it is used to record the header_version and layers stack of the archive of reference
 	    /// in the context of an isolated catalogue. Having this information stored make possible to
-	    /// create the layers stack of the archive of reference without reading any part of its data.
+	    /// create the layer stack of the archive of reference without reading any part of its data.
 	    /// Having it stored so low in the stack of the archive of reference make it available very
 	    /// early in the reading process, in fact in the reference archive constructor before calling
 	    /// any reading operation when the use of an external catalogue is provided.
-	void set_ref_header_version(std::unique_ptr<header_version> & ptr) { ref_version = std::move(ptr); };
-	void clear_ref_header_version() { ref_version.reset(); };
+	void set_ref_header_version(std::unique_ptr<header_version> & ptr,
+				    const infinint & ref_second_terminateur_offset);
+	void clear_ref_header_version() { ref_version.reset(); ref_second_term_offset = 0; };
 
 	void set_tape_marks(bool presence) { has_tape_marks = presence; };
 	void set_signed(bool is_signed) { arch_signed = is_signed; };
@@ -119,6 +120,7 @@ namespace libdar
 	const header* get_slice_header() const;
 	const slice_layout* get_slice_layout() const;
 	const header_version* get_ref_header_version() const { return ref_version.get(); };
+	const infinint & get_ref_second_terminateur_offset() const { return ref_second_term_offset; };
 	bool get_tape_marks() const { return has_tape_marks; };
 	const std::string & get_salt() const { return salt; };
 	const infinint & get_iteration_count() const { return iteration_count; };
@@ -143,6 +145,7 @@ namespace libdar
 	memory_file *crypted_key;///< optional field containing the asymmetrically ciphered key used for strong encryption ciphering
 	std::unique_ptr<header> ref_header; ///< optional field used in isolated catalogues to record the slice format and slicing layout of their archive of reference
 	std::unique_ptr<header_version> ref_version; ///< optional field used in isolated catalogues to record archive format and slice stack of the reference
+	infinint ref_second_term_offset; ///< second terminator offset of the ref (ignored if ref_version is nullptr)
 	bool only_slice_layout;  ///< whether ref_header only has slice_layout information
 	bool has_tape_marks;     ///< whether the archive contains tape marks aka escape marks aka sequence marks
 

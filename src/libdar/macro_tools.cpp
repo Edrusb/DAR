@@ -1123,6 +1123,7 @@ namespace libdar
 				   header & slicing,
 				   const header* ref_header,
 				   const header_version* ref_version,
+				   const infinint & ref_second_terminateur_offset,
 				   const shared_ptr<entrepot> & sauv_path_t,
 				   const string & filename,
 				   const string & extension,
@@ -1553,7 +1554,7 @@ namespace libdar
 		    if(!utmp)
 			throw Ememory("macro_tools_create_layers");
 
-		    ver.set_ref_header_version(utmp);
+		    ver.set_ref_header_version(utmp, ref_second_terminateur_offset);
 		}
 		else
 		    ver.clear_ref_header_version();
