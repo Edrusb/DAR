@@ -201,6 +201,27 @@ namespace libdar
 	status = reading;
     }
 
+    void tronco_with_elastic::get_ready_for_reading(const infinint & initial_shift,
+						    trailing_clear_data_callback callback)
+    {
+	if(status != init)
+	    throw SRC_BUG;
+
+	if(! behind_weak)
+	{
+	    if(! behind)
+		throw SRC_BUG;
+
+	    if(encrypted == nullptr)
+		throw SRC_BUG;
+
+	    behind->set_callback_trailing_clear_data(callback);
+	    behind->set_initial_shift(initial_shift);
+	}
+	    // else nothing to do, scrambling not concerned by initial_shift
+
+	status = reading;
+    }
 
     void tronco_with_elastic::write_end_of_file()
     {

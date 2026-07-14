@@ -1665,7 +1665,7 @@ namespace libdar
 					const archive_options_isolate & options)
     {
 	const header_version* ref_version = &ver;
-	infinint ref_second_terminateur_offset = second_term_offset;
+	infinint ignored_offset;
 	infinint ref_second_term_offset = second_term_offset;
 	const header* ref_slicing = &slice_header;
 	shared_ptr<entrepot> sauv_path_t = options.get_entrepot();
@@ -1834,7 +1834,7 @@ namespace libdar
 				     options.get_gnupg_recipients(),
 				     options.get_gnupg_signatories(),
 				     options.get_empty(),
-				     ref_second_terminateur_offset); // not used here
+				     ignored_offset); // not used here
 	}
 	catch(...)
 	{

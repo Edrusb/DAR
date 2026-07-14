@@ -131,6 +131,17 @@ namespace libdar
 	void get_ready_for_reading(trailing_clear_data_callback callback,
 				   bool skip_after_initial_elastic);
 
+	    /// get ready for reading providing the information from external/reference archive
+
+	    /// \param[in] callback callback function to detect clear data after encrypted one at end of file
+	    /// \param[in] initial_shift offset of the first ciphered byte, before this is only clear data
+	    /// \note this method is to be used in place of the first with only initial_shift when the
+	    /// last ciphered byte offset is not known from the archive of reference (something known a the
+	    /// second_terminator_offset)
+	void get_ready_for_reading(const infinint & initial_shift,
+				   trailing_clear_data_callback callback);
+
+
 	    /// in write_only mode indicate that end of file is reached
 
 	    /// this call must be called in write mode to add final elastic buffer then purge the

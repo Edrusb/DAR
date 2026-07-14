@@ -579,6 +579,13 @@ namespace libdar
 	    {
 		ver = *(ref_header->get_ref_header_version());
 		second_terminateur_offset = ref_header->get_ref_second_terminateur_offset();
+
+		    // second terminator may be null if the isolated catalogue
+		    // from which the external header comes, has been created
+		    // in sequential read mode. In that case, when a crypto layer
+		    // is used, to prevent the tentative to decrypt clear data
+		    // at the end of the archive is done using the call to the
+		    // crypto layer get_read_for_reading(<callback>)
 	    }
 	    else
 	    {
@@ -771,21 +778,38 @@ namespace libdar
 		else
 		    tmp = tmp_tronco;
 
-		if(! sequential_read)
-		    if(second_terminateur_offset.is_zero()
-		       && ! has_external_header)
-			tmp_tronco->get_ready_for_reading(&macro_tools_get_terminator_start,
-							  false);
+		if(second_terminateur_offset.is_zero())
+		    if(ver.get_initial_offset().is_zero())
+			if(! sequential_read)
+			    tmp_tronco->get_ready_for_reading(&macro_tools_get_terminator_start,
+							      false);
+			else
+			    tmp_tronco->get_ready_for_reading(&macro_tools_get_terminator_start,
+							      true);
 		    else
-			tmp_tronco->get_ready_for_reading(ver.get_initial_offset());
-		else // archive openned by the beginning
-		    if(! has_external_header)
-			tmp_tronco->get_ready_for_reading(&macro_tools_get_terminator_start,
-							  true);
+		    {
+			tmp_tronco->get_ready_for_reading(ver.get_initial_offset(),
+							  &macro_tools_get_terminator_start);
+			    // the header_version comes from an isolated catalogue that
+			    // has been built in sequential read mode and is lacking the
+			    // second terminateur offset but has all the rest, including the
+			    // initial_shift
+		    }
+		else // second_terminator_offset is known:
+		    if(ver.get_initial_offset().is_zero())
+		    {
+			throw SRC_BUG;
+			    // the second terminator is either known after having read our own header_version
+			    // at the end of the archive (non-sequential-read mode) or is provided
+			    // by an isolated catalogue, but on both cases the header_version
+			    // contains the initial shift information.
+		    }
 		    else
+		    {
 			tmp_tronco->get_ready_for_reading(ver.get_initial_offset());
-
-		break;
+			    // the normal case where both second_terminator_offset and initial shift
+			    // are know after having read the header_version at the end of the backup
+		    }		break;
 	    default:
 		throw Erange("macro_tools_open_archive", gettext("Unknown encryption algorithm"));
 	    }
