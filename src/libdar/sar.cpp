@@ -1334,6 +1334,7 @@ namespace libdar
         of_last_file_known = false;
 	of_current = 0; // no slice has been yet open
         of_fd = nullptr;
+	slicing.set_magic(SAUV_MAGIC_NUMBER);
 	slicing.set_flag('\0');
         slicing.set_first_slice_header_size(0); // means that the sizes have to be determined from file or wrote to file
 	slicing.set_common_slice_header_size(0);
@@ -1504,7 +1505,7 @@ namespace libdar
     {
         header hh;
 
-        hh.set_magic(SAUV_MAGIC_NUMBER);
+        hh.set_magic(slicing.get_magic());
         hh.set_internal_name(slicing.get_internal_name());
 	hh.set_data_name(slicing.get_data_name());
         hh.set_flag(flag);
