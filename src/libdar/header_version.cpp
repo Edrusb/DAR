@@ -737,13 +737,13 @@ namespace libdar
 		// and having slice_layout should
 		// not have to be written back to
 		// a new archive.
-	    ref_header->write(dialog, f, true);
+	    ref_header->write(dialog, f, true, true);
 		// we write down the slice header too
 		// as this is not at the location of a slice
 		// header but inside the archive trailer/header
 		// of an archive which reference has this
 		// slice header. This way, it will be
-		// able to feed it to the sar layer to
+		// possible to feed it to the sar layer to
 		// be able to properly locate slice of a particular
 		// offset without having first to open the
 		// first or the last slice

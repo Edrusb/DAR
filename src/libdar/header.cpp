@@ -231,6 +231,7 @@ namespace libdar
 
     void header::write(user_interaction & ui,
 		       generic_file & f,
+		       bool as_first_slice,
 		       bool with_header_size) const
     {
         magic_number tmp;
@@ -242,7 +243,7 @@ namespace libdar
         f.write(&flag, 1);
 	if(sly.older_sar_than_v8)
 	{
-	    if(sly.first_size != sly.other_size)
+	    if(sly.first_size != sly.other_size && as_first_slice == 1)
 	    {
 		tmp_ext[0] = extension_size;
 		f.write(tmp_ext, 1);

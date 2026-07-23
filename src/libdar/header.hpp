@@ -80,10 +80,28 @@ namespace libdar
         void read(user_interaction & ui,
 		  generic_file & f,
 		  bool lax = false);
-        void write(user_interaction &,  ///< user interaction for messages when necessary
-		   generic_file & f,    ///< where to write down the header
-		   bool with_header_size = false) const; ///< whether to also write down the slice header size info
 
+
+	    /// write down a slice header in the provided generic_file
+
+	    /// \param[in] ui for user interaction in case of need
+	    /// \param[in] f the generic_file where to write down the slice header
+	    /// \param[in] as_first_slice for format older then 08, whether to write a first slice header of not
+	    /// \param[in] with_header_size whether to write header size information
+	    /// \note in dar/libdar release before 2.9.0 the as_first_slice was not needed
+	    /// because the sar class was giving or not giving the other slice information
+	    /// to a newly created slice header for each not slice to create. But as feature
+	    /// got added over time, this ended the sar header to have a permanent slice header
+	    /// and another generated for each new slice to write and mostly copied from the
+	    /// permanent one. It was found more efficient to directly use the permanent one
+	    /// but not to lose the 'other slice size' information when generating the second
+	    /// and further slices, to add this as_first_slice argument here. This in particular
+	    /// let the sar header to provide the correct slice header to the caller after the
+	    /// archive has been completed for it be stored in an isolated catalogue (since format 12).
+        void write(user_interaction & ui,
+		   generic_file & f,
+		   bool as_first_slice,
+		   bool with_header_size) const;
 
 	    /// resets the object
 	void clear();

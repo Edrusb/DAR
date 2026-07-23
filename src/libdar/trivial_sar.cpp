@@ -504,7 +504,7 @@ namespace libdar
 	    tete.set_data_name(of_data_name);
 	    if(old_sar)
 		tete.set_format_07_compatibility();
-	    tete.write(get_ui(), *reference);
+	    tete.write(get_ui(), *reference, true, false);
 	    offset = reference->get_position();
 	    cur_pos = 0;
 	    break;

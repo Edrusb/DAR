@@ -241,7 +241,6 @@ namespace libdar
         void open_last_file();                       ///< open the last slice, ask the user, test, until last slice available
 	bool is_current_eof_a_normal_end_of_slice() const;  ///< return true if current reading position is at end of slice
 	infinint bytes_still_to_read_in_slice() const;  ///< returns the number of bytes expected before the end of slice
-        header make_write_header(const infinint &num, char flag);
 	void fetch_slicing() const;
 	bool check_header(const header & ref,         ///< check header compatibility with other slices and record it as reference first slice opened
 			  const std::string & fic,    ///< must be either an empty string when the header is provided from an isolated catalogue or slice filename it has been fetched from

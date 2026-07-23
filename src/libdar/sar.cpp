@@ -826,9 +826,11 @@ namespace libdar
 	    {
 		if(slicing.get_format_07_compatibility())
 		{
-		    header h = make_write_header(of_current, terminal ? flag_type_terminal : flag_type_non_terminal);
+		    slicing.set_flag(terminal ? flag_type_terminal : flag_type_non_terminal);
 		    of_fd->skip(0);
-		    h.write(get_ui(), *of_fd);
+		    slicing.write(get_ui(), *of_fd, of_current == 1, false);
+			// we may overwrite an existing slice header with one
+			// having the terminal flag
 		}
 		else
 		{
@@ -1291,11 +1293,13 @@ namespace libdar
 
 	try
 	{
-	    header h;
-
+		// even for older format we set this flag type
+		// because at slice closing time it will be overwritten
+		// with the correct one for archive format <= 07
 	    slicing.set_flag(flag_type_located_at_end_of_slice);
-	    h = make_write_header(num, slicing.get_flag());
-	    h.write(get_ui(), *of_fd);
+	    slicing.write(get_ui(), *of_fd, num == 1, false);
+
+		// setting header size information in the slicing field:
 	    if(num == 1)
 	    {
 		slicing.set_first_slice_header_size(of_fd->get_position());
@@ -1499,34 +1503,6 @@ namespace libdar
 	default:
 	    throw SRC_BUG;
 	}
-    }
-
-    header sar::make_write_header(const infinint & num, char flag)
-    {
-        header hh;
-
-        hh.set_magic(slicing.get_magic());
-        hh.set_internal_name(slicing.get_internal_name());
-	hh.set_data_name(slicing.get_data_name());
-        hh.set_flag(flag);
-	if(slicing.get_format_07_compatibility())
-	{
-	    if(num == 1)
-	    {
-		hh.set_slice_size(slicing.get_slice_size());
-		if(slicing.get_slice_size() != slicing.get_first_slice_size())
-		    hh.set_first_slice_size(slicing.get_first_slice_size());
-	    }
-	    hh.set_format_07_compatibility();
-	}
-	else
-	{
-	    hh.set_slice_size(slicing.get_slice_size());
-	    if(slicing.get_slice_size() != slicing.get_first_slice_size())
-		hh.set_first_slice_size(slicing.get_first_slice_size());
-	}
-
-        return hh;
     }
 
     void sar::fetch_slicing() const
