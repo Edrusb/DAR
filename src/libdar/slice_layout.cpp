@@ -81,10 +81,7 @@ namespace libdar
 	if(first_size.is_zero() || other_size.is_zero())
 	{
 	    slice_num = 1;
-	    if(offset < first_slice_header)
-		slice_offset = first_slice_header;
-	    else
-		slice_offset = offset - first_slice_header;
+	    slice_offset = offset + first_slice_header;
 	    return;
 	}
 
