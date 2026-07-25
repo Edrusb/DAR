@@ -1179,6 +1179,7 @@ namespace libdar
 	try
 	{
 	    generic_file *tmp = nullptr;
+	    contextual* tmp_ctxt = nullptr;
 	    escape *esc = nullptr;
 	    generic_file *level1 = nullptr;
 	    bool force_permission = (slice_permission != "");
@@ -1212,6 +1213,7 @@ namespace libdar
 		    tmp = new (nothrow) null_file(open_mode);
 		}
 		else
+		{
 		    if(file_size.is_zero()) // one SLICE
 			if(filename == "-") // output to stdout
 			{
@@ -1248,32 +1250,38 @@ namespace libdar
 			}
 		    else
 		    {
-			sar *tmp_sar = nullptr;
 			if(info_details)
 			    dialog->message(gettext("Creating low layer: Writing archive into a sar object (Segmentation and Reassembly) for slicing..."));
-			tmp = tmp_sar = new (nothrow) sar(dialog,
-							  open_mode,
-							  filename,
-							  extension,
-							  file_size,
-							  first_file_size,
-							  warn_over,
-							  allow_over,
-							  pause,
-							  sauv_path_t, // shared_ptr<entrepot> !!
-							  internal_name,
-							  data_name,
-							  force_permission,
-							  permission,
-							  hash,
-							  slice_min_digits,
-							  false,
-							  execute);
-
-			if(tmp_sar != nullptr)
-			    slicing = tmp_sar->get_slice_info();
+			tmp = new (nothrow) sar(dialog,
+						open_mode,
+						filename,
+						extension,
+						file_size,
+						first_file_size,
+						warn_over,
+						allow_over,
+						pause,
+						sauv_path_t, // shared_ptr<entrepot> !!
+						internal_name,
+						data_name,
+						force_permission,
+						permission,
+						hash,
+						slice_min_digits,
+						false,
+						execute);
 		    }
 
+		    tmp_ctxt = dynamic_cast<contextual*>(tmp);
+
+		    if(tmp_ctxt != nullptr)
+			slicing = tmp_ctxt->get_slice_info();
+		    else
+			throw SRC_BUG;
+			// all object pointed to by tmp
+			// in the present context should be generic_file
+			// but also inheriting from class contextual
+		}
 
 		if(tmp == nullptr)
 		    throw Ememory("op_create_in_sub");
