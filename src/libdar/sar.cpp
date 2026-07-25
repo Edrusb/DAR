@@ -1587,15 +1587,9 @@ namespace libdar
 	if(initial)
 	{
 		// this is the first time we get a header (external or internal)
-		// we take it as reference compare to following ones we might have to read
+		// we take it as reference to compare to the following ones we might have to read
 	    slicing = h;
 	    initial = false;
-
-	    if(h.get_first_slice_header_size().is_zero())
-		slicing.set_first_slice_header_size(slicing.get_common_slice_header_size());
-
-	    if(h.get_first_slice_size().is_zero())
-		slicing.set_first_slice_size(slicing.get_slice_size());
 	}
 	else // not the first time we see a slice of that archive
 	{
