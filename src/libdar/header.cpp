@@ -86,7 +86,6 @@ namespace libdar
 	tlv_list tempo;
 	char extension;
 	fichier_global *f_fic = dynamic_cast<fichier_global *>(&f); // we read a header from a slice header
-	contextual *f_sar = dynamic_cast<contextual *>(&f);         // we read an external slice header
 
 	clear();
 
@@ -141,7 +140,7 @@ namespace libdar
 	    }
 
 	    sly.other_slice_header = min_size();
-	    sly.first_slice_header = 0; // unknown slice header size of the first slice
+	    sly.first_slice_header = min_size();
 
 	    sly.older_sar_than_v8 = true;
             break;
@@ -165,17 +164,12 @@ namespace libdar
 	    }
 	    else
 	    {
-		if(f_sar != nullptr)
-		    throw Erange("header::read", gettext("Archive format older than \"08\" does not allow the use of an isolated catalog as backup of an internal one"));
-		else // nor header from a slice not external header
+		if(!lax)
+		    throw Erange("header::read", gettext("Archive format older than \"08\" (release 2.4.0) cannot be read through a single pipe. It only can be read using dar_slave or as normal plain files (slices)"));
+		else
 		{
-		    if(!lax)
-			throw Erange("header::read", gettext("Archive format older than \"08\" (release 2.4.0) cannot be read through a single pipe. It only can be read using dar_slave or as normal plain files (slices)"));
-		    else
-		    {
-			ui.message(gettext("LAX MODE: first slice size is not possible to read, continuing anyway..."));
-			sly.first_size = 0; // no specific size for the first slice as we assume we read a single sliced archive
-		    }
+		    ui.message(gettext("LAX MODE: first slice size is not possible to read, continuing anyway..."));
+		    sly.first_size = 0; // no specific size for the first slice as we assume we read a single sliced archive
 		}
 	    }
 
@@ -183,14 +177,13 @@ namespace libdar
 	    sly.other_slice_header = min_size();
 	    if(sly.first_slice_header < min_size())
 		throw Erange("header::read", gettext("Invalid first slice header size for a slice of format 07 or older"));
-
 	    sly.older_sar_than_v8 = true;
             break;
 	case extension_tlv:
 	    sly.first_size = 0;
 	    sly.other_size = 0;
-	    sly.other_slice_header = 0; // we be eventually set from tlv
-	    sly.first_slice_header = 0; // we be eventually set from tlv
+	    sly.other_slice_header = 0; // will eventually be set from tlv
+	    sly.first_slice_header = 0; // will eventually be set from tlv
 
 	    tempo.read(f);        // read the list of TLV stored in the header
 	    fill_from(ui, tempo); // from the TLV list, set the different fields of the current header object
@@ -293,17 +286,7 @@ namespace libdar
 		throw SRC_BUG;
 
 	    if(sly.older_sar_than_v8)
-	    {
-		if(as_first_slice)
-		    me->sly.other_slice_header = header::min_size();
-		else
-		{
-		    throw SRC_BUG;
-			// should start writing the first slice
-			// first! Here we cannot know the first
-			// slice header size.
-		}
-	    }
+		me->sly.other_slice_header = header::min_size();
 	    else
 		me->sly.other_slice_header = sly.first_slice_header;
 
@@ -313,8 +296,6 @@ namespace libdar
 		throw SRC_BUG; // header is larger than the slice size
 	    if(! sly.other_size.is_zero() && sly.other_slice_header >= sly.other_size)
 		throw SRC_BUG; // header is larger than the slice size
-
-	    me->has_header_info = true;
 	}
     }
 
@@ -325,7 +306,6 @@ namespace libdar
 	data_name.clear();
 	flag = '\0';
 	sly.clear();
-	has_header_info = false;
     }
 
     void header::check_validity(user_interaction & dialog,
@@ -348,9 +328,6 @@ namespace libdar
 	if(external && get_format_07_compatibility())
 	    throw Erange("header::check_validity", gettext("slice layout of an old archive stored in an isolated catalog cannot be used to avoid openning the first or last slice of the archive, consider using the ignore external slice header option"));
 
-	if(external && ! has_header_info)
-	    throw Erange("header::check_validity", gettext("Corrupted external slice header: missing header size tlv"));
-
 	if(external && ! initial)
 	    throw SRC_BUG;
 
@@ -362,9 +339,9 @@ namespace libdar
 	    // sanity checks on slice sizes and header slice sizes
 
 	if(get_common_slice_header_size() < min_size())
-		throw Erange("header::check_validity", gettext("Incoherent slice header: header size too small"));
+	    throw Erange("header::check_validity", gettext("Incoherent slice header: header size too small"));
 
-	if(get_slice_size() <= get_common_slice_header_size())
+	if(! get_slice_size().is_zero() && get_slice_size() <= get_common_slice_header_size())
 	    throw Erange("header::check_validity", gettext("Incoherent slice header: slice size too small"));
 
 	if(get_format_07_compatibility())
@@ -393,11 +370,19 @@ namespace libdar
 		// for non initial slice, the size of the first slice and first slice header size
 		// may be unknown (slice > 1 with format <= 07) and would be set both to zero
 
-	    if(get_first_slice_size() < min_size())
-		throw Erange("header::check_validity", gettext("Incoherent slice header: first slice header size too small"));
+	    if(! get_first_slice_size().is_zero())
+	    {
+		if(get_first_slice_size() < min_size())
+		    throw Erange("header::check_validity", gettext("Incoherent slice header: first slice header size too small"));
 
-	    if(get_first_slice_size() <= get_first_slice_header_size())
-		throw Erange("header::check_validity", gettext("Incoherent slice header: First slice size too small"));
+		if(get_first_slice_size() <= get_first_slice_header_size())
+		    throw Erange("header::check_validity", gettext("Incoherent slice header: First slice size too small"));
+	    }
+		// else probably reading from a pipe
+		// and the zero value, which means unlimited for slice_size,
+		// and means non different size for the first slice,
+		// could not be determined reading the file size thas
+		// has been opened.
 	}
     }
 
@@ -449,7 +434,6 @@ namespace libdar
 		    throw Erange("header::fill_from", gettext("Unexpected null size for first slice header size"));
 		if(sly.other_slice_header.is_zero())
 		    throw Erange("header::fill_from", gettext("Unexpected null size for slice header size"));
-		has_header_info = true;
 		break;
 	    default:
 		ui.pause(tools_printf(gettext("Unknown entry found in slice header (type = %d), option not supported. The archive you are reading may have been generated by a more recent version of libdar, ignore this entry and continue anyway?"), extension[index].get_type()));
@@ -482,9 +466,6 @@ namespace libdar
 	    throw SRC_BUG;
 
 	if(with_header_size && sly.first_slice_header.is_zero())
-	    throw SRC_BUG;
-
-	if(with_header_size && ! has_header_info)
 	    throw SRC_BUG;
 
 	if(with_header_size)

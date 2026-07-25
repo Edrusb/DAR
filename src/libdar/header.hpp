@@ -175,7 +175,6 @@ namespace libdar
 	label data_name;       ///< constant string for a set of data (constant with dar_xform, used to link isolated catalogue to its original data)
         char flag;             ///< whether slice is the last of the archive or not
 	slice_layout sly;      ///< slicing information
-	bool has_header_info;  ///< whether the header contains information on header sizes
 
 	void fill_from(user_interaction & ui, const tlv_list & list);
 	tlv_list build_tlv_list(user_interaction & ui, bool with_header_size) const;
