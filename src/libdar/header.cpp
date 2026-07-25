@@ -191,20 +191,37 @@ namespace libdar
 		// specific case of trivial_sar (non-sliced archive)
 		// where no slice nor first_slice info is set (surfacing both as zero)
 
-	    if(sly.other_size.is_zero() && f_fic != nullptr)
-		sly.other_size = f_fic->get_size();
-
-	    if(sly.first_size.is_zero())
-		sly.first_size = sly.other_size;
-
 	    if(sly.other_slice_header.is_zero())
+	    {
 		sly.other_slice_header = f.get_position();
 
-	    if(sly.other_slice_header < min_size())
-		throw Erange("header::read", gettext("Invalid slice header size for a slice of format 08 or more recent (below minimum)"));
+		if(sly.other_slice_header < min_size())
+		    throw Erange("header::read", gettext("Invalid slice header size for a slice of format 08 or more recent (below minimum)"));
 
-	    sly.first_slice_header = sly.other_slice_header;
-		// in format >= 08 all slice have the exact same header (and thus header size).
+		if(sly.first_slice_header.is_zero())
+		    sly.first_slice_header = sly.other_slice_header;
+
+		    // in format >= 08 all slice have the exact same header (and thus header size).
+		if(sly.first_slice_header != sly.other_slice_header)
+		    throw SRC_BUG;
+
+		    // if slice_header were not present as TLV
+		    // we know the slice header currently read is not a reference
+		    // of another archive, so we can replacing the zero-valued
+		    // slice size by the size of the generic_file we read from:
+		if(f_fic != nullptr)
+		{
+			// we read a header from a slice header not from a pipe
+
+			// single sliced archive was requested at creation time
+		    if(sly.other_size.is_zero())
+			sly.other_size = f_fic->get_size();
+		}
+	    }
+
+		// no specific size for the first slice
+	    if(sly.first_size.is_zero())
+		sly.first_size = sly.other_size;
 
 	    sly.older_sar_than_v8 = false;
 	    break;
