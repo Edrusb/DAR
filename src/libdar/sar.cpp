@@ -1521,7 +1521,20 @@ namespace libdar
 
 	try
 	{
-	    h.check_validity(get_ui(), slice_num, initial);
+	    if(h.get_format_07_compatibility() && initial && slice_num > 1)
+		throw Edata(gettext("This is an old archive, it can only be opened starting by the first slice"));
+		// if slice_num is zero, this means we're checking an external header
+		// and we do not have any issue about the slice to start with
+		// even for format <= 07 as we already have a full slice header
+		// and will no read it from slices at this opening step.
+
+		// external related checks
+
+	    if(external && h.get_format_07_compatibility())
+		throw Erange("header::check_validity", gettext("slice layout of an old archive stored in an isolated catalog cannot be used to avoid openning the first or last slice of the archive, consider using the ignore external slice header option"));
+
+	    if(external && ! initial)
+		throw SRC_BUG;
 	}
 	catch(Erange & e)
 	{

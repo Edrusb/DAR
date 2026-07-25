@@ -92,6 +92,10 @@ namespace libdar
         if(f.read((char *)&tmp, sizeof(magic_number)) != sizeof(magic_number))
 	    throw Erange("header::read", gettext("Reached end of file while reading slice header"));
         magic = ntohl(tmp);
+
+	if(magic != SAUV_MAGIC_NUMBER)
+	    throw Erange("header::read", tools_printf(gettext("not a valid dar file (wrong magic number), please provide the good file.")));
+
 	try
 	{
 	    internal_name.read(f);
@@ -110,28 +114,27 @@ namespace libdar
         switch(extension)
         {
         case extension_none:
+		// this extension was used in archives before release 2.4.0
+		// when the first slice had the same size of the following ones.
+		// The slice size of all slices was thus the one of the first which
+		// was learnt by getting the size of the file.
+		// This works also for single sliced archives.
+
 	    if(f_fic != nullptr)
 	    {
 		sly.other_size = f_fic->get_size();
-		if(sly.other_size.is_zero())
+		if(sly.other_size <= min_size())
 		{
 		    if(!lax)
 			throw Erange("header::read", gettext("Invalide slice size"));
 		    else
+		    {
 			ui.message(gettext("LAX MODE: slice size is not possible to read, (lack of virtual memory?), continuing anyway..."));
+			sly.other_size = 0;
+		    }
+		}
 
-			// this extension was used in archives before release 2.4.0
-			// when the first slice had the same size of the following ones.
-			// The slice size of all slices was thus the one of the first which
-			// was learnt by getting the size of the file.
-			// This works also for single sliced archives.
-		}
-		else
-		{
-		    sly.first_size = 0;
-			// header not the first slice or no
-			// specific size for the first slice
-		}
+		sly.first_size = sly.other_size;
 	    }
 	    else // not reading from a file (but read from a pipe or reading an external header, for example)
 	    {
@@ -140,22 +143,34 @@ namespace libdar
 	    }
 
 	    sly.other_slice_header = min_size();
-	    sly.first_slice_header = min_size();
-
+	    sly.first_slice_header = min_size(); // yes, this his the header we read, only sar/trivial sar have context on that
 	    sly.older_sar_than_v8 = true;
             break;
         case extension_size:
 	    sly.other_size.read(f);
+	    if(sly.other_size <= min_size())
+	    {
+		if(!lax)
+		    throw Erange("header::read", gettext("Invalide slice size"));
+		else
+		{
+		    ui.message(gettext("LAX MODE: slice size is not possible to read, (lack of virtual memory?), continuing anyway..."));
+		    sly.other_size = 0;
+		}
+	    }
+
 	    if(f_fic != nullptr)
 	    {
 		sly.first_size = f_fic->get_size();
-		if(sly.first_size.is_zero())
+		if(sly.first_size <= min_size())
 		{
 		    if(!lax)
 			throw Erange("header::read", gettext("Invalide first slice size"));
 		    else
+		    {
 			ui.message(gettext("LAX MODE: first slice size is not possible to read, (lack of virtual memory?), continuing anyway..."));
-
+			sly.first_size = 0;
+		    }
 			// note: the "extension_size" extension was used in archives before release 2.4.0
 			// this option was only used in the first slice and contained the size of slices (not of the first slice)
 			// when the first slice had a different size. This way, reading the size of the current file gives
@@ -174,28 +189,30 @@ namespace libdar
 	    }
 
 	    sly.first_slice_header = f.get_position();
-	    sly.other_slice_header = min_size();
 	    if(sly.first_slice_header < min_size())
 		throw Erange("header::read", gettext("Invalid first slice header size for a slice of format 07 or older"));
+	    sly.other_slice_header = min_size();
 	    sly.older_sar_than_v8 = true;
             break;
 	case extension_tlv:
 	    sly.first_size = 0;
 	    sly.other_size = 0;
-	    sly.other_slice_header = 0; // will eventually be set from tlv
 	    sly.first_slice_header = 0; // will eventually be set from tlv
+	    sly.other_slice_header = 0; // will eventually be set from tlv
 
 	    tempo.read(f);        // read the list of TLV stored in the header
 	    fill_from(ui, tempo); // from the TLV list, set the different fields of the current header object
 
-		// specific case of trivial_sar (non-sliced archive)
-		// where no slice nor first_slice info is set (surfacing both as zero)
 
+		// header information was not stored as TLV
+		// we obviously read a header at the start of a slice
+		// not a header of a reference archive stored beside an isolated catalogue
+		// thus we can the header size information from the generic_file we read from:
 	    if(sly.other_slice_header.is_zero())
 	    {
 		sly.other_slice_header = f.get_position();
 
-		if(sly.other_slice_header < min_size())
+		if(sly.other_slice_header <= min_size())
 		    throw Erange("header::read", gettext("Invalid slice header size for a slice of format 08 or more recent (below minimum)"));
 
 		if(sly.first_slice_header.is_zero())
@@ -205,23 +222,32 @@ namespace libdar
 		if(sly.first_slice_header != sly.other_slice_header)
 		    throw SRC_BUG;
 
+
 		    // if slice_header were not present as TLV
 		    // we know the slice header currently read is not a reference
-		    // of another archive, so we can replacing the zero-valued
-		    // slice size by the size of the generic_file we read from:
+		    // of another archive, so we can replace the zero-valued
+		    // slice size by the size of the generic_file we read from
+		    // if possible (when not reading from a pipe):
 		if(f_fic != nullptr)
 		{
-			// we read a header from a slice header not from a pipe
-
-			// single sliced archive was requested at creation time
+			// if a single sliced archive was requested at creation time
 		    if(sly.other_size.is_zero())
 			sly.other_size = f_fic->get_size();
 		}
 	    }
 
-		// no specific size for the first slice
+		// handling the case of nospecific size for the first slice
+
 	    if(sly.first_size.is_zero())
 		sly.first_size = sly.other_size;
+
+		// sanity checks
+
+	    if(! sly.first_size.is_zero() && sly.first_size <= sly.first_slice_header)
+		throw Erange("header::read", gettext("Incoherent slice header: first slice size too small"));
+
+	    if(! sly.other_size.is_zero() && sly.other_size <= sly.other_slice_header)
+		throw Erange("header::read", gettext("Incoherent slice header: slice size too small"));
 
 	    sly.older_sar_than_v8 = false;
 	    break;
@@ -237,6 +263,7 @@ namespace libdar
 
 	if(data_name.is_cleared())
 	    data_name = internal_name;
+
     }
 
     void header::write(user_interaction & ui,
@@ -323,84 +350,6 @@ namespace libdar
 	data_name.clear();
 	flag = '\0';
 	sly.clear();
-    }
-
-    void header::check_validity(user_interaction & dialog,
-				const infinint & slice_num,
-				bool initial) const
-    {
-	bool external = slice_num.is_zero();
-
-	    // old format related checks
-
-	if(get_format_07_compatibility() && initial && slice_num > 1)
-	    throw Edata(gettext("This is an old archive, it can only be opened starting by the first slice"));
-	    // if slice_num is zero, this means we're checking an external header
-	    // and we do not have any issue about the slice to start with
-	    // even for format <= 07 as we already have a full slice header
-	    // and will no read it from slices at this opening step.
-
-	    // external related checks
-
-	if(external && get_format_07_compatibility())
-	    throw Erange("header::check_validity", gettext("slice layout of an old archive stored in an isolated catalog cannot be used to avoid openning the first or last slice of the archive, consider using the ignore external slice header option"));
-
-	if(external && ! initial)
-	    throw SRC_BUG;
-
-	    // checking against the magic number
-	    //
-	if(get_magic() != SAUV_MAGIC_NUMBER)
-	    throw Erange("sar::check_header", tools_printf(gettext("not a valid dar file (wrong magic number), please provide the good file.")));
-
-	    // sanity checks on slice sizes and header slice sizes
-
-	if(get_common_slice_header_size() < min_size())
-	    throw Erange("header::check_validity", gettext("Incoherent slice header: header size too small"));
-
-	if(! get_slice_size().is_zero() && get_slice_size() <= get_common_slice_header_size())
-	    throw Erange("header::check_validity", gettext("Incoherent slice header: slice size too small"));
-
-	if(get_format_07_compatibility())
-	{
-	    if(slice_num == 1)
-	    {
-		header* me = const_cast<header*>(this);
-
-		if(me == nullptr)
-		    throw SRC_BUG;
-
-		if(get_first_slice_size().is_zero())
-		    me->set_first_slice_size(get_slice_size());
-		    // the archive has not a specific size for the first slice
-		    // and is an old format.
-
-		if(sly.first_slice_header.is_zero())
-		    me->sly.first_slice_header = sly.other_slice_header;
-	    }
-		// else the first_slice_size and first_slice_header
-		// is not known
-	}
-
-	if(slice_num == 1 || !get_format_07_compatibility())
-	{
-		// for non initial slice, the size of the first slice and first slice header size
-		// may be unknown (slice > 1 with format <= 07) and would be set both to zero
-
-	    if(! get_first_slice_size().is_zero())
-	    {
-		if(get_first_slice_size() < min_size())
-		    throw Erange("header::check_validity", gettext("Incoherent slice header: first slice header size too small"));
-
-		if(get_first_slice_size() <= get_first_slice_header_size())
-		    throw Erange("header::check_validity", gettext("Incoherent slice header: First slice size too small"));
-	    }
-		// else probably reading from a pipe
-		// and the zero value, which means unlimited for slice_size,
-		// and means non different size for the first slice,
-		// could not be determined reading the file size thas
-		// has been opened.
-	}
     }
 
     bool header::check_same_slice_set(const header & ref) const
