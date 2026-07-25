@@ -169,15 +169,13 @@ namespace libdar
 
 	const slice_layout & get_slice_layout() const { return sly; };
 
-	bool has_header_tlv() const { return header_tlv; };
-
     private:
         magic_number magic;    ///< constant string for all Dar archives
         label internal_name;   ///< constant string for all slices of a given archive (computed based on date and pid)
 	label data_name;       ///< constant string for a set of data (constant with dar_xform, used to link isolated catalogue to its original data)
         char flag;             ///< whether slice is the last of the archive or not
 	slice_layout sly;      ///< slicing information
-	bool header_tlv;       ///< whether the header contains information on header sizes
+	bool has_header_info;  ///< whether the header contains information on header sizes
 
 	void fill_from(user_interaction & ui, const tlv_list & list);
 	tlv_list build_tlv_list(user_interaction & ui, bool with_header_size) const;
