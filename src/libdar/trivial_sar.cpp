@@ -145,8 +145,6 @@ namespace libdar
 	hook = execute;
 	base = base_name;
 	ext = extension;
-	of_data_name = data_name;
-	old_sar = format_07_compatible;
 	min_digits = x_min_digits;
 	hook_where = where.get_full_path().display();
 	base_url = where.get_url();
@@ -241,7 +239,7 @@ namespace libdar
 
 	    set_info_status(CONTEXT_LAST_SLICE);
 	    reference = tmp;
-	    init(internal_name);
+	    init_write(internal_name, data_name, format_07_compatible);
 	    tmp = nullptr; // setting it to null only now was necesary to be able to release the object in case of exception
 	}
 	catch(...)
@@ -268,7 +266,6 @@ namespace libdar
 	hook = "";
 	base = "";
 	ext = "";
-	old_sar = false;
 	min_digits = 0;
 	hook_where = "";
 	base_url = "";
@@ -286,7 +283,7 @@ namespace libdar
 		throw Ememory("trivial_sar::trivial_sar");
 
 	    for_init.clear();
-	    init(for_init);
+	    init_read();
 	}
 	catch(...)
 	{
@@ -311,7 +308,6 @@ namespace libdar
 	hook = "";
 	base = "";
 	ext = "";
-	old_sar = false;
 	min_digits = 0;
 	hook_where = "";
 	base_url = "";
@@ -325,7 +321,7 @@ namespace libdar
 		throw Ememory("trivial_sar::trivial_sar");
 
 	    for_init.clear();
-	    init(for_init);
+	    init_read();
 	}
 	catch(...)
 	{
@@ -355,15 +351,13 @@ namespace libdar
 	hook = execute;
 	base = "";
 	ext = "";
-	of_data_name = data_name;
-	old_sar = format_07_compatible;
 	min_digits = 0;
 	hook_where = "";
 	base_url = "";
 	natural_destruction = true;
 
 	set_info_status(CONTEXT_LAST_SLICE);
-	init(internal_name);
+	init_write(internal_name, data_name, format_07_compatible);
     }
 
     trivial_sar::~trivial_sar()
@@ -405,7 +399,7 @@ namespace libdar
 		break; // explicitely accepting other value
 	    case gf_write_only:
 	    case gf_read_write:
-		if(!old_sar)
+		if(!tete.get_format_07_compatibility())
 		    reference->write(&last, 1); // adding the trailing flag
 		break;
 	    default:
@@ -480,10 +474,8 @@ namespace libdar
 	}
     }
 
-    void trivial_sar::init(const label & internal_name)
+    void trivial_sar::init_read()
     {
-        header tete;
-
 	switch(reference->get_mode())
 	{
 	case gf_read_only:
@@ -492,18 +484,38 @@ namespace libdar
 		throw Erange("trivial_sar::trivial_sar", gettext("This archive has slices and is not possible to read from a pipe"));
 		// if flag is flag_type_located_at_end_of_slice, we will warn at end of slice
 	    offset = reference->get_position();
-	    of_data_name = tete.get_data_name();
-	    old_sar = tete.get_format_07_compatibility();
 	    cur_pos = 0;
 	    break;
+	case gf_read_write:
+	    throw SRC_BUG;
+	case gf_write_only:
+	    throw SRC_BUG;
+	default:
+	    throw SRC_BUG;
+	}
+    }
+
+
+    void trivial_sar::init_write(const label & internal_name,
+				 const label & data_name,
+				 bool old_sar)
+    {
+	switch(reference->get_mode())
+	{
+	case gf_read_only:
+	    throw SRC_BUG;
 	case gf_write_only:
 	case gf_read_write:
+	    tete.clear();
 	    tete.set_magic(SAUV_MAGIC_NUMBER);
 	    tete.set_internal_name(internal_name);
 	    tete.set_flag(flag_type_terminal);
-	    tete.set_data_name(of_data_name);
+	    tete.set_data_name(data_name);
 	    if(old_sar)
 		tete.set_format_07_compatibility();
+	    tete.set_first_slice_size(0); // unlimited slice size
+	    tete.set_slice_size(0); // unlimited slice size
+
 	    tete.write(get_ui(), *reference, true, false);
 	    offset = reference->get_position();
 	    cur_pos = 0;
@@ -522,7 +534,7 @@ namespace libdar
 	{
 	    if(ret > 0)
 	    {
-		if(!old_sar)
+		if(!tete.get_format_07_compatibility())
 		{
 		    --ret;
 		    if(a[ret] != flag_type_terminal)

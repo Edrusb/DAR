@@ -109,7 +109,7 @@ namespace libdar
 		if(cont_data == nullptr)
 		    set_data_name(label_zero);
 		else
-		    set_data_name(cont_data->get_data_name());
+		    set_data_name(cont_data->get_slice_info().get_data_name());
 	    }
 
 	    // considering the in_place path

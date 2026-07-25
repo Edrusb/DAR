@@ -80,8 +80,7 @@ namespace libdar
 
 	    // overwritten inherited methods from contextual
         virtual void set_info_status(const std::string & s) override;
-	virtual bool is_an_old_start_end_archive() const override;
-	virtual const label & get_data_name() const override;
+	virtual const header & get_slice_info() const { throw Efeature("slice info"); };
 
 	    /// get the first slice header
 	    ///

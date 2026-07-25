@@ -59,7 +59,7 @@ namespace libdar
 		    const std::string & base_name,     ///< archive basename to create
 		    const std::string & extension,     ///< archive extension
  		    const entrepot & where,            ///< where to store the archive
-		    const label & internal_nale,       ///< tag common to all slices of the archive
+		    const label & internal_name,       ///< tag common to all slices of the archive
 		    const label & data_name,           ///< tag that follows the data when archive is dar_xform'ed
 		    const std::string & execute,       ///< command line to execute at end of slice creation
 		    bool allow_over,                   ///< whether to allow overwriting
@@ -78,6 +78,7 @@ namespace libdar
 		    bool lax                           ///< whether to be laxist or follow the normal and strict controlled procedure
 	    );
 
+	    /// construtor to read a (single sliced) archive from a file (using a filedescriptor)
 	trivial_sar(const std::shared_ptr<user_interaction> & dialog,  ///< how to interact with the user
 		    int filedescriptor,                ///< if set to '-' the data are read from standard input, else the given file is expected to be named pipe to read data from
 		    bool lax                           ///< whether to be laxist or follow the normal and strict controlled procedure
@@ -115,8 +116,7 @@ namespace libdar
         virtual infinint get_position() const override { return cur_pos; };
 
 	    // contextual inherited method
-	virtual bool is_an_old_start_end_archive() const override { return old_sar; };
-	virtual const label & get_data_name() const override { return of_data_name; };
+	virtual const header & get_slice_info() const override { return tete; };
 
 	    /// size of the slice header
 	const infinint & get_slice_header_size() const { return offset; };
@@ -138,20 +138,30 @@ namespace libdar
 
     private:
         generic_file *reference;  ///< points to the underlying data, owned by "this"
+	header tete;              ///< the slice information
         infinint offset;          ///< offset to apply to get the first byte of data out of SAR headers
 	infinint cur_pos;         ///< current position as returned by get_position()
 	infinint end_of_slice;    ///< when end of slice/archive is met, there is an offset by 1 compared to the offset of reference. end_of_slice is set to 1 in that situation, else it is always equal to zero
 	std::string hook;         ///< command to execute after slice writing (not used in read-only mode)
 	std::string base;         ///< basename of the archive (used for string susbstitution in hook)
 	std::string ext;          ///< extension of the archive (used for string substitution in hook)
-	label of_data_name;       ///< archive's data name
-	bool old_sar;             ///< true if the read sar has an old header (format <= "07") or the to be written must keep a version 07 format.
 	infinint min_digits;      ///< minimum number of digits in slice name
 	std::string hook_where;   ///< what value to use for %p substitution in hook
 	std::string base_url;     ///< what value to use for %u substitution in hook
 	bool natural_destruction; ///< whether user command is executed once the single sliced archive is completed (disable upon user interaction)
 
-	void init(const label & internal_name); ///< write the slice header and set the offset field (write mode), or (read-mode),  reads the slice header an set offset field
+
+	    /// read and setup the slice information
+	void init_read();
+
+	    /// setup and write down the slice information
+	    /// \param[in] internal_name internal name to use (ignored in read-mode)
+	    /// \param[in] data_name name associated to the data
+	    /// \param[in] format version to use (ignored in read-mode)
+	    /// \note this setup also includes the offset field
+	void init_write(const label & internal_name,
+			const label & data_name,
+			bool old_sar);
 
 	void where_am_i();
     };

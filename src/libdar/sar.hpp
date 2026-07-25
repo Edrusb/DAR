@@ -153,36 +153,21 @@ namespace libdar
 	virtual bool truncatable(const infinint & pos) const override;
         virtual infinint get_position() const override;
 
-            // informational routines
-	const slice_layout & get_slicing() const { fetch_slicing(); return slicing.get_slice_layout(); };
+            /// informational routines
         bool get_total_file_number(infinint &num) const { num = of_last_file_num; return of_last_file_known; };
         bool get_last_file_size(infinint &num) const { num = of_last_file_size; return of_last_file_known; };
 
-	    // disable execution of user command when destroying the current object
+	    /// disable execution of user command when destroying the current object
 	void disable_natural_destruction() { natural_destruction = false; };
 
-	    // enable back execution of user command when destroying the current object
+	    /// enable back execution of user command when destroying the current object
 	void enable_natural_destruction() { natural_destruction = true; };
 
-	    // true if sar's header is from an old archive format (<= "07")
-	virtual bool is_an_old_start_end_archive() const override { fetch_slicing(); return slicing.get_format_07_compatibility(); };
-
-	    // return the internal_name used to link slices toghether
-	const label & get_internal_name_used() const { fetch_slicing(); return slicing.get_internal_name(); };
-
-	    // return the data_name used to link slices toghether
-	virtual const label & get_data_name() const override { fetch_slicing(); return slicing.get_data_name(); };
-
+	    /// return the entrepot oject where are stored slices
 	const std::shared_ptr<entrepot> & get_entrepot() const { return entr; };
 
-	    /// get the first slice header
-	const infinint & get_first_slice_header_size() const { fetch_slicing(); return slicing.get_first_slice_header_size(); };
-
-	    /// get the non first slice header
-	const infinint & get_non_first_slice_header_size() const { fetch_slicing(); return slicing.get_common_slice_header_size(); };
-
-	    /// get a reference to the slice header
-	const header & get_slice_header() const { return slicing; };
+	    /// get a reference to the slice header (inherited from contextual class)
+	const header & get_slice_info() const override { return slicing; };
 
     protected :
 	virtual void inherited_read_ahead(const infinint & amount) override;

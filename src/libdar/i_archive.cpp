@@ -336,7 +336,7 @@ namespace libdar
 				    label lab = label_zero;
 				    stack.find_first_from_bottom(layer1);
 				    if(layer1 != nullptr)
-					lab = layer1->get_data_name();
+					lab = layer1->get_slice_info().get_data_name();
 
 				    cat = macro_tools_read_catalogue(dialog,
 								     ver,
@@ -2078,16 +2078,10 @@ namespace libdar
 	U_64 ret;
 	infinint pre_ret;
 	const generic_file *bottom = stack.bottom();
-	const trivial_sar *b_triv = dynamic_cast<const trivial_sar *>(bottom);
-	const sar *b_sar = dynamic_cast<const sar *>(bottom);
-	const zapette *b_zap = dynamic_cast<const zapette *>(bottom);
+	const contextual* b_contextual = dynamic_cast<const contextual*>(bottom);
 
-	if(b_triv != nullptr)
-	    pre_ret = b_triv->get_slice_header_size();
-	else if(b_sar != nullptr)
-	    pre_ret = b_sar->get_first_slice_header_size();
-	else if(b_zap != nullptr)
-	    pre_ret = b_zap->get_first_slice_header_size();
+	if(b_contextual != nullptr)
+	    pre_ret = b_contextual->get_slice_info().get_first_slice_header_size();
 	else
 	    pre_ret = 0; // unknown size
 
@@ -2102,16 +2096,11 @@ namespace libdar
 	U_64 ret;
 	infinint pre_ret;
 	const generic_file *bottom = stack.bottom();
-	const trivial_sar *b_triv = dynamic_cast<const trivial_sar *>(bottom);
-	const sar *b_sar = dynamic_cast<const sar *>(bottom);
-	const zapette *b_zap = dynamic_cast<const zapette *>(bottom);
+	const contextual* b_contextual = dynamic_cast<const contextual*>(bottom);
 
-	if(b_triv != nullptr)
-	    pre_ret = b_triv->get_slice_header_size();
-	else if(b_sar != nullptr)
-	    pre_ret = b_sar->get_non_first_slice_header_size();
-	else if(b_zap != nullptr)
-	    pre_ret = b_zap->get_non_first_slice_header_size();
+
+	if(b_contextual != nullptr)
+	    pre_ret = b_contextual->get_slice_info().get_common_slice_header_size();
 	else
 	    pre_ret = 0; // unknown size
 
@@ -2946,7 +2935,7 @@ namespace libdar
 
 	stack.find_first_from_bottom(l1);
 	if(l1 != nullptr)
-	    return l1->get_data_name();
+	    return l1->get_slice_info().get_data_name();
 	else
 	    throw Erange("catalogue::get_data_name", gettext("Cannot get data name of the archive, this archive is not completely initialized"));
     }
@@ -3004,7 +2993,7 @@ namespace libdar
 	stack.find_first_from_bottom(real_decoupe);
         if(real_decoupe != nullptr)
         {
-	    slice_layout tmp = real_decoupe->get_slicing();
+	    slice_layout tmp = real_decoupe->get_slice_info().get_slice_layout();
 
             sub_file_size = tmp.other_size;
             first_file_size = tmp.first_size;

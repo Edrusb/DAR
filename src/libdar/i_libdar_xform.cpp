@@ -45,8 +45,6 @@ namespace libdar
 						 const infinint & min_digits,
 						 const string & execute): mem_ui(ui)
     {
-	sar *tmp_sar = nullptr;
-
 	can_xform = true;
 	init_entrep();
 	src_path.reset(new (nothrow) path(chem));
@@ -55,70 +53,45 @@ namespace libdar
 
 	entrep_src->set_location(*src_path);
 
-	tmp_sar = new (nothrow) libdar::sar(get_pointer(),
-					    basename,
-					    extension,
-					    entrep_src,
-					    min_digits,
-					    false,
-					    nullptr,
-					    false,
-					    execute);
-	source.reset(tmp_sar);
+	source.reset(new (nothrow) libdar::sar(get_pointer(),
+					       basename,
+					       extension,
+					       entrep_src,
+					       min_digits,
+					       false,
+					       nullptr,
+					       false,
+					       execute));
 	if(!source)
 	    throw Ememory("i_libdar_xform::lidar_xform");
-	if(tmp_sar == nullptr)
-	    throw SRC_BUG;
 	else
 	{
 		// yes we modify directly the object
 		// we assigned to "source", only for
 		// short time and simplicity not to cast
 		// back to libdar::sar type
-	    tmp_sar->set_info_status(CONTEXT_OP);
-	    format_07_compatible = tmp_sar->is_an_old_start_end_archive();
-	    dataname = tmp_sar->get_data_name();
+	    source->set_info_status(CONTEXT_OP);
 	}
     }
 
     libdar_xform::i_libdar_xform::i_libdar_xform(const shared_ptr<user_interaction> & ui,
 						 const std::string & pipename) : mem_ui(ui)
     {
-	trivial_sar *tmp_sar = nullptr;
-
 	can_xform = true;
 	init_entrep();
-	tmp_sar = new (nothrow) libdar::trivial_sar(get_pointer(), pipename, false);
-	source.reset(tmp_sar);
+	source.reset(new (nothrow) libdar::trivial_sar(get_pointer(), pipename, false));
 	if(!source)
 	    throw Ememory("i_libdar_xform::i_libdar_xform");
-	if(tmp_sar == nullptr)
-	    throw SRC_BUG;
-	else
-	{
-	    format_07_compatible = tmp_sar->is_an_old_start_end_archive();
-	    dataname = tmp_sar->get_data_name();
-	}
     }
 
     libdar_xform::i_libdar_xform::i_libdar_xform(const shared_ptr<user_interaction> & ui,
 						 int filedescriptor) : mem_ui(ui)
     {
-	trivial_sar *tmp_sar = nullptr;
-
 	can_xform = true;
 	init_entrep();
-	tmp_sar = new (nothrow) libdar::trivial_sar(get_pointer(), filedescriptor, false);
-	source.reset(tmp_sar);
+	source.reset(new (nothrow) libdar::trivial_sar(get_pointer(), filedescriptor, false));
 	if(!source)
 	    throw Ememory("i_libdar_xform::i_libdar_xform");
-	if(tmp_sar == nullptr)
-	    throw SRC_BUG;
-	else
-	{
-	    format_07_compatible = tmp_sar->is_an_old_start_end_archive();
-	    dataname = tmp_sar->get_data_name();
-	}
     }
 
     void libdar_xform::i_libdar_xform::xform_to(const string & chem,
@@ -145,6 +118,10 @@ namespace libdar
 
 	if(!dst_path)
 	    throw Ememory("i_libdar_xform::xform_to");
+
+	if(!source)
+	    throw SRC_BUG;
+
 	entrep_dst->set_location(*dst_path);
 	entrep_dst->set_user_ownership(slice_user);
 	entrep_dst->set_group_ownership(slice_group);
@@ -167,7 +144,7 @@ namespace libdar
 								extension,
 								*entrep_dst,
 								internal_name,
-								dataname,
+								source->get_slice_info().get_data_name(),
 								execute,
 								allow_over,
 								warn_over,
@@ -175,7 +152,7 @@ namespace libdar
 								perm,
 								hash,
 								min_digits,
-								format_07_compatible));
+								source->get_slice_info().get_format_07_compatibility()));
 	}
 	else // generating multi-sliced archive
 	{
@@ -190,12 +167,12 @@ namespace libdar
 							pause,
 							entrep_dst,
 							internal_name,
-							dataname,
+							source->get_slice_info().get_data_name(),
 							force_perm,
 							perm,
 							hash,
 							min_digits,
-							format_07_compatible,
+							source->get_slice_info().get_format_07_compatibility(),
 							execute));
 	}
 	if(!destination)
@@ -215,8 +192,8 @@ namespace libdar
 							 filedescriptor,
 							 gf_write_only,
 							 internal_name,
-							 dataname,
-							 format_07_compatible,
+							 source->get_slice_info().get_data_name(),
+							 source->get_slice_info().get_format_07_compatibility(),
 							 execute));
 
 	if(!destination)
@@ -241,7 +218,10 @@ namespace libdar
 	    throw SRC_BUG;
 	try
 	{
-	    source->copy_to(*dst);
+	    generic_file* src = dynamic_cast<generic_file*>(source.get());
+	    if(src == nullptr)
+		throw SRC_BUG; // the source should not only inherit from contextual but also from generic_file
+	    src->copy_to(*dst);
 	}
 	catch(Escript & e)
 	{

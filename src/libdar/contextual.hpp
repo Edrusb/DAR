@@ -39,6 +39,7 @@ extern "C"
 
 #include "erreurs.hpp"
 #include "label.hpp"
+#include "header.hpp"
 
 #include <string>
 
@@ -90,14 +91,8 @@ namespace libdar
 	    /// get the current contextual value
         virtual std::string get_info_status() const { return status; };
 
-	    /// returns whether the archive is a old archive (format < 8)
-	virtual bool is_an_old_start_end_archive() const = 0;
-
-	    /// obtain the data_name of the archive (label associated with the archive's data)
-
-	    /// \note label are conserved with dar_xform and archive isolation, but are
-	    /// not with archive merging or archive creation (full or differential backup)
-	virtual const label & get_data_name() const = 0;
+	    /// returns the slice layout information
+	virtual const header & get_slice_info() const = 0;
 
     private:
 	std::string status;

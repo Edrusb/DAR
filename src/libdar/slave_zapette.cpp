@@ -157,15 +157,15 @@ namespace libdar
                     else if(req.offset == REQUEST_IS_OLD_START_END_ARCHIVE) // return whether the underlying archive has an old slice header or not
 		    {
 			ans.type = ANSWER_TYPE_INFININT;
-			ans.arg = src_ctxt->is_an_old_start_end_archive() ? 1 : 0;
+			ans.arg = src_ctxt->get_slice_info().get_format_07_compatibility() ? 1 : 0;
 			ans.write(out, nullptr);
 		    }
 		    else if(req.offset == REQUEST_GET_DATA_NAME) // return the data_name of the underlying sar
 		    {
 			ans.type = ANSWER_TYPE_DATA;
 			ans.arg = 0;
-			ans.size = src_ctxt->get_data_name().size();
-			ans.write(out, (char *)(src_ctxt->get_data_name().data()));
+			ans.size = src_ctxt->get_slice_info().get_data_name().size();
+			ans.write(out, (char *)(src_ctxt->get_slice_info().get_data_name().data()));
 		    }
 		    else if(req.offset == REQUEST_FIRST_SLICE_HEADER_SIZE)
 		    {
@@ -176,7 +176,7 @@ namespace libdar
 			if(src_triv != nullptr)
 			    ans.arg = src_triv->get_slice_header_size();
 			else if(src_sar != nullptr)
-			    ans.arg = src_sar->get_first_slice_header_size();
+			    ans.arg = src_sar->get_slice_info().get_first_slice_header_size();
 			else
 			    ans.arg = 0; // means unknown
 			ans.write(out, nullptr);
@@ -190,7 +190,7 @@ namespace libdar
 			if(src_triv != nullptr)
 			    ans.arg = src_triv->get_slice_header_size();
 			else if(src_sar != nullptr)
-			    ans.arg = src_sar->get_non_first_slice_header_size();
+			    ans.arg = src_sar->get_slice_info().get_common_slice_header_size();
 			else
 			    ans.arg = 0; // means unknown
 			ans.write(out, nullptr);

@@ -553,7 +553,7 @@ namespace libdar
 			else
 			    tmp_sar->skip(0);
 
-			sl_header = tmp_sar->get_slice_header();
+			sl_header = tmp_sar->get_slice_info();
 		    }
 		    else
 			sl_header = *ref_slice_header;
@@ -592,7 +592,7 @@ namespace libdar
 
 		    // ****** Reading the header version ************** //
 
-		if(tmp_ctxt->is_an_old_start_end_archive())
+		if(tmp_ctxt->get_slice_info().get_format_07_compatibility())
 		    by_the_end = false; // old archive format have only a header, no trailer
 
 		second_terminateur_offset = 0;
@@ -1271,7 +1271,7 @@ namespace libdar
 							  execute);
 
 			if(tmp_sar != nullptr)
-			    slicing = tmp_sar->get_slice_header();
+			    slicing = tmp_sar->get_slice_info();
 		    }
 
 

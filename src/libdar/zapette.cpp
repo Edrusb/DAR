@@ -186,35 +186,6 @@ namespace libdar
 	contextual::set_info_status(s);
     }
 
-    bool zapette::is_an_old_start_end_archive() const
-    {
-	infinint val;
-	S_I tmp = 0;
-
-	if(is_terminated())
-	    throw SRC_BUG;
-
-  	make_transfert(REQUEST_SIZE_SPECIAL_ORDER, REQUEST_IS_OLD_START_END_ARCHIVE, nullptr, "", tmp, val);
-	return val == 1;
-    }
-
-    const label & zapette::get_data_name() const
-    {
-	static label data_name;
-	infinint arg;
-	S_I lu = data_name.size(); // used to specify the amount of space allocated for the answer
-
-	if(is_terminated())
-	    throw SRC_BUG;
-
-	make_transfert(REQUEST_SIZE_SPECIAL_ORDER, REQUEST_GET_DATA_NAME, data_name.data(), "", lu, arg);
-
-	if(lu != (S_I)data_name.size())
-	    throw Erange("zapette::get_data_name", gettext("Uncomplete answer received from peer"));
-
-	return data_name;
-    }
-
     infinint zapette::get_first_slice_header_size() const
     {
 	infinint ret;
