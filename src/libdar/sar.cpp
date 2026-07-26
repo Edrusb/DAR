@@ -1611,7 +1611,7 @@ namespace libdar
 		string mesg;
 
 		if(slicing.check_same_data_set(h))
-		    mesg = tools_printf(gettext("%s is a slice from another backup resulting of a dar_xform transformation of the expected backup, please use the slice of the original backup"), fic.c_str());
+		    mesg = tools_printf(gettext("%s is a slice from another backup resulting of a dar_xform transformation of the expected backup, please use the slice of the original backup or disable the use of external slice headers"), fic.c_str());
 		else
 		    mesg = tools_printf(gettext("%s is a slice from another backup, please provide the correct slice."), fic.c_str());
 
