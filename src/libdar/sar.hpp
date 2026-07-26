@@ -167,7 +167,7 @@ namespace libdar
 	const std::shared_ptr<entrepot> & get_entrepot() const { return entr; };
 
 	    /// get a reference to the slice header (inherited from contextual class)
-	const header & get_slice_info() const override { return slicing; };
+	const header & get_slice_info() const override { fetch_slicing(); return slicing; };
 
     protected :
 	virtual void inherited_read_ahead(const infinint & amount) override;
