@@ -89,6 +89,63 @@ namespace libdar
 	return ret;
     }
 
+    infinint memory_file::dump_to(unsigned char* a, const infinint & size) const
+    {
+	if(data.size() > size)
+	    return size + 1;
+	else
+	{
+	    storage::iterator it = data.begin();
+	    unsigned char *ptr = a;
+
+	    while(it != data.end())
+	    {
+		*ptr = *it;
+		++ptr;
+		++a;
+	    }
+
+	    return data.size();
+	}
+    }
+
+    void memory_file::load_from(unsigned char* a, const infinint & size)
+    {
+	storage::iterator it;
+	U_32 step;
+	unsigned char* ptr = a;
+	infinint to_xfer = size;
+
+	if(data.size() < size)
+	{
+	    infinint to_add = size - data.size();
+	    U_I step;
+
+	    while(!to_add.is_zero())
+	    {
+		step = 0;
+		to_add.unstack(step);
+		data.insert_null_bytes_at_iterator(data.end(), step);
+	    }
+	}
+
+	if(data.size() > size)
+	    data.truncate(size);
+
+	it = data.begin();
+
+	while(!to_xfer.is_zero())
+	{
+	    step = 0;
+	    to_xfer.unstack(step);
+	    data.write(it, ptr, step);
+	    it  += step;
+	    ptr += step;
+	}
+
+	position = 0;
+    }
+
     U_I memory_file::inherited_read(char *a, U_I size)
     {
 	U_I ret = 0;

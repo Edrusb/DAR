@@ -65,6 +65,18 @@ namespace libdar
 
 	void change_mode(gf_mode mode) { set_mode(mode); /* inherited from generic_file */ };
 
+	    // interface to char* buffers
+
+	    /// write down the memory_file content to the provided unsigned char array
+
+	    /// \return the size used to store the data or a value greater than size of
+	    /// the provided buffer is too small (in that case no data is modified in the
+	    /// pointed to unsigned char array.
+	infinint dump_to(unsigned char* a, const infinint & size) const;
+
+	    /// replace the memory_file content by the content of the pointed to unsigned char buffer
+	void load_from(unsigned char* a, const infinint & size);
+
     protected:
 
 	    // virtual method inherited from generic_file
