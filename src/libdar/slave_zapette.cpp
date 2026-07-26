@@ -53,7 +53,10 @@ using namespace std;
 namespace libdar
 {
 
-    slave_zapette::slave_zapette(generic_file *input, generic_file *output, generic_file *data)
+    slave_zapette::slave_zapette(const std::shared_ptr<user_interaction> & dialog,
+				 generic_file *input,
+				 generic_file *output,
+				 generic_file *data) : mem_ui(dialog)
     {
         if(input == nullptr)
             throw SRC_BUG;
@@ -194,6 +197,49 @@ namespace libdar
 			else
 			    ans.arg = 0; // means unknown
 			ans.write(out, nullptr);
+		    }
+		    else if(req.offset == REQUEST_SLICE_INFO_SIZE)
+		    {
+			header tmp = src_ctxt->get_slice_info();
+
+			serialzd.reset();
+			tmp.write(get_ui(), serialzd, true, true);
+
+			ans.type = ANSWER_TYPE_INFININT;
+			ans.arg = serialzd.size();
+			ans.write(out, nullptr);
+		    }
+		    else if(req.offset == REQUEST_SLICE_INFO_DATA)
+		    {
+			infinint data_size = serialzd.size();
+			char* tmp_data = nullptr;
+
+			if(serialzd.size().is_zero())
+			    throw SRC_BUG; // a previous call with REQUEST_SLICE_INFO_SIZE has not taken place
+
+			data_size.unstack(ans.size);
+			if(! data_size.is_zero())
+			    throw Erange("slave_zapette::action", gettext("too large slice header information for zapette protocol"));
+
+			tmp_data = new (nothrow) char[ans.size];
+			if(tmp_data == nullptr)
+			    throw Ememory("slave_zapette::action");
+
+			try
+			{
+			    serialzd.dump_to((unsigned char*)(tmp_data), infinint(ans.size));
+			    ans.type = ANSWER_TYPE_DATA;
+			    ans.write(out, tmp_data);
+			}
+			catch(...)
+			{
+			    delete [] tmp_data;
+			    throw;
+			}
+			if(tmp_data != nullptr)
+			    delete [] tmp_data;
+
+			serialzd.reset();
 		    }
 		    else
                         throw Erange("zapette::action", gettext("Received unknown special order"));

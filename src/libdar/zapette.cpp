@@ -47,6 +47,7 @@ extern "C"
 #include "trivial_sar.hpp"
 #include "sar.hpp"
 #include "zapette_protocol.hpp"
+#include "user_interaction_blind.hpp"
 
 using namespace std;
 
@@ -184,6 +185,64 @@ namespace libdar
 
 	make_transfert(REQUEST_SIZE_SPECIAL_ORDER, REQUEST_OFFSET_CHANGE_CONTEXT_STATUS, nullptr, s, tmp, val);
 	contextual::set_info_status(s);
+    }
+
+    const header & zapette::get_slice_info() const
+    {
+	S_I tmp = 0;
+	infinint data_size;
+	U_I data_size_step;
+	char *data_buf = nullptr;
+
+	if(is_terminated())
+	    throw SRC_BUG;
+
+	    // first fetching the amount of byte to be fetched
+
+	make_transfert(REQUEST_SIZE_SPECIAL_ORDER, REQUEST_SLICE_INFO_SIZE, nullptr, "", tmp, data_size);
+
+
+	    // preparing the needed buffers to store the data to be transfered
+
+	data_size_step = 0;
+	data_size.unstack(data_size_step);
+	if(!data_size.is_zero())
+	    throw Erange("zapette::get_slice_info", gettext("too large amount of data to transfer for slice information over zapette protocol"));
+
+	data_buf = new(nothrow) char[data_size_step];
+	if(data_buf == nullptr)
+	    throw Ememory("zapette:get_slice_info");
+
+
+	    // getting and deserializing the datastructure
+
+	try
+	{
+	    S_I lu = 0;
+
+	    make_transfert(REQUEST_SIZE_SPECIAL_ORDER, REQUEST_SLICE_INFO_DATA, data_buf, "", lu, data_size);
+		// data_size is not used above
+
+	    slice_info_xfer.load_from((unsigned char*)(data_buf), data_size_step);
+	    slice_info.read(get_ui(), slice_info_xfer, false);
+	}
+	catch(...)
+	{
+	    if(data_buf != nullptr)
+	    {
+		delete [] data_buf;
+		data_buf = nullptr;
+	    }
+	    throw;
+	}
+
+	if(data_buf != nullptr)
+	{
+	    delete [] data_buf;
+	    data_buf = nullptr;
+	}
+
+	return slice_info;
     }
 
     infinint zapette::get_first_slice_header_size() const

@@ -137,7 +137,7 @@ namespace libdar
 	    if(output == nullptr)
 		throw Ememory("libdar_slave::libdar_slave");
 
-	    zap.reset(new (nothrow) slave_zapette(input, output, source));
+	    zap.reset(new (nothrow) slave_zapette(dialog, input, output, source));
 	    if(!zap)
 		throw Ememory("libdar_slave::libdar_slave");
             input = output = nullptr; // now managed by zap;

@@ -48,6 +48,7 @@ namespace libdar
     constexpr unsigned char ANSWER_TYPE_INFININT = 'I';
 
     constexpr U_I REQUEST_SIZE_SPECIAL_ORDER = 0;
+
     constexpr U_I REQUEST_OFFSET_END_TRANSMIT = 0;
     constexpr U_I REQUEST_OFFSET_GET_FILESIZE = 1;
     constexpr U_I REQUEST_OFFSET_CHANGE_CONTEXT_STATUS = 2;
@@ -55,6 +56,8 @@ namespace libdar
     constexpr U_I REQUEST_GET_DATA_NAME = 4;
     constexpr U_I REQUEST_FIRST_SLICE_HEADER_SIZE = 5;
     constexpr U_I REQUEST_OTHER_SLICE_HEADER_SIZE = 6;
+    constexpr U_I REQUEST_SLICE_INFO_SIZE = 7;
+    constexpr U_I REQUEST_SLICE_INFO_DATA = 8;
 
     struct request
     {

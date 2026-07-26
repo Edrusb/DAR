@@ -37,6 +37,8 @@
 #include "../my_config.h"
 #include "generic_file.hpp"
 #include "contextual.hpp"
+#include "header.hpp"
+#include "mem_ui.hpp"
 
 namespace libdar
 {
@@ -50,16 +52,20 @@ namespace libdar
 	/// through a pair of pipes slave_zapette return information about
 	/// a given local archive (single or multi slices).
 
-    class slave_zapette
+    class slave_zapette: public mem_ui
     {
     public:
 
 	    /// slave_zapette constructor
 
+	    /// \param[in] dialog for user interaction when needed
 	    /// \param[in] input is used to receive orders from an zapette object
 	    /// \param[in] output is used to return informations or data in answer to received orders
 	    /// \param[in] data is where the informations or data is taken from. Object must inherit from contextual
-        slave_zapette(generic_file *input, generic_file *output, generic_file *data);
+        slave_zapette(const std::shared_ptr<user_interaction> & dialog,
+		      generic_file *input,
+		      generic_file *output,
+		      generic_file *data);
 	slave_zapette(const slave_zapette & ref) = delete;
 	slave_zapette(slave_zapette && ref) noexcept = delete;
 	slave_zapette & operator = (const slave_zapette & ref) = delete;
@@ -77,6 +83,7 @@ namespace libdar
 	generic_file *out;    ///< where to send requested info or data to
 	generic_file *src;    ///< where to read data from
 	contextual *src_ctxt; ///< same as src but seen as contextual
+	memory_file serialzd; ///< to avoid sterializing twice the header first time to get it size, and second time its data
     };
 
 	/// @}

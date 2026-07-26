@@ -39,6 +39,7 @@
 #include "integers.hpp"
 #include "mem_ui.hpp"
 #include "contextual.hpp"
+#include "memory_file.hpp"
 
 namespace libdar
 {
@@ -80,7 +81,7 @@ namespace libdar
 
 	    // overwritten inherited methods from contextual
         virtual void set_info_status(const std::string & s) override;
-	virtual const header & get_slice_info() const { throw Efeature("slice info"); };
+	virtual const header & get_slice_info() const override;
 
 	    /// get the first slice header
 	    ///
@@ -102,9 +103,13 @@ namespace libdar
 	virtual void inherited_terminate() override;
 
     private:
+	static constexpr const U_I MEMBUF_INCR = 1024;
+
         generic_file *in, *out;
         infinint position, file_size;
         char serial_counter;
+	mutable header slice_info;
+	mutable memory_file slice_info_xfer;
 
 	    /// wrapped formatted method to communicate with the slave_zapette located behind the pair of pipes (= tuyau)
 
@@ -114,7 +119,7 @@ namespace libdar
 	    /// \param[in] info the new contextual string to set to the slave_zapette.
 	    /// \param[out] lu the amount of byte wrote to '*data'
 	    /// \param[out] arg infinint value return for special order (see note below).
-	    /// \note with default parameters, this method permits the caller to get a portion of data from the
+	    /// \note with default parameters, this method permits to the caller to get a portion of data from the
 	    /// remote slave_zapette. In addition, it let the caller change the 'contextual' status of the remote object.
 	    /// if size is set to REQUEST_SPECIAL_ORDER, the offset is used to transmit a special order to the
 	    /// remote slave_zapette. Defined order are for example REQUEST_OFFSET_END_TRANSMIT , REQUEST_OFFSET_GET_FILESIZE,
