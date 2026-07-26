@@ -351,12 +351,12 @@ namespace libdar
         {
             if(req.offset == REQUEST_OFFSET_END_TRANSMIT)
             {
-                if(ans.size != 0 && ans.type != ANSWER_TYPE_DATA)
+                if(ans.size != 0 || ans.type != ANSWER_TYPE_DATA)
                     get_ui().message(gettext("Bad answer from peer, while closing connection"));
             }
             else if(req.offset == REQUEST_OFFSET_GET_FILESIZE)
             {
-                if(ans.size != 0 && ans.type != ANSWER_TYPE_INFININT)
+                if(ans.size != 0 || ans.type != ANSWER_TYPE_INFININT)
                     throw Erange("zapette::make_transfert", gettext("Incoherent answer from peer"));
             }
 	    else if(req.offset == REQUEST_OFFSET_CHANGE_CONTEXT_STATUS)
@@ -371,18 +371,28 @@ namespace libdar
 	    }
 	    else if(req.offset == REQUEST_GET_DATA_NAME)
 	    {
-		if(ans.type != ANSWER_TYPE_DATA && lu != (S_I)(label::common_size()))
+		if(ans.type != ANSWER_TYPE_DATA || lu != (S_I)(label::common_size()))
 		    throw Erange("zapetee::make_transfert", gettext("Unexpected answer from slave, communication problem or bug may hang the operation"));
 	    }
 	    else if(req.offset == REQUEST_FIRST_SLICE_HEADER_SIZE)
 	    {
-		if(ans.size != 0 && ans.type != ANSWER_TYPE_INFININT)
+		if(ans.size != 0 || ans.type != ANSWER_TYPE_INFININT)
                     throw Erange("zapette::make_transfert", gettext("Incoherent answer from peer"));
 	    }
 	    else if(req.offset == REQUEST_OTHER_SLICE_HEADER_SIZE)
 	    {
-		if(ans.size != 0 && ans.type != ANSWER_TYPE_INFININT)
+		if(ans.size != 0 || ans.type != ANSWER_TYPE_INFININT)
                     throw Erange("zapette::make_transfert", gettext("Incoherent answer from peer"));
+	    }
+	    else if(req.offset == REQUEST_SLICE_INFO_SIZE)
+	    {
+		if(ans.size != 0 || ans.type != ANSWER_TYPE_INFININT)
+		    throw Erange("zapette::make_transfert", gettext("Incoherent answer from peer"));
+	    }
+	    else if(req.offset == REQUEST_SLICE_INFO_DATA)
+	    {
+		if(lu == 0 || ans.type != ANSWER_TYPE_DATA)
+		    throw Erange("zapette::make_transfert", gettext("Incoherent answer from peer"));
 	    }
 	    else
                 throw Erange("zapette::make_transfert", gettext("Corrupted data read from pipe"));
