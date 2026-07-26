@@ -102,7 +102,7 @@ namespace libdar
 	    {
 		*ptr = *it;
 		++ptr;
-		++a;
+		++it;
 	    }
 
 	    return data.size();
