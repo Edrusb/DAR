@@ -332,7 +332,10 @@ namespace libdar
         switch(ans.type)
         {
         case ANSWER_TYPE_DATA:
-            lu = ans.size;
+	    if(ans.size <= size)
+		lu = ans.size;
+	    else
+		lu = size;
             arg = 0;
             break;
         case ANSWER_TYPE_INFININT:
