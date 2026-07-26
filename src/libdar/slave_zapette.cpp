@@ -214,9 +214,10 @@ namespace libdar
 			infinint data_size = serialzd.size();
 			char* tmp_data = nullptr;
 
-			if(serialzd.size().is_zero())
+			if(data_size.is_zero())
 			    throw SRC_BUG; // a previous call with REQUEST_SLICE_INFO_SIZE has not taken place
 
+			ans.size = 0;
 			data_size.unstack(ans.size);
 			if(! data_size.is_zero())
 			    throw Erange("slave_zapette::action", gettext("too large slice header information for zapette protocol"));
