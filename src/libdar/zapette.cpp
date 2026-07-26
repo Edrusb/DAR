@@ -218,12 +218,12 @@ namespace libdar
 
 	try
 	{
-	    S_I lu = 0;
+	    S_I lu = data_size_step;
 
 	    make_transfert(REQUEST_SIZE_SPECIAL_ORDER, REQUEST_SLICE_INFO_DATA, data_buf, "", lu, data_size);
-		// data_size is not used above
+		// data_size above is equals to zero an is not used, since this is a DATA request not INFININT one
 
-	    slice_info_xfer.load_from((unsigned char*)(data_buf), data_size_step);
+	    slice_info_xfer.load_from((unsigned char*)(data_buf), lu);
 	    slice_info.read(get_ui(), slice_info_xfer, false);
 	}
 	catch(...)
