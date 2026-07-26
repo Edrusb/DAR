@@ -56,11 +56,11 @@ namespace libdar
 	    /// \param[in] execute command to execute before each new slice
 	    /// same substitution is available as archive_options_create::set_execute()
 	i_libdar_xform(const std::shared_ptr<user_interaction> & ui,
-		     const std::string & chem,
-		     const std::string & basename,
-		     const std::string & extension,
-		     const infinint & min_digits,
-		     const std::string & execute);
+		       const std::string & chem,
+		       const std::string & basename,
+		       const std::string & extension,
+		       const infinint & min_digits,
+		       const std::string & execute);
 
 	    /// the archive to transform is read from a named pipe
 
