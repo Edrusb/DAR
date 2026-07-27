@@ -43,6 +43,7 @@ extern "C"
 
 #include "zapette_protocol.hpp"
 #include "tools.hpp"
+#include "null_file.hpp"
 
 using namespace std;
 
@@ -120,24 +121,17 @@ namespace libdar
             size = ntohs(tmp);
 
 		// recycling tmp to carry the max data to store in the data arg of this method
-	    if(size > max)
-		tmp = max;
-	    else
-		tmp = size;
+	    tmp = size > max ? max : size;
 
 		// recycling pas to follow the steps of data fullfilment
-            pas = 0;
-            while(pas < tmp)
-                pas += f->read(data+pas, tmp - pas);
+	    f->read(data, tmp);
 
 		// need to drop the remaining data
             if(size > max)
             {
-                char black_hole;
+		null_file black_hole(gf_write_only);
 
-                for(tmp = max; tmp < size; ++tmp)
-                    f->read(&black_hole, 1);
-                    // might not be very performant code
+		f->copy_to(black_hole, size - max);
             }
             arg = 0;
             break;
