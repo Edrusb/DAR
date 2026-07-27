@@ -516,8 +516,6 @@ namespace libdar
 	    }
 	    else
 	    {
-		sar *tmp_sar = nullptr;
-
 		if(info_details)
 		    dialog->message(gettext("Opening the archive using the multi-slice abstraction layer..."));
 
@@ -534,30 +532,15 @@ namespace libdar
 		    }
 		}
 
-		tmp = tmp_sar = new (nothrow) sar(dialog,
-						  basename,
-						  extension,
-						  where,
-						  min_digits,
-						  sequential_read,
-						  ref_slice_header,
-						  lax,
-						  execute);
-		if(tmp_sar != nullptr)
-		{
-		    if(ref_slice_header == nullptr)
-		    {
-			    // not openned by the end in sequential read mode
-			if(by_the_end)
-			    tmp_sar->skip_to_eof();
-			else
-			    tmp_sar->skip(0);
-
-			sl_header = tmp_sar->get_slice_info();
-		    }
-		    else
-			sl_header = *ref_slice_header;
-		}
+		tmp = new (nothrow) sar(dialog,
+					basename,
+					extension,
+					where,
+					min_digits,
+					sequential_read,
+					ref_slice_header,
+					lax,
+					execute);
 	    }
 
 	    if(tmp == nullptr)
@@ -574,6 +557,22 @@ namespace libdar
 	    stack.find_first_from_top(tmp_ctxt);
 	    if(tmp_ctxt == nullptr)
 		throw SRC_BUG;
+	    else
+	    {
+		if(ref_slice_header == nullptr)
+		{
+			// not openned by the end in sequential read mode
+		    if(by_the_end)
+			stack.skip_to_eof();
+		    else
+			stack.skip(0);
+
+		    sl_header = tmp_ctxt->get_slice_info();
+		}
+		else
+		    sl_header = *ref_slice_header;
+	    }
+
 
 	    if(has_external_header)
 	    {
