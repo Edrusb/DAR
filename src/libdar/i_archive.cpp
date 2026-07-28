@@ -169,7 +169,21 @@ namespace libdar
 			    if(! options.get_ignore_external_slice_header())
 				if(ref_ver.get_slice_header() != nullptr
 				   && ref_ver.get_ref_header_version() != nullptr)
+				{
 				    ref_header = &ref_ver;
+				    if(info_details)
+					dialog->printf(gettext("Relying on slice layout and format version information stored in the isolated catalogue to avoid reading first/last slice of the backup to extracting data from"));
+				}
+				else
+				{
+				    if(info_details)
+					dialog->printf(gettext("No slice layout and format version information stored in the isolated catalogue, will need to read the first or last slice of the backup prior extracting data from it"));
+				}
+			    else
+			    {
+				if(info_details)
+				    dialog->printf(gettext("Ignoring any slice layout and format version information possibly stored in the isolated catalogue but fetching it from the first or last slice of the backup to extract data from"));
+			    }
 				// else ref_ver stays equal to nullptr
 				// leading the slice and header_version
 				// information to be read from the main
