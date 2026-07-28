@@ -14,12 +14,16 @@ from 2.8.x to 2.9.0
   overloaded methods in API and '--delta sig:...' enhancement in CLI.
 - isolated catalogues now contains all informations necessary to read a
   backup of reference without first reading any part of it. This means
-  that restoring data with the help of an isolated catalogue dar will no
-  more require the first or the last slice before the ones where is
+  that when restoring data with the help of an isolated catalogue, dar will
+  no more require the first or the last slice before the ones where is
   located the data to restore.
 - added -aiesh option, to cope with dar_xform transformed backup when
-  read with the help of an isolated catalogue since the slicing info is
-  of the backup is stored in the isolated catalogue.
+  read with the help of an isolated catalogue since the slicing info
+  changed and the isolated catalogue has not been updated. With this
+  option the slicing info is fetched as before release 2.9.x from the first
+  or last slice of the backup to restore from. A alternative is to
+  recreate the isolated catalogues after an archive has been re-sliced
+  using dar_xform.
 
 from 2.8.5 to 2.8.6
 - fixing bug met when restoring backup in dry-run mode (--empty option)
