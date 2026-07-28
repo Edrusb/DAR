@@ -123,8 +123,7 @@ namespace libdar
 
     void secu_string::append_at(U_I offset, int fd, U_I size)
     {
-	U_I lu = 0;
-	S_I tmp = 0;
+	S_I lu = 0;
 
 	if(size == 0)
 	    return; // nothing to append
@@ -137,20 +136,20 @@ namespace libdar
 	if(size + offset > get_allocated_size())
 	    throw Erange("secu_string::append", gettext("Cannot receive that much data in regard to the allocated memory"));
 
-	do
+	lu = ::read(fd, &(ptr->mem) + offset, size);
+	if(lu < 0)
 	{
-	    tmp = ::read(fd, &(ptr->mem) + offset + lu, size - lu);
-	    if(tmp > 0)
-		lu += tmp;
+	    get_array()[ptr->allocated_size - 1] = '\0';
+	    throw Erange("secu_string::read", string(gettext("Error while reading data for a secure memory:" )) + tools_strerror_r(errno));
 	}
-	while(tmp > 0 && lu < size);
 
 	offset += lu;
-	if(offset > ptr->string_size)
-	    ptr->string_size = offset;
-	get_array()[ptr->string_size] = '\0';
-	if(tmp < 0) // if tmp == 0 we reached eof, no issue thus.
-	    throw Erange("secu_string::read", string(gettext("Error while reading data for a secure memory:" )) + tools_strerror_r(errno));
+	if(offset > ptr->allocated_size)
+	    throw SRC_BUG;
+
+        if(ptr->string_size < offset)
+            ptr->string_size = offset;
+        get_array()[ptr->string_size] = '\0';
     }
 
     void secu_string::reduce_string_size_to(U_I pos)
