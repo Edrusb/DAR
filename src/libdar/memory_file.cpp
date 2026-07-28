@@ -27,14 +27,17 @@ using namespace std;
 
 namespace libdar
 {
+
+
+
     bool memory_file::skip(const infinint & pos)
     {
 	if(is_terminated())
 	    throw SRC_BUG;
 
-	if(pos >= data.size())
+	if(pos >= data_size)
 	{
-	    position = data.size();
+	    position = data_size;
 	    return false;
 	}
 	else
@@ -49,7 +52,7 @@ namespace libdar
 	if(is_terminated())
 	    throw SRC_BUG;
 
-	position = data.size();
+	position = data_size;
 	return true;
     }
 
@@ -77,9 +80,9 @@ namespace libdar
 	else
 	{
 	    position += x;
-	    if(position > data.size())
+	    if(position > data_size)
 	    {
-		position = data.size();
+		position = data_size;
 		ret = false;
 	    }
 	    else
@@ -91,7 +94,7 @@ namespace libdar
 
     infinint memory_file::dump_to(unsigned char* a, const infinint & size) const
     {
-	if(data.size() > size)
+	if(data_size > size)
 	    return size + 1;
 	else
 	{
@@ -105,7 +108,7 @@ namespace libdar
 		++it;
 	    }
 
-	    return data.size();
+	    return data_size;
 	}
     }
 
@@ -116,9 +119,11 @@ namespace libdar
 	unsigned char* ptr = a;
 	infinint to_xfer = size;
 
-	if(data.size() < size)
+	    // expanding the storage if needed
+
+	if(data_size < size)
 	{
-	    infinint to_add = size - data.size();
+	    infinint to_add = size - data_size;
 	    U_I step;
 
 	    while(!to_add.is_zero())
@@ -129,8 +134,12 @@ namespace libdar
 	    }
 	}
 
-	if(data.size() > size)
+	    // shrinking the storage if needed
+
+	if(data_size > size)
 	    data.truncate(size);
+
+	data_size = size;
 
 	it = data.begin();
 
@@ -150,7 +159,7 @@ namespace libdar
     {
 	U_I ret = 0;
 
-	while(ret < size && position < data.size())
+	while(ret < size && position < data_size)
 	{
 	    *(a++) = (char)(data[position]);
 	    ++ret;
@@ -167,22 +176,31 @@ namespace libdar
 	if(size == 0)
 	    return;
 
-	while(ret < size && position < data.size())
+	while(ret < size && position < data_size)
 	{
 	    data[position] = (unsigned char)(*(a++));
 	    ret++;
 	    ++position;
 	}
 
-	data.insert_bytes_at_iterator(data.end(), (unsigned char *)(a), size - ret);
-	position += size - ret;
+	size -= ret; // size is now the amount of extra bytes needed to be added at then end of storage
+
+	data.insert_bytes_at_iterator(data.end(), (unsigned char *)(a), size);
+	position += size; // position has been increased up to size
+
+	if(position > data_size) // storage has been extended
+	    data_size = position;
+
     }
 
     void memory_file::inherited_truncate(const infinint & pos)
     {
+	if(pos >= data_size)
+	    throw SRC_BUG; // truncating after the last byte !?!
 	data.truncate(pos);
 	if(position > pos)
 	    position = pos;
+	data_size = pos;
     }
 
 }  // end of namespace

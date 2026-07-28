@@ -42,7 +42,7 @@ namespace libdar
     public:
 
 	    /// Constructors & Destructor
-	memory_file() : generic_file(gf_read_write), data(0) { position = 0; };
+	memory_file() : generic_file(gf_read_write), data(0), data_size(0), position(0) {};
 	memory_file(const memory_file & ref) = default;
 	memory_file(memory_file && ref) noexcept = default;
 	memory_file & operator = (const memory_file & ref) = default;
@@ -51,8 +51,8 @@ namespace libdar
 
 	    // memory_storage specific methods
 
-	void reset() { if(is_terminated()) throw SRC_BUG; position = 0; data = storage(0); };
-	infinint size() const { return data.size(); };
+	void reset() { if(is_terminated()) throw SRC_BUG; position = 0; data = storage(0); data_size = 0; };
+	infinint size() const { return data_size; };
 
 
 	    // virtual method inherited from generic_file
@@ -90,6 +90,7 @@ namespace libdar
 
     private:
 	storage data;
+	infinint data_size; /// used to limit the calls data.size() for performance improvements
 	infinint position;
     };
 
