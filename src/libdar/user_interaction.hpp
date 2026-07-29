@@ -65,7 +65,7 @@ namespace libdar
 	virtual ~user_interaction() = default;
 
 	    // the following methode are used by libdar and rely in their inherited_* versions
-	    // than must be defined in the inherited classes
+	    // that must be defined in the inherited classes
 
 	void message(const std::string & message);
 	void pause(const std::string & message);
