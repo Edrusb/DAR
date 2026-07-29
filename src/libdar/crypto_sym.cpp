@@ -63,6 +63,7 @@ namespace libdar
 #if CRYPTO_AVAILABLE
 	U_I algo_id;
 	S_I retry = use_pkcs5? MAX_RETRY_IF_WEAK_PASSWORD: 0;
+	bool retry_cond = salt.empty() && use_pkcs5 && reading_version >= 10;
 
 	nullify();
 
@@ -89,7 +90,7 @@ namespace libdar
 	    {
 		    // generate a salt if not provided and pkcs5 is needed
 
-		if(salt.empty() && use_pkcs5 && reading_version >= 10)
+		if(retry_cond)
 		    sel = generate_salt(max_key_len(xalgo));
 		else
 		    sel = salt;
@@ -104,7 +105,7 @@ namespace libdar
 				     algo);
 
 	    }
-	    while(! is_a_strong_password(algo, hashed_password) && --retry >= 0);
+	    while(retry_cond && ! is_a_strong_password(algo, hashed_password) && --retry >= 0);
 
 	    if(retry < 0)
 		throw Erange("crypto_sym::crypto_sym", tools_printf(gettext("Failed to obtain a strong hashed password after %d retries with pkcs5 and different salt values, aborting"), MAX_RETRY_IF_WEAK_PASSWORD));
