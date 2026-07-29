@@ -677,6 +677,7 @@ namespace libdar
 				    of_last_file_num = of_current;
 				    of_last_file_size = of_fd->get_size(); // or get_position() should give the same result
 				    slicing.set_flag(flag_type_terminal);
+				    break;
 				case flag_type_non_terminal:
 				    break; // can't know anything more
 				case flag_type_located_at_end_of_slice:
