@@ -500,26 +500,8 @@ namespace libdar
 	    sauv_path_t->set_location(sauv_path);
 
 	    filesystem_ids same_fs(options.get_same_fs(), fs_root);
-	    deque<string> same_fs_inc = options.get_same_fs_include();
-	    deque<string> same_fs_exc = options.get_same_fs_exclude();
-	    if(!same_fs_inc.empty() || !same_fs_exc.empty())
-	    {
-		deque<string>::iterator it = same_fs_inc.begin();
-		same_fs.clear();
-
-		while(it != same_fs_inc.end())
-		{
-		    same_fs.include_fs_at(*it);
-		    ++it;
-		}
-
-		it = same_fs_exc.begin();
-		while(it != same_fs_exc.end())
-		{
-		    same_fs.exclude_fs_at(*it);
-		    ++it;
-		}
-	    }
+	    same_fs.include_fs_at(options.get_same_fs_include());
+	    same_fs.exclude_fs_at(options.get_same_fs_exclude());
 
 	    if(options.get_reference().get() != nullptr
 	       && options.get_reference().get()->pimpl != nullptr

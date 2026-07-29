@@ -80,7 +80,10 @@ namespace libdar
 	    /// files located on the explictely excluded filesystems.
 	void include_fs_at(const path & chem);
 
-	    /// exclude the filessytem where the given path is stored
+	    /// include the filesystems where the given list of path is stored
+	void include_fs_at(const std::deque<std::string> & listing);
+
+	    /// exclude the filesytem where the given path is stored
 
 	    /// \note if a filesystem is both included and excluded
 	    /// it is excluded. The only filesystem that is never
@@ -91,6 +94,9 @@ namespace libdar
 	    /// \note if both include and excluded list are empty,
 	    /// is_covered() always return true.
 	void exclude_fs_at(const path & chem);
+
+	    /// exclude the filesystems where the given path is stored
+	void exclude_fs_at(const std::deque<std::string> & listing);
 
 	    /// returns true if the fs_id is included and not excluded,
 	    /// true is also always returned for the fs set as root_fs

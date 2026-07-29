@@ -76,12 +76,33 @@ namespace libdar
 	included.insert(path2fs_id(chem.display()));
     }
 
+    void filesystem_ids::include_fs_at(const deque<string> & listing)
+    {
+	for(deque<string>::const_iterator it = listing.begin();
+	    it != listing.end();
+	    ++it)
+	{
+	    include_fs_at(*it);
+	}
+    }
+
     void filesystem_ids::exclude_fs_at(const path & chem)
     {
 	if(chem.is_relative())
 	    throw Erange("filesystem_ids::set_root_fs","path to a filesystem must be an absolute path");
 	excluded.insert(path2fs_id(chem.display()));
     }
+
+    void filesystem_ids::exclude_fs_at(const deque<string> & listing)
+    {
+	for(deque<string>::const_iterator it = listing.begin();
+	    it != listing.end();
+	    ++it)
+	{
+	    exclude_fs_at(*it);
+	}
+    }
+
 
     bool filesystem_ids::is_covered(const infinint & fs_id) const
     {
