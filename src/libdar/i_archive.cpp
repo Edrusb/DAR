@@ -37,7 +37,7 @@ extern "C"
 #include "sar.hpp"
 #include "trivial_sar.hpp"
 #include "tools.hpp"
-#include "header.hpp"
+#include "slice_header.hpp"
 #include "header_version.hpp"
 #include "scrambler.hpp"
 #include "null_file.hpp"
@@ -126,7 +126,7 @@ namespace libdar
 			{
 			    secu_string live_ref_pass = options.get_ref_crypto_pass();
 			    U_32 live_ref_crypto_bs = options.get_ref_crypto_size();
-			    header ignored;
+			    slice_header ignored;
 
 			    if(options.get_ref_basename() == "-")
 				throw Erange("archive::i_archive::archive", gettext("Reading the archive of reference from pipe or standard input is not possible"));
@@ -241,7 +241,7 @@ namespace libdar
 					 options.get_sequential_read(),
 					 options.get_info_details(),
 					 gnupg_signed,
-					 slice_header,  // slice_header field is set from here
+					 sl_header,  // slice_header field is set from here
 					 ref_header, // may be nullptr or be a header without slice layout info
 					 options.get_multi_threaded_crypto(),
 					 options.get_multi_threaded_compress(),
@@ -1681,7 +1681,7 @@ namespace libdar
 	const header_version* ref_version = &ver;
 	infinint ignored_offset;
 	infinint ref_second_term_offset = second_term_offset;
-	const header* ref_slicing = &slice_header;
+	const slice_header* ref_slicing = &sl_header;
 	shared_ptr<entrepot> sauv_path_t = options.get_entrepot();
 	if(sauv_path_t == nullptr)
 	    throw Ememory("archive::i_archive::archive");
@@ -1705,7 +1705,7 @@ namespace libdar
 	    header_version isol_ver;
 	    label isol_data_name;
 	    label internal_name;
-	    header isol_slices; // this field is not used here, but necessary to call macro_tools_create_layers()
+	    slice_header isol_slices; // this field is not used here, but necessary to call macro_tools_create_layers()
 
 	    if(!exploitable && options.get_delta_signature())
 		throw Erange("archive::i_archive::op_isolate", gettext("Isolation with delta signature is not possible on a just created archive (on-fly isolation)"));
@@ -1971,7 +1971,7 @@ namespace libdar
 	    if(tmp_ptr == nullptr)
 		throw SRC_BUG;
 
-	    tmp_ptr->set_list_entry(&(slice_header.get_slice_layout()), fetch_ea, ent);
+	    tmp_ptr->set_list_entry(&(sl_header.get_slice_layout()), fetch_ea, ent);
 
 		// fill a new entry in the table
 	    ret.push_back(ent);
@@ -2058,7 +2058,7 @@ namespace libdar
 
     bool archive::i_archive::get_catalogue_slice_layout(slice_layout & slicing) const
     {
-	slicing = slice_header.get_slice_layout();
+	slicing = sl_header.get_slice_layout();
 	    // by default we use the slice layout of the current archive,
 	    // this is modified if the current archive is an isolated catalogue
 	    // in archive format 9 or greater, then we use the slice layout contained
@@ -2476,7 +2476,7 @@ namespace libdar
 		macro_tools_create_layers(get_pointer(),
 					  stack, // this object field is set!
 					  ver,   // this object field is set!
-					  slice_header,// this object field is set!
+					  sl_header,// this object field is set!
 					  nullptr, // no slicing reference stored in archive header/trailer
 					  nullptr, // no header_version reference store in archive
 					  0,       // not used since previous arg is nullptr
@@ -2891,7 +2891,7 @@ namespace libdar
     {
 	stack.clear();
 	gnupg_signed.clear();
-	slice_header.clear();
+	sl_header.clear();
 	ver.clear_crypted_key();
 	if(cat != nullptr)
 	{

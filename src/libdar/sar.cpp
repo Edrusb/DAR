@@ -125,7 +125,7 @@ namespace libdar
 	     const shared_ptr<entrepot> & where,
 	     const infinint & x_min_digits,
 	     bool sequential_read,
-	     const header* header_from_external,
+	     const slice_header* header_from_external,
 	     bool x_lax,
 	     const string & execute) : generic_file(gf_read_only), mem_ui(dialog)
     {
@@ -187,11 +187,11 @@ namespace libdar
 	if(open_mode == gf_read_only)
 	    throw SRC_BUG;
 
-        if(file_size < header::min_size() + 1)  //< one more byte to store at least one byte of data
+        if(file_size < slice_header::min_size() + 1)  //< one more byte to store at least one byte of data
             throw Erange("sar::sar", gettext("File size too small"));
 	    // note that this test does not warranty that the file is large enough to hold a header structure
 
-	if(first_file_size < header::min_size() + 1)
+	if(first_file_size < slice_header::min_size() + 1)
 	    throw Erange("sar::sar", gettext("First file size too small"));
 	    // note that this test does not warranty that the file is large enough to hold a header structure
 
@@ -860,7 +860,7 @@ namespace libdar
 
     void sar::open_readonly(const string & fic, const infinint &num)
     {
-        header h;
+        slice_header h;
 
         while(of_fd == nullptr)
         {
@@ -1161,7 +1161,7 @@ namespace libdar
 
 			try
 			{
-			    header h;
+			    slice_header h;
 
 			    try
 			    {
@@ -1510,7 +1510,7 @@ namespace libdar
 	}
     }
 
-    bool sar::check_header(const header & h, const string & fic, const infinint & slice_num)
+    bool sar::check_header(const slice_header & h, const string & fic, const infinint & slice_num)
     {
 	bool external = fic.empty(); // header is not obtained while openning a slice (and of_fd might be nullptr)
 

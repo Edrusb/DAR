@@ -116,7 +116,7 @@ namespace libdar
         virtual infinint get_position() const override { return cur_pos; };
 
 	    // contextual inherited method
-	virtual const header & get_slice_info() const override { return tete; };
+	virtual const slice_header & get_slice_info() const override { return tete; };
 
 	    /// size of the slice header
 	const infinint & get_slice_header_size() const { return offset; };
@@ -138,7 +138,7 @@ namespace libdar
 
     private:
         generic_file *reference;  ///< points to the underlying data, owned by "this"
-	header tete;              ///< the slice information
+	slice_header tete;        ///< the slice information
         infinint offset;          ///< offset to apply to get the first byte of data out of SAR headers
 	infinint cur_pos;         ///< current position as returned by get_position()
 	infinint end_of_slice;    ///< when end of slice/archive is met, there is an offset by 1 compared to the offset of reference. end_of_slice is set to 1 in that situation, else it is always equal to zero

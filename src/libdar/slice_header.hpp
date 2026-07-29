@@ -19,13 +19,13 @@
 // to contact the author, see the AUTHOR file
 /*********************************************************************/
 
-    /// \file header.hpp
+    /// \file slice_header.hpp
     /// \brief slice header structure is defined here
     /// \ingroup Private
 
 
-#ifndef HEADER_HPP
-#define HEADER_HPP
+#ifndef SLICE_HEADER_HPP
+#define SLICE_HEADER_HPP
 
 #include "../my_config.h"
 
@@ -63,17 +63,17 @@ namespace libdar
 	/// old implementation to be able to use more recent archives
 	/// the main use of TLV is to handle optional fields easily.
 
-    class header
+    class slice_header
     {
     public:
 	    // constructors & Co.
 
-        header() { clear(); };
-        header(const header & ref) = default;
-	header(header && ref) noexcept = default;
-        header & operator = (const header & ref) = default;
-	header & operator = (header && ref) noexcept = default;
-	~header() = default;
+        slice_header() { clear(); };
+        slice_header(const slice_header & ref) = default;
+	slice_header(slice_header && ref) noexcept = default;
+        slice_header & operator = (const slice_header & ref) = default;
+	slice_header & operator = (slice_header && ref) noexcept = default;
+	~slice_header() = default;
 
 	    // global methods
 
@@ -107,17 +107,17 @@ namespace libdar
 	void clear();
 
 	    /// check whether the given argument is part of the same slice set as current header
-	bool check_same_slice_set(const header & ref) const;
+	bool check_same_slice_set(const slice_header & ref) const;
 
 	    /// check whether the given argument is par of an archive containing the same data set
 
 	    /// \note if dar_xform has been used, this check can succeed while check_same_slice_set() will fail
-	bool check_same_data_set(const header & ref) const;
+	bool check_same_data_set(const slice_header & ref) const;
 
 
-	    /// minimal size of a header in an archive
+	    /// minimal size of a slice_header in an archive
 
-	    /// \return min size of a header once stored in an archive
+	    /// \return min size of a slice_header once stored in an archive
 	    /// \note since release 2.4.0 the header used for each slice is exactly the same.
 	    /// before this release the header of the first slice might be bigger, it was known that
 	    /// the size of the other header was "min_size" this let dar be able to find the proper

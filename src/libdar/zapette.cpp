@@ -187,7 +187,7 @@ namespace libdar
 	contextual::set_info_status(s);
     }
 
-    const header & zapette::get_slice_info() const
+    const slice_header & zapette::get_slice_info() const
     {
 	S_I tmp = 0;
 	infinint data_size;

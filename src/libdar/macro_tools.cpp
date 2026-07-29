@@ -415,7 +415,7 @@ namespace libdar
 				  bool sequential_read,
 				  bool info_details,
 				  list<signator> & gnupg_signed,
-				  header & sl_header,
+				  slice_header & sl_header,
 				  const header_version* ref_header,
 				  U_I multi_threaded_crypto,
 				  U_I multi_threaded_compress,
@@ -430,7 +430,7 @@ namespace libdar
 	string salt;
 	bool by_the_end = ! sequential_read;
 	bool remote_repo = false;
-	const header* ref_slice_header = nullptr;
+	const slice_header* ref_slice_header = nullptr;
 	bool has_external_header = ref_header != nullptr && ref_header->get_ref_header_version() != nullptr;
 
 #ifdef LIBCURL_AVAILABLE
@@ -1147,8 +1147,8 @@ namespace libdar
     void macro_tools_create_layers(const shared_ptr<user_interaction> & dialog,
 				   pile & layers,
 				   header_version & ver,
-				   header & slicing,
-				   const header* ref_header,
+				   slice_header & slicing,
+				   const slice_header* ref_header,
 				   const header_version* ref_version,
 				   const infinint & ref_second_terminateur_offset,
 				   const shared_ptr<entrepot> & sauv_path_t,
@@ -1570,9 +1570,9 @@ namespace libdar
 
 		if(ref_header != nullptr)
 		{
-		    unique_ptr<header> utmp;
+		    unique_ptr<slice_header> utmp;
 
-		    utmp.reset(new (nothrow) header(*ref_header));
+		    utmp.reset(new (nothrow) slice_header(*ref_header));
 		    if(!utmp)
 			throw Ememory("macro_tools_create_layers");
 

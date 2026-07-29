@@ -107,7 +107,7 @@ namespace libdar
 	    return gettext("none");
     }
 
-    const header* header_version::get_slice_header() const
+    const slice_header* header_version::get_slice_header() const
     {
 	if(only_slice_layout)
 	    return nullptr;
@@ -190,7 +190,7 @@ namespace libdar
 
 	if(ref.ref_header)
 	{
-	    ref_header.reset(new (nothrow) header(*(ref.ref_header)));
+	    ref_header.reset(new (nothrow) slice_header(*(ref.ref_header)));
 	    if(!ref_header)
 		throw Ememory("header_version::copy_from");
 	    ref_second_term_offset = ref.ref_second_term_offset;
@@ -454,7 +454,7 @@ namespace libdar
 	    {
 		if(!ref_header)
 		{
-		    ref_header.reset(new (nothrow) header());
+		    ref_header.reset(new (nothrow) slice_header());
 		    if(!ref_header)
 			throw Ememory("header_version::read");
 		}

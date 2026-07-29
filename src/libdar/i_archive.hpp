@@ -229,7 +229,7 @@ namespace libdar
 	bool lax_read_mode;      ///< whether the archive has been openned in lax mode (unused for creation/merging/isolation)
 	bool sequential_read;    ///< whether the archive is read in sequential mode
 	std::list<signator> gnupg_signed; ///< list of signature found in the archive (reading an existing archive)
-	header slice_header;     ///< slice header of the "level1" of the archive (sar, trivial_sar, zapette...)
+	slice_header sl_header;  ///< slice header of the "level1" of the archive (sar, trivial_sar, zapette...)
 	infinint second_term_offset; ///< offset of the data never ciphered at end of achive (zero if not yet known)
 
 	U_32 live_crypto_bs;     ///< this fields is never written to file but left available to feed a dar_manager database when needed

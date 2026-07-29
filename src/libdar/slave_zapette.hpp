@@ -37,7 +37,7 @@
 #include "../my_config.h"
 #include "generic_file.hpp"
 #include "contextual.hpp"
-#include "header.hpp"
+#include "slice_header.hpp"
 #include "mem_ui.hpp"
 
 namespace libdar

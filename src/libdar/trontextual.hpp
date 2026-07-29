@@ -52,7 +52,7 @@ namespace libdar
 	trontextual & operator = (trontextual && ref) = delete;
 	~trontextual() = default;
 
-	virtual const header & get_slice_info() const override { if(ref == nullptr) throw SRC_BUG; return ref->get_slice_info(); };
+	virtual const slice_header & get_slice_info() const override { if(ref == nullptr) throw SRC_BUG; return ref->get_slice_info(); };
 
     private:
 	contextual *ref;   ///< this is just a pointer to data owned by the inherited class tronc part of this object

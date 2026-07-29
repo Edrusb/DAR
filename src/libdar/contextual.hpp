@@ -39,7 +39,7 @@ extern "C"
 
 #include "erreurs.hpp"
 #include "label.hpp"
-#include "header.hpp"
+#include "slice_header.hpp"
 
 #include <string>
 
@@ -92,7 +92,7 @@ namespace libdar
         virtual std::string get_info_status() const { return status; };
 
 	    /// returns the slice layout information
-	virtual const header & get_slice_info() const = 0;
+	virtual const slice_header & get_slice_info() const = 0;
 
     private:
 	std::string status;

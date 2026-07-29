@@ -81,7 +81,7 @@ namespace libdar
 
 	    // overwritten inherited methods from contextual
         virtual void set_info_status(const std::string & s) override;
-	virtual const header & get_slice_info() const override;
+	virtual const slice_header & get_slice_info() const override;
 
 	    /// get the first slice header
 	    ///
@@ -108,7 +108,7 @@ namespace libdar
         generic_file *in, *out;
         infinint position, file_size;
         char serial_counter;
-	mutable header slice_info;
+	mutable slice_header slice_info;
 	mutable memory_file slice_info_xfer;
 
 	    /// wrapped formatted method to communicate with the slave_zapette located behind the pair of pipes (= tuyau)

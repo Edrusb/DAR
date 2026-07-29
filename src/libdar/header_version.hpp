@@ -38,7 +38,7 @@
 #include "user_interaction.hpp"
 #include "memory_file.hpp"
 #include "archive_aux.hpp"
-#include "header.hpp"
+#include "slice_header.hpp"
 
 namespace libdar
 {
@@ -79,7 +79,7 @@ namespace libdar
 
 	    /// \note it is used to record the slice format and slicing layout of the archive of reference when it is present
 	    /// \note this replaces and extends the set_slice_layout() as a slice layout is embedded in a header object
-	void set_slice_header(std::unique_ptr<header> & ptr) { ref_header = std::move(ptr); only_slice_layout = false; };
+	void set_slice_header(std::unique_ptr<slice_header> & ptr) { ref_header = std::move(ptr); only_slice_layout = false; };
 	void clear_slice_header() { ref_header.reset(); };
 
 	    /// the provided header_version object will be dumped with the current header version
@@ -117,7 +117,7 @@ namespace libdar
 	std::string get_sym_crypto_name() const;
 	std::string get_asym_crypto_name() const;
 	memory_file* get_crypted_key() const { return crypted_key; };
-	const header* get_slice_header() const;
+	const slice_header* get_slice_header() const;
 	const slice_layout* get_slice_layout() const;
 	const header_version* get_ref_header_version() const { return ref_version.get(); };
 	const infinint & get_ref_second_terminateur_offset() const { return ref_second_term_offset; };
@@ -143,7 +143,7 @@ namespace libdar
 	    // has to be set to zero when it is unknown, in that case this field is not dump to archive
 	crypto_algo sym;         ///< strong encryption algorithm used for symmetrical encryption
 	memory_file *crypted_key;///< optional field containing the asymmetrically ciphered key used for strong encryption ciphering
-	std::unique_ptr<header> ref_header; ///< optional field used in isolated catalogues to record the slice format and slicing layout of their archive of reference
+	std::unique_ptr<slice_header> ref_header; ///< optional field used in isolated catalogues to record the slice format and slicing layout of their archive of reference
 	std::unique_ptr<header_version> ref_version; ///< optional field used in isolated catalogues to record archive format and slice stack of the reference
 	infinint ref_second_term_offset; ///< second terminator offset of the ref (ignored if ref_version is nullptr)
 	bool only_slice_layout;  ///< whether ref_header only has slice_layout information

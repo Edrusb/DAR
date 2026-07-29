@@ -46,7 +46,7 @@ extern "C"
 #endif
 } // end extern "C"
 
-#include "header.hpp"
+#include "slice_header.hpp"
 #include "tlv_list.hpp"
 #include "tools.hpp"
 #include "fichier_global.hpp"
@@ -78,7 +78,7 @@ namespace libdar
 	/******************* HEADER datastructure ********************/
 	/*************************************************************/
 
-    void header::read(user_interaction & ui,
+    void slice_header::read(user_interaction & ui,
 		      generic_file & f,
 		      bool lax)
     {
@@ -90,11 +90,11 @@ namespace libdar
 	clear();
 
         if(f.read((char *)&tmp, sizeof(magic_number)) != sizeof(magic_number))
-	    throw Erange("header::read", gettext("Reached end of file while reading slice header"));
+	    throw Erange("slice_header::read", gettext("Reached end of file while reading slice header"));
         magic = ntohl(tmp);
 
 	if(magic != SAUV_MAGIC_NUMBER)
-	    throw Erange("header::read", tools_printf(gettext("not a valid dar file (wrong magic number), please provide the good file.")));
+	    throw Erange("slice_header::read", tools_printf(gettext("not a valid dar file (wrong magic number), please provide the good file.")));
 
 	try
 	{
@@ -102,12 +102,12 @@ namespace libdar
 	}
 	catch(Erange & e)
 	{
-	    throw Erange("header::read", gettext("Reached end of file while reading slice header"));
+	    throw Erange("slice_header::read", gettext("Reached end of file while reading slice header"));
 	}
         if(f.read(&flag, 1) != 1)
-	    throw Erange("header::read", gettext("Reached end of file while reading slice header"));
+	    throw Erange("slice_header::read", gettext("Reached end of file while reading slice header"));
         if(f.read(&extension, 1) != 1)
-	    throw Erange("header::read", gettext("Reached end of file while reading slice header"));
+	    throw Erange("slice_header::read", gettext("Reached end of file while reading slice header"));
 
 	data_name.clear();
 
@@ -126,7 +126,7 @@ namespace libdar
 		if(sly.other_size <= min_size())
 		{
 		    if(!lax)
-			throw Erange("header::read", gettext("Invalide slice size"));
+			throw Erange("slice_header::read", gettext("Invalide slice size"));
 		    else
 		    {
 			ui.message(gettext("LAX MODE: slice size is not possible to read, (lack of virtual memory?), continuing anyway..."));
@@ -151,7 +151,7 @@ namespace libdar
 	    if(sly.other_size <= min_size())
 	    {
 		if(!lax)
-		    throw Erange("header::read", gettext("Invalide slice size"));
+		    throw Erange("slice_header::read", gettext("Invalide slice size"));
 		else
 		{
 		    ui.message(gettext("LAX MODE: slice size is not possible to read, (lack of virtual memory?), continuing anyway..."));
@@ -165,7 +165,7 @@ namespace libdar
 		if(sly.first_size <= min_size())
 		{
 		    if(!lax)
-			throw Erange("header::read", gettext("Invalide first slice size"));
+			throw Erange("slice_header::read", gettext("Invalide first slice size"));
 		    else
 		    {
 			ui.message(gettext("LAX MODE: first slice size is not possible to read, (lack of virtual memory?), continuing anyway..."));
@@ -180,7 +180,7 @@ namespace libdar
 	    else
 	    {
 		if(!lax)
-		    throw Erange("header::read", gettext("Archive format older than \"08\" (release 2.4.0) cannot be read through a single pipe. It only can be read using dar_slave or as normal plain files (slices)"));
+		    throw Erange("slice_header::read", gettext("Archive format older than \"08\" (release 2.4.0) cannot be read through a single pipe. It only can be read using dar_slave or as normal plain files (slices)"));
 		else
 		{
 		    ui.message(gettext("LAX MODE: first slice size is not possible to read, continuing anyway..."));
@@ -213,7 +213,7 @@ namespace libdar
 		sly.other_slice_header = f.get_position();
 
 		if(sly.other_slice_header <= min_size())
-		    throw Erange("header::read", gettext("Invalid slice header size for a slice of format 08 or more recent (below minimum)"));
+		    throw Erange("slice_header::read", gettext("Invalid slice header size for a slice of format 08 or more recent (below minimum)"));
 
 		if(sly.first_slice_header.is_zero())
 		    sly.first_slice_header = sly.other_slice_header;
@@ -244,16 +244,16 @@ namespace libdar
 		// sanity checks
 
 	    if(! sly.first_size.is_zero() && sly.first_size <= sly.first_slice_header)
-		throw Erange("header::read", gettext("Incoherent slice header: first slice size too small"));
+		throw Erange("slice_header::read", gettext("Incoherent slice header: first slice size too small"));
 
 	    if(! sly.other_size.is_zero() && sly.other_size <= sly.other_slice_header)
-		throw Erange("header::read", gettext("Incoherent slice header: slice size too small"));
+		throw Erange("slice_header::read", gettext("Incoherent slice header: slice size too small"));
 
 	    sly.older_sar_than_v8 = false;
 	    break;
         default:
 	    if(!lax)
-		throw Erange("header::read", gettext("Badly formatted SAR header (unknown TLV type in slice header)"));
+		throw Erange("slice_header::read", gettext("Badly formatted SAR header (unknown TLV type in slice header)"));
 	    else
 	    {
 		ui.message(gettext("LAX MODE: Unknown data in slice header, ignoring and continuing"));
@@ -266,7 +266,7 @@ namespace libdar
 
     }
 
-    void header::write(user_interaction & ui,
+    void slice_header::write(user_interaction & ui,
 		       generic_file & f,
 		       bool as_first_slice,
 		       bool with_header_size) const
@@ -320,17 +320,17 @@ namespace libdar
 	    // the context of an isolated catalogue.
 	if(!with_header_size && sly.first_slice_header.is_zero() && sly.other_slice_header.is_zero())
 	{
-	    header* me = const_cast<header*>(this);
+	    slice_header* me = const_cast<slice_header*>(this);
 
 	    if(me == nullptr)
 		throw SRC_BUG;
 
 	    me->sly.first_slice_header = f.get_position();
-	    if(sly.first_slice_header < header::min_size())
+	    if(sly.first_slice_header < slice_header::min_size())
 		throw SRC_BUG;
 
 	    if(sly.older_sar_than_v8)
-		me->sly.other_slice_header = header::min_size();
+		me->sly.other_slice_header = slice_header::min_size();
 	    else
 		me->sly.other_slice_header = sly.first_slice_header;
 
@@ -343,7 +343,7 @@ namespace libdar
 	}
     }
 
-    void header::clear()
+    void slice_header::clear()
     {
 	magic = 0;
 	internal_name.clear();
@@ -352,18 +352,18 @@ namespace libdar
 	sly.clear();
     }
 
-    bool header::check_same_slice_set(const header & ref) const
+    bool slice_header::check_same_slice_set(const slice_header & ref) const
     {
 	return internal_name == ref.internal_name;
     }
 
 
-    bool header::check_same_data_set(const header & ref) const
+    bool slice_header::check_same_data_set(const slice_header & ref) const
     {
 	return data_name == ref.data_name;
     }
 
-    void header::fill_from(user_interaction & ui, const tlv_list & extension)
+    void slice_header::fill_from(user_interaction & ui, const tlv_list & extension)
     {
 	U_I taille = extension.size();
 
@@ -389,7 +389,7 @@ namespace libdar
 		}
 		catch(Erange & e)
 		{
-		    throw Erange("header::fill_from", gettext("incomplete data set name found in a slice header"));
+		    throw Erange("slice_header::fill_from", gettext("incomplete data set name found in a slice header"));
 		}
 		break;
 	    case tlv_header_size:
@@ -397,9 +397,9 @@ namespace libdar
 		sly.first_slice_header.read(extension[index]);
 		sly.other_slice_header.read(extension[index]);
 		if(sly.first_slice_header.is_zero())
-		    throw Erange("header::fill_from", gettext("Unexpected null size for first slice header size"));
+		    throw Erange("slice_header::fill_from", gettext("Unexpected null size for first slice header size"));
 		if(sly.other_slice_header.is_zero())
-		    throw Erange("header::fill_from", gettext("Unexpected null size for slice header size"));
+		    throw Erange("slice_header::fill_from", gettext("Unexpected null size for slice header size"));
 		break;
 	    default:
 		ui.pause(tools_printf(gettext("Unknown entry found in slice header (type = %d), option not supported. The archive you are reading may have been generated by a more recent version of libdar, ignore this entry and continue anyway?"), extension[index].get_type()));
@@ -407,7 +407,7 @@ namespace libdar
 	}
     }
 
-    tlv_list header::build_tlv_list(user_interaction & ui, bool with_header_size) const
+    tlv_list slice_header::build_tlv_list(user_interaction & ui, bool with_header_size) const
     {
 	tlv_list ret;
 	tlv tmp;

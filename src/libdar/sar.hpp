@@ -31,7 +31,7 @@
 #include <string>
 #include "infinint.hpp"
 #include "generic_file.hpp"
-#include "header.hpp"
+#include "slice_header.hpp"
 #include "integers.hpp"
 #include "entrepot.hpp"
 #include "slice_layout.hpp"
@@ -84,7 +84,7 @@ namespace libdar
 	    const std::shared_ptr<entrepot> & where,
 	    const infinint & x_min_digits,
 	    bool sequential_read,
-	    const header* header_from_external,
+	    const slice_header* header_from_external,
 	    bool lax = false,
 	    const std::string & execute = "");
 
@@ -167,7 +167,7 @@ namespace libdar
 	const std::shared_ptr<entrepot> & get_entrepot() const { return entr; };
 
 	    /// get a reference to the slice header (inherited from contextual class)
-	const header & get_slice_info() const override { fetch_slicing(); return slicing; };
+	const slice_header & get_slice_info() const override { fetch_slicing(); return slicing; };
 
     protected :
 	virtual void inherited_read_ahead(const infinint & amount) override;
@@ -183,7 +183,7 @@ namespace libdar
         std::string base;            ///< archive base name
 	std::string ext;             ///< archive extension
         std::string hook;            ///< command line to execute between slices
-	header slicing;              ///< slice layout
+	slice_header slicing;        ///< slice layout
         infinint file_offset;        ///< current reading/writing position in the current slice (relative to the whole slice file, including headers)
 	hash_algo hash;              ///< whether to build a hashing when creating slices, and if so, which algorithm to use
 	infinint min_digits;         ///< minimum number of digits the slices number is stored with in the filename
@@ -227,7 +227,7 @@ namespace libdar
 	bool is_current_eof_a_normal_end_of_slice() const;  ///< return true if current reading position is at end of slice
 	infinint bytes_still_to_read_in_slice() const;  ///< returns the number of bytes expected before the end of slice
 	void fetch_slicing() const;
-	bool check_header(const header & ref,         ///< check header compatibility with other slices and record it as reference first slice opened
+	bool check_header(const slice_header & ref,   ///< check header compatibility with other slices and record it as reference first slice opened
 			  const std::string & fic,    ///< must be either an empty string when the header is provided from an isolated catalogue or slice filename it has been fetched from
 			  const infinint & slice_num);///< the slice number where from the header has ebeen taken
             // function to lauch the eventually existing command to execute after/before each slice

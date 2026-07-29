@@ -200,7 +200,7 @@ namespace libdar
 		    }
 		    else if(req.offset == REQUEST_SLICE_INFO_SIZE)
 		    {
-			header tmp = src_ctxt->get_slice_info();
+			slice_header tmp = src_ctxt->get_slice_info();
 
 			serialzd.reset();
 			tmp.write(get_ui(), serialzd, true, true);

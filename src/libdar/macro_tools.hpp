@@ -123,7 +123,7 @@ namespace libdar
 					 bool sequential_read,                 ///< [in] whether to use the escape sequence (if present) to get archive contents and proceed to sequential reading
 					 bool info_details,                    ///< [in] be or not verbose about the archive openning
 					 std::list<signator> & gnupg_signed,   ///< [out] list of existing signature found for that archive (valid or not)
-					 header & sl_header,                   ///< [out] slicing header of the archive (read from "level1" object)
+					 slice_header & sl_header,             ///< [out] slicing header of the archive (read from "level1" object)
 					 const header_version* ref_header,     ///< [in] header of the archive of reference (or nullptr) containing external header_version and external slice_header to be able to build the layers without reading any part of the archive
 					 U_I multi_threaded_crypto,            ///< [in] number of worker thread to run for cryptography
 					 U_I multi_threaded_compress,          ///< [in] number of worker threads to compress/decompress (need compression_block_size > 0)
@@ -240,8 +240,8 @@ namespace libdar
     extern void macro_tools_create_layers(const std::shared_ptr<user_interaction> & dialog,
 					  pile & layers,
 					  header_version & ver,
-					  header & slicing,
-					  const header* ref_header,
+					  slice_header & slicing,
+					  const slice_header* ref_header,
 					  const header_version* ref_version,
 					  const infinint & ref_second_terminateur_offset,
 					  const std::shared_ptr<entrepot> & sauv_path_t,
