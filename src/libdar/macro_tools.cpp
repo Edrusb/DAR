@@ -830,46 +830,57 @@ namespace libdar
 
 		// *************** building the escape layer if necessary ************ //
 
-	    try
+	    if(ver.get_tape_marks())
 	    {
-		if(ver.get_tape_marks())
+		if(info_details)
+		    dialog->message(gettext("Opening escape sequence abstraction layer..."));
+		if(lax)
 		{
-		    if(info_details)
-			dialog->message(gettext("Opening escape sequence abstraction layer..."));
-		    if(lax)
+		    if(!sequential_read)
 		    {
-			if(!sequential_read)
+			try
 			{
 			    dialog->pause(gettext("LAX MODE: Archive is flagged as having escape sequence (which is normal in recent archive versions). However if this is not expected, shall I assume a data corruption occurred in this field and that this flag should be ignored? (If unsure, refuse)"));
 			    ver.set_tape_marks(false);
 			}
-			else
-			    throw Euser_abort("this exception triggers the creation of the escape layer");
-			    // else in lax & sequential_read, escape sequences are mandatory, we do not propose to ignore them
-		    }
-		    else
-			throw Euser_abort("this exception triggers the creation of the escape layer");
-		}
-		else // no escape layer in the archive
-		{
-		    if(!lax)
-		    {
-			if(sequential_read)
-			    throw Erange("macro_tools_open_archive", gettext("Sequential read asked, but this archive is flagged to not have the necessary embedded escape sequences for that operation, aborting"));
-		    }
-		    else // lax mode
-			if(sequential_read)
+			catch(Euser_abort & e)
 			{
-			    dialog->message(gettext("LAX MODE: the requested sequential read mode relies on escape sequence which seem to be absent from this archive. Assuming data corruption occurred. However, if no data corruption occurred and thus no escape sequence are present in this archive, do not use sequential reading mode to explore this archive else you will just get nothing usable from it"));
-			    ver.set_tape_marks(true);
-			    throw Euser_abort("this exception triggers the creation of the escape layer");
+				// continue normally with escape layer building
 			}
-			else // normal mode
-			    if(ver.get_edition() >= 8) // most usually escape mark are present, thus we must warn
-				dialog->pause(gettext("LAX MODE: Archive is flagged to not have escape sequence which is not the case by default since archive format 8 (release 2.4.x). If corruption occurred and an escape sequence is present, this may lead data restoration to fail, answering no at this question will let me consider that an escape sequence layer has to be added in spite of the archive flags. Do you want to continue as suggested by the archive flag, thus without escape sequence layer?"));
+		    }
 		}
 	    }
-	    catch(Euser_abort & e)
+	    else // no escape layer in the archive
+	    {
+		if(!lax)
+		{
+		    if(sequential_read)
+			throw Erange("macro_tools_open_archive", gettext("Sequential read asked, but this archive is flagged to not have the necessary embedded escape sequences for that operation, aborting"));
+		}
+		else // lax mode
+		{
+		    if(sequential_read)
+		    {
+			dialog->message(gettext("LAX MODE: the requested sequential read mode relies on escape sequence which seem to be absent from this archive. Assuming data corruption occurred. However, if no data corruption occurred and thus no escape sequence are present in this archive, do not use sequential reading mode to explore this archive else you will just get nothing usable from it"));
+			ver.set_tape_marks(true);
+		    }
+		    else // normal mode
+			if(ver.get_edition() >= 8) // most usually escape mark are present, thus we must warn
+			{
+			    try
+			    {
+				dialog->pause(gettext("LAX MODE: Archive is flagged to not have escape sequence which is not the case by default since archive format 8 (release 2.4.x). If corruption occurred and an escape sequence is present, this may lead data restoration to fail, answering no at this question will let me consider that an escape sequence layer has to be added in spite of the archive flags. Do you want to continue as suggested by the archive flag, thus without escape sequence layer?"));
+			    }
+			    catch(Euser_abort & e)
+			    {
+				ver.set_tape_marks(true);
+				    // continuing with escape layer building
+			    }
+			}
+		}
+	    }
+
+	    if(ver.get_tape_marks())
 	    {
 		set<escape::sequence_type> unjump;
 
