@@ -118,7 +118,7 @@ namespace libdar
 	std::string get_asym_crypto_name() const;
 	memory_file* get_crypted_key() const { return crypted_key; };
 	const slice_header* get_slice_header() const;
-	const slice_layout* get_slice_layout() const;
+	const slice_layout* get_slice_layout() const; // replaced by get_slice_header() but maintain for old format
 	const header_version* get_ref_header_version() const { return ref_version.get(); };
 	const infinint & get_ref_second_terminateur_offset() const { return ref_second_term_offset; };
 	bool get_tape_marks() const { return has_tape_marks; };
