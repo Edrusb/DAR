@@ -1702,7 +1702,7 @@ namespace libdar
 				      options.get_iteration_count(),
 				      options.get_kdf_hash(),
 				      options.get_multi_threaded_crypto(),
-				      options.get_multi_threaded_crypto()); /* must be changed with dedicated field for compression */
+				      options.get_multi_threaded_compress());
 
 	    if(cat == nullptr)
 		throw SRC_BUG;
