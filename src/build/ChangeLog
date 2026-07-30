@@ -39,6 +39,8 @@ from 2.8.5 to 2.8.6
   (release 2.4.0), leading to an wrong size of slices after the first one
   and to an unreadable archive due to a wrong offset to find a given data
   or metadata in the archive.
+- fixing bug in isolation process that let libdar using as number of
+  threads for compression, the number of thread to use for encryption.
 
 from 2.8.4 to 2.8.5
 - fixing bug of one-hour-shift in non-daylight saving months for
