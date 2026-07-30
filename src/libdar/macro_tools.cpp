@@ -1146,9 +1146,6 @@ namespace libdar
     }
 
     void macro_tools_create_layers(const shared_ptr<user_interaction> & dialog,
-				   pile & layers,
-				   header_version & ver,
-				   slice_header & slicing,
 				   const slice_header* ref_header,
 				   const header_version* ref_version,
 				   const infinint & ref_second_terminateur_offset,
@@ -1181,7 +1178,10 @@ namespace libdar
 				   const infinint & iteration_count,
 				   hash_algo kdf_hash,
 				   U_I multi_threaded_crypto,
-				   U_I multi_threaded_compress)
+				   U_I multi_threaded_compress,
+				   pile & layers,
+				   header_version & ver,
+				   slice_header & slicing)
     {
 #if GPGME_SUPPORT
 	U_I gnupg_key_size;

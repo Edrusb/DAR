@@ -178,9 +178,6 @@ namespace libdar
 	/// build layers for a new archive
 
 	/// \param[in]  dialog for user interaction
-	/// \param[out] layers the resulting stack of generic_file layers ready for use
-	/// \param[out] ver the archive "header/trailer" to be dropped at beginning and end of archive
-	/// \param[out] slicing slicing layout of the created archive (resulting from sar layers if present according to the provided first/file_size provided below)
 	/// \param[in]  ref_header if not nullptr the pointed to slice header will be stored in the header/trailer version of the archive
 	/// \param[in]  ref_version if not nullptr the pointed to header_version will be stored in header/trailer as header of the reference archive (islotation context)
 	/// \paral[in]  ref_second_terminateur_offset if not null this offset will be stored in the header/trailer as offset of the reference archive (isolation context)
@@ -214,6 +211,9 @@ namespace libdar
 	/// \param[in]  kdf_hash hash algorithm used for the key derivation function
 	/// \param[in]  multi_threaded_crypto number of worker threads to handle cryptography stuff
 	/// \param[in]  multi_threaded_compress number of worker threads to handle compression (block mode only)
+	/// \param[out] layers the resulting stack of generic_file layers ready for use
+	/// \param[out] ver the archive "header/trailer" to be dropped at beginning and end of archive
+	/// \param[out] slicing slicing layout of the created archive (resulting from sar layers if present according to the provided first/file_size provided below)
 	///
 	/// \note the stack has the following contents depending on given options
 	///
@@ -238,9 +238,6 @@ namespace libdar
 	///
 
     extern void macro_tools_create_layers(const std::shared_ptr<user_interaction> & dialog,
-					  pile & layers,
-					  header_version & ver,
-					  slice_header & slicing,
 					  const slice_header* ref_header,
 					  const header_version* ref_version,
 					  const infinint & ref_second_terminateur_offset,
@@ -273,7 +270,11 @@ namespace libdar
 					  const infinint & iteration_count,
 					  hash_algo kdf_hash,
 					  U_I multi_threaded_crypto,
-					  U_I multi_threaded_compress);
+					  U_I multi_threaded_compress,
+					  pile & layers,
+					  header_version & ver,
+					  slice_header & slicing
+	);
 
 	/// dumps the catalogue and close all the archive layers to terminate the archive
 

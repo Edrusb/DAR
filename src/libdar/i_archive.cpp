@@ -1721,9 +1721,6 @@ namespace libdar
 
 
 	    macro_tools_create_layers(get_pointer(),
-				      layers,
-				      isol_ver,
-				      isol_slices,
 				      ref_slicing, // either our own slicing or the one stored as reference
 				      ref_version, // either points to ver or to ver's reference if it has one
 				      ref_second_term_offset, // either points to our second_term or the one of reference
@@ -1756,7 +1753,11 @@ namespace libdar
 				      options.get_iteration_count(),
 				      options.get_kdf_hash(),
 				      options.get_multi_threaded_crypto(),
-				      options.get_multi_threaded_crypto()); /* must be changed with dedicated field for compression */
+				      options.get_multi_threaded_crypto(), /* must be changed with dedicated field for compression */
+				      layers,
+				      isol_ver,
+				      isol_slices);
+
 
 	    if(cat == nullptr)
 		throw SRC_BUG;
@@ -2458,9 +2459,6 @@ namespace libdar
 		    get_ui().pause(gettext("Ready to start writing down the archive?"));
 
 		macro_tools_create_layers(get_pointer(),
-					  stack, // this object field is set!
-					  ver,   // this object field is set!
-					  sl_header,// this object field is set!
 					  nullptr, // no slicing reference stored in archive header/trailer
 					  nullptr, // no header_version reference store in archive
 					  0,       // not used since previous arg is nullptr
@@ -2493,7 +2491,11 @@ namespace libdar
 					  iteration_count,
 					  kdf_hash,
 					  multi_threaded_crypto,
-					  multi_threaded_compress);
+					  multi_threaded_compress,
+					  stack,    // this object field is set!
+					  ver,      // this object field is set!
+					  sl_header // this object field is set!
+		    );
 
 		    // ********** building the catalogue (empty for now) ************************* //
 		datetime root_mtime;
