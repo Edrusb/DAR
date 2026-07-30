@@ -404,24 +404,25 @@ namespace libdar
 				  crypto_algo crypto,
                                   secu_string & pass,
 				  U_32 & crypto_size,
-				  pile & stack,
-                                  header_version &ver,
                                   const string &input_pipe,
                                   const string &output_pipe,
                                   const string & execute,
-				  infinint & second_terminateur_offset,
 				  bool lax,
 				  bool has_external_cat,
 				  bool sequential_read,
 				  bool info_details,
-				  list<signator> & gnupg_signed,
-				  slice_header & sl_header,
 				  const header_version* ref_header,
 				  U_I multi_threaded_crypto,
 				  U_I multi_threaded_compress,
 				  bool header_only,
 				  bool silent,
-				  bool force_read_first_slice)
+				  bool force_read_first_slice,
+				  pile & stack,
+                                  header_version &ver,
+				  infinint & second_terminateur_offset,
+				  list<signator> & gnupg_signed,
+				  slice_header & sl_header
+	)
     {
 	generic_file *tmp = nullptr;
 	contextual *tmp_ctxt = nullptr;

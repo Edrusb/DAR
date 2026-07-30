@@ -142,24 +142,25 @@ namespace libdar
 						     options.get_ref_crypto_algo(),
 						     live_ref_pass,
 						     live_ref_crypto_bs,
-						     ref_stack,
-						     ref_ver,
 						     "",
 						     "",
 						     options.get_ref_execute(),
-						     ref_second_terminateur_offset,
 						     options.get_lax(),
 						     false, // has an external catalogue (here we open the external catalogue itself)
 						     false, // sequential_read is never used to retreive the isolated catalogue (well, that's possible and easy to add this feature), see later ...
 						     options.get_info_details(),
-						     tmp1_signatories,
-						     ignored,  // we don't need to know the slice layout of the isolated catalogue
 						     nullptr,  // and we are not using an external header, of course here as we fetch it
 						     options.get_multi_threaded_crypto(),
 						     options.get_multi_threaded_compress(),
 						     false,
 						     options.get_silent(),
-						     false);
+						     false,
+						     ref_stack,
+						     ref_ver,
+						     ref_second_terminateur_offset,
+						     tmp1_signatories,
+						     ignored   // we don't need to know the slice layout of the isolated catalogue
+						     );
 				// we do not compare the signatories of the archive of reference with the current archive
 				// for example the isolated catalogue might be unencrypted and thus not signed
 
@@ -230,24 +231,25 @@ namespace libdar
 					 options.get_crypto_algo(),
 					 live_pass,
 					 live_crypto_bs,
-					 stack,
-					 ver,
 					 options.get_input_pipe(),
 					 options.get_output_pipe(),
 					 options.get_execute(),
-					 second_term_offset,       // here we setup the i_archive field
 					 options.get_lax(),
 					 options.is_external_catalogue_set(),
 					 options.get_sequential_read(),
 					 options.get_info_details(),
-					 gnupg_signed,
-					 sl_header,  // slice_header field is set from here
 					 ref_header, // may be nullptr or be a header without slice layout info
 					 options.get_multi_threaded_crypto(),
 					 options.get_multi_threaded_compress(),
 					 options.get_header_only(),
 					 options.get_silent(),
-					 options.get_force_first_slice());
+					 options.get_force_first_slice(),
+					 stack,
+					 ver,
+					 second_term_offset,  // here we setup the i_archive field
+					 gnupg_signed,
+					 sl_header            // slice_header field is set from here
+		    );
 
 		if(options.get_header_only())
 		{

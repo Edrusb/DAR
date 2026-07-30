@@ -112,24 +112,24 @@ namespace libdar
 					 crypto_algo crypto,                   ///< [in] encryption algorithm (updated value from archive found in ver, below)
                                          secu_string & pass,                   ///< [in] pass key for crypto/scrambling updated if interactivelay set
 					 U_32 & crypto_size,                   ///< [in] crypto block size, may be updated in a future implementation
-					 pile & stack,                         ///< [out] the stack of generic_file resulting of the archive openning
-                                         header_version &ver,                  ///< [out] header read from raw data (or copy of the ref_header provided below)
                                          const std::string &input_pipe,        ///< [in] named pipe for input when basename is "-" (dar_slave)
                                          const std::string &output_pipe,       ///< [in] named pipe for output when basename is "-" (dar_slave)
                                          const std::string & execute,          ///< [in] command to execute between slices
-					 infinint & second_terminateur_offset, ///< [out] where to start looking for the second terminateur (set to zero if there is only one terminateur).
 					 bool lax,                             ///< [in] whether we skip&warn the usual verifications
 					 bool has_external_cat,                ///< [in] true if the catalogue will not be read from the current archive (flag used in lax mode only)
 					 bool sequential_read,                 ///< [in] whether to use the escape sequence (if present) to get archive contents and proceed to sequential reading
 					 bool info_details,                    ///< [in] be or not verbose about the archive openning
-					 std::list<signator> & gnupg_signed,   ///< [out] list of existing signature found for that archive (valid or not)
-					 slice_header & sl_header,             ///< [out] slicing header of the archive (read from "level1" object)
 					 const header_version* ref_header,     ///< [in] header of the archive of reference (or nullptr) containing external header_version and external slice_header to be able to build the layers without reading any part of the archive
 					 U_I multi_threaded_crypto,            ///< [in] number of worker thread to run for cryptography
 					 U_I multi_threaded_compress,          ///< [in] number of worker threads to compress/decompress (need compression_block_size > 0)
 					 bool header_only,                     ///< [in] if true, stop the process before openning the encryption layer
 					 bool silent,                          ///< [in] do not display some informational messages of low importance
-					 bool force_read_first_slice           ///< [in] except when using sequential read, libdar fetches slicing information from the last slice, setting this to true lead fetching this from the first slice. historically, historical behavior is "false". This only applies when using external catalogue (has_external_cat == true)
+					 bool force_read_first_slice,          ///< [in] except when using sequential read, libdar fetches slicing information from the last slice, setting this to true lead fetching this from the first slice. historically, historical behavior is "false". This only applies when using external catalogue (has_external_cat == true)
+					 pile & stack,                         ///< [out] the stack of generic_file resulting of the archive openning
+                                         header_version &ver,                  ///< [out] header read from raw data (or copy of the ref_header provided below)
+					 infinint & second_terminateur_offset, ///< [out] where to start looking for the second terminateur (set to zero if there is only one terminateur).
+					 std::list<signator> & gnupg_signed,   ///< [out] list of existing signature found for that archive (valid or not)
+					 slice_header & sl_header              ///< [out] slicing header of the archive (read from "level1" object)
 	);
         // all allocated objects (ret1, ret2, scram), must be deleted when no more needed by the caller of this routine
 
