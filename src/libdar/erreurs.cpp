@@ -80,19 +80,6 @@ namespace libdar
         pile.push_front(niveau(source, message));
     }
 
-    const string & Egeneric::find_object(const string & location) const
-    {
-	deque<niveau>::const_iterator it = pile.begin();
-
-	while(it != pile.end() && it->lieu != location)
-	    it++;
-
-	if(it == pile.end())
-	    return empty_string;
-	else
-	    return it->objet;
-    }
-
     void Egeneric::prepend_message(const std::string & context)
     {
 	if(pile.empty())
@@ -119,7 +106,21 @@ namespace libdar
 	return ret;
     }
 
-    Ebug::Ebug(const string & file, S_I line) : Egeneric(tools_printf(gettext("File %S line %d"), &file, line), gettext("it seems to be a bug here"))
+    bool Egeneric::get_tag(const string & key,
+			   string & val) const
+    {
+	map<string, string>::const_iterator it = tag.find(key);
+
+	if(it != tag.end())
+	{
+	    val = it->second;
+	    return true;
+	}
+	else
+	    return false;
+    }
+
+    Ebug::Ebug(const string & file, S_I line) : Egeneric("", tools_printf(gettext("File %S line %d: it seems to be a bug here\n"), &file, line))
     {
 	    // adding the current stack if possible
 #if BACKTRACE_AVAILABLE
@@ -131,7 +132,7 @@ namespace libdar
 	try
 	{
 	    for(int i = 0; i < size; ++i)
-		Egeneric::stack("stack dump", string(symbols[i]));
+		prepend_message(tools_printf("\tstack: %s\n", symbols[i]));
 	}
 	catch(...)
 	{
@@ -141,14 +142,10 @@ namespace libdar
 	}
 	if(symbols != nullptr)
 	    free(symbols);
+	prepend_message("Stack dump\n");
 #else
 	Egeneric::stack("stack dump", "backtrace() call absent, cannot dump the stack information at the time the exception was thrown");
 #endif
-    }
-
-    void Ebug::stack(const string & passage, const string & file, const string & line)
-    {
-        Egeneric::stack(passage, tools_printf(gettext("in file %S line %S"), &file, &line));
     }
 
     Esystem::Esystem(const string & source, const string & message, io_error code):

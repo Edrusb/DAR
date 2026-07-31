@@ -204,9 +204,10 @@ namespace libdar
 	    }
 	    catch(Egeneric & e)
 	    {
-		e.stack("generic_file::copy_to", "read");
+		e.set_tag(ERROR_CONTEXT, CONTEXT_READ);
 		throw;
 	    }
+
             if(lu > 0)
 	    {
 		try
@@ -215,7 +216,7 @@ namespace libdar
 		}
 		catch(Egeneric & e)
 		{
-		    e.stack("generic_file::copy_to", "write");
+		    e.set_tag(ERROR_CONTEXT, CONTEXT_WRITE);
 		    throw;
 		}
 	    }
@@ -254,15 +255,17 @@ namespace libdar
         {
 	    lu = size - wrote; // temporarily using lu for the next line:
             pas = lu > BUFFER_SIZE ? BUFFER_SIZE : lu;
+
 	    try
 	    {
 		lu = read(buffer, pas);
 	    }
 	    catch(Egeneric & e)
 	    {
-		e.stack("generic_file::copy_to", "read");
+		e.set_tag(ERROR_CONTEXT, CONTEXT_READ);
 		throw;
 	    }
+
             if(lu > 0)
             {
 		try
@@ -271,10 +274,10 @@ namespace libdar
 		}
 		catch(Egeneric & e)
 		{
-		    e.stack("generic_file::copy_to", "write");
+		    e.set_tag(ERROR_CONTEXT, CONTEXT_WRITE);
 		    throw;
 		}
-                wrote += lu;
+		wrote += lu;
             }
         }
 

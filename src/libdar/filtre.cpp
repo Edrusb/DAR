@@ -1115,10 +1115,12 @@ namespace libdar
 			}
 			catch(Egeneric & ex)
 			{
-			    const string & how = ex.find_object("generic_file::copy_to");
+			    string how;
 
-			    if(how != "write") // error did not occured while adding data to the archive
+			    if(! ex.get_tag(generic_file::ERROR_CONTEXT, how) || how != generic_file::CONTEXT_WRITE)
 			    {
+				    // error did not occured while adding data to the archive
+
 				cat_nomme *tmp = new (nothrow) cat_ignored(nom->get_name());
 				dialog->message(string(gettext("Error while saving ")) + juillet.get_string() + ": " + ex.get_message());
 				st.incr_errored();

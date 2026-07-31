@@ -33,57 +33,28 @@ void f2(S_I i, S_I j);
 
 void f1(S_I i)
 {
-    try
-    {
-        if(i < 0)
-            throw Erange("f1", "i < 0");
-        if(i == 0)
-            throw Edeci("f1", "i == 0");
-    }
-    catch(Egeneric & e)
-    {
-        e.stack("f1", "essai");
-        throw;
-    }
+    if(i < 0)
+	throw Erange("f1", "i < 0");
+    if(i == 0)
+	throw Edeci("f1", "i == 0");
 }
 
 void f2(S_I i, S_I j)
 {
-    try
-    {
-        if(j > 0)
-            f2(i, j-1);
-        else
-            f1(i);
-    }
-    catch(Erange & e)
-    {
-        e.stack("f2", "calling f1");
-        throw;
-    }
-    catch(Egeneric & e)
-    {
-        e.stack("f2", "unexpected");
-        throw; // Can throw an Unexpected exception (see englobing function declaration)
-    }
+    if(j > 0)
+	f2(i, j-1);
+    else
+	f1(i);
 }
 
 void f3()
 {
-    try
-    {
-        Ememory *x;
-        Ebug y = SRC_BUG;
-        string s;
+    Ememory *x;
+    Ebug y = SRC_BUG;
+    string s;
 
-        x = new Ememory("f3");
-        delete x;
-    }
-    catch(Egeneric & e)
-    {
-        e.stack("f3", "");
-        throw;
-    }
+    x = new Ememory("f3");
+    delete x;
 }
 
 void f4()
@@ -92,14 +63,22 @@ void f4()
     Erange x = Erange("essai", "coucou");
     Edeci dec = Edeci("f4", "essai");
 
-    x.stack("ajout", "par ici");
-    x.stack("crotte", "par ila");
+    x.prepend_message("par ici: ");
+    x.prepend_message("par ila: ");
     cerr << dec.dump_str();
 
     y = new Erange(x);
     cerr << y->dump_str();
     cerr << y->dump_str();
     delete y;
+}
+
+void f5(U_I loop)
+{
+    if(--loop > 0)
+	f5(loop);
+    else
+	throw SRC_BUG;
 }
 
 int main()
@@ -127,4 +106,12 @@ int main()
         cerr << e.dump_str();
     }
 
+    try
+    {
+	f5(200);
+    }
+    catch(Egeneric & e)
+    {
+	cerr << e.dump_str();
+    }
 }

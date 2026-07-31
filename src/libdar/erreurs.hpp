@@ -30,6 +30,7 @@
 
 #include <string>
 #include <deque>
+#include <map>
 #include "integers.hpp"
 
 namespace libdar
@@ -69,10 +70,6 @@ namespace libdar
 	    /// the destructor
         virtual ~Egeneric() = default;
 
-	    /// add more detailed couple of information to the exception
-        void stack(const std::string & passage, const std::string & message = "") { pile.push_back(niveau(passage, message)); };
-	void stack(const std::string && passage, const std::string && message = "") { pile.push_back(niveau(std::move(passage), std::move(message))); };
-
 	    /// get the message explaing the nature of the exception
 
 	    /// This is probably the only method you will use for all the
@@ -84,17 +81,18 @@ namespace libdar
 	    /// get the call function which has thrown this exception
 	const std::string & get_source() const { return pile.front().lieu; };
 
-	    /// retrieve the objet (object) associated to a given "lieu" (location) from the stack
-
-	    /// \param[in] location key to look for the value of
-	    /// \return returns an empty string if key is not found in the stack
-	const std::string & find_object(const std::string & location) const;
-
 	    /// prepend error message by the given string
 	void prepend_message(const std::string & context);
 
 	    /// return a string result of the exception information dump
 	std::string dump_str() const;
+
+	    /// set a tag to the exception
+	void set_tag(const std::string & key,
+		     const std::string & val) { tag[key] = val; };
+
+	    /// read the tag of the exception
+	bool get_tag(const std::string & key, std::string & val) const;
 
     protected :
         virtual std::string exceptionID() const = 0;
@@ -114,6 +112,8 @@ namespace libdar
         };
 
         std::deque<niveau> pile;
+
+	std::map<std::string, std::string> tag;
 
 	static const std::string empty_string;
     };
@@ -156,7 +156,6 @@ namespace libdar
 
 
 #define SRC_BUG Ebug(__FILE__, __LINE__)
-// #define XMT_BUG(exception, call) exception.stack(call, __FILE__, __LINE__)
 
 	/// exception used to signal a bug. A bug is triggered when reaching some code that should never be reached
     class Ebug : public Egeneric
@@ -168,9 +167,6 @@ namespace libdar
 	Ebug & operator = (const Ebug & ref) = default;
 	Ebug & operator = (Ebug && ref) = default;
 	~Ebug() = default;
-
-	using Egeneric::stack; // to avoid warning with clang
-        void stack(const std::string & passage, const std::string & file, const std::string & line);
 
     protected :
         virtual std::string exceptionID() const override { return "BUG"; };

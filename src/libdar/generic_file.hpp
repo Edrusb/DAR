@@ -76,6 +76,15 @@ namespace libdar
     class generic_file: public proto_generic_file
     {
     public :
+	    // in case of error in copy_to methods, the throw exception
+	    // will have a tag ERROR_CONTEXT set to it with either the
+	    // CONTEXT_READ or the CONTEXT_WRITE value depending whether
+	    // the error occurred while read or writing respectively.
+	static constexpr const char* ERROR_CONTEXT = "generic_file::copy_to";
+	static constexpr const char* CONTEXT_READ = "read";
+	static constexpr const char* CONTEXT_WRITE = "write";
+
+
 	    /// main constructor
         generic_file(gf_mode m) { rw = m; terminated = no_read_ahead = false; enable_crc(false); checksum = nullptr; };
 
