@@ -254,7 +254,7 @@ namespace libdar
     class Efeature : public Egeneric
     {
     public :
-        Efeature(const std::string & message) : Egeneric(message) {};
+        Efeature(const std::string & message): Egeneric(message) {};
 	Efeature(const Efeature & ref) = default;
 	Efeature(Efeature && ref) = default;
 	Efeature & operator = (const Efeature & ref) = default;
@@ -272,7 +272,7 @@ namespace libdar
     class Ehardware : public Egeneric
     {
     public :
-        Ehardware(const std::string & message) : Egeneric(message) {};
+        Ehardware(const std::string & message): Egeneric(message) {};
 	Ehardware(const Ehardware & ref) = default;
 	Ehardware(Ehardware && ref) = default;
 	Ehardware & operator = (const Ehardware & ref) = default;
@@ -290,7 +290,7 @@ namespace libdar
     class Euser_abort : public Egeneric
     {
     public :
-        Euser_abort(const std::string & msg) : Egeneric(msg) {};
+        Euser_abort(const std::string & msg): Egeneric(msg) {};
 	Euser_abort(const Euser_abort & ref) = default;
 	Euser_abort(Euser_abort && ref) = default;
 	Euser_abort & operator = (const Euser_abort & ref) = default;
