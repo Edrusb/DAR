@@ -82,16 +82,36 @@ namespace libdar
 	const std::string & get_source() const { return pile.front().lieu; };
 
 	    /// prepend error message by the given string
+
+	    /// if you want to add context to the an exception and propagate
+	    /// it for global handling, this call let prepend the message
+	    /// string by the provided string. There is no specific formatting
+	    /// you probably should end the provided argument by a colon followed
+	    /// by a space.
 	void prepend_message(const std::string & context);
 
 	    /// append message to the current stirng
+
+	    /// like prepend_message but the provided stack is concatenated
+	    /// right after the message string. There is neither here a
+	    /// specific formating.
 	void append_message(const std::string & precision);
 
 	    /// set a tag to the exception
+
+	    /// tags are not show to users, the are used to treat differently
+	    /// a given exception type depending on the value associated to
+	    /// a given key. By default no key-value pair is associated to
+	    /// an exception.
 	void set_tag(const std::string & key,
 		     const std::string & val) { tag[key] = val; };
 
 	    /// read the tag of the exception
+
+	    /// \param[in] key is the key to look for
+	    /// \param[out] val is the value associated to the key if it exists
+	    /// \return true if the key exists and val is set to the corresponding
+	    /// value, else false is returned and val is not modified.
 	bool get_tag(const std::string & key, std::string & val) const;
 
     protected :
