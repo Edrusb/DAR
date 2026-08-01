@@ -1133,7 +1133,7 @@ namespace libdar
 	    {
 		string tmp = e.get_message();
 		get_ui().message(tools_printf(gettext("failed openning slice %S: %S. Will try to erase it first, if allowed"), &fic, &tmp));
-		throw Esystem("sar::open_writeonly", "failed openning, will try erasing first", Esystem::io_exist);
+		throw Esystem("failed openning, will try erasing first", Esystem::io_exist);
 	    }
 	}
 	catch(Esystem & e)

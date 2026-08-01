@@ -2131,8 +2131,7 @@ static secu_string fetch_password_from_file(const string & path)
     {
 	Esystem::io_error err = errno == EACCES ? Esystem::io_access: Esystem::io_absent;
 
-	throw Esystem("fetch_password_from_file",
-		      tools_printf(gettext("Error while reading password from file %s: %s"), path.c_str(),
+	throw Esystem(tools_printf(gettext("Error while reading password from file %s: %s"), path.c_str(),
 				   tools_strerror_r(errno).c_str()),
 		      err);
     }
@@ -2142,8 +2141,7 @@ static secu_string fetch_password_from_file(const string & path)
 	struct stat metadata;
 	if(fstat(fd, &metadata) < 0)
 	{
-	    throw Esystem("fetch_password_from_file)",
-			  tools_printf(gettext("Error while reading file size of file %s: %s"), path.c_str(),
+	    throw Esystem(tools_printf(gettext("Error while reading file size of file %s: %s"), path.c_str(),
 				       tools_strerror_r(errno).c_str()),
 			  Esystem::io_access);
 	}

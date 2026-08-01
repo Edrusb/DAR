@@ -140,16 +140,16 @@ namespace libdar
 	    switch(errno)
 	    {
 	    case EEXIST:
-		throw Esystem("entrepot_local::create_dir", gettext(create_msg) + tools_strerror_r(errno), Esystem::io_exist);
+		throw Esystem(gettext(create_msg) + tools_strerror_r(errno), Esystem::io_exist);
 	    case ENOENT:
 	    case ENOTDIR:
-		throw Esystem("entrepot_local::create_dir", gettext(create_msg) + tools_strerror_r(errno), Esystem::io_absent);
+		throw Esystem(gettext(create_msg) + tools_strerror_r(errno), Esystem::io_absent);
 	    case EACCES:
 	    case EPERM:
 	    case EFAULT:
-		throw Esystem("entrepot_local::create_dir", gettext(create_msg) + tools_strerror_r(errno), Esystem::io_access);
+		throw Esystem(gettext(create_msg) + tools_strerror_r(errno), Esystem::io_access);
 	    case EROFS:
-		throw Esystem("entrepot_local::create_dir", gettext(create_msg) + tools_strerror_r(errno), Esystem::io_ro_fs);
+		throw Esystem(gettext(create_msg) + tools_strerror_r(errno), Esystem::io_ro_fs);
 	    case ENOMEM:
 		throw Ememory();
 	    default:

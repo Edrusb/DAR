@@ -411,7 +411,7 @@ namespace libdar
 	    io_ro_fs   ///< read-only filesystem (write mode/read-write mode)
 	};
 
-	Esystem(const std::string & source, const std::string & message, io_error code);
+	Esystem(const std::string & message, io_error code);
 	Esystem(const Esystem & ref) = default;
 	Esystem(Esystem && ref) = default;
 	Esystem & operator = (const Esystem & ref) = default;

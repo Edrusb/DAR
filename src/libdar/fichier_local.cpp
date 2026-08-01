@@ -444,13 +444,13 @@ namespace libdar
 			get_ui().pause(gettext("No space left for inode, you have the opportunity to make some room now. When done : can we continue ?"));
 			break;
 		    case EEXIST:
-			throw Esystem("fichier_local::open", tools_strerror_r(errno), Esystem::io_exist);
+			throw Esystem(tools_strerror_r(errno), Esystem::io_exist);
 		    case ENOENT:
-			throw Esystem("fichier_local::open", tools_strerror_r(errno), Esystem::io_absent);
+			throw Esystem(tools_strerror_r(errno), Esystem::io_absent);
 		    case EACCES:
-			throw Esystem("fichier_local::open", tools_strerror_r(errno), Esystem::io_access);
+			throw Esystem(tools_strerror_r(errno), Esystem::io_access);
 		    case EROFS:
-			throw Esystem("fichier_local::open", tools_strerror_r(errno), Esystem::io_ro_fs);
+			throw Esystem(tools_strerror_r(errno), Esystem::io_ro_fs);
 		    default:
 			throw Erange(string(gettext("Cannot open file : ")) + tools_strerror_r(errno));
 		    }

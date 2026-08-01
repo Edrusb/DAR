@@ -128,7 +128,7 @@ namespace libdar
 #endif
     }
 
-    Esystem::Esystem(const string & source, const string & message, io_error code):
+    Esystem::Esystem(const string & message, io_error code):
 	Egeneric(message)
     {
 	x_code = code;
