@@ -461,7 +461,7 @@ namespace libdar
     template <class B> limitint<B> & limitint<B>::operator /= (const limitint & arg)
     {
         if(arg == 0)
-            throw Einfinint("limitint.cpp : operator /=", gettext("Division by zero"));
+            throw Einfinint(gettext("Division by zero"));
 
         field /= arg.field;
         return *this;
@@ -470,7 +470,7 @@ namespace libdar
     template <class B> limitint<B> & limitint<B>::operator %= (const limitint & arg)
     {
         if(arg == 0)
-            throw Einfinint("limitint.cpp : operator %=", gettext("Division by zero"));
+            throw Einfinint(gettext("Division by zero"));
 
         field %= arg.field;
         return *this;

@@ -178,10 +178,10 @@ namespace libdar
 
 	/// the inherited get_message() method is probably
 	/// the only one you will need to use
-    class Einfinint : public Egeneric
+    class Einfinint: public Egeneric
     {
     public :
-        Einfinint(const std::string & source, const std::string & message) : Egeneric(message) {};
+        Einfinint(const std::string & message) : Egeneric(message) {};
 	Einfinint(const Einfinint & ref) = default;
 	Einfinint(Einfinint && ref) = default;
 	Einfinint & operator = (const Einfinint & ref) = default;

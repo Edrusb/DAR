@@ -837,7 +837,7 @@ namespace libdar
     void euclide(infinint a, const infinint &b, infinint &q, infinint &r)
     {
         if(b.is_zero())
-            throw Einfinint("infinint.cpp : euclide", gettext("Division by zero")); // division by zero
+            throw Einfinint(gettext("Division by zero")); // division by zero
 
         if(a < b)
         {
