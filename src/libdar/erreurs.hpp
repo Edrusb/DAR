@@ -352,7 +352,7 @@ namespace libdar
 	U_64 flag;
     };
 
-	/// exception used to carry system error
+	/// exception used to carry operating system errors
 
     class Esystem : public Egeneric
     {
