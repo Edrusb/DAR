@@ -111,7 +111,6 @@ namespace libdar
 	bool get_tag(const std::string & key, std::string & val) const;
 
     protected :
-        virtual std::string exceptionID() const = 0;
 
 	    /// replace the whole message by a new value
 	void replace_message(const std::string & message) { msg = message; };
@@ -135,9 +134,6 @@ namespace libdar
 	Ememory & operator = (const Ememory & ref) = default;
 	Ememory & operator = (Ememory && ref) = default;
 	~Ememory() = default;
-
-    protected:
-        virtual std::string exceptionID() const override { return "MEMORY"; };
     };
 
 	/// exception used when secure memory has been exhausted
@@ -151,9 +147,6 @@ namespace libdar
 	Esecu_memory & operator = (const Esecu_memory & ref) = default;
 	Esecu_memory & operator = (Esecu_memory && ref) = default;
 	~Esecu_memory() = default;
-
-    protected:
-        virtual std::string exceptionID() const override { return "SECU_MEMORY"; };
     };
 
 
@@ -169,9 +162,6 @@ namespace libdar
 	Ebug & operator = (const Ebug & ref) = default;
 	Ebug & operator = (Ebug && ref) = default;
 	~Ebug() = default;
-
-    protected :
-        virtual std::string exceptionID() const override { return "BUG"; };
     };
 
 	/// exception used when arithmetic error is detected when operating on infinint
@@ -187,9 +177,6 @@ namespace libdar
 	Einfinint & operator = (const Einfinint & ref) = default;
 	Einfinint & operator = (Einfinint && ref) = default;
 	~Einfinint() = default;
-
-    protected :
-        virtual std::string exceptionID() const override { return "INFININT"; };
     };
 
 	/// exception used when a limitint overflow is detected, the maximum value of the limitint has been exceeded
@@ -205,9 +192,6 @@ namespace libdar
 	Elimitint & operator = (const Elimitint & ref) = default;
 	Elimitint & operator = (Elimitint && ref) = default;
 	~Elimitint() = default;
-
-    protected :
-        virtual std::string exceptionID() const override { return "LIMITINT"; };
     };
 
 	/// exception used to signal range error
@@ -223,9 +207,6 @@ namespace libdar
 	Erange & operator = (const Erange & ref) = default;
 	Erange & operator = (Erange && ref) = default;
 	~Erange() = default;
-
-    protected :
-        virtual std::string exceptionID() const override { return "RANGE"; };
     };
 
 	/// exception used to signal convertion problem between infinint and string (decimal representation)
@@ -242,9 +223,6 @@ namespace libdar
 	Edeci & operator = (const Edeci & ref) = default;
 	Edeci & operator = (Edeci && ref) = default;
 	~Edeci() = default;
-
-    protected :
-        virtual std::string exceptionID() const override { return "DECI"; };
     };
 
 	/// exception used when a requested feature is not (yet) implemented
@@ -260,9 +238,6 @@ namespace libdar
 	Efeature & operator = (const Efeature & ref) = default;
 	Efeature & operator = (Efeature && ref) = default;
 	~Efeature() = default;
-
-    protected :
-        virtual std::string exceptionID() const override { return "UNIMPLEMENTED FEATURE"; };
     };
 
 	/// exception used when hardware problem is found
@@ -278,9 +253,6 @@ namespace libdar
 	Ehardware & operator = (const Ehardware & ref) = default;
 	Ehardware & operator = (Ehardware && ref) = default;
 	~Ehardware() = default;
-
-    protected :
-        virtual std::string exceptionID() const override { return "HARDWARE ERROR"; };
     };
 
 	/// exception used to signal that the user has aborted the operation
@@ -296,9 +268,6 @@ namespace libdar
 	Euser_abort & operator = (const Euser_abort & ref) = default;
 	Euser_abort & operator = (Euser_abort && ref) = default;
 	~Euser_abort() = default;
-
-    protected :
-        virtual std::string exceptionID() const override { return "USER ABORTED OPERATION"; };
     };
 
 
@@ -315,9 +284,6 @@ namespace libdar
 	Edata & operator = (const Edata & ref) = default;
 	Edata & operator = (Edata && ref) = default;
 	~Edata() = default;
-
-    protected :
-        virtual std::string exceptionID() const override { return "ERROR IN TREATED DATA"; };
     };
 
 	/// exception used when error the inter-slice user command returned an error code
@@ -333,9 +299,6 @@ namespace libdar
 	Escript & operator = (const Escript & ref) = default;
 	Escript & operator = (Escript && ref) = default;
 	~Escript() = default;
-
-    protected :
-        virtual std::string exceptionID() const override { return "USER ABORTED OPERATION"; };
     };
 
 	/// exception used to signal an error in the argument given to libdar call of the API
@@ -351,9 +314,6 @@ namespace libdar
 	Elibcall & operator = (const Elibcall & ref) = default;
 	Elibcall & operator = (Elibcall && ref) = default;
 	~Elibcall() = default;
-
-    protected :
-        virtual std::string exceptionID() const override { return "USER ABORTED OPERATION"; };
     };
 
 	/// exception used when a requested fearture has not beed activated at compilation time
@@ -369,9 +329,6 @@ namespace libdar
 	Ecompilation & operator = (const Ecompilation & ref) = default;
 	Ecompilation & operator = (Ecompilation && ref) = default;
 	~Ecompilation() = default;
-
-    protected :
-        virtual std::string exceptionID() const override { return "FEATURE DISABLED AT COMPILATION TIME"; };
     };
 
 
@@ -389,9 +346,6 @@ namespace libdar
 
 	bool immediate_cancel() const { return immediate; };
 	U_64 get_flag() const { return flag; };
-
-    protected:
-	virtual std::string exceptionID() const override { return "THREAD CANCELLATION REQUESTED, ABORTING"; };
 
     private:
 	bool immediate;
@@ -420,9 +374,6 @@ namespace libdar
 
 	io_error get_code() const { return x_code; };
 
-    protected:
-	virtual std::string exceptionID() const override { return "SYSTEM ERROR MET"; };
-
     private:
 	io_error x_code;
     };
@@ -438,9 +389,6 @@ namespace libdar
 	Enet_auth & operator = (const Enet_auth & ref) = default;
 	Enet_auth & operator = (Enet_auth && ref) = default;
 	~Enet_auth() = default;
-
-    protected:
-	virtual std::string exceptionID() const override { return "NETWORK AUTHENTICATION ERROR"; };
     };
 
 
