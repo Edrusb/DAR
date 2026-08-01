@@ -529,7 +529,7 @@ namespace libdar
 
 	ivec = (unsigned char *)gcry_malloc_secure(algo_block_size);
 	if(ivec == nullptr)
-	    throw Esecu_memory("crypto_sym::init_ivec");
+	    throw Esecu_memory();
     }
 
     void crypto_sym::nullify()

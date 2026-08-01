@@ -245,11 +245,11 @@ namespace libdar
 #if CRYPTO_AVAILABLE
 		ptr = (allocated*)gcry_malloc_secure(alloc_size);
 		if(ptr == nullptr)
-		    throw Esecu_memory("secu_string::secus_string");
+		    throw Esecu_memory();
 #else
 		ptr = (allocated*)(new (nothrow) char[alloc_size]);
 		if(ptr == nullptr)
-		    throw Ememory("secu_string::secus_string");
+		    throw Ememory();
 #endif
 		ptr->allocated_size = size + 1;
 	    }

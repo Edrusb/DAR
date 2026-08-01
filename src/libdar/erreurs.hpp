@@ -145,7 +145,7 @@ namespace libdar
     class Esecu_memory : public Ememory
     {
     public:
-        Esecu_memory(const std::string &source) : Ememory() { replace_message(dar_gettext("Lack of Secured Memory")); };
+        Esecu_memory() { replace_message(dar_gettext("Lack of Secured Memory")); };
 	Esecu_memory(const Esecu_memory & ref) = default;
 	Esecu_memory(Esecu_memory && ref) = default;
 	Esecu_memory & operator = (const Esecu_memory & ref) = default;
