@@ -124,7 +124,7 @@ namespace libdar
 	    constexpr S_I msg_size = 1024;
 	    char msg[msg_size];
 	    regerror(ret, &preg, msg, msg_size);
-	    throw Erange("regular_mask::regular_mask", msg);
+	    throw Erange(msg);
 	}
 
     }

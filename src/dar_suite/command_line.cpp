@@ -393,13 +393,13 @@ bool get_args(shared_ptr<user_interaction> & dialog,
             for(deque<string>::iterator it = unseen.begin(); it != unseen.end(); ++it)
                 not_seen += *it + " ";
 
-            throw Erange("get_args", tools_printf(gettext("Given user target(s) could not be found: %S"), &not_seen));
+            throw Erange(tools_printf(gettext("Given user target(s) could not be found: %S"), &not_seen));
         }
 
         if(p.filename == "" || p.sauv_root == nullptr || p.op == noop)
-            throw Erange("get_args", tools_printf(gettext("Missing -c -x -d -t -l -C -+ option, see `%S -h' for help"), &cmd));
+            throw Erange(tools_printf(gettext("Missing -c -x -d -t -l -C -+ option, see `%S -h' for help"), &cmd));
         if(p.filename == "-" && !p.file_size.is_zero())
-            throw Erange("get_args", gettext("Slicing (-s option), is not compatible with archive on standard output (\"-\" as filename)"));
+            throw Erange(gettext("Slicing (-s option), is not compatible with archive on standard output (\"-\" as filename)"));
         if(p.filename != "-" && (p.op != create && p.op != isolate && p.op != merging))
             if(p.sauv_root == nullptr)
                 throw SRC_BUG;
@@ -433,9 +433,9 @@ bool get_args(shared_ptr<user_interaction> & dialog,
 	if(p.in_place)
 	{
 	    if(p.op != extract && p.op != diff)
-		throw Erange("get_args", gettext("-ap/--alter=place option is only available for restoration and comparison"));
+		throw Erange(gettext("-ap/--alter=place option is only available for restoration and comparison"));
 	    if(p.fs_root != nullptr)
-		throw Erange("get_args", gettext("-ap/--alter=place option is incompatible with -R/--fs-root option"));
+		throw Erange(gettext("-ap/--alter=place option is incompatible with -R/--fs-root option"));
 	}
 
         if(p.fs_root == nullptr)
@@ -446,26 +446,26 @@ bool get_args(shared_ptr<user_interaction> & dialog,
 	    *p.fs_root = tools_relative2absolute_path(*p.fs_root, tools_getcwd());
         }
 	if(p.extract_from_database && p.op != extract)
-	    throw Erange("get_args", gettext("-aefd option is only available with -x"));
+	    throw Erange(gettext("-aefd option is only available with -x"));
 	if(p.extract_from_database && ! p.remote.ent_host.empty())
-	    throw Erange("get_args", gettext("remote repository not supported whith -aefd option"));
+	    throw Erange(gettext("remote repository not supported whith -aefd option"));
 	if(p.extract_from_database && p.aux_root != nullptr)
-	    throw Erange("get_args", gettext("-@ option not supported whith -aefd option"));
+	    throw Erange(gettext("-@ option not supported whith -aefd option"));
         if(rec.fixed_date_mode && p.op != create && !p.extract_from_database) // extract_from_database is now only true in extract mode
-            throw Erange("get_args", gettext("-af option is only available with -c"));
+            throw Erange(gettext("-af option is only available with -c"));
         if(p.ref_filename != nullptr && p.op == listing)
             dialog->message(gettext("-A option is not available with -l"));
 	if(p.list_mode != archive_options_listing_shell::normal && p.op != listing)
             dialog->message(gettext("-T option is only available with -l"));
         if(p.op == isolate && p.ref_filename == nullptr)
-            throw Erange("get_args", gettext("with -C option, -A option is mandatory"));
+            throw Erange(gettext("with -C option, -A option is mandatory"));
         if(p.op == merging && p.ref_filename == nullptr)
-            throw Erange("get_args", gettext("with -+ option, -A option is mandatory"));
+            throw Erange(gettext("with -+ option, -A option is mandatory"));
         if(p.op != extract && !p.warn_remove_no_match)
             dialog->message(gettext("-wa is only useful with -x option"));
         if(p.filename == "-" && p.ref_filename != nullptr && *p.ref_filename == "-"
            && p.output_pipe == "" && !p.sequential_read)
-            throw Erange("get_args", gettext("-o is mandatory when using \"-A -\" with \"-c -\" \"-C -\" or \"-+ -\""));
+            throw Erange(gettext("-o is mandatory when using \"-A -\" with \"-c -\" \"-C -\" or \"-+ -\""));
         if(p.ref_filename != nullptr && *p.ref_filename != "-")
         {
             if(p.ref_root == nullptr)
@@ -486,7 +486,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
         if(p.algo != compression::none && p.op != create && p.op != isolate && p.op != merging)
             dialog->message(gettext("-z option needs only to be used with -c -C or -+ options"));
         if(!p.first_file_size.is_zero() && p.file_size.is_zero())
-            throw Erange("get_args", gettext("-S option requires the use of -s"));
+            throw Erange(gettext("-S option requires the use of -s"));
         if(p.what_to_check != comparison_fields::all && (p.op == isolate || (p.op == create && p.ref_root == nullptr) || p.op == test || p.op == listing || p.op == merging))
             dialog->message(gettext("ignoring -O option, as it is useless in this situation"));
 
@@ -535,13 +535,13 @@ bool get_args(shared_ptr<user_interaction> & dialog,
             dialog->message(gettext("The Cache Directory Tagging Standard is only useful while performing a backup, ignoring it here"));
 
         if((p.aux_root != nullptr || p.aux_filename != nullptr) && p.op != merging && p.op != create)
-            throw Erange("get_args", gettext("-@ is only available with -+ and -c options"));
+            throw Erange(gettext("-@ is only available with -+ and -c options"));
         if(p.aux_pass != "" && p.op != merging && p.op != create)
-            throw Erange("get_args", gettext("-$ is only available with -+ option and -c options"));
+            throw Erange(gettext("-$ is only available with -+ option and -c options"));
         if(p.aux_execute != "" && p.op != merging && p.op != create)
-            throw Erange("get_args", gettext("-~ is only available with -+ and -c options"));
+            throw Erange(gettext("-~ is only available with -+ and -c options"));
         if(p.aux_crypto_size != DEFAULT_CRYPTO_SIZE && p.op != merging && p.op != create)
-            throw Erange("get_args", tools_printf(gettext("-%% is only available with -+ option")));
+            throw Erange(tools_printf(gettext("-%% is only available with -+ option")));
 
         if(p.aux_pass != "" && p.aux_filename == nullptr)
             dialog->message(gettext("-$ is only useful with -@ option, for the auxiliary archive of reference"));
@@ -575,10 +575,10 @@ bool get_args(shared_ptr<user_interaction> & dialog,
             dialog->message(gettext("-k option is only useful with -x option"));
 
         if(p.not_deleted && p.only_deleted)
-            throw Erange("get_args", gettext("-konly and -kignore cannot be used at the same time"));
+            throw Erange(gettext("-konly and -kignore cannot be used at the same time"));
 
         if(rec.no_inter && !p.pause.is_zero())
-            throw Erange("get_args", gettext("-p and -Q options are mutually exclusives"));
+            throw Erange(gettext("-p and -Q options are mutually exclusives"));
 
         if(p.display_finished && p.op != create)
             dialog->message(gettext("-vf is only useful with -c option"));
@@ -589,23 +589,23 @@ bool get_args(shared_ptr<user_interaction> & dialog,
 	if(p.op == repairing)
 	{
 	    if(p.ref_filename == nullptr)
-		throw Erange("get_args", gettext("-A option is required with -y option"));
+		throw Erange(gettext("-A option is required with -y option"));
 	    if(p.snapshot)
-		throw Erange("get_args", gettext("'-A +' is not possible with -y option"));
+		throw Erange(gettext("'-A +' is not possible with -y option"));
 	    if(rec.fixed_date_mode)
-		throw Erange("get_args", gettext("-af is not possible with -y option"));
+		throw Erange(gettext("-af is not possible with -y option"));
 	    if(p.only_deleted)
-		throw Erange("get_args", gettext("-k option is not possible with -y option"));
+		throw Erange(gettext("-k option is not possible with -y option"));
 	    if(rec.name_include_exclude.size() > 0 || rec.path_include_exclude.size() > 0)
-		throw Erange("get_args", gettext("-X, -I, -P, -g, -], -[ and any other file selection relative commands are not possible with -y option"));
+		throw Erange(gettext("-X, -I, -P, -g, -], -[ and any other file selection relative commands are not possible with -y option"));
 	    if(p.empty_dir)
 		dialog->message(gettext("-D option is useless with -y option"));
 	    if(rec.only_more_recent)
 		dialog->message(gettext("-r option is useless with -y option"));
 	    if(rec.ea_include_exclude.size() > 0)
-		throw Erange("get_args", gettext("-u, -U, -P, -g, -], -[ and any other EA selection relative commands are not possible with -y option"));
+		throw Erange(gettext("-u, -U, -P, -g, -], -[ and any other EA selection relative commands are not possible with -y option"));
 	    if(p.what_to_check != comparison_fields::all)
-		throw Erange("get_args", gettext("-O option is not possible with -y option"));
+		throw Erange(gettext("-O option is not possible with -y option"));
 	    if(!p.hourshift.is_zero())
 		dialog->message(gettext("-H option is useless with -y option"));
 	    if(p.filter_unsaved)
@@ -643,14 +643,14 @@ bool get_args(shared_ptr<user_interaction> & dialog,
 	    if(p.sparse_file_min_size != sparse_file_min_size_default)
 		dialog->message(gettext("-ah option is useless with -y option"));
 	    if(p.sequential_read)
-		throw Erange("get_args", gettext("--sequential-read is useless with -y option"));
+		throw Erange(gettext("--sequential-read is useless with -y option"));
 	    if(!p.use_sequential_marks)
-		throw Erange("get_args", gettext("--alter=tape-marks is impossible with -y option"));
+		throw Erange(gettext("--alter=tape-marks is impossible with -y option"));
 	}
 
 	if(p.force_first_slice &&
 	   (p.ref_filename == nullptr || (p.op != diff && p.op != extract && p.op != test)))
-	    throw Erange("get_args", gettext("-aforce-first-slice is only valid while reading an archive with the help of an isolated catalog"));
+	    throw Erange(gettext("-aforce-first-slice is only valid while reading an archive with the help of an isolated catalog"));
 	if(p.fully_detailed_dates && p.op != listing)
 	    dialog->message(gettext("-afdd option is useless while listing (-l option), ignoring"));
 
@@ -909,9 +909,9 @@ static bool get_args_recursive(recursive_param & rec,
             case '+':
 	    case 'y':
                 if(optarg == nullptr)
-                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(p.filename != "" || p.sauv_root != nullptr)
-                    throw Erange("get_args", gettext(" Only one option of -c -d -t -l -C -x -+ or -y is allowed"));
+                    throw Erange(gettext(" Only one option of -c -d -t -l -C -x -+ or -y is allowed"));
                 if(string(optarg) != string(""))
 		{
 		    string path_basename;
@@ -931,7 +931,7 @@ static bool get_args_recursive(recursive_param & rec,
 		    }
 		}
                 else
-                    throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(INVALID_ARG), char(lu)));
                 switch(lu)
                 {
                 case 'c':
@@ -964,11 +964,11 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case 'A':
                 if(p.ref_filename != nullptr || p.ref_root != nullptr || p.snapshot || !p.fixed_date.is_zero())
-                    throw Erange("get_args", gettext("Only one -A option is allowed"));
+                    throw Erange(gettext("Only one -A option is allowed"));
                 if(optarg == nullptr)
-                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(strcmp("", optarg) == 0)
-                    throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(INVALID_ARG), char(lu)));
                 if(rec.fixed_date_mode)
                 {
                     try
@@ -991,7 +991,7 @@ static bool get_args_recursive(recursive_param & rec,
                     }
                     catch(Egeneric & e)
                     {
-                        throw Erange("get_args", string(gettext("Error while parsing -A argument as a date: ")+ e.get_message()));
+                        throw Erange(string(gettext("Error while parsing -A argument as a date: ")+ e.get_message()));
                     }
                 }
                 else
@@ -1063,7 +1063,7 @@ static bool get_args_recursive(recursive_param & rec,
                     else if(strcasecmp("masks", optarg) == 0)
 			p.display_masks = true;
 		    else
-                        throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext(INVALID_ARG), char(lu)));
+                        throw Erange(tools_printf(gettext(INVALID_ARG), char(lu)));
                 break;
             case 'z':
                 if(optarg != nullptr)
@@ -1076,7 +1076,7 @@ static bool get_args_recursive(recursive_param & rec,
                     if(p.algo == compression::none)
                         p.algo = compression::gzip;
                     else
-                        throw Erange("get_args", gettext("Choose only one compression algorithm"));
+                        throw Erange(gettext("Choose only one compression algorithm"));
                 break;
             case 'n':
                 p.allow_over = false;
@@ -1094,7 +1094,7 @@ static bool get_args_recursive(recursive_param & rec,
                         p.warn_remove_no_match = false;
                     else
                         if(strcmp(optarg, "d") != 0 && strcmp(optarg, "default") != 0)
-                            throw Erange("get_args", string(gettext("Unknown argument given to -w: ")) + optarg);
+                            throw Erange(string(gettext("Unknown argument given to -w: ")) + optarg);
                         // else this is the default -w
                 }
                 break;
@@ -1114,31 +1114,31 @@ static bool get_args_recursive(recursive_param & rec,
                 if(optarg == nullptr) // -k without argument
                 {
                     if(p.only_deleted)
-                        throw Erange("command_line.cpp:get_args_recursive", string(gettext("\"-k\" (or \"-kignore\") and \"-konly\" are not compatible")));
+                        throw Erange(string(gettext("\"-k\" (or \"-kignore\") and \"-konly\" are not compatible")));
                     p.not_deleted = true;
                 }
                 else
                     if(strcasecmp(optarg, "ignore") == 0)
                     {
                         if(p.only_deleted)
-                            throw Erange("command_line.cpp:get_args_recursive", string(gettext("\"-k\" (or \"-kignore\") and \"-konly\" are not compatible")));
+                            throw Erange(string(gettext("\"-k\" (or \"-kignore\") and \"-konly\" are not compatible")));
                         p.not_deleted = true;
                     }
                     else
                         if(strcasecmp(optarg, "only") == 0)
                         {
                             if(p.not_deleted)
-                                throw Erange("command_line.cpp:get_args_recursive", string(gettext("\"-k\" (or \"-kignore\") and \"-konly\" are not compatible")));
+                                throw Erange(string(gettext("\"-k\" (or \"-kignore\") and \"-konly\" are not compatible")));
                             p.only_deleted = true;
                         }
                         else
-                            throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext("Unknown argument given to -k : %s"), optarg));
+                            throw Erange(tools_printf(gettext("Unknown argument given to -k : %s"), optarg));
                 break;
             case 'R':
                 if(p.fs_root != nullptr)
-                    throw Erange("get_args", gettext("Only one -R option is allowed"));
+                    throw Erange(gettext("Only one -R option is allowed"));
                 if(optarg == nullptr)
-                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
                 else
 		{
 		    string cwd = tools_getcwd();
@@ -1168,9 +1168,9 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case 's':
                 if(!p.file_size.is_zero())
-                    throw Erange("get_args", gettext("Only one -s option is allowed"));
+                    throw Erange(gettext("Only one -s option is allowed"));
                 if(optarg == nullptr)
-                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
                 else
                 {
                     try
@@ -1188,12 +1188,12 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case 'S':
                 if(optarg == nullptr)
-                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(p.first_file_size.is_zero())
                     p.first_file_size = tools_get_extended_size(optarg, rec.suffix_base);
                 else
                     if(p.file_size.is_zero())
-                        throw Erange("get_args", gettext("Only one -S option is allowed"));
+                        throw Erange(gettext("Only one -S option is allowed"));
                     else
                         if(p.file_size == p.first_file_size)
                         {
@@ -1211,11 +1211,11 @@ static bool get_args_recursive(recursive_param & rec,
 
                         }
                         else
-                            throw Erange("get_args", gettext("Only one -S option is allowed"));
+                            throw Erange(gettext("Only one -S option is allowed"));
                 break;
             case 'X':
                 if(optarg == nullptr)
-                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
                 tmp_pre_mask.file_listing = false;
                 tmp_pre_mask.case_sensit = rec.case_sensit;
                 tmp_pre_mask.included = false;
@@ -1225,7 +1225,7 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case 'I':
                 if(optarg == nullptr)
-                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
                 tmp_pre_mask.file_listing = false;
                 tmp_pre_mask.case_sensit = rec.case_sensit;
                 tmp_pre_mask.included = true;
@@ -1236,7 +1236,7 @@ static bool get_args_recursive(recursive_param & rec,
             case 'P':
             case ']':
                 if(optarg == nullptr)
-                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
                 tmp_pre_mask.file_listing = lu == ']';
                 tmp_pre_mask.case_sensit = rec.case_sensit;
                 tmp_pre_mask.included = false;
@@ -1247,7 +1247,7 @@ static bool get_args_recursive(recursive_param & rec,
             case 'g':
             case '[':
                 if(optarg == nullptr)
-                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
                 tmp_pre_mask.file_listing = lu == '[';
                 tmp_pre_mask.case_sensit = rec.case_sensit;
                 tmp_pre_mask.included = true;
@@ -1285,7 +1285,7 @@ static bool get_args_recursive(recursive_param & rec,
             case 'u':
             case 'U':
                 if(optarg == nullptr)
-                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
                 tmp_pre_mask.file_listing = false;
                 tmp_pre_mask.case_sensit = rec.case_sensit;
                 tmp_pre_mask.included = lu == 'U';
@@ -1299,7 +1299,7 @@ static bool get_args_recursive(recursive_param & rec,
                 return false;
             case 'i':
                 if(optarg == nullptr)
-                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(p.input_pipe == "")
                     p.input_pipe = optarg;
                 else
@@ -1307,7 +1307,7 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case 'o':
                 if(optarg == nullptr)
-                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(p.output_pipe == "")
                     p.output_pipe = optarg;
                 else
@@ -1329,7 +1329,7 @@ static bool get_args_recursive(recursive_param & rec,
                                 if(strcasecmp(optarg, "inode-type") == 0)
                                     p.what_to_check = comparison_fields::inode_type;
                                 else
-                                    throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
+                                    throw Erange(tools_printf(gettext(INVALID_ARG), char(lu)));
 
                 break;
             case 'T':
@@ -1341,7 +1341,7 @@ static bool get_args_recursive(recursive_param & rec,
 			// this is the --kdf-iter-count option
 
 		    if(optarg == nullptr)
-			throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+			throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
 
 		    vector<string> splitted;
 		    string iter_count;
@@ -1359,7 +1359,7 @@ static bool get_args_recursive(recursive_param & rec,
 			kdf_hash = splitted[1];
 			break;
 		    default:
-			throw Erange("get_args", tools_printf(gettext("Invalid argument given to -T option, expecting <num>[:<hash_algo>]")));
+			throw Erange(tools_printf(gettext("Invalid argument given to -T option, expecting <num>[:<hash_algo>]")));
 		    }
 
 		    try
@@ -1375,7 +1375,7 @@ static bool get_args_recursive(recursive_param & rec,
 		    if(kdf_hash != "")
 		    {
 			if(!string_to_hash_algo(kdf_hash, p.kdf_hash) || p.kdf_hash == hash_algo::none)
-			    throw Erange("get_args", tools_printf(gettext("Invalid hash algorithm provided to -T opton: %s"), kdf_hash.c_str()));
+			    throw Erange(tools_printf(gettext("Invalid hash algorithm provided to -T opton: %s"), kdf_hash.c_str()));
 		    }
 		}
 		else
@@ -1393,12 +1393,12 @@ static bool get_args_recursive(recursive_param & rec,
 		    else if(strcasecmp("slicing", optarg) == 0 || strcasecmp("slice", optarg) == 0)
 			p.list_mode = archive_options_listing_shell::slicing;
 		    else
-			throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext(INVALID_ARG), char(lu)));
+			throw Erange(tools_printf(gettext(INVALID_ARG), char(lu)));
 		}
                 break;
             case 'E':
                 if(optarg == nullptr)
-                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
                 line_tools_split_at_first_space(optarg, tmp_string, tmp_string2);
                 tmp_string = line_tools_get_full_path_from_PATH(rec.dar_duc_path, tmp_string.c_str()) + " " + tmp_string2;
                 if(p.execute == "")
@@ -1414,7 +1414,7 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case 'F':
                 if(optarg == nullptr)
-                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
 		line_tools_split_at_first_space(optarg, tmp_string, tmp_string2);
                 tmp_string = line_tools_get_full_path_from_PATH(rec.dar_duc_path, tmp_string.c_str()) + " " + tmp_string2;
                 if(p.execute_ref == "")
@@ -1430,7 +1430,7 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case 'J':
                 if(optarg == nullptr)
-                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(p.pass_ref == "")
                     p.pass_ref = secu_string(optarg, strlen(optarg));
                 else
@@ -1438,7 +1438,7 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case 'K':
                 if(optarg == nullptr)
-                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(p.pass == "")
                     p.pass = secu_string(optarg, strlen(optarg));
                 else
@@ -1446,7 +1446,7 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case 'Y':
                 if(optarg == nullptr)
-                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
                 tmp_pre_mask.file_listing = false;
                 tmp_pre_mask.case_sensit = rec.case_sensit;
                 tmp_pre_mask.included = true;
@@ -1456,7 +1456,7 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case 'Z':
                 if(optarg == nullptr)
-                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
                 tmp_pre_mask.file_listing = false;
                 tmp_pre_mask.case_sensit = rec.case_sensit;
                 tmp_pre_mask.included = false;
@@ -1466,10 +1466,10 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case 'B':
                 if(optarg == nullptr)
-                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
                 tmp_string = line_tools_get_full_path_from_PATH(rec.dar_dcf_path, optarg);
                 if(find(rec.inclusions.begin(), rec.inclusions.end(), tmp_string) != rec.inclusions.end())
-                    throw Erange("get_args", tools_printf(gettext("File inclusion loop detected. The file %s includes itself directly or through other files (-B option)"), optarg));
+                    throw Erange(tools_printf(gettext("File inclusion loop detected. The file %s includes itself directly or through other files (-B option)"), optarg));
                 else
                 {
                     bool ret;
@@ -1486,12 +1486,12 @@ static bool get_args_recursive(recursive_param & rec,
                     }
                     catch(Esystem & e)
                     {
-                        Erange modif = Erange("get_args", tools_printf(gettext("Error reading included file (%s): "), optarg) + e.get_message());
+                        Erange modif = Erange(tools_printf(gettext("Error reading included file (%s): "), optarg) + e.get_message());
                         throw modif;
                     }
                     catch(Erange & e)
                     {
-                        Erange modif = Erange("get_args", tools_printf(gettext("Error in included file (%s): "), optarg) + e.get_message());
+                        Erange modif = Erange(tools_printf(gettext("Error in included file (%s): "), optarg) + e.get_message());
                         throw modif;
                     }
 
@@ -1547,7 +1547,7 @@ static bool get_args_recursive(recursive_param & rec,
                 else
                 {
                     if(optarg == nullptr)
-                        throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                        throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
                     p.min_compr_size = tools_get_extended_size(optarg, rec.suffix_base);
                     if(p.min_compr_size == min_compr_size_default)
                         rec.dialog->message(tools_printf(gettext("%d is the default value for -m, no need to specify it on command line, ignoring"), min_compr_size_default));
@@ -1583,13 +1583,13 @@ static bool get_args_recursive(recursive_param & rec,
                     }
                     catch(Edeci & e)
                     {
-                        throw Erange("command_line.cpp:get_args_recursive", gettext("Argument given to -H is not a positive integer number"));
+                        throw Erange(gettext("Argument given to -H is not a positive integer number"));
                     }
                 }
                 break;
             case 'a':
                 if(optarg == nullptr)
-                    throw Erange("command_line.cpp:get_args_recursive", gettext("-a option requires an argument"));
+                    throw Erange(gettext("-a option requires an argument"));
                 if(strcasecmp("SI-unit", optarg) == 0 || strcasecmp("SI", optarg) == 0 || strcasecmp("SI-units", optarg) == 0)
                     rec.suffix_base = LINE_TOOLS_SI_SUFFIX;
                 else if(strcasecmp("binary-unit", optarg) == 0 || strcasecmp("binary", optarg) == 0 || strcasecmp("binary-units", optarg) == 0)
@@ -1642,7 +1642,7 @@ static bool get_args_recursive(recursive_param & rec,
                 else if(strcasecmp("f", optarg) == 0 || strcasecmp("fixed-date", optarg) == 0)
                 {
                     if(p.ref_filename != nullptr || p.ref_root != nullptr || p.snapshot)
-                        throw Erange("get_args", gettext("-af must be present before -A option not after!"));
+                        throw Erange(gettext("-af must be present before -A option not after!"));
                     if(rec.fixed_date_mode)
                         rec.dialog->message(gettext("-af option need not be specified more than once, ignoring extra -af options"));
                     rec.fixed_date_mode = true;
@@ -1700,7 +1700,7 @@ static bool get_args_recursive(recursive_param & rec,
 		else if(strcasecmp("iesh", optarg) == 0 || strcasecmp("ignore-external-slice-header", optarg) == 0)
 		    p.ignore_external_sh = true;
 		else
-                    throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext("Unknown argument given to -a : %s"), optarg));
+                    throw Erange(tools_printf(gettext("Unknown argument given to -a : %s"), optarg));
                 break;
             case 'e':
                 if(p.empty)
@@ -1713,7 +1713,7 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case 'G':
                 if(optarg == nullptr)
-                    throw Erange("command_line.cpp:get_arg_recursive", tools_printf(gettext(INVALID_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(INVALID_ARG), char(lu)));
 
 		if(compile_time::libthreadar())
 		{
@@ -1724,36 +1724,36 @@ static bool get_args_recursive(recursive_param & rec,
 		    {
 		    case 1:
 			if(! tools_my_atoi(optarg, tmp))
-			    throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
+			    throw Erange(tools_printf(gettext(INVALID_ARG), char(lu)));
 			else
 			{
 			    if(tmp < 1)
-				throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
+				throw Erange(tools_printf(gettext(INVALID_ARG), char(lu)));
 			    p.multi_threaded_crypto = 2;
 			    p.multi_threaded_compress = (U_I)tmp;
 			}
 			break;
 		    case 2:
 			if(! tools_my_atoi(split[0].c_str(), tmp))
-			    throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
+			    throw Erange(tools_printf(gettext(INVALID_ARG), char(lu)));
 			else
 			{
 			    if(tmp < 1)
-				throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
+				throw Erange(tools_printf(gettext(INVALID_ARG), char(lu)));
 			    p.multi_threaded_crypto = (U_I)tmp;
 			}
 
 			if(! tools_my_atoi(split[1].c_str(), tmp))
-			    throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
+			    throw Erange(tools_printf(gettext(INVALID_ARG), char(lu)));
 			else
 			{
 			    if(tmp < 1)
-				throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
+				throw Erange(tools_printf(gettext(INVALID_ARG), char(lu)));
 			    p.multi_threaded_compress = (U_I)tmp;
 			}
 			break;
 		    default:
-			throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
+			throw Erange(tools_printf(gettext(INVALID_ARG), char(lu)));
 		    }
 		}
 		else
@@ -1774,7 +1774,7 @@ static bool get_args_recursive(recursive_param & rec,
 		    line_tools_split(string(optarg), ':', splitted);
 		    if(splitted.size() != 2 ||
 		       (splitted[0] != "X" && splitted[0] != "I"))
-			throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
+			throw Erange(tools_printf(gettext(INVALID_ARG), char(lu)));
 		    if(splitted[0] == "I")
 			p.same_fs_incl.push_back(splitted[1]);
 		    else
@@ -1783,13 +1783,13 @@ static bool get_args_recursive(recursive_param & rec,
 		break;
             case '#':
                 if(! tools_my_atoi(optarg, tmp))
-                    throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(INVALID_ARG), char(lu)));
                 else
                     p.crypto_size = (U_32)tmp;
                 break;
             case '*':
                 if(! tools_my_atoi(optarg, tmp))
-                    throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(INVALID_ARG), char(lu)));
                 else
                     p.crypto_size_ref = (U_32)tmp;
                 break;
@@ -1801,11 +1801,11 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case '@':
                 if(p.aux_filename != nullptr || p.aux_root != nullptr)
-                    throw Erange("get_args", gettext("Only one -@ option is allowed"));
+                    throw Erange(gettext("Only one -@ option is allowed"));
                 if(optarg == nullptr)
-                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(strcmp("", optarg) == 0)
-                    throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(INVALID_ARG), char(lu)));
                 else
                 {
                     p.aux_filename = new (nothrow) string();
@@ -1840,7 +1840,7 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case '~':
                 if(optarg == nullptr)
-                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
 		line_tools_split_at_first_space(optarg, tmp_string, tmp_string2);
                 tmp_string = line_tools_get_full_path_from_PATH(rec.dar_duc_path, tmp_string.c_str()) + " " + tmp_string2;
                 if(p.aux_execute == "")
@@ -1856,7 +1856,7 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case '$':
                 if(optarg == nullptr)
-                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(p.aux_pass == "")
                     p.aux_pass = secu_string(optarg, strlen(optarg));
                 else
@@ -1864,13 +1864,13 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case '%':
                 if(! tools_my_atoi(optarg, tmp))
-                    throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(INVALID_ARG), char(lu)));
                 else
                     p.aux_crypto_size = (U_32)tmp;
                 break;
             case '/':
                 if(optarg == nullptr)
-                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(p.overwrite == nullptr)
                 {
                     try
@@ -1888,19 +1888,19 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case '^':
                 if(optarg == nullptr)
-                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
                 line_tools_slice_ownership(string(optarg), p.slice_perm, p.slice_user, p.slice_group);
                 break;
             case '_':
                 if(optarg == nullptr)
-                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
                 line_tools_repeat_param(string(optarg), p.repeat_count, p.repeat_byte);
                 break;
             case '0':
                 if(optarg == nullptr)
                     p.sequential_read = true;
                 else
-                    throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(INVALID_ARG), char(lu)));
                 break;
             case '1':
                 if(p.sparse_file_min_size != sparse_file_min_size_default)
@@ -1908,7 +1908,7 @@ static bool get_args_recursive(recursive_param & rec,
                 else
                 {
                     if(optarg == nullptr)
-                        throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                        throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
                     try
                     {
                         p.sparse_file_min_size = tools_get_extended_size(optarg, rec.suffix_base);
@@ -1917,7 +1917,7 @@ static bool get_args_recursive(recursive_param & rec,
                     }
                     catch(Edeci & e)
                     {
-                        throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
+                        throw Erange(tools_printf(gettext(INVALID_ARG), char(lu)));
                     }
                 }
                 break;
@@ -1927,19 +1927,19 @@ static bool get_args_recursive(recursive_param & rec,
                 else
                 {
                     if(optarg == nullptr)
-                        throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                        throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
                     if(strcasecmp("ignore", optarg) == 0)
                         p.dirty = dirtyb_ignore;
                     else
                         if(strcasecmp("no-warn", optarg) == 0)
                             p.dirty = dirtyb_ok;
                         else
-                            throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext("Unknown argument given to -2 : %s"), optarg));
+                            throw Erange(tools_printf(gettext("Unknown argument given to -2 : %s"), optarg));
                 }
                 break;
             case '"':
                 if(optarg == nullptr)
-                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
                 else
                 {
                     tlv_list tmp;
@@ -1965,24 +1965,24 @@ static bool get_args_recursive(recursive_param & rec,
 		else if(strcasecmp("crypto", optarg) == 0)
 		    p.quiet_crypto = true;
 		else
-		    throw Erange("command_line.cpp:get_args_recursive", tools_printf(gettext(INVALID_ARG), char(lu)));
+		    throw Erange(tools_printf(gettext(INVALID_ARG), char(lu)));
                 break;
             case '.':
                 if(optarg == nullptr)
-                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
                 if(p.user_comment != "")
                     p.user_comment += " ";
                 p.user_comment += optarg;
                 break;
             case '3':
                 if(optarg == nullptr)
-                    throw Erange("get_args", tools_printf(gettext("Missing argument to --hash"), char(lu)));
+                    throw Erange(tools_printf(gettext("Missing argument to --hash"), char(lu)));
 		if(!string_to_hash_algo(optarg, p.hash) || p.hash == hash_algo::none)
-		    throw Erange("get_args", string(gettext("Unknown parameter given to --hash option: ")) + optarg);
+		    throw Erange(string(gettext("Unknown parameter given to --hash option: ")) + optarg);
                 break;
             case '9':
                 if(optarg == nullptr)
-                    throw Erange("get_args", tools_printf(gettext("Missing argument to --min-digits"), char(lu)));
+                    throw Erange(tools_printf(gettext("Missing argument to --min-digits"), char(lu)));
                 else
                 {
                     try
@@ -1991,13 +1991,13 @@ static bool get_args_recursive(recursive_param & rec,
                     }
                     catch(Erange & e)
                     {
-                        throw Erange("get_args", string(gettext("Error while parsing --min-digits option: ")) + e.get_message());
+                        throw Erange(string(gettext("Error while parsing --min-digits option: ")) + e.get_message());
                     }
                 }
                 break;
             case '=':
                 if(optarg == nullptr)
-                    throw Erange("get_args", tools_printf(gettext("Missing argument to --backup-hook-execute"), char(lu)));
+                    throw Erange(tools_printf(gettext("Missing argument to --backup-hook-execute"), char(lu)));
                 line_tools_split_at_first_space(optarg, tmp_string, tmp_string2);
                 tmp_string = line_tools_get_full_path_from_PATH(rec.dar_duc_path, tmp_string.c_str()) + " " + tmp_string2;
                 if(p.backup_hook_execute == "")
@@ -2007,7 +2007,7 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case '>':
                 if(optarg == nullptr)
-                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
                 tmp_pre_mask.file_listing = false;
                 tmp_pre_mask.case_sensit = rec.case_sensit;
                 tmp_pre_mask.included = false;
@@ -2017,7 +2017,7 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case '<':
                 if(optarg == nullptr)
-                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
                 tmp_pre_mask.file_listing = false;
                 tmp_pre_mask.case_sensit = rec.case_sensit;
                 tmp_pre_mask.included = true;
@@ -2027,7 +2027,7 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
             case '4':
                 if(optarg == nullptr)
-                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
                 p.scope = string_to_fsa(optarg);
                 if(p.info_details)
                 {
@@ -2053,7 +2053,7 @@ static bool get_args_recursive(recursive_param & rec,
 		if(optarg != nullptr)
 		    p.delta_sig_min_size = tools_get_extended_size(optarg, rec.suffix_base);
                 else
-                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
 		break;
             case '7':
                 if(optarg != nullptr)
@@ -2061,14 +2061,14 @@ static bool get_args_recursive(recursive_param & rec,
                     if(strlen(optarg) != 0)
                         line_tools_split(optarg, ',', p.signatories);
                     else
-                        throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
+                        throw Erange(tools_printf(gettext(INVALID_ARG), char(lu)));
                 }
                 else
-                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
                 break;
 	    case '8':
 		if(optarg == nullptr)
-                    throw Erange("get_args", tools_printf(gettext("Missing argument to --delta"), char(lu)));
+                    throw Erange(tools_printf(gettext("Missing argument to --delta"), char(lu)));
 		if(strcasecmp(optarg, "sig") == 0)
 		    p.delta_sig = libdar::default_sig_magic;
 		else if(strcasecmp(optarg, "no-patch") == 0)
@@ -2090,13 +2090,13 @@ static bool get_args_recursive(recursive_param & rec,
 
 			    // reading the function
 			if(it == splitted.end())
-			    throw Erange("get_args", tools_printf(gettext(INVALID_BS_FUNC), gettext("missing function name argument in string")));
+			    throw Erange(tools_printf(gettext(INVALID_BS_FUNC), gettext("missing function name argument in string")));
 			p.delta_sig_len.fs_function = line_tools_string_to_sig_block_size_function(*it);
 			++it;
 
 			    // reading the multiplier
 			if(it == splitted.end())
-			    throw Erange("get_args", tools_printf(gettext(INVALID_BS_FUNC), gettext("missing multiplier argument in string")));
+			    throw Erange(tools_printf(gettext(INVALID_BS_FUNC), gettext("missing multiplier argument in string")));
 			p.delta_sig_len.multiplier = tools_get_extended_size(*it, rec.suffix_base);
 			++it;
 
@@ -2114,7 +2114,7 @@ static bool get_args_recursive(recursive_param & rec,
 			    p.delta_sig_len.min_block_len = 0;
 			    tmp_infinint.unstack(p.delta_sig_len.min_block_len);
 			    if(!tmp_infinint.is_zero())
-				throw Erange("get_args", tools_printf(gettext(INVALID_BS_FUNC), gettext("too large value provided for the min block size")));
+				throw Erange(tools_printf(gettext(INVALID_BS_FUNC), gettext("too large value provided for the min block size")));
 			    ++it;
 			}
 
@@ -2125,7 +2125,7 @@ static bool get_args_recursive(recursive_param & rec,
 			    p.delta_sig_len.max_block_len = 0;
 			    tmp_infinint.unstack(p.delta_sig_len.max_block_len);
 			    if(!tmp_infinint.is_zero())
-				throw Erange("get_args", tools_printf(gettext(INVALID_BS_FUNC), gettext("too large value provided for the min block size")));
+				throw Erange(tools_printf(gettext(INVALID_BS_FUNC), gettext("too large value provided for the min block size")));
 			    ++it;
 			}
 
@@ -2134,22 +2134,22 @@ static bool get_args_recursive(recursive_param & rec,
 			{
 			    if(! libdar::string_to_rsync_sig_magic(*it, p.delta_sig)
 			       || p.delta_sig == rsync_sig_magic::none)
-				throw Erange("get_args", tools_printf(gettext("Invalid hash string in delta signature specification: %s"), it->c_str()));
+				throw Erange(tools_printf(gettext("Invalid hash string in delta signature specification: %s"), it->c_str()));
 			    ++it;
 			}
 			else
 			    p.delta_sig = default_sig_magic;
 
 			if(it != splitted.end())
-			    throw Erange("get_args", tools_printf(gettext(INVALID_BS_FUNC), gettext("unexpected extra argument in string")));
+			    throw Erange(tools_printf(gettext(INVALID_BS_FUNC), gettext("unexpected extra argument in string")));
 		    }
 		}
 		else
-		    throw Erange("get_args", string(gettext("Unknown parameter given to --delta option: ")) + optarg);
+		    throw Erange(string(gettext("Unknown parameter given to --delta option: ")) + optarg);
 		break;
 	    case '{':
 		if(optarg == nullptr)
-		    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+		    throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
                 tmp_pre_mask.file_listing = false;
                 tmp_pre_mask.case_sensit = rec.case_sensit;
                 tmp_pre_mask.included = true;
@@ -2159,7 +2159,7 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
 	    case '}':
 		if(optarg == nullptr)
-                    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+                    throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
                 tmp_pre_mask.file_listing = false;
                 tmp_pre_mask.case_sensit = rec.case_sensit;
                 tmp_pre_mask.included = false;
@@ -2169,9 +2169,9 @@ static bool get_args_recursive(recursive_param & rec,
                 break;
 	    case 'j':
 		if(optarg == nullptr)
-		    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+		    throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
 		if(!tools_my_atoi(optarg, tmp))
-		    throw Erange("get_args", tools_printf(gettext(INVALID_ARG), char(lu)));
+		    throw Erange(tools_printf(gettext(INVALID_ARG), char(lu)));
 		else
 		{
 		    p.remote.network_retry = tmp;
@@ -2181,25 +2181,25 @@ static bool get_args_recursive(recursive_param & rec,
 		break;
 	    case '\\':
 		if(optarg == nullptr)
-		    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+		    throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
 		p.ignored_as_symlink = optarg;
 		break;
 	    case '\'':
 		if(optarg == nullptr)
-		    throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(lu)));
+		    throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
 		if(strcasecmp(optarg, "any-inode-change") == 0)
 		    p.modet = modified_data_detection::any_inode_change;
 		else if(strcasecmp(optarg, "mtime-and-size") == 0)
 		    p.modet = modified_data_detection::mtime_size;
 		else
-		    throw Erange("get_args", string(gettext("Unknown parameter given to --modified-data-detection option: ")) + optarg);
+		    throw Erange(string(gettext("Unknown parameter given to --modified-data-detection option: ")) + optarg);
 		break;
             case ':':
-                throw Erange("get_args", tools_printf(gettext(MISSING_ARG), char(optopt)));
+                throw Erange(tools_printf(gettext(MISSING_ARG), char(optopt)));
             case '?':
-                throw Erange("get_args", tools_printf(gettext("Unknown option -%c"),char(optopt)));
+                throw Erange(tools_printf(gettext("Unknown option -%c"),char(optopt)));
             default:
-                throw Erange("get_args", tools_printf(gettext("Unknown option -%c"),char(lu)));
+                throw Erange(tools_printf(gettext("Unknown option -%c"),char(lu)));
             }
         }
 
@@ -3443,7 +3443,7 @@ static fsa_scope string_to_fsa(const string & arg)
                     || *it == "hfs+")
                 ret.insert(fsaf_hfs_plus);
             else
-                throw Erange("string_to_fsa", string(gettext("unknown FSA family: ")) + (*it));
+                throw Erange(string(gettext("unknown FSA family: ")) + (*it));
         }
     }
 
@@ -3475,7 +3475,7 @@ static void add_non_options(S_I argc, char * const argv[], deque<string> & non_o
            || strcmp(argv[i], "auxiliary") == 0
            || strcmp(argv[i], "all") == 0
            || strcmp(argv[i], "default") == 0)
-            throw Erange("add_non_options", tools_printf(gettext("User target named \"%s\" is not allowed (reserved word for conditional syntax)"), argv[i]));
+            throw Erange(tools_printf(gettext("User target named \"%s\" is not allowed (reserved word for conditional syntax)"), argv[i]));
         else
             non_options.push_back(argv[i]);
 

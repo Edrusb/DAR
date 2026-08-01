@@ -83,7 +83,7 @@ static infinint calculus(const string & formula)
     if(it != formula.end())
     {
 	if(formula.size() < 3)
-	    throw Erange("calculus", tools_printf("Unknown meaning for string: %S", &formula));
+	    throw Erange(tools_printf("Unknown meaning for string: %S", &formula));
 
 	s1 = string(formula.begin(), it);
 	s2 = string(it + 1, formula.end());

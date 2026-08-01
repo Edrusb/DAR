@@ -42,8 +42,7 @@ namespace libdar
     {
 #if LIBLZMA_AVAILABLE
 	if(compression_level > 9 || compression_level < 1)
-	    throw Erange("xz_module::xz_module",
-			 tools_printf(gettext("out of range XZ compression level: %d"), compression_level));
+	    throw Erange(tools_printf(gettext("out of range XZ compression level: %d"), compression_level));
 	setup(compression_level);
 #else
 	throw Ecompilation(gettext("xz/lzma compression"));
@@ -65,8 +64,7 @@ namespace libdar
     {
 #if LIBLZMA_AVAILABLE
 	if(clear_size > get_max_compressing_size() || clear_size < 1)
-	    throw Erange("xz_module::get_min_size_to_compress",
-			 gettext("out of range block size submitted to xz_module::get_min_size_to_compress"));
+	    throw Erange(gettext("out of range block size submitted to xz_module::get_min_size_to_compress"));
 
 	return clear_size * 2;
 	    // should be large enough, liblzma does not seem

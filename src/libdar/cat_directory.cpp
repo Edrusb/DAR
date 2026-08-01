@@ -215,7 +215,7 @@ namespace libdar
 		}
 		else
 		    if(!lax)
-			throw Erange("cat_directory::cat_directory", gettext("missing data to build a cat_directory"));
+			throw Erange(gettext("missing data to build a cat_directory"));
 		    else
 			lax_end = true;
 	    }
@@ -527,7 +527,7 @@ namespace libdar
 	    ++ot;
 
 	if(ot == ordered_fils.end())
-	    throw Erange("cat_directory::remove", tools_printf(gettext("Cannot remove nonexistent entry %S from catalogue"), &name));
+	    throw Erange(tools_printf(gettext("Cannot remove nonexistent entry %S from catalogue"), &name));
 
 	if(*ot == nullptr)
 	    throw SRC_BUG;

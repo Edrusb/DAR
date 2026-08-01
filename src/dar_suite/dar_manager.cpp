@@ -316,7 +316,7 @@ S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * const ar
     case listing:
 	partial_read_only = true;
 	if(change_compression)
-	    throw Erange("little_main", gettext("Cannot change compression when the requested operation is a read operation"));
+	    throw Erange(gettext("Cannot change compression when the requested operation is a read operation"));
 	break;
     case chbase:
     case where:
@@ -325,7 +325,7 @@ S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * const ar
     case archcrypto:
 	partial_read = true;
 	if(change_compression)
-	    throw Erange("little_main", gettext("Cannot change compression when the requested operation only modifies the database header"));
+	    throw Erange(gettext("Cannot change compression when the requested operation only modifies the database header"));
 	break;
     default:
 	throw SRC_BUG;
@@ -437,114 +437,114 @@ static bool command_line(shell_interaction & dialog,
 		{
 		case 'C':
 		    if(op != none_op)
-			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
+			throw Erange(tools_printf(gettext(ONLY_ONCE), char(lu)));
 		    op = create;
 		    if(optarg == nullptr)
-			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
+			throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
 		    base = optarg;
 		    break;
 		case 'B':
 		    if(recursive)
-			throw Erange("command_line", tools_printf(gettext("-B option cannot be given inside a batch file")));
+			throw Erange(tools_printf(gettext("-B option cannot be given inside a batch file")));
 		    if(base != "")
-			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
+			throw Erange(tools_printf(gettext(ONLY_ONCE), char(lu)));
 		    if(optarg == nullptr)
-			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
+			throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
 		    base = optarg;
 		    break;
 		case 'A':
 		    if(op != none_op)
-			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
+			throw Erange(tools_printf(gettext(ONLY_ONCE), char(lu)));
 		    op = add;
 		    if(optarg == nullptr)
-			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
+			throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
 		    line_tools_split_path_basename(optarg, chem, filename);
 		    line_tools_check_basename(dialog, chem, filename, EXTENSION, false);
 		    arg = (path(chem).append(filename)).display();
 		    break;
 		case 'l':
 		    if(op != none_op)
-			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
+			throw Erange(tools_printf(gettext(ONLY_ONCE), char(lu)));
 		    op = listing;
 		    break;
 		case 'D':
 		    if(op != none_op)
-			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
+			throw Erange(tools_printf(gettext(ONLY_ONCE), char(lu)));
 		    op = del;
 		    if(optarg == nullptr)
-			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
+			throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
 		    try
 		    {
 			line_tools_read_range(string(optarg), min, max);
 		    }
 		    catch(Edeci & e)
 		    {
-			throw Erange("command_line", tools_printf(gettext(INVALID_ARG), char(lu)));
+			throw Erange(tools_printf(gettext(INVALID_ARG), char(lu)));
 		    }
 		    num = min;
 		    num2 = max;
 		    break;
 		case 'b':
 		    if(op != none_op)
-			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
+			throw Erange(tools_printf(gettext(ONLY_ONCE), char(lu)));
 		    op = chbase;
 		    if(optarg == nullptr)
-			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
+			throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
 		    num = line_tools_str2signed_int(optarg);
 		    break;
 		case 'p':
 		    if(op != none_op)
-			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
+			throw Erange(tools_printf(gettext(ONLY_ONCE), char(lu)));
 		    op = where;
 		    if(optarg == nullptr)
-			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
+			throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
 		    num = line_tools_str2signed_int(optarg);
 		    break;
 		case 'o':
 		    if(op != none_op)
-			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
+			throw Erange(tools_printf(gettext(ONLY_ONCE), char(lu)));
 		    op = options;
 		    break;
 		case 'd':
 		    if(op != none_op)
-			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
+			throw Erange(tools_printf(gettext(ONLY_ONCE), char(lu)));
 		    op = dar;
 		    if(optarg == nullptr)
-			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
+			throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
 		    arg = optarg;
 		    break;
 		case 'r':
 		    if(op != none_op)
-			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
+			throw Erange(tools_printf(gettext(ONLY_ONCE), char(lu)));
 		    op = restore;
 		    break;
 		case 'u':
 		    if(op != none_op)
-			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
+			throw Erange(tools_printf(gettext(ONLY_ONCE), char(lu)));
 		    op = used;
 		    if(optarg == nullptr)
-			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
+			throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
 		    num = line_tools_str2signed_int(optarg);
 		    break;
 		case 'f':
 		    if(op != none_op)
-			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
+			throw Erange(tools_printf(gettext(ONLY_ONCE), char(lu)));
 		    op = files;
 		    if(optarg == nullptr)
-			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
+			throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
 		    arg = optarg;
 		    break;
 		case 's':
 		    if(op != none_op)
-			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
+			throw Erange(tools_printf(gettext(ONLY_ONCE), char(lu)));
 		    op = stats;
 		    break;
 		case 'm':
 		    if(op != none_op)
-			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
+			throw Erange(tools_printf(gettext(ONLY_ONCE), char(lu)));
 		    op = moving;
 		    if(optarg == nullptr)
-			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
+			throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
 		    num = tools_str2int(optarg);
 		    break;
 		case 'h':
@@ -560,35 +560,35 @@ static bool command_line(shell_interaction & dialog,
 		    break;  // ignore this option already parsed during initialization (dar_suite.cpp)
 		case 'w':
 		    if(optarg == nullptr)
-			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
+			throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
 		    date = line_tools_convert_date(optarg);
 		    date_set = date_set_by_w;
 		    break;
 		case 'i':
 		    if(op != none_op)
-			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
+			throw Erange(tools_printf(gettext(ONLY_ONCE), char(lu)));
 		    op = interactive;
 		    break;
 		case 'c':
 		    if(op != none_op)
-			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
+			throw Erange(tools_printf(gettext(ONLY_ONCE), char(lu)));
 		    op = check;
 		    break;
 		case 'e':
 		    if(extra != "")
-			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
+			throw Erange(tools_printf(gettext(ONLY_ONCE), char(lu)));
 		    if(optarg == nullptr)
-			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
+			throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
 		    extra = optarg;
 		    break;
 		case '@':
 		    if(recursive)
-			throw Erange("command_line", tools_printf(gettext("Running batch file from a batch file is not allowed")));
+			throw Erange(tools_printf(gettext("Running batch file from a batch file is not allowed")));
 		    if(op != none_op)
-			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
+			throw Erange(tools_printf(gettext(ONLY_ONCE), char(lu)));
 		    op = batch;
 		    if(optarg == nullptr)
-			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
+			throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
 		    arg = optarg;
 		    break;
 		case 'N':
@@ -609,20 +609,20 @@ static bool command_line(shell_interaction & dialog,
 		    }
 		    catch(Edeci & e)
 		    {
-			throw Erange("command_line", tools_printf(gettext("invalid number given to -9 option: %s"), optarg));
+			throw Erange(tools_printf(gettext("invalid number given to -9 option: %s"), optarg));
 		    }
 		    break;
 		case 'a':
 		    if(optarg == nullptr)
-			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
+			throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
 		    if(strcasecmp("i", optarg) == 0 || strcasecmp("ignore-order", optarg) == 0)
 			check_order = false;
 		    else
-			throw Erange("command_line", tools_printf(gettext(INVALID_ARG), char(lu)));
+			throw Erange(tools_printf(gettext(INVALID_ARG), char(lu)));
 		    break;
 		case 'z':
 		    if(optarg == nullptr)
-			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
+			throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
 
 		    line_tools_split_compression_algo(optarg,
 						      1,         // no prefix (used for block anyway)
@@ -633,7 +633,7 @@ static bool command_line(shell_interaction & dialog,
 		    break;
 		case 'J':
 		    if(optarg == nullptr)
-			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
+			throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
 		    switch(op)
 		    {
 		    case none_op: // becoming archcrypto operation
@@ -642,19 +642,19 @@ static bool command_line(shell_interaction & dialog,
 			num = line_tools_str2signed_int(optarg);
 			break;
 		    case archcrypto:
-			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
+			throw Erange(tools_printf(gettext(ONLY_ONCE), char(lu)));
 		    case add:
 			arch_crypto_params = optarg;
 			break; // keep the same operation but will fill the archive crypto parameters
 		    default:
-			throw Erange("command_line", tools_printf(gettext("-J option is only valide as standalone command or after -A option")));
+			throw Erange(tools_printf(gettext("-J option is only valide as standalone command or after -A option")));
 		    }
 		    break;
 		case 'K':
 		    if(recursive)
-			throw Erange("command_line", tools_printf(gettext("-K option cannot be given inside a batch file")));
+			throw Erange(tools_printf(gettext("-K option cannot be given inside a batch file")));
 		    if(optarg == nullptr)
-			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
+			throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
 
 		    switch(op)
 		    {
@@ -666,17 +666,17 @@ static bool command_line(shell_interaction & dialog,
 			base_crypto_params = optarg;
 			break;
 		    default:
-			throw Erange("command_line", tools_printf(gettext("-K option is only valide as standalone command or after -C option")));
+			throw Erange(tools_printf(gettext("-K option is only valide as standalone command or after -C option")));
 		    }
 		    break;
 		case 'L':
 		    if(recursive)
-			throw Erange("command_line", tools_printf(gettext("-L option cannot be given inside a batch file")));
+			throw Erange(tools_printf(gettext("-L option cannot be given inside a batch file")));
 		    if(optarg == nullptr)
-			throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(lu)));
+			throw Erange(tools_printf(gettext(MISSING_ARG), char(lu)));
 
 		    if(! password.empty())
-			throw Erange("command_line", tools_printf(gettext(ONLY_ONCE), char(lu)));
+			throw Erange(tools_printf(gettext(ONLY_ONCE), char(lu)));
 		    else
 		    {
 			try
@@ -697,11 +697,11 @@ static bool command_line(shell_interaction & dialog,
 		    detailed_dates = true;
 		    break;
 		case ':':
-		    throw Erange("command_line", tools_printf(gettext(MISSING_ARG), char(optopt)));
+		    throw Erange(tools_printf(gettext(MISSING_ARG), char(optopt)));
 		case '?':
-		    throw Erange("command_line", tools_printf(gettext("Ignoring unknown option -%c"), char(optopt)));
+		    throw Erange(tools_printf(gettext("Ignoring unknown option -%c"), char(optopt)));
 		default:
-		    throw Erange("command_line", tools_printf(gettext("Ignoring unknown option -%c"), char(lu)));
+		    throw Erange(tools_printf(gettext("Ignoring unknown option -%c"), char(lu)));
 		}
 		if(lu == 'o' || lu == 'r')
 		    break; // stop reading arguments
@@ -791,7 +791,7 @@ static bool command_line(shell_interaction & dialog,
 	case restore:
 	    for(unsigned int i = 0; i < rest.size(); ++i)
 		if(!path(rest[i]).is_relative())
-		    throw Erange("command_line", gettext("Arguments to -r must be relative path (never begin by '/')"));
+		    throw Erange(gettext("Arguments to -r must be relative path (never begin by '/')"));
 	    arg = extra;
 	    break;
 	case options:
@@ -1105,7 +1105,7 @@ static void op_move(shared_ptr<user_interaction> & dialog, database *dat, S_I sr
     bool date_order_problem = false;
 
     if(src <= 0)
-	throw Erange("op_move", gettext("Negative number or zero not allowed when moving an archive inside a database"));
+	throw Erange(gettext("Negative number or zero not allowed when moving an archive inside a database"));
 
     if(dat == nullptr)
 	throw SRC_BUG;
@@ -1398,7 +1398,7 @@ static void op_interactive(shared_ptr<user_interaction> & dialog, database *dat,
 		input = dialog->get_string(gettext("Compression level to use (usually an integer from 1 to 9)? "), true);
 		tmp_si = line_tools_str2signed_int(input);
 		if(tmp_si < 1)
-		    throw Erange("op_interactive", gettext("Compression level must be strictly positive"));
+		    throw Erange(gettext("Compression level must be strictly positive"));
 		compr_level = (U_I)tmp_si;
 		dialog->message(gettext("Note: the new compression algorithm/level will be used when saving the database"));
 		change_compression = true;
@@ -1682,13 +1682,13 @@ static void op_batch(shared_ptr<user_interaction> & dialog, database *dat, const
 			     base_crypto_params,
 			     unused_pass_here,
 			     true))
-		throw Erange("op_batch", tools_printf(gettext("Syntax error in batch file: %S"), &line));
+		throw Erange(tools_printf(gettext("Syntax error in batch file: %S"), &line));
 
 	    if(sub_op == create)
-		throw Erange("op_batch", gettext("Syntax error in batch file: -C option not allowed"));
+		throw Erange(gettext("Syntax error in batch file: -C option not allowed"));
 
 	    if(sub_op == interactive)
-		throw Erange("op_batch", gettext("Syntax error in batch file: -i option not allowed"));
+		throw Erange(gettext("Syntax error in batch file: -i option not allowed"));
 
 	    action(dialog, sub_op, dat, arg, num, rest, num2, date, faked_base, sub_info_details, false,
 		   ignore_dat_options, even_when_removed, detailed_dates,
@@ -1786,7 +1786,7 @@ static void op_chbasecrypto(shared_ptr<user_interaction> & dialog,
 		    // requested interactive input as if the password was given empty
 		splitted.push_back("");
 	    else
-		throw Erange("split_base_crypto_params", gettext("invalid argument given to -K option"));
+		throw Erange(gettext("invalid argument given to -K option"));
 
 		/* no break to go to case 2 */
 	case 2:
@@ -1811,15 +1811,14 @@ static void op_chbasecrypto(shared_ptr<user_interaction> & dialog,
 	    break;
 	case 4: // only valid syntax is (f|p):<string>:<kdf_hash>:<kdf_count>
 	    if(! string_to_hash_algo(splitted[2], kdf_hash))
-		throw Erange("split_base_crypto_params", gettext("invalid argument given to -K option"));
+		throw Erange(gettext("invalid argument given to -K option"));
 	    try
 	    {
 		kdf_count = deci(splitted[3]).computer();
 	    }
 	    catch(Edeci & e)
 	    {
-		throw Erange("split_base_crypto_params",
-			     gettext("invalid interation count given to -K option"));
+		throw Erange(gettext("invalid interation count given to -K option"));
 	    }
 	    splitted.pop_back(); // removing the iteration count
 	    splitted.pop_back(); // removing the kdf hash
@@ -1832,7 +1831,7 @@ static void op_chbasecrypto(shared_ptr<user_interaction> & dialog,
 	    loop = true; // looping to case 4
 	    break;
 	default:
-	    throw Erange("split_base_crypto_params", gettext("invalid argument given to -K option"));
+	    throw Erange(gettext("invalid argument given to -K option"));
 	}
     }
     while(loop);
@@ -2048,7 +2047,7 @@ static void split_arch_crypto_params(shared_ptr<user_interaction> & dialog,
 		    // requested interactive input of the password
 		splitted.push_back("");
 	    else
-		throw Erange("split_arch_crypto_params", gettext("invalid argument given to -J option"));
+		throw Erange(gettext("invalid argument given to -J option"));
 
 		/* no break */
 	case 2:
@@ -2058,7 +2057,7 @@ static void split_arch_crypto_params(shared_ptr<user_interaction> & dialog,
 		if(splitted[0] == "f")
 		    pass = fetch_password_from_file(splitted[1]);
 		else
-		    throw Erange("split_arch_crypto_params", gettext("invalid argument given to -J option"));
+		    throw Erange(gettext("invalid argument given to -J option"));
 	    loop = false;
 	    break;
 	case 3:
@@ -2084,10 +2083,10 @@ static void split_arch_crypto_params(shared_ptr<user_interaction> & dialog,
 			loop = true;
 		    }
 		    else
-			throw Erange("split_arch_crypto_params", gettext("invalid argument given to -J option"));
+			throw Erange(gettext("invalid argument given to -J option"));
 		}
 		else
-		    throw Erange("split_arch_crypto_params", gettext("invalid argument given to -J option"));
+		    throw Erange(gettext("invalid argument given to -J option"));
 	    break;
 	case 4:
 		// expecting both algo: and :crypto-block size around f:path or p:password
@@ -2100,10 +2099,10 @@ static void split_arch_crypto_params(shared_ptr<user_interaction> & dialog,
 		loop = true;
 	    }
 	    else
-		throw Erange("split_arch_crypto_params", gettext("invalid argument given to -J option"));
+		throw Erange(gettext("invalid argument given to -J option"));
 	    break;
 	default:
-	    throw Erange("split_arch_crypto_params", gettext("invalid argument given to -J option"));
+	    throw Erange(gettext("invalid argument given to -J option"));
 	}
     }
     while(loop);
@@ -2118,7 +2117,7 @@ static secu_string parse_password_p_or_f(const string & type, const string & arg
     else if(type == "f")
 	ret = fetch_password_from_file(arg);
     else
-	throw Erange("parse_password_p_or_f", gettext("invalid argument given after p: or f: in password string argument"));
+	throw Erange(gettext("invalid argument given after p: or f: in password string argument"));
 
     return ret;
 }
@@ -2176,7 +2175,7 @@ static bool ask_crypto_params(shared_ptr<user_interaction> & dialog, crypto_algo
 	if(tools_my_atoi(tmp.c_str(), val))
 	    crypto_bs = val;
 	else
-	    throw Erange("ask_crypto_params",  gettext("Invalid number given for crypto block, aborting"));
+	    throw Erange( gettext("Invalid number given for crypto block, aborting"));
 
 	    // we don't set the algo, as only very old archive need that info to be read.
 	    // if some user still need it, we will add a new question

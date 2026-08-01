@@ -41,7 +41,7 @@ namespace libdar
     {
 #if LIBBZ2_AVAILABLE
 	if(compression_level > 9 || compression_level < 1)
-	    throw Erange("bzip2_module::bzip2_module", tools_printf(gettext("out of range BZIP2 compression level: %d"), compression_level));
+	    throw Erange(tools_printf(gettext("out of range BZIP2 compression level: %d"), compression_level));
 	level = compression_level;
 #else
 	throw Ecompilation(gettext("bzip2 compression"));
@@ -63,7 +63,7 @@ namespace libdar
     {
 #if LIBBZ2_AVAILABLE
 	if(clear_size > get_max_compressing_size() || clear_size < 1)
-	    throw Erange("bzip2_module::get_min_size_to_compress", "out of range block size submitted to bzip2_module::get_min_size_to_compress");
+	    throw Erange("out of range block size submitted to bzip2_module::get_min_size_to_compress");
 
 	    // extract for libzip2 manual:
 	    // * To guarantee that the compressed data will fit in its buffer,
@@ -91,7 +91,7 @@ namespace libdar
 	    // needed for long/non-long int conversion
 
 	if(normal_size > get_max_compressing_size())
-	    throw Erange("bzip2_module::compress_data", "oversized uncompressed data given to BZIP2 compression engine");
+	    throw Erange("oversized uncompressed data given to BZIP2 compression engine");
 
 	ret = BZ2_bzBuffToBuffCompress(zip_buf,
 				       & tmp_zip_buf_size,
@@ -106,13 +106,13 @@ namespace libdar
 	case BZ_OK:
 	    break;
 	case BZ_CONFIG_ERROR:
-	    throw Erange("bzip2_module::uncompress_data", "libbzip2 error: \"the library has been mis-compiled\"");
+	    throw Erange("libbzip2 error: \"the library has been mis-compiled\"");
 	case BZ_PARAM_ERROR:
 	    throw SRC_BUG; // zip, or zip_size is NULL or other parameter is out of range
 	case BZ_MEM_ERROR:
-	    throw Erange("bzip2_module::uncompress_data", "lack of memory to perform the bzip2 compression operation");
+	    throw Erange("lack of memory to perform the bzip2 compression operation");
 	case BZ_OUTBUFF_FULL:
-	    throw Erange("bzip2_module::uncompress_data", "too small buffer provided to receive compressed data");
+	    throw Erange("too small buffer provided to receive compressed data");
 	default:
 	    throw SRC_BUG;
 	}
@@ -144,13 +144,13 @@ namespace libdar
 	case BZ_OK:
 	    break;
 	case BZ_CONFIG_ERROR:
-	    throw Erange("bzip2_module::uncompress_data", "libbzip2 error: \"the library has been mis-compiled\"");
+	    throw Erange("libbzip2 error: \"the library has been mis-compiled\"");
 	case BZ_PARAM_ERROR:
 	    throw SRC_BUG; // normal, or normal_size is NULL or other parameter is out of range
 	case BZ_MEM_ERROR:
-	    throw Erange("bzip2_module::uncompress_data", "lack of memory to perform the bzip2 decompression operation");
+	    throw Erange("lack of memory to perform the bzip2 decompression operation");
 	case BZ_OUTBUFF_FULL:
-	    throw Erange("bzip2_module::uncompress_data", "too small buffer provided to receive decompressed data");
+	    throw Erange("too small buffer provided to receive decompressed data");
 	case BZ_DATA_ERROR:
 	case BZ_DATA_ERROR_MAGIC:
 	case BZ_UNEXPECTED_EOF:

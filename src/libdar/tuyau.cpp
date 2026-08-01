@@ -87,10 +87,10 @@ namespace libdar
 	gf_mode tmp;
 
         if(fd < 0)
-            throw Erange("tuyau::tuyau", "Bad file descriptor given");
+            throw Erange("Bad file descriptor given");
 	tmp = generic_file_get_mode(fd);
 	if(tmp == gf_read_write)
-	    throw Erange("tuyau::tuyau", tools_printf("A pipe cannot be in read and write mode at the same time, I need precision on the mode to use for the given filedscriptor"));
+	    throw Erange(tools_printf("A pipe cannot be in read and write mode at the same time, I need precision on the mode to use for the given filedscriptor"));
 	pipe_mode = pipe_fd;
         filedesc = fd;
         position = 0;
@@ -103,12 +103,12 @@ namespace libdar
         gf_mode tmp;
 
         if(fd < 0)
-            throw Erange("tuyau::tuyau", "Bad file descriptor given");
+            throw Erange("Bad file descriptor given");
 	if(mode == gf_read_write)
-	    throw Erange("tuyau::tuyau", tools_printf("A pipe cannot be in read and write mode at the same time"));
+	    throw Erange(tools_printf("A pipe cannot be in read and write mode at the same time"));
         tmp = generic_file_get_mode(fd);
         if(tmp != gf_read_write && tmp != mode)
-            throw Erange("tuyau::tuyau", tools_printf("%s cannot be restricted to %s", generic_file_get_name(tmp), generic_file_get_name(mode)));
+            throw Erange(tools_printf("%s cannot be restricted to %s", generic_file_get_name(tmp), generic_file_get_name(mode)));
 	pipe_mode = pipe_fd;
         filedesc = fd;
         position = 0;
@@ -130,7 +130,7 @@ namespace libdar
 	int tube[2];
 
 	if(pipe(tube) < 0)
-	    throw Erange("tuyau::tuyau", string(gettext("Error while creating anonymous pipe: ")) + tools_strerror_r(errno));
+	    throw Erange(string(gettext("Error while creating anonymous pipe: ")) + tools_strerror_r(errno));
 	pipe_mode = pipe_both;
 	position = 0;
 	filedesc = tube[1];
@@ -158,7 +158,7 @@ namespace libdar
 	if(pipe_mode == pipe_both)
 	    return other_end_fd;
 	else
-	    throw Erange("tuyau::get_read_fd", gettext("Pipe's other end is not known, cannot provide a filedescriptor on it"));
+	    throw Erange(gettext("Pipe's other end is not known, cannot provide a filedescriptor on it"));
     }
 
     void tuyau::close_read_fd()
@@ -172,7 +172,7 @@ namespace libdar
 	    pipe_mode = pipe_fd;
 	}
 	else
-	    throw Erange("tuyau::get_read_fd", gettext("Pipe's other end is not known, cannot close any filedescriptor pointing on it"));
+	    throw Erange(gettext("Pipe's other end is not known, cannot close any filedescriptor pointing on it"));
     }
 
     void tuyau::do_not_close_read_fd()
@@ -183,7 +183,7 @@ namespace libdar
 	if(pipe_mode == pipe_both)
 	    pipe_mode = pipe_fd;
 	else
-	    throw Erange("tuyau::get_read_fd", "Pipe's other end is not known, there is no reason to ask not to close a filedescriptor on it");
+	    throw Erange("Pipe's other end is not known, there is no reason to ask not to close a filedescriptor on it");
     }
 
     bool tuyau::skippable(skippability direction, const infinint & amount)
@@ -200,7 +200,7 @@ namespace libdar
 	    throw SRC_BUG;
 
         if(pos < position)
-            throw Erange("tuyau::skip", "Skipping backward is not possible on a pipe");
+            throw Erange("Skipping backward is not possible on a pipe");
 	else
 	    if(pos == position)
 		return true;
@@ -225,7 +225,7 @@ namespace libdar
 	    throw SRC_BUG;
 
         if(x < 0)
-            throw Erange("tuyau::skip", "Skipping backward is not possible on a pipe");
+            throw Erange("Skipping backward is not possible on a pipe");
 	else
 	    return read_and_drop(x);
     }
@@ -299,7 +299,7 @@ namespace libdar
                 case EIO:
                     throw Ehardware("tuyau::inherited_read", "");
                 default:
-                    throw Erange("tuyau::inherited_read", string(gettext("Error while reading from pipe: "))+tools_strerror_r(errno));
+                    throw Erange(string(gettext("Error while reading from pipe: "))+tools_strerror_r(errno));
                 }
             }
             else
@@ -358,7 +358,7 @@ namespace libdar
                     get_ui().pause(gettext("No space left on device, you have the opportunity to make room now. When ready : can we continue ?"));
                     break;
                 default :
-                    throw Erange("tuyau::inherited_write", string(gettext("Error while writing data to pipe: ")) + tools_strerror_r(errno));
+                    throw Erange(string(gettext("Error while writing data to pipe: ")) + tools_strerror_r(errno));
                 }
             }
             else
@@ -409,7 +409,7 @@ namespace libdar
 	    }
 	    filedesc = ::open(chemin.c_str(), flag|O_BINARY);
 	    if(filedesc < 0)
-		throw Erange("tuyau::ouverture", string(gettext("Error opening pipe: "))+tools_strerror_r(errno));
+		throw Erange(string(gettext("Error opening pipe: "))+tools_strerror_r(errno));
 	    pipe_mode = pipe_fd;
         }
     }
@@ -431,7 +431,7 @@ namespace libdar
 	    max_i_step = BUFFER_SIZE; // max read a time
 
 	if(get_mode() != gf_read_only)
-	    throw Erange("tuyau::read_and_drop", "Cannot skip in pipe in writing mode");
+	    throw Erange("Cannot skip in pipe in writing mode");
 
 	u_step = 0;
 	byte.unstack(u_step);
@@ -472,7 +472,7 @@ namespace libdar
 	S_I lu = 0;
 
 	if(get_mode() != gf_read_only)
-	    throw Erange("tuyau::read_and_drop", "Cannot skip in pipe in writing mode");
+	    throw Erange("Cannot skip in pipe in writing mode");
 
 	while((lu = read(buffer, BUFFER_SIZE)) > 0)
 	    position += lu;
@@ -497,7 +497,7 @@ namespace libdar
             ret = gf_read_write;
             break;
         default:
-            throw Erange("generic_file_get_mode", gettext("File mode is neither read nor write"));
+            throw Erange(gettext("File mode is neither read nor write"));
         }
 
         return ret;

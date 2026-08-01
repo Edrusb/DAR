@@ -106,7 +106,7 @@ namespace libdar
 
 		buffer = new (nothrow) char[buf_size+1]; // one char more to be able to add a '\0' if necessary
 		if(buffer == nullptr)
-		    throw Erange("mask_list::mask_list", tools_printf(gettext("Cannot allocate memory for buffer while reading %S"), &filename_list_st));
+		    throw Erange(tools_printf(gettext("Cannot allocate memory for buffer while reading %S"), &filename_list_st));
 
 
 		    /////////////
@@ -264,7 +264,7 @@ namespace libdar
 		    //
 
 		if(prefix.is_relative() && !prefix.is_subdir_of(path("<ROOT>"), true))
-		    throw Erange("mask_list::mask_list", gettext("Mask_list's prefix must be an absolute path or start with \"<ROOT>\" string for archive merging"));
+		    throw Erange(gettext("Mask_list's prefix must be an absolute path or start with \"<ROOT>\" string for archive merging"));
 		else
 		{
 		    path current("/");
@@ -289,7 +289,7 @@ namespace libdar
 			    string err = e.get_message();
 			    string line = *it;
 
-			    throw Erange("mask_list::mask_list", tools_printf(gettext("Error met while reading line\n\t%S\n from file %S: %S"), &line, &filename_list_st, &err));
+			    throw Erange(tools_printf(gettext("Error met while reading line\n\t%S\n from file %S: %S"), &line, &filename_list_st, &err));
 			}
 			it++;
 		    }
@@ -306,7 +306,7 @@ namespace libdar
 		contenu.assign(tmp.begin(), tmp.end());
 		taille = contenu.size();
 		if(taille < contenu.size())
-		    throw Erange("mask_list::mask_list", tools_printf(gettext("Too much line in file %S (integer overflow)"), &filename_list_st));
+		    throw Erange(tools_printf(gettext("Too much line in file %S (integer overflow)"), &filename_list_st));
 	    }
 	    catch(Egeneric & e)
 	    {

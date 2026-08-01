@@ -68,7 +68,7 @@ namespace libdar
 	case 'Q':
 	    return compression::lz4;
         default :
-            throw Erange("char2compression", gettext("unknown compression"));
+            throw Erange(gettext("unknown compression"));
         }
     }
 
@@ -100,7 +100,7 @@ namespace libdar
 	case compression::lz4:
 	    return per_block ? 'Q': 'q';
         default:
-            throw Erange("compression2char", gettext("unknown compression"));
+            throw Erange(gettext("unknown compression"));
         }
     }
 
@@ -127,7 +127,7 @@ namespace libdar
 	case compression::lz4:
 	    return "lz4";
         default:
-            throw Erange("compresion2string", gettext("unknown compression"));
+            throw Erange(gettext("unknown compression"));
         }
     }
 
@@ -160,7 +160,7 @@ namespace libdar
 	if(a == "none")
 	    return compression::none;
 
-	throw Erange("string2compression", tools_printf(gettext("unknown compression algorithm: %S"), &a));
+	throw Erange(tools_printf(gettext("unknown compression algorithm: %S"), &a));
     }
 
 

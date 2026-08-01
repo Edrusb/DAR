@@ -152,7 +152,7 @@ namespace libdar
 
         struct stat buf;
         if(lstat(s, &buf) < 0)
-            throw Erange("filesystem_tools_supprime", string(gettext("Cannot get inode information about file to remove ")) + s + " : " + tools_strerror_r(errno));
+            throw Erange(string(gettext("Cannot get inode information about file to remove ")) + s + " : " + tools_strerror_r(errno));
 
         if(S_ISDIR(buf.st_mode))
         {
@@ -171,7 +171,7 @@ namespace libdar
 
                 // then the directory itself
             if(rmdir(s) < 0)
-                throw Erange("filesystem_tools_supprime (dir)", string(gettext("Cannot remove directory ")) + s + " : " + tools_strerror_r(errno));
+                throw Erange(string(gettext("Cannot remove directory ")) + s + " : " + tools_strerror_r(errno));
         }
         else
             tools_unlink(s);
@@ -245,11 +245,11 @@ namespace libdar
 	    infinint tmp = ref.get_uid();
 	    tmp.unstack(tmp_uid);
 	    if(!tmp.is_zero())
-		throw Erange("make_owner_perm", gettext("uid value is too high for this system for libdar be able to restore it properly"));
+		throw Erange(gettext("uid value is too high for this system for libdar be able to restore it properly"));
 	    tmp = ref.get_gid();
 	    tmp.unstack(tmp_gid);
 	    if(!tmp.is_zero())
-		throw Erange("make_owner_perm", gettext("gid value is too high for this system for libdar be able to restore it properly"));
+		throw Erange(gettext("gid value is too high for this system for libdar be able to restore it properly"));
 
 #if HAVE_LCHOWN
 	    if(lchown(name, tmp_uid, tmp_gid) < 0)
@@ -413,7 +413,7 @@ namespace libdar
         if(lstat(ptr, &buf) < 0) // stat not lstat, thus we eventually get the symlink pointed to inode
         {
             string tmp = tools_strerror_r(errno);
-            throw Erange("filesystem:get_root_with_symlink", tools_printf(gettext("Cannot get inode information for %s : %s"), ptr, tmp.c_str()));
+            throw Erange(tools_printf(gettext("Cannot get inode information for %s : %s"), ptr, tmp.c_str()));
         }
 
         if(S_ISDIR(buf.st_mode))
@@ -445,7 +445,7 @@ namespace libdar
                 dialog.message(tools_printf(gettext("Replacing %s in the -R option by the directory pointed to by this symbolic link: "), ptr) + ret->display());
         }
         else // not a directory given as argument
-            throw Erange("filesystem:get_root_with_symlink", tools_printf(gettext("The given path %s must be a directory (or symbolic link to an existing directory)"), ptr));
+            throw Erange(tools_printf(gettext("The given path %s must be a directory (or symbolic link to an existing directory)"), ptr));
 
         if(ret == nullptr)
             throw SRC_BUG; // exit without exception, but ret not allocated !
@@ -460,7 +460,7 @@ namespace libdar
         if(lstat(path.c_str(), &buf) < 0)
         {
             string tmp = tools_strerror_r(errno);
-            throw Erange("filesystem.cpp:get_file_permission", tools_printf("Cannot read file permission for %s: %s",path.c_str(), tmp.c_str()));
+            throw Erange(tools_printf("Cannot read file permission for %s: %s",path.c_str(), tmp.c_str()));
         }
 
         return buf.st_mode;
@@ -605,7 +605,7 @@ namespace libdar
 		    if(hard_linked)
 			mismatch = true;
 		    else
-			throw Erange("filesystem.cpp::make_delta_patch", gettext("File the patch is about to be applied to is not the expected one, aborting the patch operation"));
+			throw Erange(gettext("File the patch is about to be applied to is not the expected one, aborting the patch operation"));
 		}
 		else
 		{
@@ -628,7 +628,7 @@ namespace libdar
                     if(expected_patch_crc == nullptr)
                         throw SRC_BUG;
                     if(*expected_patch_crc != *calculated_patch_crc)
-                        throw Erange("filesystem.cpp::make_delta_patch", gettext("Patch data does not match its CRC, archive corruption took place"));
+                        throw Erange(gettext("Patch data does not match its CRC, archive corruption took place"));
                 }
                 else
                     throw SRC_BUG; // at the archive format that support delta patch CRC is always present
@@ -661,7 +661,7 @@ namespace libdar
 		    {
 			    // checking whether the inode has not already been patched (hard-link context)
 			if(*calculated_base_crc != *expected_result_crc)
-			    throw Erange("filesystem.cpp::make_delta_patch", gettext("File the patch is about to be applied to is not the expected one, aborting the patch operation"));
+			    throw Erange(gettext("File the patch is about to be applied to is not the expected one, aborting the patch operation"));
 		    }
                 }
                 catch(Erange & e)
@@ -795,7 +795,7 @@ namespace libdar
             try
             {
                 if(*calculated_crc != *expected_crc)
-                    throw Erange("filesystem.cpp:copy_content_from_to", gettext("Copied data does not match expected CRC"));
+                    throw Erange(gettext("Copied data does not match expected CRC"));
             }
             catch(...)
             {

@@ -134,7 +134,7 @@ namespace libdar
 	    // sanity checks done
 
 	if(t == seqt_not_a_sequence)
-	    throw Erange("escape::add_mark_at_current_position", gettext("Adding an explicit escape sequence of type seqt_not_a_sequence is forbidden"));
+	    throw Erange(gettext("Adding an explicit escape sequence of type seqt_not_a_sequence is forbidden"));
 
 	flush_write();
 	escaped_data_count_since_last_skip = 0;
@@ -947,7 +947,7 @@ namespace libdar
 	case 'P':
 	    return seqt_in_place;
 	default:
-	    throw Erange("escape::char2type", gettext("Unknown escape sequence type"));
+	    throw Erange(gettext("Unknown escape sequence type"));
 	}
     }
 

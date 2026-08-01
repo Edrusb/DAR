@@ -45,7 +45,7 @@ namespace libdar
 	tlv_list *me = const_cast<tlv_list *>(this);
 
 	if(item > contents.size())
-	    throw Erange("tlv_list::operator[]", "index out of range when accessing a tlv_list object");
+	    throw Erange("index out of range when accessing a tlv_list object");
 	if(me == nullptr)
 	    throw SRC_BUG;
 

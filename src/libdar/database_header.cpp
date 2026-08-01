@@ -98,11 +98,11 @@ namespace libdar
 
 	f.read((char *)&version, 1);
 	if(version > database_version)
-	    throw Erange("database_header::read", gettext("The format version of this database is too high for that software version, use a more recent software to read or modify this database"));
+	    throw Erange(gettext("The format version of this database is too high for that software version, use a more recent software to read or modify this database"));
 	f.read((char *)&options, 1);
 
 	if((options & HEADER_OPTION_EXTENSION) != 0)
-	    throw Erange("database_header::read",  gettext("Unknown header option in database, aborting"));
+	    throw Erange( gettext("Unknown header option in database, aborting"));
 
 	if((options & HEADER_OPTION_COMPRESSOR) != 0)
 	{
@@ -142,7 +142,7 @@ namespace libdar
 	    crypto_bs = 0;
 	    itmp.unstack(crypto_bs);
 	    if(!itmp.is_zero()) // valid infinint but too large value for crypto_bs
-		throw Erange("database_header::read", gettext("Format error in database crypto header, aborting"));
+		throw Erange(gettext("Format error in database crypto header, aborting"));
 
 	    itmp.read(f); // salt size
 	    tools_read_string_size(f, salt, itmp);
@@ -214,8 +214,7 @@ namespace libdar
 	case crypto_algo::none:
 	    break;
 	case crypto_algo::scrambling:
-	    throw Erange("database_header::set_crypto",
-			 gettext("weak crypto algorithm requested, aborting"));
+	    throw Erange(gettext("weak crypto algorithm requested, aborting"));
 	case crypto_algo::blowfish: // databases should barely exceed 4GB of size... even uncompressed.
 	case crypto_algo::aes256:
 	case crypto_algo::twofish256:
@@ -243,8 +242,7 @@ namespace libdar
 	case hash_algo::none:
 	case hash_algo::md5:
 	case hash_algo::sha1:
-	    throw Erange("database_header::set_kdf_hash",
-			 gettext("invalid hash algorithm set for the key derivation function"));
+	    throw Erange(gettext("invalid hash algorithm set for the key derivation function"));
 	case hash_algo::sha512:
 	case hash_algo::argon2:
 	case hash_algo::whirlpool:
@@ -259,8 +257,7 @@ namespace libdar
     void database_header::set_kdf_iteration(const infinint & val)
     {
 	if(val < default_iteration_count_argon2) // even if hash algo is not argon2
-	    throw Erange("database_header::set_kdf_iteration",
-			 gettext("Setting KDF iteration count too low would deserve the benefit of KDF cost, facilitating dictionnary attack type"));
+	    throw Erange(gettext("Setting KDF iteration count too low would deserve the benefit of KDF cost, facilitating dictionnary attack type"));
 
 	kdf_count = val;
 
@@ -270,8 +267,7 @@ namespace libdar
     void database_header::set_crypto_block_size(U_32 val)
     {
 	if(val < default_crypto_size)
-	    throw Erange("database_header::set_crypto_block_size",
-		gettext("Setting crypto block size below the default value, would lead to lower performance and weaken security"));
+	    throw Erange(gettext("Setting crypto block size below the default value, would lead to lower performance and weaken security"));
 
 	crypto_bs = val;
     }
@@ -297,7 +293,7 @@ namespace libdar
 	try
 	{
 	    if(stat(filename.c_str(), &buf) >= 0 && !overwrite)
-		throw Erange("database_header_create", gettext("Cannot create database, file exists"));
+		throw Erange(gettext("Cannot create database, file exists"));
 	    tmp = new (nothrow) fichier_local(dialog, filename, gf_write_only, 0666, !overwrite, overwrite, false);
 	    if(tmp == nullptr)
 		throw Ememory();
@@ -388,7 +384,7 @@ namespace libdar
 	    }
 	    catch(Erange & e)
 	    {
-		throw Erange("database_header_open", tools_printf(gettext("Error reading database %S : "), &filename) + e.get_message());
+		throw Erange(tools_printf(gettext("Error reading database %S : "), &filename) + e.get_message());
 	    }
 	    if(tmp == nullptr)
 		throw Ememory();
@@ -462,8 +458,7 @@ namespace libdar
     static infinint database_clear_data_callback(generic_file &below, const archive_version & reading_ver)
     {
 	if(!below.skip_to_eof())
-	    throw Erange("database_clear_data_callback",
-			 "Probable data corruption in encrypted database file, aborting");
+	    throw Erange(gettext("Probable data corruption in encrypted database file, aborting"));
 
 	    // we return the offset of end of file as we don't
 	    // expect clear data after encrypted data when treating

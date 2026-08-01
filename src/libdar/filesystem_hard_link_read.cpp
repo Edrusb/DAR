@@ -150,7 +150,7 @@ namespace libdar
 			// time here we read inode details, so we issue a warning in that situation
 		    break;
 		default:
-		    throw Erange("filesystem_hard_link_read::make_read_entree", string(gettext("Cannot read inode for ")) + ptr_name + " : " + tools_strerror_r(errno));
+		    throw Erange(string(gettext("Cannot read inode for ")) + ptr_name + " : " + tools_strerror_r(errno));
 		}
 
 		    // the current method returns nullptr (= ref)  (meaning file does not exists)

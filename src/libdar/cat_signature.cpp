@@ -69,7 +69,7 @@ namespace libdar
 	saved_status tmp_status;
 
 	if(!read(f, reading_ver) || !get_base_and_status(tmp_base, tmp_status))
-	    throw Erange("cat_signature::cat_signature(generic_file)", gettext("incoherent catalogue structure"));
+	    throw Erange(gettext("incoherent catalogue structure"));
     }
 
     bool cat_signature::read(generic_file & f, const archive_version & reading_ver)

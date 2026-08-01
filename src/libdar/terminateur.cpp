@@ -100,7 +100,7 @@ namespace libdar
             do
             {
                 if(f.read_back(b) != 1)
-                    throw Erange("",""); // exception used locally
+                    throw Erange(""); // exception used locally
                 a = (unsigned char)b;
                 if(a == 0xFF)
                     ++offset;
@@ -112,7 +112,7 @@ namespace libdar
             while(a != 0)
             {
                 if((a & 0x80) == 0)
-                    throw Erange("","");
+                    throw Erange("");
                 ++offset;
                 a <<= 1;
             }
@@ -124,13 +124,13 @@ namespace libdar
 
                 // skipping the start of "location"
             if(! f.skip_relative(-offset))
-                throw Erange("","");
+                throw Erange("");
 
 	    t_start = f.get_position();
         }
         catch(Erange &e)
         {
-            throw Erange("terminateur::get_catalogue", gettext("Badly formatted terminator, cannot extract catalogue location: ") + e.get_message());
+            throw Erange(gettext("Badly formatted terminator, cannot extract catalogue location: ") + e.get_message());
         }
 
             // reading and returning the position

@@ -63,9 +63,9 @@ namespace libdar
 	if(output == nullptr)
 	    throw SRC_BUG;
 	if(input->get_mode() == gf_write_only)
-	    throw Erange("zapette::zapette", gettext("Cannot read on input"));
+	    throw Erange(gettext("Cannot read on input"));
 	if(output->get_mode() == gf_read_only)
-	    throw Erange("zapette::zapette", gettext("Cannot write on output"));
+	    throw Erange(gettext("Cannot write on output"));
 
 	in = input;
 	out = output;
@@ -207,7 +207,7 @@ namespace libdar
 	data_size_step = 0;
 	data_size.unstack(data_size_step);
 	if(!data_size.is_zero())
-	    throw Erange("zapette::get_slice_info", gettext("too large amount of data to transfer for slice information over zapette protocol"));
+	    throw Erange(gettext("too large amount of data to transfer for slice information over zapette protocol"));
 
 	data_buf = new(nothrow) char[data_size_step];
 	if(data_buf == nullptr)
@@ -343,7 +343,7 @@ namespace libdar
             arg = ans.arg;
             break;
         default:  // might be a transmission error do to weak transport layer
-            throw Erange("zapette::make_transfert", gettext("Incoherent answer from peer"));
+            throw Erange(gettext("Incoherent answer from peer"));
         }
 
             // sanity checks
@@ -357,45 +357,45 @@ namespace libdar
             else if(req.offset == REQUEST_OFFSET_GET_FILESIZE)
             {
                 if(ans.size != 0 || ans.type != ANSWER_TYPE_INFININT)
-                    throw Erange("zapette::make_transfert", gettext("Incoherent answer from peer"));
+                    throw Erange(gettext("Incoherent answer from peer"));
             }
 	    else if(req.offset == REQUEST_OFFSET_CHANGE_CONTEXT_STATUS)
 	    {
 		if(ans.arg != 1)
-		    throw Erange("zapette::make_transfert", gettext("Unexpected answer from slave, communication problem or bug may hang the operation"));
+		    throw Erange(gettext("Unexpected answer from slave, communication problem or bug may hang the operation"));
 	    }
             else if(req.offset == REQUEST_IS_OLD_START_END_ARCHIVE)
 	    {
 		if(ans.type != ANSWER_TYPE_INFININT || (ans.arg != 0 && ans.arg != 1) )
-		    throw Erange("zapetee::make_transfert", gettext("Unexpected answer from slave, communication problem or bug may hang the operation"));
+		    throw Erange(gettext("Unexpected answer from slave, communication problem or bug may hang the operation"));
 	    }
 	    else if(req.offset == REQUEST_GET_DATA_NAME)
 	    {
 		if(ans.type != ANSWER_TYPE_DATA || lu != (S_I)(label::common_size()))
-		    throw Erange("zapetee::make_transfert", gettext("Unexpected answer from slave, communication problem or bug may hang the operation"));
+		    throw Erange(gettext("Unexpected answer from slave, communication problem or bug may hang the operation"));
 	    }
 	    else if(req.offset == REQUEST_FIRST_SLICE_HEADER_SIZE)
 	    {
 		if(ans.size != 0 || ans.type != ANSWER_TYPE_INFININT)
-                    throw Erange("zapette::make_transfert", gettext("Incoherent answer from peer"));
+                    throw Erange(gettext("Incoherent answer from peer"));
 	    }
 	    else if(req.offset == REQUEST_OTHER_SLICE_HEADER_SIZE)
 	    {
 		if(ans.size != 0 || ans.type != ANSWER_TYPE_INFININT)
-                    throw Erange("zapette::make_transfert", gettext("Incoherent answer from peer"));
+                    throw Erange(gettext("Incoherent answer from peer"));
 	    }
 	    else if(req.offset == REQUEST_SLICE_INFO_SIZE)
 	    {
 		if(ans.size != 0 || ans.type != ANSWER_TYPE_INFININT)
-		    throw Erange("zapette::make_transfert", gettext("Incoherent answer from peer"));
+		    throw Erange(gettext("Incoherent answer from peer"));
 	    }
 	    else if(req.offset == REQUEST_SLICE_INFO_DATA)
 	    {
 		if(lu == 0 || ans.type != ANSWER_TYPE_DATA)
-		    throw Erange("zapette::make_transfert", gettext("Incoherent answer from peer"));
+		    throw Erange(gettext("Incoherent answer from peer"));
 	    }
 	    else
-                throw Erange("zapette::make_transfert", gettext("Corrupted data read from pipe"));
+                throw Erange(gettext("Corrupted data read from pipe"));
         }
     }
 

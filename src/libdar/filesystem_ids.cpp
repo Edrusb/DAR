@@ -72,7 +72,7 @@ namespace libdar
     void filesystem_ids::include_fs_at(const path & chem)
     {
 	if(chem.is_relative())
-	    throw Erange("filesystem_ids::set_root_fs","path to a filesystem must be an absolute path");
+	    throw Erange("path to a filesystem must be an absolute path");
 	included.insert(path2fs_id(chem.display()));
     }
 
@@ -89,7 +89,7 @@ namespace libdar
     void filesystem_ids::exclude_fs_at(const path & chem)
     {
 	if(chem.is_relative())
-	    throw Erange("filesystem_ids::set_root_fs","path to a filesystem must be an absolute path");
+	    throw Erange("path to a filesystem must be an absolute path");
 	excluded.insert(path2fs_id(chem.display()));
     }
 
@@ -145,7 +145,7 @@ namespace libdar
     bool filesystem_ids::is_covered(const path & chem) const
     {
 	if(chem.is_relative())
-	    throw Erange("filesystem_ids::set_root_fs","path to a filesystem must be an absolute path");
+	    throw Erange("path to a filesystem must be an absolute path");
 	return is_covered(path2fs_id(chem.display()));
     }
 
@@ -159,9 +159,9 @@ namespace libdar
 	{
 	    string errmsg = tools_strerror_r(errno);
 
-	    throw Erange("filesystem_ids", tools_printf(gettext("Cannot read filesystem information at %S: %S"),
-							&path,
-							&errmsg));
+	    throw Erange(tools_printf(gettext("Cannot read filesystem information at %S: %S"),
+				      &path,
+				      &errmsg));
 	}
 
 	return buf.st_dev;

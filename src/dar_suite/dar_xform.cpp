@@ -225,9 +225,9 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
             {
             case 's':
                 if(!file_size.is_zero())
-                    throw Erange("command_line", gettext("Only one -s option is allowed"));
+                    throw Erange(gettext("Only one -s option is allowed"));
                 if(optarg == nullptr)
-                    throw Erange("command_line", gettext("Missing argument to -s"));
+                    throw Erange(gettext("Missing argument to -s"));
                 else
                 {
                     try
@@ -245,12 +245,12 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
                 break;
             case 'S':
                 if(optarg == nullptr)
-                    throw Erange("command_line", gettext("Missing argument to -S"));
+                    throw Erange(gettext("Missing argument to -S"));
                 if(first_file_size.is_zero())
                     first_file_size = tools_get_extended_size(optarg, suffix_base);
                 else
                     if(file_size.is_zero())
-                        throw Erange("command_line", gettext("Only one -S option is allowed"));
+                        throw Erange(gettext("Only one -S option is allowed"));
                     else
                         if(file_size == first_file_size)
                         {
@@ -268,7 +268,7 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
 
                         }
                         else
-                            throw Erange("command_line", gettext("Only one -S option is allowed"));
+                            throw Erange(gettext("Only one -S option is allowed"));
                 break;
             case 'p':
 		if(optarg != nullptr)
@@ -299,7 +299,7 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
                 return false;
             case 'E':
                 if(optarg == nullptr)
-                    throw Erange("command_line", gettext("Missing argument to -E"));
+                    throw Erange(gettext("Missing argument to -E"));
                 if(execute_dst == "")
                     execute_dst = optarg;
                 else
@@ -307,7 +307,7 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
                 break;
             case 'F':
                 if(optarg == nullptr)
-                    throw Erange("command_line", gettext("Missing argument to -F"));
+                    throw Erange(gettext("Missing argument to -F"));
                 if(execute_src == "")
                     execute_src = optarg;
                 else
@@ -315,36 +315,36 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
                 break;
 	    case 'a':
 		if(optarg == nullptr)
-		    throw Erange("command_line", gettext("-a option requires an argument"));
+		    throw Erange(gettext("-a option requires an argument"));
 		if(strcasecmp("SI-unit", optarg) == 0 || strcasecmp("SI", optarg) == 0 || strcasecmp("SI-units", optarg) == 0)
 		    suffix_base = LINE_TOOLS_SI_SUFFIX;
 		else
 		    if(strcasecmp("binary-unit", optarg) == 0 || strcasecmp("binary", optarg) == 0 || strcasecmp("binary-units", optarg) == 0)
 			suffix_base = LINE_TOOLS_BIN_SUFFIX;
 		    else
-			throw Erange("command_line", string(gettext("Unknown parameter given to -a option: ")) + optarg);
+			throw Erange(string(gettext("Unknown parameter given to -a option: ")) + optarg);
 		break;
 	    case 'Q':
 		break;  // ignore this option already parsed during initialization (dar_suite.cpp)
 	    case '^':
 		if(optarg == nullptr)
-		    throw Erange("command_line", tools_printf(gettext("Missing argument to -^"), char(lu)));
+		    throw Erange(tools_printf(gettext("Missing argument to -^"), char(lu)));
 		line_tools_slice_ownership(string(optarg), slice_perm, slice_user, slice_group);
 		break;
 	    case '3':
 		if(optarg == nullptr)
-		    throw Erange("command_line", tools_printf(gettext("Missing argument to --hash"), char(lu)));
+		    throw Erange(tools_printf(gettext("Missing argument to --hash"), char(lu)));
 		if(strcasecmp(optarg, "md5") == 0)
 		    hash = hash_algo::md5;
 		else
 		    if(strcasecmp(optarg, "sha1") == 0)
 			hash = hash_algo::sha1;
 		    else
-			throw Erange("command_line", string(gettext("Unknown parameter given to --hash option: ")) + optarg);
+			throw Erange(string(gettext("Unknown parameter given to --hash option: ")) + optarg);
 		break;
 	    case '9':
 		if(optarg == nullptr)
-		    throw Erange("command_line", tools_printf(gettext("Missing argument to --min-digits"), char(lu)));
+		    throw Erange(tools_printf(gettext("Missing argument to --min-digits"), char(lu)));
 		else
 		{
 		    infinint tmp2;
@@ -352,9 +352,9 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
 		}
 		break;
             case ':':
-                throw Erange("command_line", tools_printf(gettext("Missing parameter to option -%c"), char(optopt)));
+                throw Erange(tools_printf(gettext("Missing parameter to option -%c"), char(optopt)));
             case '?':
-                throw Erange("command_line", tools_printf(gettext("Ignoring unknown option -%c"), char(optopt)));
+                throw Erange(tools_printf(gettext("Ignoring unknown option -%c"), char(optopt)));
             default:
                 throw SRC_BUG;
             }
@@ -396,7 +396,7 @@ static bool command_line(shell_interaction & dialog, S_I argc, char * const argv
 
             // sanity checks
         if(dst == "-" && !file_size.is_zero())
-            throw Erange("dar_xform::command_line", gettext("Archive on stdout is not compatible with slicing (-s option)"));
+            throw Erange(gettext("Archive on stdout is not compatible with slicing (-s option)"));
     }
     catch(...)
     {

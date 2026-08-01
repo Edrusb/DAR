@@ -129,7 +129,7 @@ namespace libdar
 		size++;
 
 	    if(size == 0) // empty string
-		throw Erange("deci::deci(string s)", gettext("an empty string is an invalid argument"));
+		throw Erange(gettext("an empty string is an invalid argument"));
 
 	    decimales = new (nothrow) storage(size);
 	    if(decimales == nullptr)

@@ -149,7 +149,7 @@ static bool command_line(shell_interaction & dialog,
         {
         case 'i':
             if(optarg == nullptr)
-                throw Erange("command_line", gettext("Missing argument to -i option"));
+                throw Erange(gettext("Missing argument to -i option"));
             if(input_pipe == "")
                 input_pipe = optarg;
             else
@@ -157,7 +157,7 @@ static bool command_line(shell_interaction & dialog,
             break;
         case 'o':
             if(optarg == nullptr)
-                throw Erange("command_line", gettext("Missing argument to -o option"));
+                throw Erange(gettext("Missing argument to -o option"));
             if(output_pipe == "")
                 output_pipe = optarg;
             else
@@ -171,7 +171,7 @@ static bool command_line(shell_interaction & dialog,
             return false;
         case 'E':
             if(optarg == nullptr)
-                throw Erange("command_line", gettext("Missing argument to -E option"));
+                throw Erange(gettext("Missing argument to -E option"));
             if(execute == "")
                 execute = optarg;
             else
@@ -181,7 +181,7 @@ static bool command_line(shell_interaction & dialog,
 	    break;  // ignore this option already parsed during initialization (dar_suite.cpp)
 	case '9':
 	    if(optarg == nullptr)
-		throw Erange("command_line", tools_printf(gettext("Missing argument to --min-digits"), char(lu)));
+		throw Erange(tools_printf(gettext("Missing argument to --min-digits"), char(lu)));
 	    else
 	    {
 		infinint tmp2, tmp3;
@@ -189,11 +189,11 @@ static bool command_line(shell_interaction & dialog,
 	    }
 	    break;
         case ':':
-            throw Erange("command_line", tools_printf(gettext("Missing parameter to option -%c"), char(optopt)));
+            throw Erange(tools_printf(gettext("Missing parameter to option -%c"), char(optopt)));
         case '?':
-            throw Erange("command_line", tools_printf(gettext("Ignoring unknown option -%c"), char(optopt)));
+            throw Erange(tools_printf(gettext("Ignoring unknown option -%c"), char(optopt)));
         default:
-            throw Erange("command_line", tools_printf(gettext("Ignoring unknown option -%c"), char(lu)));
+            throw Erange(tools_printf(gettext("Ignoring unknown option -%c"), char(lu)));
         }
     }
 

@@ -91,7 +91,7 @@ namespace libdar
 
 	date.read(f, db2archive_version(db_version));
 	if(f.read(&tmp, 1) != 1)
-	    throw Erange("data_tree::status::read", gettext("reached End of File before all expected data could be read"));
+	    throw Erange(gettext("reached End of File before all expected data could be read"));
 	switch(tmp)
 	{
 	case ETAT_SAVED[0]:
@@ -116,7 +116,7 @@ namespace libdar
 	    present = db_etat::et_patch_unusable;
 	    break;
 	default:
-	    throw Erange("data_tree::status::read", gettext("Unexpected value found in database"));
+	    throw Erange(gettext("Unexpected value found in database"));
 	}
     }
 
@@ -1092,7 +1092,7 @@ namespace libdar
 	    has_ea_date = false;
 
 	if(callback == nullptr)
-	    throw Erange("data_tree::display_line", "nullptr given as callback function");
+	    throw Erange("nullptr given as callback function");
 
 	try
 	{

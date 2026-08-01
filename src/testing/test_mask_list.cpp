@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
     try
     {
 	if(argc != 2)
-	    throw Erange("mask_list", tools_printf("usage: %s <filename>\n", argv[0]));
+	    throw Erange(tools_printf("usage: %s <filename>\n", argv[0]));
 	f1(dialog, argv[1]);
     }
     catch(Egeneric & e)

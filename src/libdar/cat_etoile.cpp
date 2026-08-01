@@ -41,7 +41,7 @@ namespace libdar
         if(host == nullptr)
             throw SRC_BUG;
         if(dynamic_cast<cat_directory *>(host) != nullptr)
-            throw Erange("cat_etoile::cat_etoile", gettext("Hard links of directories are not supported"));
+            throw Erange(gettext("Hard links of directories are not supported"));
         hosted = host;
         etiquette = etiquette_number;
 	refs.clear();

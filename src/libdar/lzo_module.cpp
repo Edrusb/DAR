@@ -90,9 +90,9 @@ namespace libdar
 	case LZO_E_OK:
 	    break; // all is fine
 	case LZO_E_ERROR:
-	    throw Erange("lzo_module::compress_data", "invalid compresion level or argument provided");
+	    throw Erange("invalid compresion level or argument provided");
 	default:
-	    throw Erange("lzo_module::compress_data", tools_printf(gettext("Probable bug in liblzo2: lzo1x_*_compress returned unexpected/undocumented code %d"), status));
+	    throw Erange(tools_printf(gettext("Probable bug in liblzo2: lzo1x_*_compress returned unexpected/undocumented code %d"), status));
 	}
 
 	return zip_buf_size;
@@ -155,13 +155,13 @@ namespace libdar
     {
 #if LIBLZO2_AVAILABLE
 	if(compression_level > 9 || compression_level < 1)
-	    throw Erange("lzo_module::lzo_module", tools_printf(gettext("out of range LZO compression level: %d"), compression_level));
+	    throw Erange(tools_printf(gettext("out of range LZO compression level: %d"), compression_level));
 	level = compression_level;
 
 	if(algo != compression::lzo
 	   && algo != compression::lzo1x_1_15
 	   && algo != compression::lzo1x_1)
-	    throw Erange("lzo_module::lzo_module", "invalid lzo compression algoritm provided");
+	    throw Erange("invalid lzo compression algoritm provided");
 	lzo_algo = algo;
 
 	try

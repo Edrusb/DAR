@@ -274,7 +274,7 @@ static void xfer_before_error(int block, char *buffer, int src, int dst)
     if(read(src, buffer, 1) == 1)
     {
 	if(lseek(src, -1, SEEK_CUR) < 0)
-	    throw Erange("xfer_before_error", gettext("Cannot seek back one char"));
+	    throw Erange(gettext("Cannot seek back one char"));
     }
     else
 	return; // the error is just next char to read
@@ -285,7 +285,7 @@ static void xfer_before_error(int block, char *buffer, int src, int dst)
         if(lu > 0)
         {
             if(write(dst, buffer, lu) < 0)
-                throw Erange("xfer_before_error", gettext("Cannot write to destination, aborting"));
+                throw Erange(gettext("Cannot write to destination, aborting"));
         }
         else
             block /= 2;
@@ -370,7 +370,7 @@ static int normal_copy(int block, char *buffer, int src, int dst)
         {
             int tmp = write(dst, buffer+ecrit, lu-ecrit);
             if(tmp < 0)
-		throw Erange("normal_copy", gettext("Cannot write to destination, aborting"));
+		throw Erange(gettext("Cannot write to destination, aborting"));
             else
                 if(tmp == 0)
                     printf(gettext("Non fatal error while writing to destination file, retrying\n"));

@@ -46,7 +46,7 @@ namespace libdar
     {
 	ref = dynamic_cast<contextual *>(f);
 	if(ref == nullptr)
-	    throw Erange("trontextual::trontextual", "Trontextual must receive a class contextual aware generic file as argument");
+	    throw Erange("Trontextual must receive a class contextual aware generic file as argument");
     }
 
 } // end of namespace

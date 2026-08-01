@@ -89,7 +89,7 @@ namespace libdar
 	    catch(...)
 	    {
 		if(!lax)
-		    throw Erange("escape_catalogue::escape_catalogue", gettext("incoherent data after escape sequence, cannot read internal data set label"));
+		    throw Erange(gettext("incoherent data after escape sequence, cannot read internal data set label"));
 		else
 		{
 		    get_ui().message("LAX MODE: Could not read the internal data set label, using a fake value, this will probably avoid using isolated catalogue");
@@ -99,7 +99,7 @@ namespace libdar
 	}
 	else // skip to expected mark failed
 	    if(!lax)
-		throw Erange("escape_catalogue::escape_catalogue", gettext("Could not find tape mark for the internal catalogue"));
+		throw Erange(gettext("Could not find tape mark for the internal catalogue"));
 	    else
 	    {
 		contextual *cont_data = nullptr;
@@ -128,7 +128,7 @@ namespace libdar
 			if(in_place == path("."))
 			    catalogue::clear_in_place();
 			else
-			    throw Erange("escape_catalogue::escape_catalogue", gettext("invalid in-place path value"));
+			    throw Erange(gettext("invalid in-place path value"));
 		    else
 			catalogue::set_in_place(in_place);
 		}
@@ -159,7 +159,7 @@ namespace libdar
 	    else // failed finding the in_place path
 	    {
 		if(!lax)
-		    throw Erange("escape_catalogue::escape_catalogue", gettext("Could not find tape mark for the in-place path"));
+		    throw Erange(gettext("Could not find tape mark for the in-place path"));
 		else
 		{
 		    get_ui().message("LAX MODE: Could not find the in-place path information as it should be found for this archive format, assuming it no in-place path is present so for older format");
@@ -548,7 +548,7 @@ namespace libdar
 				    --(ceci->depth);
 				else
 				    if(!x_lax)
-					throw Erange("escape_catalogue::read", gettext("Escape sequences used for reading lead the archive to place some files out of the specified root. To overcome this problem, try reading the archive in direct mode (not using sequential reading), try repairing the archive using Parchive if redundancy data has been created or in last resort try using the lax mode"));
+					throw Erange(gettext("Escape sequences used for reading lead the archive to place some files out of the specified root. To overcome this problem, try reading the archive in direct mode (not using sequential reading), try repairing the archive using Parchive if redundancy data has been created or in last resort try using the lax mode"));
 				    else // lax mode
 				    {
 					get_ui().message(gettext("LAX MODE: Archive directory structure is corrupted, it would lead to place some files out of the specified root directory. Restoring different directory contents at the root not out of it, which will put files of different directories in the specified root directory"));
@@ -573,7 +573,7 @@ namespace libdar
 			}
 
 			if(ref == nullptr)
-			    throw Erange("escape_catalogue::read", gettext("Corrupted entry following an escape mark in the archive"));
+			    throw Erange(gettext("Corrupted entry following an escape mark in the archive"));
 			else
 			{
 			    bool is_eod = ref_eod != nullptr;
@@ -672,7 +672,7 @@ namespace libdar
 				ceci->status = ec_completed;
 
 				if(!x_lax)
-				    throw Erange("escape_catalogue::read", gettext("Cannot extract from the internal catalogue the list of files to remove"));
+				    throw Erange(gettext("Cannot extract from the internal catalogue the list of files to remove"));
 				else
 				{
 				    get_ui().message("LAX MODE: Cannot extract from the internal catalogue the list of files to remove, skipping this step");

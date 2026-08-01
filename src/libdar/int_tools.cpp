@@ -63,7 +63,7 @@ namespace libdar
         {
             a <<= 1;
             if(b[i] > 1)
-                throw Erange("infinint.cpp : contract_byte", gettext("a binary digit is either 0 or 1"));
+                throw Erange(gettext("a binary digit is either 0 or 1"));
             a += b[i];
         }
     }

@@ -230,13 +230,13 @@ namespace libdar
 
 		tmp = f.read(buffer, FAM_SIG_WIDTH);
 		if(tmp < FAM_SIG_WIDTH)
-		    throw Erange("filesystem_specific_attribute_list::read", gettext("invalid length for FSA family flag"));
+		    throw Erange(gettext("invalid length for FSA family flag"));
 		buffer[FAM_SIG_WIDTH] = '\0';
 		fam = signature_to_family(buffer);
 
 		tmp = f.read(buffer, NAT_SIG_WIDTH);
 		if(tmp < NAT_SIG_WIDTH)
-		    throw Erange("filesystem_specific_attribute_list::read", gettext("invalid length for FSA nature flag"));
+		    throw Erange(gettext("invalid length for FSA nature flag"));
 		buffer[NAT_SIG_WIDTH] = '\0';
 		nat = signature_to_nature(buffer);
 
@@ -727,7 +727,7 @@ namespace libdar
 	    }
 	    catch(Egeneric & e)
 	    {
-		throw Erange("filesystem_specific_attribute_list::fill_extX_FSA_with", string(gettext("Failed setting (opening) extX family FSA: ")) + e.get_message());
+		throw Erange(string(gettext("Failed setting (opening) extX family FSA: ")) + e.get_message());
 	    }
 
 	    if(fd < 0)
@@ -740,7 +740,7 @@ namespace libdar
 		const fsa_bool *it_bool = nullptr;
 
 		if(ioctl(fd, EXT2_IOC_GETFLAGS, &f_orig) < 0)
-		    throw Erange("filesystem_specific_attribute_list::fill_extX_FSA_with", string(gettext("Failed reading existing extX family FSA: ")) + tools_strerror_r(errno));
+		    throw Erange(string(gettext("Failed reading existing extX family FSA: ")) + tools_strerror_r(errno));
 		f = f_orig;
 
 		for(it = fsa.begin() ; it != fsa.end() ; ++it)
@@ -988,7 +988,7 @@ namespace libdar
 		if(tmp_f != f_orig)
 		{
 		    if(ioctl(fd, EXT2_IOC_SETFLAGS, &tmp_f) < 0)
-			throw Erange("filesystem_specific_attribute_list::fill_extX_FSA_with", string(gettext("Failed set extX family FSA: ")) + tools_strerror_r(errno ));
+			throw Erange(string(gettext("Failed set extX family FSA: ")) + tools_strerror_r(errno ));
 		    ret = true; // some flags have been set or cleared
 		}
 
@@ -1181,14 +1181,14 @@ namespace libdar
     fsa_family filesystem_specific_attribute_list::signature_to_family(const string & sig)
     {
 	if(sig.size() != FAM_SIG_WIDTH)
-	    throw Erange("filesystem_specific_attribute_list::signature_to_family", gettext("invalid length for FSA family flag"));
+	    throw Erange(gettext("invalid length for FSA family flag"));
 	if(sig == "h")
 	    return fsaf_hfs_plus;
 	if(sig == "l")
 	    return fsaf_linux_extX;
 	if(sig == "X") // resevered for field extension if necessary in the future
-	    throw Erange("filesysttem_specific_attribute_list::signature_to_family", gettext("invalid FSA family flag"));
-	throw Erange("filesysttem_specific_attribute_list::signature_to_family", gettext("invalid FSA family flag"));
+	    throw Erange(gettext("invalid FSA family flag"));
+	throw Erange(gettext("invalid FSA family flag"));
     }
 
     fsa_nature filesystem_specific_attribute_list::signature_to_nature(const string & sig)
@@ -1222,9 +1222,9 @@ namespace libdar
 	if(sig == "bl")
 	    return fsan_top_of_dir_hierarchy;
 	if(sig == "XX") // resevered for field extension if necessary in the future
-	    throw Erange("filesystem_specific_attribute_list::signature_to_nature", gettext("invalid FSA nature flag"));
+	    throw Erange(gettext("invalid FSA nature flag"));
 
-	throw Erange("filesystem_specific_attribute_list::signature_to_nature", gettext("invalid FSA nature flag"));
+	throw Erange(gettext("invalid FSA nature flag"));
     }
 
 
@@ -1252,7 +1252,7 @@ namespace libdar
 	    }
 	}
 	else
-	    throw Erange("fsa_bool::fsa_bool", string(gettext("Error while reading FSA: ")) + tools_strerror_r(errno));
+	    throw Erange(string(gettext("Error while reading FSA: ")) + tools_strerror_r(errno));
     }
 
 

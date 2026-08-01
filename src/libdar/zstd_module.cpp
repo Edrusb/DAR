@@ -41,8 +41,7 @@ namespace libdar
     {
 #if LIBZSTD_AVAILABLE
 	if(compression_level > (U_I)ZSTD_maxCLevel() || compression_level < 1)
-	    throw Erange("zstd_module::zstd_module",
-			 tools_printf(gettext("out of range ZSTD compression level: %d"), compression_level));
+	    throw Erange(tools_printf(gettext("out of range ZSTD compression level: %d"), compression_level));
 	level = compression_level;
 #else
 	throw Ecompilation(gettext("zstd compression"));
@@ -64,8 +63,7 @@ namespace libdar
     {
 #if LIBZSTD_AVAILABLE
 	if(clear_size > get_max_compressing_size() || clear_size < 1)
-	    throw Erange("zstd_module::get_min_size_to_compress",
-			 gettext("out of range block size submitted to zstd_module::get_min_size_to_compress"));
+	    throw Erange(gettext("out of range block size submitted to zstd_module::get_min_size_to_compress"));
 
 	return ZSTD_compressBound(clear_size);
 #else
@@ -83,16 +81,14 @@ namespace libdar
 	size_t ret;
 
 	if(normal_size > get_max_compressing_size())
-	    throw Erange("zstd_module::compress_data",
-			 "oversized uncompressed data given to ZSTD compression engine");
+	    throw Erange("oversized uncompressed data given to ZSTD compression engine");
 
 	ret = ZSTD_compress(zip_buf, zip_buf_size,
 			    normal, normal_size,
 			    level);
 
 	if(ZSTD_isError(ret))
-	    throw Erange("zstd_module::uncompress_data",
-			 tools_printf(gettext("libzstd returned an error while performing block compression: %s"),
+	    throw Erange(tools_printf(gettext("libzstd returned an error while performing block compression: %s"),
 				      ZSTD_getErrorName(ret)));
 
 	return (U_I)ret;
@@ -111,8 +107,7 @@ namespace libdar
 				     zip_buf, zip_buf_size);
 
 	if(ZSTD_isError(ret))
-	    throw Erange("zstd_module::uncompress_data",
-			 tools_printf(gettext("libzstd returned an error while performing block decompression: %s"),
+	    throw Erange(tools_printf(gettext("libzstd returned an error while performing block decompression: %s"),
 				      ZSTD_getErrorName(ret)));
 
 	return (U_I)ret;

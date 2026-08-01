@@ -59,7 +59,7 @@ const crit_action * crit_action_create_from_string(user_interaction & dialog,
     const crit_action *ret = nullptr;
 
     if(argument.begin() == argument.end())
-	throw Erange("crit_action_create_from_string","Unexpected empty string in expression");
+	throw Erange("Unexpected empty string in expression");
 
 	// looking for ';' (chain actions)
 
@@ -112,14 +112,14 @@ const crit_action * crit_action_create_from_string(user_interaction & dialog,
 
 	    it = line_tools_find_first_char_out_of_parenth(argument, '}');
 	    if(it == argument.end())
-		throw Erange("crit_action_create_from_string", string(gettext("Missing } in conditional statement: ")) + argument);
+		throw Erange(string(gettext("Missing } in conditional statement: ")) + argument);
 	    if(*it != '}')
 		throw SRC_BUG;
 	    if(it + 1 == argument.end() || *(it + 1) != '[' )
-		throw Erange("crit_action_create_from_string", string(gettext("Missing [ after } in conditional statement: ")) + argument);
+		throw Erange(string(gettext("Missing [ after } in conditional statement: ")) + argument);
 	    fin =  line_tools_find_first_char_out_of_parenth(argument, ']');
 	    if(fin == argument.end())
-		throw Erange("crit_action_create_from_string", string(gettext("Missing ] in conditional statement: ")) + argument);
+		throw Erange(string(gettext("Missing ] in conditional statement: ")) + argument);
 	    if(*fin != ']')
 		throw SRC_BUG;
 
@@ -197,7 +197,7 @@ const crit_action * crit_action_create_from_string(user_interaction & dialog,
 		data = data_ask;
 		break;
 	    default:
-		throw Erange("crit_action_create_from_string", tools_printf(gettext("Unknown policy for data '%c' in expression %S"), *argument.begin(), &argument));
+		throw Erange(tools_printf(gettext("Unknown policy for data '%c' in expression %S"), *argument.begin(), &argument));
 	    }
 
 	    switch(*(argument.begin() +1))
@@ -230,7 +230,7 @@ const crit_action * crit_action_create_from_string(user_interaction & dialog,
 		ea = EA_ask;
 		break;
 	    default:
-		throw Erange("crit_action_create_from_string", tools_printf(gettext("Unknown policy for EA '%c' in expression %S"), *(argument.begin() +1), &argument));
+		throw Erange(tools_printf(gettext("Unknown policy for EA '%c' in expression %S"), *(argument.begin() +1), &argument));
 	    }
 
 	    ret = new (nothrow) crit_constant_action(data, ea);
@@ -240,7 +240,7 @@ const crit_action * crit_action_create_from_string(user_interaction & dialog,
 		return ret;
 	}
 
-	throw Erange("crit_action_create_from_string", string(gettext("Unknown expression in overwriting policy: ")) + argument);
+	throw Erange(string(gettext("Unknown expression in overwriting policy: ")) + argument);
     }
     catch(...)
     {
@@ -259,7 +259,7 @@ static const criterium * criterium_create_from_string(user_interaction &dialog, 
     const criterium *ret = nullptr;
 
     if(argument.begin() == argument.end())
-	throw Erange("criterium_create_from_string","Unexpected empty string in expression");
+	throw Erange("Unexpected empty string in expression");
 
     try
     {
@@ -423,7 +423,7 @@ static const criterium * criterium_create_from_string(user_interaction &dialog, 
 		    }
 		    break;
 		default:
-		    throw Erange("criterium_create_from_string", string(gettext("Unknown atomic operator, or atomic not allowed with an argument: ") + argument));
+		    throw Erange(string(gettext("Unknown atomic operator, or atomic not allowed with an argument: ") + argument));
 		}
 
 		    // creating the criterium with its parameter
@@ -511,7 +511,7 @@ static const criterium * criterium_create_from_string(user_interaction &dialog, 
 		ret = new (nothrow) crit_same_type();
 		break;
 	    default:
-		throw Erange("criterium_create_from_string", string(gettext("Unknown character found while parsing conditional string: ")) + argument);
+		throw Erange(string(gettext("Unknown character found while parsing conditional string: ")) + argument);
 	    }
 
 	    if(ret == nullptr)
@@ -520,7 +520,7 @@ static const criterium * criterium_create_from_string(user_interaction &dialog, 
 		return ret;
 	}
 
-	throw Erange("criterium_create_from_string", string(gettext("Unknown expression found while parsing conditional string: ")) + argument);
+	throw Erange(string(gettext("Unknown expression found while parsing conditional string: ")) + argument);
 
     }
     catch(...)

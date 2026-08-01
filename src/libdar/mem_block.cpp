@@ -132,7 +132,7 @@ namespace libdar
     void mem_block::rewind_read(U_I offset)
     {
 	if(offset > data_size)
-	    throw Erange("mem_block::reset_read", "offset out of range for mem_block");
+	    throw Erange("offset out of range for mem_block");
 	read_cursor = offset;
     }
 

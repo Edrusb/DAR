@@ -72,7 +72,7 @@ namespace libdar
                 while(lu < ptr->size && tmp != 0);
 
                 if(lu < ptr->size)
-                    throw Erange("storage::storage", gettext("Not enough data to initialize storage field"));
+                    throw Erange(gettext("Not enough data to initialize storage field"));
                 ptr = ptr->next;
             }
         }
@@ -97,7 +97,7 @@ namespace libdar
 
         do {
             if(ptr == nullptr)
-                throw Erange("storage::operator[]", gettext("Asking for an element out of array"));
+                throw Erange(gettext("Asking for an element out of array"));
             if(offset > ptr->size)
             {
                 offset -= ptr->size;
@@ -149,7 +149,7 @@ namespace libdar
     U_I storage::write(iterator & it, unsigned char *a, U_I size)
     {
         if(it.ref != this)
-            throw Erange("storage::write", gettext("The iterator is not indexing the object it has been asked to write to"));
+            throw Erange(gettext("The iterator is not indexing the object it has been asked to write to"));
 
 	U_I wrote = 0;
 	while(wrote < size && it != end())
@@ -183,7 +183,7 @@ namespace libdar
     U_I storage::read(iterator & it, unsigned char *a, U_I size) const
     {
         if(it.ref != this)
-            throw Erange("storage::read", gettext("The iterator is not indexing the object it has been asked to read from"));
+            throw Erange(gettext("The iterator is not indexing the object it has been asked to read from"));
 
 	U_I read = 0;
 	while(read < size && it != end())
@@ -514,7 +514,7 @@ namespace libdar
     void storage::insert_bytes_at_iterator_cmn(iterator it, bool constant, unsigned char *a, U_I size)
     {
         if(it.ref != this)
-	    throw Erange("storage::insert_bytes_at_iterator_cmn", gettext("The iterator is not indexing the object it has been defined for"));
+	    throw Erange(gettext("The iterator is not indexing the object it has been defined for"));
 
 	if(size == 0)
 	    return; // nothing to insert
@@ -768,7 +768,7 @@ namespace libdar
         if(points_on_data())
             return cell->data[offset];
         else
-            throw Erange("storage::iterator::operator *()", gettext("Iterator does not point to data"));
+            throw Erange(gettext("Iterator does not point to data"));
     }
 
     void storage::iterator::skip_to(const storage & st, infinint val)
@@ -827,13 +827,13 @@ namespace libdar
     infinint storage::iterator::get_position() const
     {
         if(ref == nullptr || ref->first == nullptr)
-            throw Erange("storage::iterator::get_position", gettext("Reference storage of the iterator is empty or non existent"));
+            throw Erange(gettext("Reference storage of the iterator is empty or non existent"));
 
         struct cellule *p = ref->first;
         infinint ret = 0;
 
         if(cell == nullptr)
-            throw Erange("storage::iterator::get_position", gettext("Iterator does not point to data"));
+            throw Erange(gettext("Iterator does not point to data"));
 
         while(p != nullptr && p != cell)
         {
@@ -844,7 +844,7 @@ namespace libdar
         if(p != nullptr)
             ret += offset;
         else
-            throw Erange("storage::iterator::get_position", gettext("The iterator position is not inside the storage of reference"));
+            throw Erange(gettext("The iterator position is not inside the storage of reference"));
 
         return ret;
     }

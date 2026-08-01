@@ -315,10 +315,10 @@ namespace libdar
 	    bs = 0;
 	    bh.size.unstack(bs);
 	    if(!bh.size.is_zero())
-		throw Erange("zip_below_read::work", gettext("incoherent compressed block structure, compressed data corruption"));
+		throw Erange(gettext("incoherent compressed block structure, compressed data corruption"));
 
 	    if(bs > current->crypted_data.get_max_size())
-		throw Erange("zip_below_read::work", gettext("incoherent compressed block structure, compressed block size in archive too large"));
+		throw Erange(gettext("incoherent compressed block structure, compressed block size in archive too large"));
 
 	    if(bs > 0)
 	    {
@@ -330,16 +330,16 @@ namespace libdar
 		current->clear_data.rewind_read();
 	    }
 	    else
-	    	throw Erange("zip_below_read::work", gettext("incoherent compressed block structure, compressed data corruption"));
+		throw Erange(gettext("incoherent compressed block structure, compressed data corruption"));
 	    break;
 	case compress_block_header::H_EOF:
 	    if(!bh.size.is_zero())
-		throw Erange("zip_below_read::work", gettext("incoherent compressed block structure, compressed data corruption"));
+		throw Erange(gettext("incoherent compressed block structure, compressed data corruption"));
 	    current->reset();
 	    reof = true;
 	    break;
 	default:
-	    throw Erange("zip_below_read::work", gettext("incoherent compressed block structure, compressed data corruption"));
+	    throw Erange(gettext("incoherent compressed block structure, compressed data corruption"));
 	}
     }
 

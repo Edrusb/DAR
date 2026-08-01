@@ -155,7 +155,7 @@ namespace libdar
 
 
 	    /// defines the protocol to use to retrieve slices
-	void set_entrepot(const std::shared_ptr<entrepot> & entr) { if(!entr) throw Erange("archive_options_read::set_entrepot", "null entrepot pointer given in argument"); x_entrepot = entr; };
+	void set_entrepot(const std::shared_ptr<entrepot> & entr) { if(!entr) throw Erange("null entrepot pointer given in argument"); x_entrepot = entr; };
 
 	    /// whether to warn (false) or ignore (true) signature failure (default is false, signature failure is reported)
 	void set_ignore_signature_check_failure(bool val) { x_ignore_signature_check_failure = val; };
@@ -220,7 +220,7 @@ namespace libdar
 	void set_ref_slice_min_digits(infinint val) { x_ref_slice_min_digits = val; };
 
 	    /// defines the protocol to use to retrieve slices of the reference archive (where the external catalogue resides)
-	void set_ref_entrepot(const std::shared_ptr<entrepot> & entr) { if(!entr) throw Erange("archive_options_read::set_ref_entrepot", "null entrepot pointer given in argument"); x_ref_entrepot = entr; };
+	void set_ref_entrepot(const std::shared_ptr<entrepot> & entr) { if(!entr) throw Erange("null entrepot pointer given in argument"); x_ref_entrepot = entr; };
 
 	    /// whether to ignore the slice header of the archive of reference stored in the isolated catalogue
 	void set_ignore_external_slice_header(bool val) { x_ignore_external_slice_header = val; };
@@ -557,7 +557,7 @@ namespace libdar
 	void set_ignore_unknown_inode_type(bool val) { x_ignore_unknown = val; };
 
 	    /// defines the protocol to use for slices
-	void set_entrepot(const std::shared_ptr<entrepot> & entr) { if(!entr) throw Erange("archive_options_create::set_entrepot", "null entrepot pointer given in argument"); x_entrepot = entr; };
+	void set_entrepot(const std::shared_ptr<entrepot> & entr) { if(!entr) throw Erange("null entrepot pointer given in argument"); x_entrepot = entr; };
 
 	    /// defines the FSA (Filesystem Specific Attribute) to only consider (by default all FSA activated at compilation time are considered)
 	void set_fsa_scope(const fsa_scope & scope) { x_scope = scope; };
@@ -894,7 +894,7 @@ namespace libdar
 	void set_sequential_marks(bool sequential) { x_sequential_marks = sequential; };
 
 	    /// defines the protocol to use for slices
-	void set_entrepot(const std::shared_ptr<entrepot> & entr) { if(!entr) throw Erange("archive_options_isolated::set_entrepot", "null entrepot pointer given in argument"); x_entrepot = entr; };
+	void set_entrepot(const std::shared_ptr<entrepot> & entr) { if(!entr) throw Erange("null entrepot pointer given in argument"); x_entrepot = entr; };
 
 	    /// whether libdar is allowed to created several thread to work possibily faster on multicore CPU (require libthreadar)
 
@@ -1200,7 +1200,7 @@ namespace libdar
 	void set_slice_min_digits(infinint val) { x_slice_min_digits = val; };
 
 	    /// defines the protocol to use for slices
-	void set_entrepot(const std::shared_ptr<entrepot> & entr) { if(!entr) throw Erange("archive_options_merge::set_entrepot", "null entrepot pointer given in argument"); x_entrepot = entr; };
+	void set_entrepot(const std::shared_ptr<entrepot> & entr) { if(!entr) throw Erange("null entrepot pointer given in argument"); x_entrepot = entr; };
 
 	    /// defines the FSA (Filesystem Specific Attribute) to only consider (by default all FSA are considered)
 	void set_fsa_scope(const fsa_scope & scope) { x_scope = scope; };
@@ -1968,7 +1968,7 @@ namespace libdar
 	void set_slice_min_digits(infinint val) { x_slice_min_digits = val; };
 
 	    /// defines the protocol to use for slices
-	void set_entrepot(const std::shared_ptr<entrepot> & entr) { if(!entr) throw Erange("archive_options_repair::set_entrepot", "null entrepot pointer given in argument"); x_entrepot = entr; };
+	void set_entrepot(const std::shared_ptr<entrepot> & entr) { if(!entr) throw Erange("null entrepot pointer given in argument"); x_entrepot = entr; };
 
 	    /// whether libdar is allowed to spawn several threads to possibily work faster on multicore CPU (requires libthreadar)
 

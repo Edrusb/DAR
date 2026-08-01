@@ -71,7 +71,7 @@ namespace libdar
 	    {
 		entry = read_next_in_list_from_file(f, db_version);
 		if(entry == nullptr)
-		    throw Erange("data_dir::data_dir", gettext("Unexpected end of file"));
+		    throw Erange(gettext("Unexpected end of file"));
 		rejetons.push_back(entry);
 		entry = nullptr;
 		--tmp;
@@ -324,7 +324,7 @@ namespace libdar
 	case db_lookup::not_found:
 	    if(fix_corruption())
 		throw Edata("This is to signal the caller of this method that this object has to be removed from database"); // exception caugth in data_dir::finalize_except_self
-	    throw Erange("data_dir::finalize", gettext("This database has been corrupted probably due to a bug in release 2.4.0 to 2.4.9, and it has not been possible to cleanup this corruption, please rebuild the database from archives or extracted \"catalogues\", if the database has never been used by one of the previously mentioned released, you are welcome to open a bug report and provide as much as possible details about the circumstances"));
+	    throw Erange(gettext("This database has been corrupted probably due to a bug in release 2.4.0 to 2.4.9, and it has not been possible to cleanup this corruption, please rebuild the database from archives or extracted \"catalogues\", if the database has never been used by one of the previously mentioned released, you are welcome to open a bug report and provide as much as possible details about the circumstances"));
 	case db_lookup::not_restorable:
 	    break;  // also an acceptable result;
 	default:
@@ -411,7 +411,7 @@ namespace libdar
 	    if(data || ea || num == 0)
 	    {
 		if(callback == nullptr)
-		    throw Erange("data_dir::show", "nullptr provided as user callback function");
+		    throw Erange("nullptr provided as user callback function");
 
 		try
 		{
@@ -625,7 +625,7 @@ namespace libdar
 	else if(sign == data_dir::signature())
 	    ret = new (nothrow) data_dir(f, db_version);
 	else
-	    throw Erange("read_next_in_list_from_file", gettext("Unknown record type"));
+	    throw Erange(gettext("Unknown record type"));
 
 	if(ret == nullptr)
 	    throw Ememory();

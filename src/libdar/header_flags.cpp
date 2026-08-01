@@ -63,14 +63,14 @@ namespace libdar
 	do
 	{
 	    if(f.read((char *)&a, 1) != 1)
-		throw Erange("header_glags::read", gettext("Reached End of File while reading flag field"));
+		throw Erange(gettext("Reached End of File while reading flag field"));
 	    if(((bits << 8) >> 8) == bits)
 	    {
 		bits <<= 8;
 		bits |= a & 0xFE;
 	    }
 	    else
-		throw Erange("header_flags::read", gettext("tool large flag field for this implementation, either data corruption occured or you need to upgrade your software"));
+		throw Erange(gettext("tool large flag field for this implementation, either data corruption occured or you need to upgrade your software"));
 	}
 	while((a & 0x01) > 0);
     }

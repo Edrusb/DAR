@@ -153,7 +153,7 @@ namespace libdar
 	    case ENOMEM:
 		throw Ememory();
 	    default:
-		throw Erange("entrepot_local::create_dir", gettext(create_msg) + tools_strerror_r(errno));
+		throw Erange(gettext(create_msg) + tools_strerror_r(errno));
 	    }
 	}
 
@@ -176,7 +176,7 @@ namespace libdar
 		case ENOMEM:
 		    throw Ememory();
 		default:
-		    throw Erange("entrepot_local::create_dir", gettext(owner_msg) + tools_strerror_r(errno));
+		    throw Erange(gettext(owner_msg) + tools_strerror_r(errno));
 		}
 	    }
 	}
@@ -245,7 +245,7 @@ namespace libdar
 	if(::unlink(target.c_str()) != 0)
 	{
 	    string err = tools_strerror_r(errno);
-	    throw Erange("entrepot_local::inherited_unlink", tools_printf(gettext("Cannot remove file %s: %s"), target.c_str(), err.c_str()));
+	    throw Erange(tools_printf(gettext("Cannot remove file %s: %s"), target.c_str(), err.c_str()));
 	}
     }
 

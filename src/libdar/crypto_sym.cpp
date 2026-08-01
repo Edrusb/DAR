@@ -74,17 +74,17 @@ namespace libdar
 	    algo_id = get_algo_id(algo);
 
 	    if(reading_ver <= 5 && algo == crypto_algo::blowfish)
-		throw Erange("crypto_sym::crypto_sym", gettext("Current implementation of blowfish encryption is not compatible with old (weak) implementation, use dar-2.3.x software or later (or other software based on libdar-4.4.x or greater) to read this archive"));
+		throw Erange(gettext("Current implementation of blowfish encryption is not compatible with old (weak) implementation, use dar-2.3.x software or later (or other software based on libdar-4.4.x or greater) to read this archive"));
 
 	    if(kdf_hash == hash_algo::none && use_pkcs5)
-		throw Erange("crypto_sym::crypto_sym", gettext("cannot use 'none' as hashing algorithm for key derivation function"));
+		throw Erange(gettext("cannot use 'none' as hashing algorithm for key derivation function"));
 
 
 		// checking for algorithm availability in libgcrypt
 
 	    gcry_error_t err = gcry_cipher_algo_info(algo_id, GCRYCTL_TEST_ALGO, nullptr, nullptr);
 	    if(err != GPG_ERR_NO_ERROR)
-		throw Erange("crypto_sym::crypto_sym",tools_printf(gettext("Cyphering algorithm not available in libgcrypt: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+		throw Erange(tools_printf(gettext("Cyphering algorithm not available in libgcrypt: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 
 	    do
 	    {
@@ -108,7 +108,7 @@ namespace libdar
 	    while(retry_cond && ! is_a_strong_password(algo, hashed_password) && --retry >= 0);
 
 	    if(retry < 0)
-		throw Erange("crypto_sym::crypto_sym", tools_printf(gettext("Failed to obtain a strong hashed password after %d retries with pkcs5 and different salt values, aborting"), MAX_RETRY_IF_WEAK_PASSWORD));
+		throw Erange(tools_printf(gettext("Failed to obtain a strong hashed password after %d retries with pkcs5 and different salt values, aborting"), MAX_RETRY_IF_WEAK_PASSWORD));
 
 
 		// building the main key for this object
@@ -194,14 +194,14 @@ namespace libdar
 	    stic.dump((unsigned char *)(const_cast<char *>(clear_buf + clear_size)), (U_32)(clear_allocated - clear_size));
 	    err = gcry_cipher_reset(main_clef);
 	    if(err != GPG_ERR_NO_ERROR)
-		throw Erange("crypto_sym::encrypt_data",tools_printf(gettext("Error while resetting encryption key for a new block: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+		throw Erange(tools_printf(gettext("Error while resetting encryption key for a new block: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 	    make_ivec(block_num, ivec, algo_block_size, essiv_clef);
 	    err = gcry_cipher_setiv(main_clef, (const void *)ivec, algo_block_size);
 	    if(err != GPG_ERR_NO_ERROR)
-		throw Erange("crypto_sym::encrypt_data",tools_printf(gettext("Error while setting IV for current block: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+		throw Erange(tools_printf(gettext("Error while setting IV for current block: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 	    err = gcry_cipher_encrypt(main_clef, (unsigned char *)crypt_buf, size_to_fill, (const unsigned char *)clear_buf, size_to_fill);
 	    if(err != GPG_ERR_NO_ERROR)
-		throw Erange("crypto_sym::encrypt_data",tools_printf(gettext("Error while cyphering data: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+		throw Erange(tools_printf(gettext("Error while cyphering data: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 	    return size_to_fill;
 	}
 	else
@@ -226,13 +226,13 @@ namespace libdar
 	make_ivec(block_num, ivec, algo_block_size, essiv_clef);
 	err = gcry_cipher_setiv(main_clef, (const void *)ivec, algo_block_size);
 	if(err != GPG_ERR_NO_ERROR)
-	    throw Erange("crypto_sym::decrypt_data",tools_printf(gettext("Error while setting IV for current block: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+	    throw Erange(tools_printf(gettext("Error while setting IV for current block: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 	err = gcry_cipher_decrypt(main_clef, (unsigned char *)clear_buf, clear_size, (const unsigned char *)crypt_buf, crypt_size);
 	if(err != GPG_ERR_NO_ERROR)
-	    throw Erange("crypto_sym::decrypt_data",tools_printf(gettext("Error while decyphering data: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+	    throw Erange(tools_printf(gettext("Error while decyphering data: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 	elastic stoc = elastic((unsigned char *)clear_buf, crypt_size, elastic_backward, reading_ver);
 	if(stoc.get_size() > crypt_size)
-	    throw Erange("crypto_sym::decrypt_data",gettext("Data corruption may have occurred, cannot decrypt data"));
+	    throw Erange(gettext("Data corruption may have occurred, cannot decrypt data"));
 	return crypt_size - stoc.get_size();
 	    // this is crypt_size to be used here as the clear data has the same length
 	    // gcry_cipher_decrypt does not provide any mean to know the amount of clear bytes produced
@@ -264,12 +264,12 @@ namespace libdar
 	    // checking for algorithm availability
 	err = gcry_cipher_algo_info(algo_id, GCRYCTL_TEST_ALGO, nullptr, nullptr);
 	if(err != GPG_ERR_NO_ERROR)
-	    throw Erange("crypto_sym::max_key_len",tools_printf(gettext("Cyphering algorithm not available in libgcrypt: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+	    throw Erange(tools_printf(gettext("Cyphering algorithm not available in libgcrypt: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 
 	    // obtaining the maximum key length
 	key_len = gcry_cipher_get_algo_keylen(algo_id);
 	if(key_len == 0)
-	    throw Erange("crypto_sym::max_key_len",gettext("Failed retrieving from libgcrypt the maximum key length"));
+	    throw Erange(gettext("Failed retrieving from libgcrypt the maximum key length"));
 
 	return key_len;
 #else
@@ -302,9 +302,9 @@ namespace libdar
 
 	err = gcry_cipher_open(&main_clef, algo_id, GCRY_CIPHER_MODE_CBC, GCRY_CIPHER_SECURE);
 	if(err != GPG_ERR_NO_ERROR)
-	    throw Erange("crypto_sym::is_a_strong_password",tools_printf(gettext("Error while opening libgcrypt key handle to check password strength: %s/%s"),
-									 gcry_strsource(err),
-									 gcry_strerror(err)));
+	    throw Erange(tools_printf(gettext("Error while opening libgcrypt key handle to check password strength: %s/%s"),
+				      gcry_strsource(err),
+				      gcry_strerror(err)));
 
 	try
 	{
@@ -314,7 +314,7 @@ namespace libdar
 		if(gcry_err_code(err) == GPG_ERR_WEAK_KEY)
 		    ret = false;
 		else
-		    throw Erange("crypto_sym::is_a_strong_password",tools_printf(gettext("Error while assigning key to libgcrypt key handle to check password strength: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+		    throw Erange(tools_printf(gettext("Error while assigning key to libgcrypt key handle to check password strength: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 	    }
 	}
 	catch(...)
@@ -372,7 +372,7 @@ namespace libdar
 
 	    iteration_count.unstack(it);
 	    if(!iteration_count.is_zero())
-		throw Erange("crypto_sym::init_hashed_password", gettext("Too large value give for key derivation interation count"));
+		throw Erange(gettext("Too large value give for key derivation interation count"));
 
 	    switch(kdf_hash)
 	    {
@@ -421,15 +421,15 @@ namespace libdar
 
 	    err = gcry_cipher_open(&main_clef, get_algo_id(algo), GCRY_CIPHER_MODE_CBC, GCRY_CIPHER_SECURE);
 	    if(err != GPG_ERR_NO_ERROR)
-		throw Erange("crypto_sym::init_main_clef",tools_printf(gettext("Error while opening libgcrypt key handle: %s/%s"),
-								   gcry_strsource(err),
-								   gcry_strerror(err)));
+		throw Erange(tools_printf(gettext("Error while opening libgcrypt key handle: %s/%s"),
+					  gcry_strsource(err),
+					  gcry_strerror(err)));
 
 		// assigning key to the handle
 
 	    err = gcry_cipher_setkey(main_clef, (const void *)hashed_password.c_str(), hashed_password.get_size());
 	    if(err != GPG_ERR_NO_ERROR)
-		throw Erange("crypto_sym::init_main_clef",tools_printf(gettext("Error while assigning key to libgcrypt key handle: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+		throw Erange(tools_printf(gettext("Error while assigning key to libgcrypt key handle: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 
 	}
 	catch(...)
@@ -451,7 +451,7 @@ namespace libdar
 			       GCRY_CIPHER_MODE_ECB,
 			       GCRY_CIPHER_SECURE);
 	if(err != GPG_ERR_NO_ERROR)
-	    throw Erange("crypto_sym::init_essiv_clef",tools_printf(gettext("Error while creating ESSIV handle: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+	    throw Erange(tools_printf(gettext("Error while creating ESSIV handle: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 
 
 	    // obtaining key len for IV_cipher
@@ -459,7 +459,7 @@ namespace libdar
 	size_t essiv_key_len;
 	err = gcry_cipher_algo_info(IV_cipher, GCRYCTL_GET_KEYLEN, nullptr, &essiv_key_len);
 	if(err != GPG_ERR_NO_ERROR)
-	    throw Erange("crypto_sym::init_essiv_clef", tools_printf(gettext("Error while setting IV for current block: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+	    throw Erange(tools_printf(gettext("Error while setting IV for current block: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 
 	    // failing if the digest size is larger than key size for IV_cipher
 
@@ -481,7 +481,7 @@ namespace libdar
 		// tolerating WEAK key here, we use that key to fill the IV of the real strong key
 		// (the encrypted data by this key --- the IV values for each block --- are not stored in the archive)
 	    if(gpg_err_code(err) != GPG_ERR_WEAK_KEY)
-		throw Erange("crypto_sym::init_essiv_clef",tools_printf(gettext("Error while assigning key to libgcrypt key handle (essiv): %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+		throw Erange(tools_printf(gettext("Error while assigning key to libgcrypt key handle (essiv): %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 	}
 
 	    // obtaining the block size of the essiv cipher
@@ -490,7 +490,7 @@ namespace libdar
 
 	err = gcry_cipher_algo_info(IV_cipher, GCRYCTL_GET_BLKLEN, nullptr, &algo_block_size_essiv);
 	if(err != GPG_ERR_NO_ERROR)
-	    throw Erange("crypto_sym::init_essiv_clef",tools_printf(gettext("Failed retrieving from libgcrypt the block size used by the cyphering algorithm (essiv): %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+	    throw Erange(tools_printf(gettext("Failed retrieving from libgcrypt the block size used by the cyphering algorithm (essiv): %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 	if(algo_block_size_essiv == 0)
 	    throw SRC_BUG;
 
@@ -517,7 +517,7 @@ namespace libdar
 
 	err = gcry_cipher_algo_info(get_algo_id(algo), GCRYCTL_GET_BLKLEN, nullptr, &algo_block_size);
 	if(err != GPG_ERR_NO_ERROR)
-	    throw Erange("crypto_sym::init_algo_block_size",tools_printf(gettext("Failed retrieving from libgcrypt the block size used by the cyphering algorithm: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+	    throw Erange(tools_printf(gettext("Failed retrieving from libgcrypt the block size used by the cyphering algorithm: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 	if(algo_block_size == 0)
 	    throw SRC_BUG;
     }
@@ -642,7 +642,7 @@ namespace libdar
 		// IV(sector) = E_salt(sector)
 	    err = gcry_cipher_encrypt(IVkey, (unsigned char *)ivec, size, (const unsigned char *)sect, size);
 	    if(err != GPG_ERR_NO_ERROR)
-		throw Erange("crypto_sym::make_ivec",tools_printf(gettext("Error while generating IV: %s/%s"), gcry_strsource(err), gcry_strerror(err)));
+		throw Erange(tools_printf(gettext("Error while generating IV: %s/%s"), gcry_strsource(err), gcry_strerror(err)));
 	}
 	catch(...)
 	{
@@ -688,13 +688,13 @@ namespace libdar
 
 	err = gcry_md_open(&hmac, hash_gcrypt, GCRY_MD_FLAG_SECURE|GCRY_MD_FLAG_HMAC);
 	if(err != GPG_ERR_NO_ERROR)
-	    throw Erange("crypto_sym::pkcs5_pass2key",tools_printf(gettext("Error while derivating key from password (HMAC open): %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+	    throw Erange(tools_printf(gettext("Error while derivating key from password (HMAC open): %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 
 	    // setting the HMAC key
 
 	err = gcry_md_setkey(hmac, password.c_str(), password.get_size());
 	if(err != GPG_ERR_NO_ERROR)
-	    throw Erange("crypto_sym::pkcs5_pass2key",tools_printf(gettext("Error while derivating key from password (HMAC set key): %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+	    throw Erange(tools_printf(gettext("Error while derivating key from password (HMAC set key): %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 
 	    // now ready to compute HMAC-SHA1 message digest using "hmac"
 
@@ -823,8 +823,7 @@ namespace libdar
 
 	if(err != ARGON2_OK)
 	{
-	    throw Erange("crypto_sym::argon2_pas2key",
-			 tools_printf(gettext("Error while computing KDF with argon2 algorithm: %d"),
+	    throw Erange(tools_printf(gettext("Error while computing KDF with argon2 algorithm: %d"),
 				      err));
 	}
 	else

@@ -77,7 +77,7 @@ namespace libdar
 #endif
 
 	    if(tas.empty())
-		throw Erange("heap::get", "heap is empty, it should have be set larger");
+		throw Erange("heap is empty, it should have be set larger");
 
 	    ret = std::move(tas.back()); // moving the object pointed to by tas.back() to ret
 	    tas.pop_back(); // removing the now empty pointer at the end of 'tas'

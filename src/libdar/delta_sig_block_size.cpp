@@ -59,9 +59,9 @@ namespace libdar
     void delta_sig_block_size::check() const
     {
 	if(divisor == 0)
-	    throw Erange("delta_sig_block_size::check", gettext("Invalid divisor used for delta signature block len calculation"));
+	    throw Erange(gettext("Invalid divisor used for delta signature block len calculation"));
 	if(max_block_len != 0 && min_block_len > max_block_len)
-	    throw Erange("delta_sig_block_size::check", gettext("minimum size should be lesser or equal than maximum size when specifying delta signature block size formula"));
+	    throw Erange(gettext("minimum size should be lesser or equal than maximum size when specifying delta signature block size formula"));
     }
 
     U_I delta_sig_block_size::calculate(const infinint & filesize) const

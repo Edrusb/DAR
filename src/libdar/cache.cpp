@@ -56,7 +56,7 @@ namespace libdar
     {
 	    // sanity checks
 	if(x_size < 10)
-	    throw Erange("cache::cache", gettext("wrong value given as initial_size argument while initializing cache"));
+	    throw Erange(gettext("wrong value given as initial_size argument while initializing cache"));
 
 	ref = & hidden;
 	if(ref == nullptr)

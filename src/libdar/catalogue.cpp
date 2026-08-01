@@ -147,7 +147,7 @@ namespace libdar
 		    }
 		    catch(Erange & e)
 		    {
-			throw Erange("catalogue::catalogue(generic_file &)", gettext("incoherent catalogue structure"));
+			throw Erange(gettext("incoherent catalogue structure"));
 		    }
 
 		}
@@ -172,11 +172,11 @@ namespace libdar
 		    }
 		    catch(Erange & e)
 		    {
-			throw Erange("catalogue::catalogue(generic_file &)", gettext("incoherent catalogue structure"));
+			throw Erange(gettext("incoherent catalogue structure"));
 		    }
 
 		    if(in_place.is_relative() && tmp != ".")
-			throw Erange("catalogue::catalogue(generic_file &)", gettext("incoherent catalogue structure"));
+			throw Erange(gettext("incoherent catalogue structure"));
 		}
 		else
 		    in_place = path(".");
@@ -193,9 +193,9 @@ namespace libdar
 		cat_signature cat_sig(*pdesc.stack, reading_ver);
 
 		if(!cat_sig.get_base_and_status(base, st) && !lax)
-		    throw Erange("catalogue::catalogue(generic_file &)", gettext("incoherent catalogue structure"));
+		    throw Erange(gettext("incoherent catalogue structure"));
 		if(base != 'd' && !lax)
-		    throw Erange("catalogue::catalogue(generic_file &)", gettext("incoherent catalogue structure"));
+		    throw Erange(gettext("incoherent catalogue structure"));
 
 		stats.clear();
 		smart_pointer<pile_descriptor> spdesc(new (nothrow) pile_descriptor(pdesc));
@@ -241,7 +241,7 @@ namespace libdar
 		if(force_crc_failure || read_crc == nullptr || calc_crc == nullptr || read_crc->get_size() != calc_crc->get_size() || *read_crc != *calc_crc)
 		{
 		    if(!lax)
-			throw Erange("catalogue::catalogue(generic_file &)", gettext("CRC failed for the catalogue"));
+			throw Erange(gettext("CRC failed for the catalogue"));
 		    else
 			get_ui().pause(gettext("LAX MODE: CRC failed for catalogue, the archive contents is corrupted. This may even lead dar to see files in the archive that never existed, but this will most probably lead to other failures in restoring files. Shall we proceed anyway?"));
 		}
@@ -282,7 +282,7 @@ namespace libdar
     void catalogue::reset_read() const
     {
 	if(mem_released)
-	    throw Erange("catalogue::reset_read", gettext("early memory release has completed, cannot read again"));
+	    throw Erange(gettext("early memory release has completed, cannot read again"));
 	current_read = contenu;
 	contenu->reset_read_children();
     }
@@ -303,7 +303,7 @@ namespace libdar
 	cat_directory *tmp = current_read->get_parent();
 
 	if(tmp == nullptr)
-	    throw Erange("catalogue::skip_read_to_parent_dir", gettext("root does not have a parent directory"));
+	    throw Erange(gettext("root does not have a parent directory"));
 	if(early_mem_release)
 	    tmp->remove_if_no_mirage(current_read->get_name());
 	current_read = tmp;
@@ -353,13 +353,13 @@ namespace libdar
 	const cat_nomme *tmp;
 
 	if(current_read == nullptr)
-	    throw Erange("catalogue::read_if_present", gettext("no current directory defined"));
+	    throw Erange(gettext("no current directory defined"));
 	if(name == nullptr) // we have to go to parent directory
 	{
 	    cat_directory* parent = current_read->get_parent();
 
 	    if(parent == nullptr)
-		throw Erange("catalogue::read_if_present", gettext("root directory has no parent directory"));
+		throw Erange(gettext("root directory has no parent directory"));
 	    else
 	    {
 		if(early_mem_release)
@@ -385,7 +385,7 @@ namespace libdar
     void catalogue::remove_read_entry(std::string & name)
     {
 	if(current_read == nullptr)
-	    throw Erange("catalogue::remove_read_entry", gettext("no current reading directory defined"));
+	    throw Erange(gettext("no current reading directory defined"));
 	current_read->remove(name);
     }
 
@@ -393,7 +393,7 @@ namespace libdar
     void catalogue::remove_last_read()
     {
 	if(current_read == nullptr)
-	    throw Erange("catalogue::remove_read_entry", gettext("no current reading directory defined"));
+	    throw Erange(gettext("no current reading directory defined"));
 
 	if(! current_read->remove_last_read() && current_read != contenu)
 	{
@@ -477,16 +477,16 @@ namespace libdar
 	    if(subdir != nullptr)
 		current_add = const_cast<cat_directory *>(subdir);
 	    else
-		throw Erange("catalogue::re_add_in", gettext("Cannot recurs in a non directory entry"));
+		throw Erange(gettext("Cannot recurs in a non directory entry"));
 	}
 	else
-	    throw Erange("catalogue::re_add_in", gettext("The entry to recurs in does not exist, cannot add further entry to that absent subdirectory"));
+	    throw Erange(gettext("The entry to recurs in does not exist, cannot add further entry to that absent subdirectory"));
     }
 
     void catalogue::re_add_in_replace(const cat_directory &dir)
     {
 	if(dir.has_children())
-	    throw Erange("catalogue::re_add_in_replace", "Given argument must be an empty dir");
+	    throw Erange("Given argument must be an empty dir");
 	re_add_in(dir.get_name());
 	*current_add = dir; // the directory's 'operator =' method does preverse existing children of the left (assigned) operand
     }
@@ -509,7 +509,7 @@ namespace libdar
     void catalogue::reset_compare() const
     {
 	if(mem_released)
-	    throw Erange("catalogue::reset_compare", gettext("early memory release has completed, cannot read again"));
+	    throw Erange(gettext("early memory release has completed, cannot read again"));
 	if(contenu == nullptr)
 	    throw SRC_BUG;
 	current_compare = contenu;
@@ -554,7 +554,7 @@ namespace libdar
 	    {
 		cat_directory *tmp = current_compare->get_parent();
 		if(tmp == nullptr)
-		    throw Erange("catalogue::compare", gettext("root has no parent directory"));
+		    throw Erange(gettext("root has no parent directory"));
 		current_compare = tmp;
 		extracted = target;
 		return true;

@@ -117,7 +117,7 @@ namespace libdar
     void label::read(generic_file & f)
     {
 	if(f.read(val, LABEL_SIZE) != (S_I)LABEL_SIZE)
-	    throw Erange("label::read", gettext("Incomplete label"));
+	    throw Erange(gettext("Incomplete label"));
     }
 
     void label::dump(generic_file & f) const

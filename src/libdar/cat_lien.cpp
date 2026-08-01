@@ -97,7 +97,7 @@ namespace libdar
 
 	if(get_saved_status() == saved_status::saved && l_other->get_saved_status() == saved_status::saved)
 	    if(get_target() != l_other->get_target())
-		throw Erange("cat_lien:sub_compare", string(gettext("symbolic link does not point to the same target: "))
+		throw Erange(string(gettext("symbolic link does not point to the same target: "))
 			     + get_target() + " <--> " + l_other->get_target());
     }
 

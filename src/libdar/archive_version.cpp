@@ -80,7 +80,7 @@ namespace libdar
 	U_I lu = f.read((char *)tmp, sizeof(tmp));
 
 	if(lu < sizeof(tmp))
-	    throw Erange("archive_version::read", gettext("Reached End of File while reading archive version"));
+	    throw Erange(gettext("Reached End of File while reading archive version"));
 
 
 	for(U_I i = 0; i < 2; ++i)
@@ -93,16 +93,16 @@ namespace libdar
 	if(version < 8)
 	{
 	    if(tmp[2] != '\0')
-		throw Erange("archive_version::read", gettext("Unexpected value while reading archive version"));
+		throw Erange(gettext("Unexpected value while reading archive version"));
 	}
 	else // version >= 8
 	{
 	    fix = to_digit(tmp[2]);
 	    lu = f.read((char *)tmp, 1);
 	    if(lu < 1)
-		throw Erange("archive_version::read", gettext("Reached premature end of file while reading archive version"));
+		throw Erange(gettext("Reached premature end of file while reading archive version"));
 	    if(tmp[0] != '\0')
-		throw Erange("archive_version::read", gettext("Unexpected value while reading archive version"));
+		throw Erange(gettext("Unexpected value while reading archive version"));
 	}
     }
 

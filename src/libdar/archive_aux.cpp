@@ -190,7 +190,7 @@ namespace libdar
 	case 'b':
 	    return hash_algo::blake2b_512;
 	default:
-	    throw Erange("char_to_hash_algo", tools_printf(gettext("unknown hash algorithm corresponding to char `%c'"), arg));
+	    throw Erange(tools_printf(gettext("unknown hash algorithm corresponding to char `%c'"), arg));
 	}
     }
 

@@ -132,11 +132,11 @@ int dar_suite_global(int argc,
     {
 	if(string(DAR_LOCALEDIR) != string(""))
 	    if(bindtextdomain(PACKAGE, DAR_LOCALEDIR) == nullptr)
-		throw Erange("", "Cannot open the translated messages directory, native language support will not work");
+		throw Erange("Cannot open the translated messages directory, native language support will not work");
 	if(setlocale(LC_MESSAGES, "") == nullptr || setlocale(LC_CTYPE, "") == nullptr)
-	    throw Erange("", "Cannot set locale category, native language support will not work");
+	    throw Erange("Cannot set locale category, native language support will not work");
 	if(textdomain(PACKAGE) == nullptr)
-	    throw Erange("", "Cannot find dar's catalogue, native language support will not work");
+	    throw Erange("Cannot find dar's catalogue, native language support will not work");
     }
     catch(Erange & e)
     {

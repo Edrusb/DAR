@@ -66,17 +66,17 @@ namespace libdar
             throw SRC_BUG;
 
         if(input->get_mode() == gf_write_only)
-            throw Erange("slave_zapette::slave_zapette", gettext("Input cannot be read"));
+            throw Erange(gettext("Input cannot be read"));
         if(output->get_mode() == gf_read_only)
-            throw Erange("slave_zapette::slave_zapette", gettext("Cannot write to output"));
+            throw Erange(gettext("Cannot write to output"));
         if(data->get_mode() != gf_read_only)
-            throw Erange("slave_zapette::slave_zapette", gettext("Data should be read-only"));
+            throw Erange(gettext("Data should be read-only"));
         in = input;
         out = output;
         src = data;
 	src_ctxt = dynamic_cast<contextual *>(data);
 	if(src_ctxt == nullptr)
-	    throw Erange("slave_zapette::slave_zapette", "Object given to data must inherit from contextual class");
+	    throw Erange("Object given to data must inherit from contextual class");
     }
 
     slave_zapette::~slave_zapette()
@@ -146,7 +146,7 @@ namespace libdar
                     {
                         ans.type = ANSWER_TYPE_INFININT;
                         if(!src->skip_to_eof())
-                            throw Erange("slave_zapette::action", gettext("Cannot skip at end of file"));
+                            throw Erange(gettext("Cannot skip at end of file"));
                         ans.arg = src->get_position();
                         ans.write(out, nullptr);
                     }
@@ -220,7 +220,7 @@ namespace libdar
 			ans.size = 0;
 			data_size.unstack(ans.size);
 			if(! data_size.is_zero())
-			    throw Erange("slave_zapette::action", gettext("too large slice header information for zapette protocol"));
+			    throw Erange(gettext("too large slice header information for zapette protocol"));
 
 			tmp_data = new (nothrow) char[ans.size];
 			if(tmp_data == nullptr)
@@ -243,7 +243,7 @@ namespace libdar
 			serialzd.reset();
 		    }
 		    else
-                        throw Erange("zapette::action", gettext("Received unknown special order"));
+                        throw Erange(gettext("Received unknown special order"));
                 }
             }
             while(req.size != REQUEST_SIZE_SPECIAL_ORDER || req.offset != REQUEST_OFFSET_END_TRANSMIT);

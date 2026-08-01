@@ -29,7 +29,7 @@ using namespace libdar;
 hide_file::hide_file(generic_file &f) : generic_file(gf_read_only)
 {
     if(f.get_mode() == gf_write_only)
-        throw Erange("hide_file::hide_file", gettext("hide_file cannot be initialized with write-only file"));
+        throw Erange(gettext("hide_file cannot be initialized with write-only file"));
 
     ref = &f;
     if(ref == nullptr)

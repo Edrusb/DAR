@@ -49,7 +49,7 @@ namespace libdar
 	    }
 	}
 	else
-	    throw Erange("slice_layout::read", gettext("Missing data while reading slice_layout object"));
+	    throw Erange(gettext("Missing data while reading slice_layout object"));
     }
 
     void slice_layout::write(generic_file & f) const

@@ -142,7 +142,7 @@ namespace libdar
 	    data = data_undefined;
 	    ea = EA_undefined;
 	    if(it == sequence.end())
-		throw Erange("crit_chain::get_action", gettext("cannot evaluate an empty chain in an overwriting policy"));
+		throw Erange(gettext("cannot evaluate an empty chain in an overwriting policy"));
 
 	    while(it != sequence.end() && (data == data_undefined || ea == EA_undefined))
 	    {

@@ -342,7 +342,7 @@ namespace libdar
 	    std::deque<mask *>::const_iterator it = lst.begin();
 
 	    if(lst.empty())
-		throw Erange("et_mask::is_covered", dar_gettext("No mask in the list of mask to operate on"));
+		throw Erange(dar_gettext("No mask in the list of mask to operate on"));
 
 	    while(it != lst.end() && (*it)->is_covered(expression))
 		++it;
@@ -382,7 +382,7 @@ namespace libdar
 	    std::deque<mask *>::const_iterator it = lst.begin();
 
 	    if(lst.empty())
-		throw Erange("et_mask::is_covered", dar_gettext("No mask to operate on in the list of mask"));
+		throw Erange(dar_gettext("No mask to operate on in the list of mask"));
 
 	    while(it != lst.end() && ! (*it)->is_covered(expression))
 		it++;

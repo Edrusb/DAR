@@ -557,7 +557,7 @@ namespace libdar
     void archive_options_create::set_hash_algo(hash_algo hash)
     {
 	if(hash == hash_algo::argon2)
-	    throw Erange("archive_options_create", gettext("argon2 hash algorithm is only used for key derivation function, it is not adapted to file or slice hashing"));
+	    throw Erange(gettext("argon2 hash algorithm is only used for key derivation function, it is not adapted to file or slice hashing"));
 	x_hash = hash;
     }
 
@@ -867,7 +867,7 @@ namespace libdar
     void archive_options_isolate::set_hash_algo(hash_algo hash)
     {
 	if(hash == hash_algo::argon2)
-	    throw Erange("archive_options_isolate", gettext("argon2 hash algorithm is only used for key derivation function, it is not adapted to file or slice hashing"));
+	    throw Erange(gettext("argon2 hash algorithm is only used for key derivation function, it is not adapted to file or slice hashing"));
 	x_hash = hash;
     }
 
@@ -1163,7 +1163,7 @@ namespace libdar
     void archive_options_merge::set_hash_algo(hash_algo hash)
     {
 	if(hash == hash_algo::argon2)
-	    throw Erange("archive_options_merge", gettext("argon2 hash algorithm is only used for key derivation function, it is not adapted to file or slice hashing"));
+	    throw Erange(gettext("argon2 hash algorithm is only used for key derivation function, it is not adapted to file or slice hashing"));
 	x_hash = hash;
     }
 
@@ -1620,14 +1620,14 @@ namespace libdar
     const mask & archive_options_listing::get_selection() const
     {
 	if(x_selection == nullptr)
-	    throw Erange("archive_options_listing", dar_gettext("No mask available"));
+	    throw Erange(dar_gettext("No mask available"));
 	return *x_selection;
     }
 
     const mask & archive_options_listing::get_subtree() const
     {
 	if(x_subtree == nullptr)
-	    throw Erange("archive_options_listing", dar_gettext("No mask available"));
+	    throw Erange(dar_gettext("No mask available"));
 	return *x_subtree;
     }
 
@@ -2110,7 +2110,7 @@ namespace libdar
     void archive_options_repair::set_hash_algo(hash_algo hash)
     {
 	if(hash == hash_algo::argon2)
-	    throw Erange("archive_options_repair", gettext("argon2 hash algorithm is only used for key derivation function, it is not adapted to file or slice hashing"));
+	    throw Erange(gettext("argon2 hash algorithm is only used for key derivation function, it is not adapted to file or slice hashing"));
 	x_hash = hash;
     }
 

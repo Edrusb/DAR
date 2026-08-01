@@ -138,7 +138,7 @@ namespace libdar
 
             etl = corres.find(tmp_tiquette);
             if(etl == corres.end())
-                throw Erange("cat_mirage::cat_mirage", gettext("Incoherent catalogue structure: hard linked inode's data not found"));
+                throw Erange(gettext("Incoherent catalogue structure: hard linked inode's data not found"));
             else
             {
                 if(etl->second == nullptr)
@@ -175,7 +175,7 @@ namespace libdar
                     delete entree_ptr;
                     entree_ptr = nullptr;
                 }
-                throw Erange("cat_mirage::cat_mirage", gettext("Incoherent catalogue structure: hard linked data is not an inode"));
+                throw Erange(gettext("Incoherent catalogue structure: hard linked data is not an inode"));
             }
 
                 // then we can bind the inode to the next to be create cat_etoile object
@@ -212,7 +212,7 @@ namespace libdar
                     }
                 }
                 else
-                    throw Erange("cat_mirage::cat_mirage", gettext("Incoherent catalogue structure: duplicated hard linked inode's data"));
+                    throw Erange(gettext("Incoherent catalogue structure: duplicated hard linked inode's data"));
             }
             catch(...)
             {
@@ -226,7 +226,7 @@ namespace libdar
 
             break;
         default:
-            throw Erange("cat_mirage::cat_mirage", gettext("Incoherent catalogue structure: unknown status flag for hard linked inode"));
+            throw Erange(gettext("Incoherent catalogue structure: unknown status flag for hard linked inode"));
         }
     }
 

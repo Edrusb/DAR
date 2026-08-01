@@ -107,12 +107,12 @@ namespace libdar
 	    return; // nothing to append
 
 	if(ptr == nullptr || offset > ptr->string_size)
-	    throw Erange("secu_string::append", gettext("appending data after the end of a secured memory"));
+	    throw Erange(gettext("appending data after the end of a secured memory"));
 
 	    // now we know that ptr != nullptr, else exception would have been thrown above
 
 	if(size + offset > get_allocated_size())
-	    throw Erange("secu_string::append", gettext("Cannot receive that much data in regard to the allocated memory"));
+	    throw Erange(gettext("Cannot receive that much data in regard to the allocated memory"));
 
 	(void)memcpy(&(ptr->mem) + offset, a, size);
 	offset += size;
@@ -129,18 +129,18 @@ namespace libdar
 	    return; // nothing to append
 
 	if(ptr == nullptr || offset > ptr->string_size)
-	    throw Erange("secu_string::append", gettext("appending data after the end of a secured memory"));
+	    throw Erange(gettext("appending data after the end of a secured memory"));
 
 	    // now we know that ptr != nullptr, else exception would have been thrown above
 
 	if(size + offset > get_allocated_size())
-	    throw Erange("secu_string::append", gettext("Cannot receive that much data in regard to the allocated memory"));
+	    throw Erange(gettext("Cannot receive that much data in regard to the allocated memory"));
 
 	lu = ::read(fd, &(ptr->mem) + offset, size);
 	if(lu < 0)
 	{
 	    get_array()[ptr->allocated_size - 1] = '\0';
-	    throw Erange("secu_string::read", string(gettext("Error while reading data for a secure memory:" )) + tools_strerror_r(errno));
+	    throw Erange(string(gettext("Error while reading data for a secure memory:" )) + tools_strerror_r(errno));
 	}
 
 	offset += lu;
@@ -155,7 +155,7 @@ namespace libdar
     void secu_string::reduce_string_size_to(U_I pos)
     {
 	if(ptr == nullptr || pos > ptr->string_size)
-	    throw Erange("secu_string::reduce_string_size_to", gettext("Cannot reduce the string to a size that is larger than its current size"));
+	    throw Erange(gettext("Cannot reduce the string to a size that is larger than its current size"));
 
 	ptr->string_size = pos;
 	get_array()[ptr->string_size] = '\0';
@@ -167,9 +167,9 @@ namespace libdar
 	    return; // nothing to expand
 
 	if(ptr == nullptr || size > get_allocated_size())
-	    throw Erange("secu_string::expand_string_size_to", gettext("Cannot expand secu_string size past its allocation size"));
+	    throw Erange(gettext("Cannot expand secu_string size past its allocation size"));
 	if(size < ptr->string_size)
-	    throw Erange("secu_stering::expand_string_size_to", gettext("asking to expand no to shrink a secu_string"));
+	    throw Erange(gettext("asking to expand no to shrink a secu_string"));
 
 	memset(get_array() + ptr->string_size, '\0', size - ptr->string_size);
 	ptr->string_size = size;
@@ -197,7 +197,7 @@ namespace libdar
 	}
 
 	if(size > get_allocated_size())
-	    throw Erange("secu_string::set_size", gettext("exceeding storage capacity while requesting secu_string::set_size()"));
+	    throw Erange(gettext("exceeding storage capacity while requesting secu_string::set_size()"));
 	if(ptr == nullptr)
 	    throw SRC_BUG;
 	    // if ptr is nullptr, get_allocated_size() returns zero
@@ -220,7 +220,7 @@ namespace libdar
 	if(ptr != nullptr && index < get_size())
 	    return get_array()[index];
 	else
-	    throw Erange("secu_string::operator[]", gettext("Out of range index requested for a secu_string"));
+	    throw Erange(gettext("Out of range index requested for a secu_string"));
     }
 
     void secu_string::init(U_I size)

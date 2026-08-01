@@ -164,7 +164,7 @@ namespace libdar
 
 	    if(string(DAR_LOCALEDIR) != string(""))
 		if(bindtextdomain(PACKAGE, DAR_LOCALEDIR) == nullptr)
-		    throw Erange("", "Cannot open the translated messages directory, native language support will not work");
+		    throw Erange("Cannot open the translated messages directory, native language support will not work");
 
 		// pseudo random generator
 
@@ -174,7 +174,7 @@ namespace libdar
 
 #if HAVE_LIBLZO2
 	    if(lzo_init() != LZO_E_OK)
-		throw Erange("libdar_init_thread_safe", gettext("Initialization problem for liblzo2 library"));
+		throw Erange(gettext("Initialization problem for liblzo2 library"));
 #endif
 
 		// initializing libgcrypt
@@ -191,7 +191,7 @@ namespace libdar
 			// by the libgcrypt documentation
 
 		    if(!gcry_check_version(MIN_VERSION_GCRYPT))
-			throw Erange("libdar_init_libgcrypt", tools_printf(gettext("Too old version for libgcrypt, minimum required version is %s"), MIN_VERSION_GCRYPT));
+			throw Erange(tools_printf(gettext("Too old version for libgcrypt, minimum required version is %s"), MIN_VERSION_GCRYPT));
 
 			// initializing default sized secured memory for libgcrypt
 		    (void)gcry_control(GCRYCTL_INIT_SECMEM, libgcrypt_secured_memory_size);
@@ -200,16 +200,16 @@ namespace libdar
 
 		    err = gcry_control(GCRYCTL_INITIALIZATION_FINISHED, 0);
 		    if(err != GPG_ERR_NO_ERROR)
-			throw Erange("libdar_init",tools_printf(gettext("Error while telling libgcrypt that initialization is finished: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
+			throw Erange(tools_printf(gettext("Error while telling libgcrypt that initialization is finished: %s/%s"), gcry_strsource(err),gcry_strerror(err)));
 
 		    libdar_initialized_gcrypt = true;
 		}
 		else
-		    throw Erange("libdar_init_libgcrypt", gettext("libgcrypt not initialized and libdar not allowed to do so"));
+		    throw Erange(gettext("libgcrypt not initialized and libdar not allowed to do so"));
 	    }
 	    else
 		if(!gcry_check_version(MIN_VERSION_GCRYPT))
-		    throw Erange("libdar_init_libgcrypt", tools_printf(gettext("Too old version for libgcrypt, minimum required version is %s"), MIN_VERSION_GCRYPT));
+		    throw Erange(tools_printf(gettext("Too old version for libgcrypt, minimum required version is %s"), MIN_VERSION_GCRYPT));
 #endif
 
 #if LIBSSH_AVAILABLE
@@ -241,14 +241,14 @@ namespace libdar
 #else
 		    throw SRC_BUG;
 #endif
-		    Erange err("", tools_printf(gettext("GPGME version requirement is not satisfied, requires version > %s"), tmp.c_str()));
+		    Erange err(tools_printf(gettext("GPGME version requirement is not satisfied, requires version > %s"), tmp.c_str()));
 		    err.set_tag(LIBDAR_INIT, LIBDAR_INIT_GPGME);
 		    throw err;
 		}
 
 		if(gpgme_err_code(gpgme_engine_check_version(GPGME_PROTOCOL_OpenPGP)) != GPG_ERR_NO_ERROR)
 		{
-		    Erange err("", tools_printf(gettext("GPGME engine not available: %s"), gpgme_get_protocol_name(GPGME_PROTOCOL_OpenPGP)));
+		    Erange err(tools_printf(gettext("GPGME engine not available: %s"), gpgme_get_protocol_name(GPGME_PROTOCOL_OpenPGP)));
 		    err.set_tag(LIBDAR_INIT, LIBDAR_INIT_GPGME);
 		    throw err;
 		}
@@ -285,8 +285,7 @@ namespace libdar
 	       || (signed int)med < atoi(MIN_MED_VERSION_THREADAR)
 	       || ((signed int)med == atoi(MIN_MED_VERSION_THREADAR)
 		   && (signed int)min < atoi(MIN_MIN_VERSION_THREADAR)))
-		throw Erange("libdar_init_libthreadar",
-			     tools_printf(gettext("libthreader version %d.%d.%d is too old, need version %s.%s.%s or more recent"),
+		throw Erange(tools_printf(gettext("libthreader version %d.%d.%d is too old, need version %s.%s.%s or more recent"),
 					  maj,med,min,
 					  EXPECTED_MAJ_VERSION_THREADAR,
 					  MIN_MED_VERSION_THREADAR,

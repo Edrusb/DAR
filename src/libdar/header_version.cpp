@@ -85,7 +85,7 @@ namespace libdar
     void header_version::set_kdf_hash(hash_algo algo)
     {
 	if(algo == hash_algo::none)
-	    throw Erange("header_version::set_kdf_hash", gettext("invalid hash algorithm provided for key derivation function"));
+	    throw Erange(gettext("invalid hash algorithm provided for key derivation function"));
 	kdf_hash = algo;
 	has_kdf_params = true;
     }
@@ -370,7 +370,7 @@ namespace libdar
 	    while(!ok);
 	}
 	else
-	    throw Erange("header_version::read", gettext("Reached End of File while reading archive header_version data structure"));
+	    throw Erange(gettext("Reached End of File while reading archive header_version data structure"));
 
 	tools_read_string(f, cmd_line);
 
@@ -392,7 +392,7 @@ namespace libdar
 	    if(edition >= 9)
 	    {
 		if(f.read(&tmp, sizeof(tmp)) != 1)
-		    throw Erange("header_version::read", gettext("Reached End of File while reading archive header_version data structure"));
+		    throw Erange(gettext("Reached End of File while reading archive header_version data structure"));
 
 		try
 		{
@@ -425,7 +425,7 @@ namespace libdar
 	    if(lax_mode)
 		has_tape_marks = false; // Escape sequence marks appeared at revision 08
 	    else
-		throw Erange("header_version::read", gettext("Corruption met while reading header_version data structure"));
+		throw Erange(gettext("Corruption met while reading header_version data structure"));
 	}
 
 	if(crypted_key != nullptr)
@@ -442,13 +442,13 @@ namespace libdar
 	    if(crypted_key == nullptr)
 		throw Ememory();
 	    if(f.copy_to(*crypted_key, key_size) != key_size)
-		throw Erange("header_version::read", gettext("Missing data for encrypted symmetrical key"));
+		throw Erange(gettext("Missing data for encrypted symmetrical key"));
 	}
 
 	if(flag.is_set(FLAG_HAS_REF_SLICING) || flag.is_set(FLAG_HAS_REF_HEADER))
 	{
 	    if(flag.is_set(FLAG_HAS_REF_HEADER) && flag.is_set(FLAG_HAS_REF_SLICING))
-		throw Erange("header_version::read", gettext("Conflicting slice-layout and slice-header flags in header/trailer version, probable data corruption occured"));
+		throw Erange(gettext("Conflicting slice-layout and slice-header flags in header/trailer version, probable data corruption occured"));
 
 	    try
 	    {
@@ -508,7 +508,7 @@ namespace libdar
 	    ref_second_term_offset.read(f);
 
 	    if(ref_version->get_ref_header_version())
-		throw Erange("header_version::read", gettext("Unexpected recursively stored header_version, data corruption may have occurred"));
+		throw Erange(gettext("Unexpected recursively stored header_version, data corruption may have occurred"));
 	}
 	else
 	    clear_ref_header_version();
@@ -528,7 +528,7 @@ namespace libdar
 	    {
 		kdf_hash = char_to_hash_algo(tmp_hash);
 		if(kdf_hash == hash_algo::none)
-		    throw Erange("header_version::read", gettext("valid hash algoritm needed for key derivation function"));
+		    throw Erange(gettext("valid hash algoritm needed for key derivation function"));
 	    }
 	    catch(Erange & e)
 	    {
@@ -600,7 +600,7 @@ namespace libdar
 		if(lax_mode)
 		    dialog.message(gettext("Consistency check failed for archive header"));
 		else
-		    throw Erange("header_version::read", gettext("Consistency check failed for archive header"));
+		    throw Erange(gettext("Consistency check failed for archive header"));
 	    }
 
 	    if(edition > 7 && !without_crc)
@@ -626,7 +626,7 @@ namespace libdar
 			    if(lax_mode)
 				dialog.message(gettext("Consistency check failed for archive header"));
 			    else
-				throw Erange("header_version::read", gettext("Consistency check failed for archive header"));
+				throw Erange(gettext("Consistency check failed for archive header"));
 			}
 		    }
 		    catch(...)

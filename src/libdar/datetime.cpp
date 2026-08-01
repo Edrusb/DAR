@@ -428,7 +428,7 @@ namespace libdar
 	case 'u':
 	    return tu_microsecond;
 	default:
-	    throw Erange("datetime::time_unit", gettext("Unknown time unit"));
+	    throw Erange(gettext("Unknown time unit"));
 	}
     }
 

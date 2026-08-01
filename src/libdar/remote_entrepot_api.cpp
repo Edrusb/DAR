@@ -43,7 +43,7 @@ namespace libdar
         else if(strcasecmp(arg.c_str(), "sftp") == 0)
             ret = remote_entrepot_type::sftp;
         else
-            throw Erange("string_to_entrepot_type", tools_printf(gettext("Unknown protocol: %S"), &arg));
+            throw Erange(tools_printf(gettext("Unknown protocol: %S"), &arg));
 
         return ret;
     }

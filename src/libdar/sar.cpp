@@ -153,7 +153,7 @@ namespace libdar
 	if(header_from_external != nullptr)
 	{
 	    if(! check_header(*header_from_external, "", 0))
-		throw Erange("sar::sar", gettext("Invalid external slice header obtained"));
+		throw Erange(gettext("Invalid external slice header obtained"));
 	    else
 	    {
 		    // of_current stays equal to zero until a real skip is performed
@@ -188,11 +188,11 @@ namespace libdar
 	    throw SRC_BUG;
 
         if(file_size < slice_header::min_size() + 1)  //< one more byte to store at least one byte of data
-            throw Erange("sar::sar", gettext("File size too small"));
+            throw Erange(gettext("File size too small"));
 	    // note that this test does not warranty that the file is large enough to hold a header structure
 
 	if(first_file_size < slice_header::min_size() + 1)
-	    throw Erange("sar::sar", gettext("First file size too small"));
+	    throw Erange(gettext("First file size too small"));
 	    // note that this test does not warranty that the file is large enough to hold a header structure
 
         initial = true;
@@ -681,9 +681,9 @@ namespace libdar
 				case flag_type_non_terminal:
 				    break; // can't know anything more
 				case flag_type_located_at_end_of_slice:
-				    throw Erange("sar::inherited_read", gettext("Data corruption met at end of slice: this flag value is not allowed at end of slice"));
+				    throw Erange(gettext("Data corruption met at end of slice: this flag value is not allowed at end of slice"));
 				default:
-				    throw Erange("sar::inherited_read", gettext("Data corruption met at end of slice, unknown flag found"));
+				    throw Erange(gettext("Data corruption met at end of slice, unknown flag found"));
 				}
 			    }
 			}
@@ -998,13 +998,13 @@ namespace libdar
 			break;
 		    case flag_type_located_at_end_of_slice:
 			if(!lax)
-			    throw Erange("sar::open_readonly", gettext("Data corruption met at end of slice, forbidden flag found at this position"));
+			    throw Erange(gettext("Data corruption met at end of slice, forbidden flag found at this position"));
 			else
 			    h.set_flag(end_flag);
 			break;
 		    default:
 			if(!lax)
-			    throw Erange("sar::open_readonly", gettext("Data corruption met at end of slice, unknown flag found"));
+			    throw Erange(gettext("Data corruption met at end of slice, unknown flag found"));
 			else
 			    h.set_flag(end_flag);
 			break;
@@ -1035,7 +1035,7 @@ namespace libdar
 		    if(of_last_file_num != num)
 		    {
 			if(!lax)
-			    throw Erange("sar::open_readonly", tools_printf(gettext("Two different slices (%i and %i) are marked as the last slice of the backup!"), &of_last_file_num, &num));
+			    throw Erange(tools_printf(gettext("Two different slices (%i and %i) are marked as the last slice of the backup!"), &of_last_file_num, &num));
 			else
 			{
 			    get_ui().message(tools_printf(gettext("LAX MODE: slices %i and %i are both recorded as last slice of the archive, keeping the higher number as the real last slice"), &of_last_file_num, &num));
@@ -1221,7 +1221,7 @@ namespace libdar
 		    if(do_erase)
 		    {
 			if(!opt_allow_overwrite)
-			    throw Erange("sar::open_writeonly", gettext("file exists, and DONT_ERASE option is set."));
+			    throw Erange(gettext("file exists, and DONT_ERASE option is set."));
 			if(opt_warn_overwrite)
 			{
 			    try
@@ -1426,11 +1426,11 @@ namespace libdar
     void sar::set_offset(infinint offset)
     {
         if(of_fd == nullptr)
-            throw Erange("sar::set_offset", gettext("file not open"));
+            throw Erange(gettext("file not open"));
         else
 	{
             if(!of_fd->skip(offset))
-		throw Erange("sar::set_offset","Cannot seek to the requested position");
+		throw Erange("Cannot seek to the requested position");
 	}
     }
 
@@ -1532,7 +1532,7 @@ namespace libdar
 		// external related checks
 
 	    if(external && h.get_format_07_compatibility())
-		throw Erange("header::check_validity", gettext("slice layout of an old archive stored in an isolated catalog cannot be used to avoid openning the first or last slice of the archive, consider using the ignore external slice header option"));
+		throw Erange(gettext("slice layout of an old archive stored in an isolated catalog cannot be used to avoid openning the first or last slice of the archive, consider using the ignore external slice header option"));
 
 	    if(external && ! initial)
 		throw SRC_BUG;

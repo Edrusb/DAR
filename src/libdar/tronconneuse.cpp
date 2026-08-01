@@ -51,7 +51,7 @@ namespace libdar
 			       std::unique_ptr<crypto_module> & ptr) : proto_tronco(encrypted_side.get_mode() == gf_read_only ? gf_read_only : gf_write_only)
     {
 	if(block_size == 0)
-	    throw Erange("tronconneuse::tronconneuse", tools_printf(gettext("%d is not a valid block size"), block_size));
+	    throw Erange(tools_printf(gettext("%d is not a valid block size"), block_size));
 	buf_offset = 0;
 	buf_byte_data = 0;
 	buf_size = 0;
@@ -72,7 +72,7 @@ namespace libdar
 	reading_ver = x_reading_ver;
 	crypto = std::move(ptr);
 	if(!crypto)
-	    throw Erange("tronconneuse::tronconneuse", "null pointer given as crypto_module to tronconneuse");
+	    throw Erange("null pointer given as crypto_module to tronconneuse");
 	trailing_clear_data = nullptr;
 
 	    // buffers cannot be initialized here as they need result from pure virtual methods
@@ -451,7 +451,7 @@ namespace libdar
 		if(buf_byte_data > buf_size)
 		{
 		    buf_byte_data = clear_block_size;
-		    throw Erange("tronconneuse::fill_buff", gettext("Data corruption may have occurred, cannot decrypt data"));
+		    throw Erange(gettext("Data corruption may have occurred, cannot decrypt data"));
 		}
 	    }
 	    else

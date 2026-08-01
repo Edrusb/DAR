@@ -83,7 +83,7 @@ namespace libdar
 		    case GPG_ERR_NO_ERROR:
 			break;
 		    default:
-			throw Erange("crypto_asym::encrypt", string(gettext("Unexpected error reported by GPGME [gpgme_signers_clear()]: ")) + tools_gpgme_strerror_r(err));
+			throw Erange(string(gettext("Unexpected error reported by GPGME [gpgme_signers_clear()]: ")) + tools_gpgme_strerror_r(err));
 		    }
 		    ++ptr;
 		}
@@ -134,9 +134,9 @@ namespace libdar
 	    case GPG_ERR_INV_VALUE:
 		throw SRC_BUG;
 	    case GPG_ERR_UNUSABLE_PUBKEY:
-		throw Erange("crypto_asym::encrypt", gettext("Key found but users are not all trusted"));
+		throw Erange(gettext("Key found but users are not all trusted"));
 	    default:
-		throw Erange("crypto_asym::encrypt", string(gettext("Unexpected error reported by GPGME [gpgme_op_encrypt[_sign]()]: ")) + tools_gpgme_strerror_r(err));
+		throw Erange(string(gettext("Unexpected error reported by GPGME [gpgme_op_encrypt[_sign]()]: ")) + tools_gpgme_strerror_r(err));
 	    }
 	}
 	catch(...)
@@ -166,13 +166,13 @@ namespace libdar
 	case GPG_ERR_INV_VALUE:
 	    throw SRC_BUG;
 	case GPG_ERR_NO_DATA:
-	    throw Erange("crypto_asym::decrypt", gettext("No data to decrypt"));
+	    throw Erange(gettext("No data to decrypt"));
 	case GPG_ERR_DECRYPT_FAILED:
-	    throw Erange("crypto_asym::decrypt", gettext("Invalid Cipher text"));
+	    throw Erange(gettext("Invalid Cipher text"));
 	case GPG_ERR_BAD_PASSPHRASE:
-	    throw Erange("crypto_asym::decrypt", gettext("Failed retreiving passphrase"));
+	    throw Erange(gettext("Failed retreiving passphrase"));
 	default:
-	    throw Erange("crypto_asym::decrypt", string(gettext("Unexpected error reported by GPGME [gpgme_op_decrypt_verify()]: ")) + tools_gpgme_strerror_r(err));
+	    throw Erange(string(gettext("Unexpected error reported by GPGME [gpgme_op_decrypt_verify()]: ")) + tools_gpgme_strerror_r(err));
 	}
 #else
 	throw Ecompilation("Asymetric Strong encryption algorithms using GPGME");
@@ -185,11 +185,11 @@ namespace libdar
 	gpgme_error_t err = gpgme_new(&context);
 
 	if(gpgme_err_code(err) != GPG_ERR_NO_ERROR)
-	    throw Erange("crypto_asym::crypto_asym", string(gettext("Failed creating GPGME context: ")) + tools_gpgme_strerror_r(err));
+	    throw Erange(string(gettext("Failed creating GPGME context: ")) + tools_gpgme_strerror_r(err));
 
 	err = gpgme_set_protocol(context, GPGME_PROTOCOL_OpenPGP);
 	if(gpgme_err_code(err) != GPG_ERR_NO_ERROR)
-	    throw Erange("crypto_asym::crypto_asym", string(gettext("Failed setting GPGME context with OpenPGP protocol: ")) + tools_gpgme_strerror_r(err));
+	    throw Erange(string(gettext("Failed setting GPGME context with OpenPGP protocol: ")) + tools_gpgme_strerror_r(err));
 
 	gpgme_set_passphrase_cb(context, read_passphrase, (void *)this);
 #endif
@@ -231,7 +231,7 @@ namespace libdar
 		case GPG_ERR_INV_VALUE:
 		    throw SRC_BUG;
 		default:
-		    throw Erange("crypto_asym::decrypt", string(gettext("Unexpected error reported by GPGME [gpgme_op_keylist_start()]: ")) + tools_gpgme_strerror_r(err));
+		    throw Erange(string(gettext("Unexpected error reported by GPGME [gpgme_op_keylist_start()]: ")) + tools_gpgme_strerror_r(err));
 		}
 
 		    // the the recipient string contains an '@' we assume we have
@@ -311,7 +311,7 @@ namespace libdar
 			}
 			break;
 		    default:
-			throw Erange("crypto_asym::decrypt", string(gettext("Unexpected error reported by GPGME [gpgme_op_keylist_next()]: ")) + tools_gpgme_strerror_r(err));
+			throw Erange(string(gettext("Unexpected error reported by GPGME [gpgme_op_keylist_next()]: ")) + tools_gpgme_strerror_r(err));
 		    }
 		}
 		while(!found && !eof);
@@ -338,9 +338,9 @@ namespace libdar
 	    if(offset + 1 >= size)
 	    {
 		if(signatories)
-		    throw Erange("crypto_asym::build_key_list", gettext("No signatory remain with a valid key, signing is impossible, aborting"));
+		    throw Erange(gettext("No signatory remain with a valid key, signing is impossible, aborting"));
 		else
-		    throw Erange("crypto_asym::build_key_list", gettext("No recipient remain with a valid key, encryption is impossible, aborting"));
+		    throw Erange(gettext("No recipient remain with a valid key, encryption is impossible, aborting"));
 	    }
 
 		// the key list must end wth a nullptr entry

@@ -123,7 +123,7 @@ namespace libdar
 	case 'c':
 	    return crypto_algo::camellia256;
 	default:
-	    throw Erange("char_to_sym_crypto", gettext("Unknown crypto algorithm"));
+	    throw Erange(gettext("Unknown crypto algorithm"));
 	}
     }
 

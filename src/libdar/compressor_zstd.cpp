@@ -185,7 +185,7 @@ namespace libdar
 
 	    err = ZSTD_decompressStream(decomp, &outbuf, &inbuf);
 	    if(ZSTD_isError(err))
-		throw Erange("zstd::read", tools_printf(gettext("Error returned by libzstd while uncompressing data: %s"), ZSTD_getErrorName(err)));
+		throw Erange(tools_printf(gettext("Error returned by libzstd while uncompressing data: %s"), ZSTD_getErrorName(err)));
 
 	    if(err == 0)
 		flueof = true;
@@ -214,7 +214,7 @@ namespace libdar
 	    wrote += outbuf.pos;
 
 	    if(no_comp_data && outbuf.pos == 0 && wrote < size && !flueof)
-		throw Erange("zstd::read", gettext("uncompleted compressed stream, some compressed data is missing or corruption occured"));
+		throw Erange(gettext("uncompleted compressed stream, some compressed data is missing or corruption occured"));
 	}
 
 	return wrote;
@@ -256,7 +256,7 @@ namespace libdar
 
 		err = ZSTD_compressStream(comp, &outbuf, &inbuf);
 		if(ZSTD_isError(err))
-		    throw Erange("zstd::write", tools_printf(gettext("Error met while giving data for compression to libzstd: %s"), ZSTD_getErrorName(err)));
+		    throw Erange(tools_printf(gettext("Error met while giving data for compression to libzstd: %s"), ZSTD_getErrorName(err)));
 
 		next_bs = err;
 
@@ -321,7 +321,7 @@ namespace libdar
 
 	err = ZSTD_endStream(comp, &outbuf);
 	if(ZSTD_isError(err))
-	    throw Erange("zstd::compr_flush_write", tools_printf(gettext("Error met while asking libzstd for compression end: %s"), ZSTD_getErrorName(err)));
+	    throw Erange(tools_printf(gettext("Error met while asking libzstd for compression end: %s"), ZSTD_getErrorName(err)));
 
 	compressed->write((char *)outbuf.dst, outbuf.pos);
 
@@ -331,7 +331,7 @@ namespace libdar
 
 	    err = ZSTD_flushStream(comp, &outbuf);
 	    if(ZSTD_isError(err))
-		throw Erange("zstd::compr_flush_write", tools_printf(gettext("Error met while asking libzstd to flush data once compression end has been asked: %s"), ZSTD_getErrorName(err)));
+		throw Erange(tools_printf(gettext("Error met while asking libzstd to flush data once compression end has been asked: %s"), ZSTD_getErrorName(err)));
 
 	    compressed->write((char *)outbuf.dst, outbuf.pos);
 	}
@@ -458,7 +458,7 @@ namespace libdar
 
 	    err = ZSTD_initDStream(decomp);
 	    if(ZSTD_isError(err))
-		throw Erange("zstd::setup_context", tools_printf(gettext("Error while initializing libzstd for decompression: %s"),
+		throw Erange(tools_printf(gettext("Error while initializing libzstd for decompression: %s"),
 								 ZSTD_getErrorName(err)));
 	    break;
 	case gf_write_only:
@@ -469,14 +469,14 @@ namespace libdar
 		// setting ZSTD_c_compressionLevel parameter
 
 	    if(compression_level > maxcomp)
-		throw Erange("zstd::setup_context", tools_printf(gettext("the requested compression level (%d) is higher than the maximum available for libzstd: %d"),
+		throw Erange(tools_printf(gettext("the requested compression level (%d) is higher than the maximum available for libzstd: %d"),
 								 compression_level,
 								 maxcomp));
 
 
 	    err = ZSTD_initCStream(comp, compression_level);
 	    if(ZSTD_isError(err))
-		throw Erange("zstd::setup_context", tools_printf(gettext("Error while setting libzstd compression level to %d: %s"),
+		throw Erange(tools_printf(gettext("Error while setting libzstd compression level to %d: %s"),
 								 compression_level,
 								 ZSTD_getErrorName(err)));
 

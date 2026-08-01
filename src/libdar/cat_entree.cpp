@@ -81,7 +81,7 @@ namespace libdar
 		if(!cat_sig.get_base_and_status((unsigned char &)type, saved))
 		{
 		    if(!lax)
-			throw Erange("cat_entree::read", gettext("corrupted file"));
+			throw Erange(gettext("corrupted file"));
 		    else
 			type = ' '; // used to by-pass object construction and return nullptr as value of this method
 		}
@@ -129,7 +129,7 @@ namespace libdar
                 if(saved != saved_status::saved)
                 {
                     if(!lax)
-                        throw Erange("cat_entree::read", gettext("corrupted file"));
+                        throw Erange(gettext("corrupted file"));
                     else
                         dialog->message(gettext("LAX MODE: Unexpected saved status for end of directory entry, assuming data corruption occurred, ignoring and continuing"));
                 }
@@ -139,7 +139,7 @@ namespace libdar
                 if(saved != saved_status::saved)
                 {
                     if(!lax)
-                        throw Erange("cat_entree::read", gettext("corrupted file"));
+                        throw Erange(gettext("corrupted file"));
                     else
                         dialog->message(gettext("LAX MODE: Unexpected saved status for class \"cat_detruit\" object, assuming data corruption occurred, ignoring and continuing"));
                 }
@@ -150,7 +150,7 @@ namespace libdar
 		break;
             default :
                 if(!lax)
-                    throw Erange("cat_entree::read", gettext("unknown type of data in catalogue"));
+                    throw Erange(gettext("unknown type of data in catalogue"));
                 else
                 {
                     dialog->message(gettext("LAX MODE: found unknown catalogue entry, assuming data corruption occurred, cannot read further the catalogue as I do not know the length of this type of entry"));
@@ -200,7 +200,7 @@ namespace libdar
 			try
 			{
 			    if(!lax)
-				throw Erange("", "temporary exception");
+				throw Erange("temporary exception");
 			    else
 			    {
 				if(nom == "")
@@ -211,9 +211,9 @@ namespace libdar
 			catch(Egeneric & e) // we catch here the temporary exception and the Euser_abort thrown by dialog.pause()
 			{
 			    if(nom != "")
-				throw Erange("cat_entree::read", tools_printf(gettext("Entry information CRC failure for %S"), &nom));
+				throw Erange(tools_printf(gettext("Entry information CRC failure for %S"), &nom));
 			    else
-				throw Erange("cat_entree::read", gettext(gettext("Entry information CRC failure")));
+				throw Erange(gettext(gettext("Entry information CRC failure")));
 			}
 		    }
 		    ret->post_constructor(*pdesc);

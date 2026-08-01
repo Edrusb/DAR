@@ -139,8 +139,7 @@ namespace libdar
 		    keysize.read(f);
 		    keysize.unstack(i_keysize);
 		    if(!keysize.is_zero())
-			throw Erange("database::i_database::build",
-				     gettext("integer type unable to handle such too large value for archive key size in database, data corruption may have occured on disk"));
+			throw Erange(gettext("integer type unable to handle such too large value for archive key size in database, data corruption may have occured on disk"));
 
 		    dat.pass.clear();
 		    if(i_keysize > 0)
@@ -154,8 +153,7 @@ namespace libdar
 		    dat.crypto_size = 0;
 		    keysize.unstack(dat.crypto_size);
 		    if(!keysize.is_zero())
-			throw Erange("database::i_database::build",
-				     gettext("integer type unable to handle such too large value for archive key size in database, data corruption may have occured on disk"));
+			throw Erange(gettext("integer type unable to handle such too large value for archive key size in database, data corruption may have occured on disk"));
 		}
 		else
 		{
@@ -168,7 +166,7 @@ namespace libdar
 		--tmp;
 	    }
 	    if(coordinate.empty())
-		throw Erange("database::i_database::database", gettext("Badly formatted database"));
+		throw Erange(gettext("Badly formatted database"));
 	    tools_read_vector(f, options_to_dar);
 	    tools_read_string(f, dar_path);
 	    if(head.get_version() < database_header_get_supported_version())
@@ -217,7 +215,7 @@ namespace libdar
 				    const database_dump_options & opt) const
     {
 	if(files == nullptr && data_files == nullptr)
-	    throw Erange("database::i_database::dump", gettext("Cannot write down a read-only database"));
+	    throw Erange(gettext("Cannot write down a read-only database"));
 
 	generic_file *f = database_header_create(get_pointer(),
 						 filename,
@@ -248,7 +246,7 @@ namespace libdar
 		if(coordinate[i].crypto != crypto_algo::none)
 		{
 		    if(get_database_crypto_algo() == crypto_algo::none)
-			throw Erange("database::dump", gettext("Refusing to write down database containing archive credentials, when the database itself is not ciphered"));
+			throw Erange(gettext("Refusing to write down database containing archive credentials, when the database itself is not ciphered"));
 
 		    infinint keysize = coordinate[i].pass.get_size();
 
@@ -310,7 +308,7 @@ namespace libdar
 		throw SRC_BUG;
 
 	    if(basename == "")
-		throw Erange("database::i_database::add_archive", gettext("Empty string is an invalid archive basename"));
+		throw Erange(gettext("Empty string is an invalid archive basename"));
 
 	    dat.chemin = chemin;
 	    dat.basename = basename;
@@ -340,9 +338,9 @@ namespace libdar
 	    min = get_real_archive_num(min, opt.get_revert_archive_numbering());
 	    max = get_real_archive_num(max, opt.get_revert_archive_numbering());
 	    if(min > max)
-		throw Erange("database::i_database::remove_archive", gettext("Incorrect archive range in database"));
+		throw Erange(gettext("Incorrect archive range in database"));
 	    if(min == 0 || max >= coordinate.size())
-		throw Erange("database::i_database::remove_archive", gettext("Incorrect archive range in database"));
+		throw Erange(gettext("Incorrect archive range in database"));
 	    for(U_I i = max ; i >= min ; --i)
 	    {
 		if(files == nullptr)
@@ -369,7 +367,7 @@ namespace libdar
 	    if(num < coordinate.size() && num != 0)
 		coordinate[num].basename = basename;
 	    else
-		throw Erange("database::i_database::change_name", gettext("Non existent archive in database"));
+		throw Erange(gettext("Non existent archive in database"));
 	}
 	catch(...)
 	{
@@ -388,7 +386,7 @@ namespace libdar
 	    if(num < coordinate.size() && coordinate[num].basename != "")
 		coordinate[num].chemin = chemin;
 	    else
-		throw Erange("database::i_database::change_name", gettext("Non existent archive in database"));
+		throw Erange(gettext("Non existent archive in database"));
 	}
 	catch(...)
 	{
@@ -418,7 +416,7 @@ namespace libdar
 		coordinate[num].crypto_size = opt.get_crypto_size();
 	    }
 	    else
-		throw Erange("database::i_database::change_name", gettext("Non existent archive in database"));
+		throw Erange(gettext("Non existent archive in database"));
 	}
 	catch(...)
 	{
@@ -442,7 +440,7 @@ namespace libdar
 		coordinate[num].crypto_size = 0;
 	    }
 	    else
-		throw Erange("database::i_database::change_name", gettext("Non existent archive in database"));
+		throw Erange(gettext("Non existent archive in database"));
 	}
 	catch(...)
 	{
@@ -462,9 +460,9 @@ namespace libdar
 	    if(files == nullptr)
 		throw SRC_BUG;
 	    if(src >= coordinate.size() || src <= 0)
-		throw Erange("database::i_database::set_permutation", string(gettext("Invalid archive number: ")) + tools_int2str(src));
+		throw Erange(string(gettext("Invalid archive number: ")) + tools_int2str(src));
 	    if(dst >= coordinate.size() || dst <= 0)
-		throw Erange("database::i_database::set_permutation", string(gettext("Invalid archive number: ")) + tools_int2str(dst));
+		throw Erange(string(gettext("Invalid archive number: ")) + tools_int2str(dst));
 
 	    moved = coordinate[src];
 	    coordinate.erase(coordinate.begin()+src);
@@ -547,7 +545,7 @@ namespace libdar
 	    if(num < coordinate.size())
 		files->show(callback, context, num);
 	    else
-		throw Erange("database::i_database::show_files", gettext("Non existent archive in database"));
+		throw Erange(gettext("Non existent archive in database"));
 	}
 	catch(...)
 	{
@@ -573,22 +571,22 @@ namespace libdar
 		throw SRC_BUG;
 
 	    if(!chemin.is_relative())
-		throw Erange("database::i_database::show_version", gettext("Invalid path, path must be relative"));
+		throw Erange(gettext("Invalid path, path must be relative"));
 
 	    while(chemin.pop_front(tmp) && ptr_dir != nullptr)
 	    {
 		ptr = ptr_dir->read_child(tmp);
 		if(ptr == nullptr)
-		    throw Erange("database::i_database::show_version", gettext("Non existent file in database"));
+		    throw Erange(gettext("Non existent file in database"));
 		ptr_dir = dynamic_cast<const data_dir *>(ptr);
 	    }
 
 	    if(ptr_dir == nullptr)
-		throw Erange("database::i_database::show_version", gettext("Non existent file in database"));
+		throw Erange(gettext("Non existent file in database"));
 
 	    ptr = ptr_dir->read_child(chemin.display());
 	    if(ptr == nullptr)
-		throw Erange("database::i_database::show_version", gettext("Non existent file in database"));
+		throw Erange(gettext("Non existent file in database"));
 	    else
 		ptr->listing(callback, context);
 	}
@@ -615,7 +613,7 @@ namespace libdar
 		throw SRC_BUG;
 
 	    if(callback == nullptr)
-		throw Erange("database::i_database::show_most_recent_stats", "nullptr provided as user callback function");
+		throw Erange("nullptr provided as user callback function");
 
 	    files->compute_most_recent_stats(stats_data, stats_ea, total_data, total_ea, datetime(0));
 	    try
@@ -973,7 +971,7 @@ namespace libdar
     archive_num database::i_database::get_real_archive_num(archive_num num, bool revert) const
     {
 	if(num == 0)
-	    throw Erange("database::i_database::get_real_archive_num", tools_printf(dar_gettext("Invalid archive number: %d"), num));
+	    throw Erange(tools_printf(dar_gettext("Invalid archive number: %d"), num));
 
 	if(revert)
 	{
@@ -981,7 +979,7 @@ namespace libdar
 	    if(size > num)
 		return size - num;
 	    else
-		throw Erange("database::i_database::get_real_archive_num", tools_printf(dar_gettext("Invalid archive number: %d"), -num));
+		throw Erange(tools_printf(dar_gettext("Invalid archive number: %d"), -num));
 	}
 	else
 	    return num;

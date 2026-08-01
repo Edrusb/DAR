@@ -102,7 +102,7 @@ argc_argv::~argc_argv() noexcept(false)
 void argc_argv::set_arg(const string & arg, S_I index)
 {
     if(index >= x_argc)
-	throw Erange("argc_argv::set_arg", gettext("Index out of range"));
+	throw Erange(gettext("Index out of range"));
 
     if(x_argv[index] != nullptr)
     {
@@ -120,7 +120,7 @@ void argc_argv::set_arg(const string & arg, S_I index)
 void argc_argv::set_arg(generic_file & f, U_I size, S_I index)
 {
     if(index >= x_argc)
-	throw Erange("argc_argv::set_arg", gettext("Index out of range"));
+	throw Erange(gettext("Index out of range"));
 
     if(x_argv[index] != nullptr)
     {
@@ -245,7 +245,7 @@ void line_tools_repeat_param(const string & cmd, infinint & repeat_count, infini
     }
     catch(Edeci & e)
     {
-	throw Erange("line_tools_repeat_param", string(gettext("Syntax error in --retry-on-change argument: ")) + e.get_message());
+	throw Erange(string(gettext("Syntax error in --retry-on-change argument: ")) + e.get_message());
     }
 }
 
@@ -260,12 +260,12 @@ void line_tools_tlv_list2argv(user_interaction & dialog, tlv_list & list, argc_a
     {
 	if(list[i].get_type() != 0)
 		// we only use type 0 here
-	    throw Erange("line_tools_tlv_list2argv", gettext("Unknown TLV record type"));
+	    throw Erange(gettext("Unknown TLV record type"));
 	size = list[i].size();
 	transfert = 0;
 	size.unstack(transfert);
 	if(!size.is_zero())
-	    throw Erange("line_tools_tlv_list2argv", "Too long argument found in TLV to be handled by standard library routine");
+	    throw Erange("Too long argument found in TLV to be handled by standard library routine");
 	list[i].skip(0);
 	arg.set_arg(list[i], transfert, i);
     }
@@ -301,7 +301,7 @@ string::const_iterator line_tools_find_first_char_out_of_parenth(const string & 
  	    if(parenth > 0)
 		--parenth;
 	    else
-		throw Erange("line_tools_find_first_char_out_of_parenth", string(gettext("Unbalanced parenthesis in expression: ")) + argument);
+		throw Erange(string(gettext("Unbalanced parenthesis in expression: ")) + argument);
 	    break;
 
 		// no default: statement needed
@@ -331,7 +331,7 @@ string::const_iterator line_tools_find_last_char_out_of_parenth(const string & a
  	    if(parenth > 0)
 		--parenth;
 	    else
-		throw Erange("line_tools_find_first_char_out_of_parenth", string(gettext("Unbalanced parenthesis in expression: ")) + argument);
+		throw Erange(string(gettext("Unbalanced parenthesis in expression: ")) + argument);
 	    break;
 
 		// no default: statement needed
@@ -399,7 +399,7 @@ string line_tools_expand_user_comment(const string & user_comment, S_I argc, cha
 		    ret += "%";
 		    break;
 		default:
-		    throw Erange("line_tools_expand_user_comment", tools_printf(gettext("Unknown macro %%%d in user comment"), *it));
+		    throw Erange(tools_printf(gettext("Unknown macro %%%d in user comment"), *it));
 		}
 	    }
 	}
@@ -589,7 +589,7 @@ void line_tools_get_min_digits(string the_arg, infinint & num, infinint & ref_nu
     }
     catch(Edeci & e)
     {
-	throw Erange("line_tools_get_min_digits", tools_printf(gettext("Invalid number in string: %S"), &the_arg));
+	throw Erange(tools_printf(gettext("Invalid number in string: %S"), &the_arg));
     }
 }
 
@@ -776,7 +776,7 @@ libdar::crypto_algo line_tools_crypto_string_to_crypto_algo(const string & val)
 			    if(val == "camellia" || val == "camellia256")
 				algo = crypto_algo::camellia256;
 			    else
-				throw Erange("line_tools_crypto_string_to_crypt_algo", string(gettext("unknown cryptographic algorithm: ")) + val);
+				throw Erange(string(gettext("unknown cryptographic algorithm: ")) + val);
 
     return algo;
 }
@@ -1175,12 +1175,12 @@ S_I line_tools_str2signed_int(const string & x)
     string residu;
 
     if((tmp >> ret).fail())
-	throw Erange("line_tools_str2string", string(dar_gettext("Invalid number: ")) + x);
+	throw Erange(string(dar_gettext("Invalid number: ")) + x);
 
     tmp >> residu;
     for(U_I i = 0; i < residu.size(); ++i)
 	if(residu[i] != ' ')
-	    throw Erange("line_tools_str2string", string(dar_gettext("Invalid number: ")) + x);
+	    throw Erange(string(dar_gettext("Invalid number: ")) + x);
 
     return ret;
 }
@@ -1221,36 +1221,36 @@ infinint line_tools_convert_date(const string & repres)
 	    {
 	    case year:
 		if(tmp < 1970)
-		    throw Erange("line_tools_convert_date", dar_gettext("date before 1970 is not allowed"));
+		    throw Erange(dar_gettext("date before 1970 is not allowed"));
 		when.tm_year = tmp - 1900;
 		break;
 	    case month:
 		if(tmp < 1 || tmp > 12)
-		    throw Erange("line_tools_convert_date", dar_gettext("Incorrect month"));
+		    throw Erange(dar_gettext("Incorrect month"));
 		when.tm_mon = tmp - 1;
 		break;
 	    case day:
 		if(tmp < 1 || tmp > 31)
-		    throw Erange("line_tools_convert_date", dar_gettext("Incorrect day of month"));
+		    throw Erange(dar_gettext("Incorrect day of month"));
 		when.tm_mday = tmp;
 		break;
 	    case hour:
 		if(tmp < 0 || tmp > 23)
-		    throw Erange("line_tools_convert_date", dar_gettext("Incorrect hour"));
+		    throw Erange(dar_gettext("Incorrect hour"));
 		when.tm_hour = tmp;
 		break;
 	    case min:
 		if(tmp < 0 || tmp > 59)
-		    throw Erange("line_tools_convert_date", dar_gettext("Incorrect minute"));
+		    throw Erange(dar_gettext("Incorrect minute"));
 		when.tm_min = tmp;
 		break;
 	    case sec:
 		if(tmp < 0 || tmp > 59)
-		    throw Erange("line_tools_convert_date", dar_gettext("Incorrect second"));
+		    throw Erange(dar_gettext("Incorrect second"));
 		when.tm_sec = tmp;
 		break;
 	    case error:
-		throw Erange("line_tools_convert_date", dar_gettext("Bad formatted date expression"));
+		throw Erange(dar_gettext("Bad formatted date expression"));
 	    default:
 		break; // nothing to do
 	    }
@@ -1365,7 +1365,7 @@ infinint line_tools_convert_date(const string & repres)
     tmp = scanner.get_struct();
     when = mktime(&tmp);
     if(when > now)
-	throw Erange("line_tools_convert_date", dar_gettext("Given date must be in the past"));
+	throw Erange(dar_gettext("Given date must be in the past"));
     ret = when;
 
     return ret;
@@ -1619,7 +1619,7 @@ string line_tools_getcwd()
 		    length += step;
 		}
 		else // other error
-		    throw Erange("line_tools_getcwd", string(dar_gettext("Cannot get full path of current working directory: ")) + tools_strerror_r(errno));
+		    throw Erange(string(dar_gettext("Cannot get full path of current working directory: ")) + tools_strerror_r(errno));
 	    }
 	}
 	while(ret == nullptr);
@@ -1690,7 +1690,7 @@ string line_tools_get_hostname()
     struct utsname uts;
 
     if(uname(&uts) < 0)
-	throw Erange("line_tools_get_hostname", string(dar_gettext("Error while fetching hostname: ")) + tools_strerror_r(errno));
+	throw Erange(string(dar_gettext("Error while fetching hostname: ")) + tools_strerror_r(errno));
 
     ret = string(uts.nodename);
 
@@ -1757,7 +1757,7 @@ delta_sig_block_size::fs_function_t line_tools_string_to_sig_block_size_function
 	return delta_sig_block_size::root2;
     if(funname == "square3" || funname == "root3") // keeping square3 for backward compatibility
 	return delta_sig_block_size::root3;
-    throw Erange("line_tools_string_to_sig_block_function", gettext("unknown name give for delta signature block len function"));
+    throw Erange(gettext("unknown name give for delta signature block len function"));
 }
 
 void line_tools_split_compression_algo(const char *arg, U_I base, compression & algo, U_I & level, U_I & block_size)
@@ -1785,7 +1785,7 @@ void line_tools_split_compression_algo(const char *arg, U_I base, compression & 
                 }
                 catch(Erange & e)
                 {
-                    throw Erange("split_compression_algo", tools_printf(gettext("%s does not name a compression \"[algorithm][:][level]\" , like for examples \"gzip\", \"lzo\", \"bzip2\", \"lzo:3\", \"gzip:2\", \"8\" or \"1\". Please review the man page about -z option"), working.c_str()));
+                    throw Erange(tools_printf(gettext("%s does not name a compression \"[algorithm][:][level]\" , like for examples \"gzip\", \"lzo\", \"bzip2\", \"lzo:3\", \"gzip:2\", \"8\" or \"1\". Please review the man page about -z option"), working.c_str()));
                 }
             }
             else // argument is a compression level, algorithm is gzip by default
@@ -1802,7 +1802,7 @@ void line_tools_split_compression_algo(const char *arg, U_I base, compression & 
 	     if(split[1] != "")
 	    {
 		if(!tools_my_atoi(split[1].c_str(), level) || (level > 9 && algo != compression::zstd) || level < 1)
-		    throw Erange("split_compression_algo", gettext("Compression level must be between 1 and 9, included"));
+		    throw Erange(gettext("Compression level must be between 1 and 9, included"));
 	    }
 	    else
 		level = 9; // default compression level
@@ -1818,7 +1818,7 @@ void line_tools_split_compression_algo(const char *arg, U_I base, compression & 
 	    if(split[1] != "")
 	    {
 		if(!tools_my_atoi(split[1].c_str(), level) || (level > 9 && algo != compression::zstd) || level < 1)
-		    throw Erange("split_compression_algo", gettext("Compression level must be between 1 and 9, included"));
+		    throw Erange(gettext("Compression level must be between 1 and 9, included"));
 	    }
 	    else
 		level = 9;
@@ -1827,10 +1827,10 @@ void line_tools_split_compression_algo(const char *arg, U_I base, compression & 
 	    block_size = 0;
 	    tmp.unstack(block_size);
 	    if(!tmp.is_zero())
-		throw Erange("split_compression_algo", gettext("Compression block size too large for this operating system"));
+		throw Erange(gettext("Compression block size too large for this operating system"));
 	    break;
 	default:
-	    throw Erange("split_compression_algo", gettext("invalid argument given for compression scheme"));
+	    throw Erange(gettext("invalid argument given for compression scheme"));
 	}
     }
 }
@@ -1965,8 +1965,7 @@ string line_tools_replace_escape_sequences(const string & arg)
 		case 'x':
 		    ++nextone;
 		    if(nextone == arg.end())
-			throw Erange("line_tools_replace_escape_sequences",
-				     tools_printf(gettext("Do not know how to handle \\x at end of string: %s"), arg.c_str()));
+			throw Erange(tools_printf(gettext("Do not know how to handle \\x at end of string: %s"), arg.c_str()));
 		    else
 		    {
 			try
@@ -1982,12 +1981,11 @@ string line_tools_replace_escape_sequences(const string & arg)
 		    }
 		    break;
 		default:
-		    throw Erange("line_tools_replace_escape_sequences", tools_printf(gettext("Unknown escape character: \\%c"), *nextone));
+		    throw Erange(tools_printf(gettext("Unknown escape character: \\%c"), *nextone));
 		}
 	    }
 	    else
-		throw Erange("line_tools_replace_escape_sequences",
-			     tools_printf(gettext("Do not know how to handle a single backslash at end of string, either use double it or remove it: %s"), arg.c_str()));
+		throw Erange(tools_printf(gettext("Do not know how to handle a single backslash at end of string, either use double it or remove it: %s"), arg.c_str()));
 	}
 	else
 	{
@@ -2081,8 +2079,7 @@ static void tools_localtime(const time_t & timep, struct tm *result)
     if(ret == nullptr)
     {
 	string err = tools_strerror_r(errno);
-	throw Erange("tools_localtime",
-		     tools_printf(gettext("Error met while retrieving current time: %S"), &err));
+	throw Erange(tools_printf(gettext("Error met while retrieving current time: %S"), &err));
     }
 #else
     struct tm *ret = localtime(&timep);
@@ -2129,7 +2126,7 @@ static char extract_hexa_from_string(string::const_iterator & x)
 	else if(*x > 'a' && *x <= 'f')
 	    val = *x - 'a' + 10;
 	else
-	    throw Erange("extract_hexa_from_string", gettext("uncomplete hexadecimal number in escape sequence"));
+	    throw Erange(gettext("uncomplete hexadecimal number in escape sequence"));
 	ret *= 16;
 	ret += val;
 	++digit;

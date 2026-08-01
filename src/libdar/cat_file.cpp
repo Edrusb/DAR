@@ -510,7 +510,7 @@ namespace libdar
 		// sanity checks
 
 	    if(!can_get_data())
-		throw Erange("cat_file::get_data", gettext("cannot provide data from a \"not saved\" file object"));
+		throw Erange(gettext("cannot provide data from a \"not saved\" file object"));
 
 	    if(delta_ref
 	       && get_saved_status() != saved_status::delta)
@@ -1077,7 +1077,7 @@ namespace libdar
 			    }
 			}
 			else
-			    throw Erange("cat_file::cat_file", gettext("can't read data CRC: No escape mark found for that file"));
+			    throw Erange(gettext("can't read data CRC: No escape mark found for that file"));
 		    }
 		    catch(...)
 		    {
@@ -1342,7 +1342,7 @@ namespace libdar
 		if(small)
 		{
 		    if(!esc->skip_to_next_mark(escape::seqt_delta_sig, true))
-			throw Erange("cat_file::read_delta_signature", gettext("can't find mark for delta signature"));
+			throw Erange(gettext("can't find mark for delta signature"));
 		}
 
 		delta_sig->read(small, read_ver);
@@ -1491,14 +1491,14 @@ namespace libdar
 	{
 	    infinint s1 = get_size();
 	    infinint s2 = f_other->get_size();
-	    throw Erange("cat_file::sub_compare", tools_printf(gettext("not same size: %i <--> %i"), &s1, &s2));
+	    throw Erange(tools_printf(gettext("not same size: %i <--> %i"), &s1, &s2));
 	}
 
 	if(!tools_is_equal_with_hourshift(hourshift, get_last_modif(), other.get_last_modif()))
 	{
 	    string s1 = tools_display_date(get_last_modif());
 	    string s2 = tools_display_date(other.get_last_modif());
-	    throw Erange("cat_file::sub_compare_internal", tools_printf(gettext("difference of last modification date: %S <--> %S"), &s1, &s2));
+	    throw Erange(tools_printf(gettext("difference of last modification date: %S <--> %S"), &s1, &s2));
 	}
 
 	if(!can_read_other_data) // we cannot compare data, nor CRC, no signature, so we just rely on mtime
@@ -1567,7 +1567,7 @@ namespace libdar
 				    crc_size,
 				    value,
 				    err_offset))
-			    throw Erange("cat_file::sub_compare", tools_printf(gettext("different file data, offset of first difference is: %i"), &err_offset));
+			    throw Erange(tools_printf(gettext("different file data, offset of first difference is: %i"), &err_offset));
 			    // data is the same, comparing the CRC values
 
 			if(get_crc(original))
@@ -1575,9 +1575,9 @@ namespace libdar
 			    if(value == nullptr)
 				throw SRC_BUG;
 			    if(original->get_size() != value->get_size())
-				throw Erange("cat_file::sub_compare", gettext("Same data but CRC value could not be verified because we did not guessed properly its width (sequential read restriction)"));
+				throw Erange(gettext("Same data but CRC value could not be verified because we did not guessed properly its width (sequential read restriction)"));
 			    if(*original != *value)
-				throw Erange("cat_file::sub_compare", gettext("Same data but stored CRC does not match the data!?!"));
+				throw Erange(gettext("Same data but stored CRC does not match the data!?!"));
 			}
 
 			    // else old archive without CRC
@@ -1618,7 +1618,7 @@ namespace libdar
 		    // both only have delta signature
 
 		if(!has_same_delta_signature(*f_other))
-		    throw Erange("cat_file::sub_compare", gettext("Delta signature do not match"));
+		    throw Erange(gettext("Delta signature do not match"));
 	    }
 	    else
 	    {
@@ -1668,9 +1668,9 @@ namespace libdar
 		    infinint size_you = sig_you->size();
 
 		    if(size_me != size_you)
-			throw Erange("cat_file::sub_compare", tools_printf(gettext("Delta signature do not have the same size: %i <--> %i"), &size_me, &size_you));
+			throw Erange(tools_printf(gettext("Delta signature do not have the same size: %i <--> %i"), &size_me, &size_you));
 		    if(*sig_me != *sig_you) // comparing file's content
-			throw Erange("cat_file::sub_compare", gettext("Delta signature have the same size but do not match"));
+			throw Erange(gettext("Delta signature have the same size but do not match"));
 		}
 		catch(...)
 		{
@@ -1690,7 +1690,7 @@ namespace libdar
 
 		const crc *value = nullptr;
 		if(!get_crc(value))
-		    throw Erange ("cat_file::sub_compare", gettext("Missing CRC field for the delta patch stored in archive"));
+		    throw Erange(gettext("Missing CRC field for the delta patch stored in archive"));
 
 
 		    // then we can fetch the delta sig structure and the patch result crc it contains
@@ -1729,7 +1729,7 @@ namespace libdar
 
 			if(my_crc->get_size() != other_crc->get_size()
 			   || *my_crc != *other_crc)
-			    throw Erange("cat_file::compare", tools_printf(gettext("CRC difference concerning file's data")));
+			    throw Erange(tools_printf(gettext("CRC difference concerning file's data")));
 		    }
 		    catch(...)
 		    {

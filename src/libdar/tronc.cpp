@@ -243,7 +243,7 @@ namespace libdar
 	if(check_pos && ref->get_position() != abso_pos)
 	{
 	    if(!ref->skip(abso_pos))
-		throw Erange("tronc::inherited_read", gettext("Cannot skip to the current position in \"tronc\""));
+		throw Erange(gettext("Cannot skip to the current position in \"tronc\""));
 	}
 
 	if(limited)
@@ -285,7 +285,7 @@ namespace libdar
 	if(check_pos)
 	{
 	    if(!ref->skip(start + current))
-		throw Erange("tronc::inherited_read", gettext("Cannot skip to the current position in \"tronc\""));
+		throw Erange(gettext("Cannot skip to the current position in \"tronc\""));
 	}
 
 	if(limited)
@@ -297,7 +297,7 @@ namespace libdar
 	    {
 		avail.unstack(macro_pas);
 		if(macro_pas == 0 && wrote < size)
-		    throw Erange("tronc::inherited_write", gettext("Tried to write out of size limited file"));
+		    throw Erange(gettext("Tried to write out of size limited file"));
 		micro_pas = size - wrote > macro_pas ? macro_pas : size - wrote;
 		ref->write(a+wrote, micro_pas);
 		wrote += micro_pas;

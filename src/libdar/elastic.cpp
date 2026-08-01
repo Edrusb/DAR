@@ -77,9 +77,9 @@ namespace libdar
     elastic::elastic(U_32 size)
     {
 	if(size == 0)
-	    throw Erange("elastic::elastic", gettext("Zero is not a valid size for an elastic buffer"));
+	    throw Erange(gettext("Zero is not a valid size for an elastic buffer"));
 	if(size >  max_length())
-	    throw Erange("elastic::elastic", gettext("Size too large for an elastic buffer"));
+	    throw Erange(gettext("Size too large for an elastic buffer"));
 
 	taille = size;
     }
@@ -95,7 +95,7 @@ namespace libdar
 
 	    // see note below
 	if(size >= forbidden_size)
-	    throw Erange("elastic::elastic", gettext("Buffer size too large to setup an elastic buffer"));
+	    throw Erange(gettext("Buffer size too large to setup an elastic buffer"));
 
 	while(pos < size && buffer[pos] != SINGLE_MARK && buffer[pos] != first_mark)
 	    pos += step;
@@ -113,13 +113,13 @@ namespace libdar
 	    // Thanks to Sviat89@github for triggering this.
 
 	if(pos >= size)
-	    throw Erange("elastic::elastic", gettext("elastic buffer incoherent structure"));
+	    throw Erange(gettext("elastic buffer incoherent structure"));
 
 	if(buffer[pos] == SINGLE_MARK)
 	    if(first_pos == pos)
 		taille = 1;
 	    else
-		throw Erange("elastic::elastic", gettext("elastic buffer incoherent structure"));
+		throw Erange(gettext("elastic buffer incoherent structure"));
 	else // elastic buffer size is greater than one
 	{
 	    U_32 power_base = 1;
@@ -145,17 +145,17 @@ namespace libdar
 
 		pos += step;
 		if(++byte_counter > int_width)
-		    throw Erange("elastic::elastic", gettext("too large elastic buffer or elastic buffer incoherent structure"));
+		    throw Erange(gettext("too large elastic buffer or elastic buffer incoherent structure"));
 	    }
 
 	    if(pos >= size)
-		throw Erange("elastic::elastic", gettext("elastic buffer incoherent structure"));
+		throw Erange(gettext("elastic buffer incoherent structure"));
 
 	    if(taille == 0 && byte_counter == 0)
 		taille = 2; // this is the trivial buffer of size 2
 	    else
 		if(taille < 3)
-		    throw Erange("elastic::elastic", gettext("elastic buffer incoherent structure"));
+		    throw Erange(gettext("elastic buffer incoherent structure"));
 	}
     }
 
@@ -171,7 +171,7 @@ namespace libdar
 	    ++count;
 
 	if(a != SINGLE_MARK && a != first_mark)
-	    throw Erange("elastic::elastic", gettext("elastic buffer incoherent structure"));
+	    throw Erange(gettext("elastic buffer incoherent structure"));
 	else
 	    ++count;
 
@@ -179,7 +179,7 @@ namespace libdar
 	    if(count == 1)
 		taille = 1;
 	    else
-		throw Erange("elastic::elastic", gettext("elastic buffer incoherent structure"));
+		throw Erange(gettext("elastic buffer incoherent structure"));
 	else // elastic buffer size is greater than one
 	{
 	    U_32 power_base = 1;
@@ -204,11 +204,11 @@ namespace libdar
 
 		count++;
 		if(++byte_counter > int_width)
-		    throw Erange("elastic::elastic", gettext("too large elastic buffer or elastic buffer incoherent structure"));
+		    throw Erange(gettext("too large elastic buffer or elastic buffer incoherent structure"));
 	    }
 
 	    if(a != last_mark)
-		throw Erange("elastic::elastic", gettext("elastic buffer incoherent structure"));
+		throw Erange(gettext("elastic buffer incoherent structure"));
 	    else
 		count++;
 
@@ -216,7 +216,7 @@ namespace libdar
 		taille = 2; // this is the trivial buffer of size 2
 	    else
 		if(taille < 3)
-		    throw Erange("elastic::elastic", gettext("elastic buffer incoherent structure"));
+		    throw Erange(gettext("elastic buffer incoherent structure"));
 
 		// now skipping to the "end" of the elastic buffer
 	    if(count < taille)
@@ -226,14 +226,14 @@ namespace libdar
 		    f.skip_relative(count - taille);
 	    else
 		if(count > taille)
-		    throw Erange("elastic::elastic", gettext("elastic buffer incoherent structure"));
+		    throw Erange(gettext("elastic buffer incoherent structure"));
 	}
     }
 
     U_32 elastic::dump(unsigned char *buffer, U_32 size) const
     {
 	if(size < taille)
-	    throw Erange("elastic::dump", gettext("not enough space provided to dump the elastic buffer"));
+	    throw Erange(gettext("not enough space provided to dump the elastic buffer"));
 
 	if(taille > 2)
 	{

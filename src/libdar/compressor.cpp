@@ -100,7 +100,7 @@ namespace libdar
 		case WR_MEM_ERROR:
 		    throw Ememory();
 		case WR_VERSION_ERROR:
-		    throw Erange("compressor::compressor", gettext("incompatible compression library version or unsupported feature required from compression library"));
+		    throw Erange(gettext("incompatible compression library version or unsupported feature required from compression library"));
 		case WR_STREAM_ERROR:
 		    throw SRC_BUG;
 		default:
@@ -119,7 +119,7 @@ namespace libdar
 		    throw Ememory();
 		case WR_VERSION_ERROR:
 		    compr->wrap.decompressEnd();
-		    throw Erange("compressor::compressor", gettext("incompatible compression library version or unsupported feature required from compression library"));
+		    throw Erange(gettext("incompatible compression library version or unsupported feature required from compression library"));
 		case WR_STREAM_ERROR:
 		    throw SRC_BUG;
 		default:
@@ -207,7 +207,7 @@ namespace libdar
             case WR_DATA_ERROR: // some data remains in the compression pipe (data loss)
                 throw SRC_BUG;
             case WR_STREAM_ERROR:
-                throw Erange("compressor::~compressor", gettext("compressed data is corrupted"));
+                throw Erange(gettext("compressed data is corrupted"));
             default :
                 throw SRC_BUG;
             }
@@ -279,7 +279,7 @@ namespace libdar
             case WR_STREAM_END:
                 break;
             case WR_DATA_ERROR:
-                throw Erange("compressor::gzip_read", gettext("compressed data CRC error"));
+                throw Erange(gettext("compressed data CRC error"));
             case WR_MEM_ERROR:
                 throw Ememory();
             case WR_BUF_ERROR:

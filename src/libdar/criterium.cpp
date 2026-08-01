@@ -504,7 +504,7 @@ namespace libdar
 	    deque<criterium *>::const_iterator it = operand.begin();
 
 	    if(it == operand.end())
-		throw Erange("crit_and::evaluate", gettext("Cannot evaluate this crit_and criterium as no criterium has been added to it"));
+		throw Erange(gettext("Cannot evaluate this crit_and criterium as no criterium has been added to it"));
 
 	    while(ret && it != operand.end())
 	    {
@@ -573,7 +573,7 @@ namespace libdar
 	    deque<criterium *>::const_iterator it = operand.begin();
 
 	    if(it == operand.end())
-		throw Erange("crit_or::evaluate", gettext("Cannot evaluate this crit_or criterium as no criterium has been added to it"));
+		throw Erange(gettext("Cannot evaluate this crit_or criterium as no criterium has been added to it"));
 
 	    while(!ret && it != operand.end())
 	    {

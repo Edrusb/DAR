@@ -42,7 +42,7 @@ namespace libdar
     {
 #if LIBLZ4_AVAILABLE
 	if(compression_level > 9 || compression_level < 1)
-	    throw Erange("lz4_module::lz4_module", tools_printf(gettext("out of range LZ4 compression level: %d"), compression_level));
+	    throw Erange(tools_printf(gettext("out of range LZ4 compression level: %d"), compression_level));
 	acceleration = 10 - compression_level;
 
 	state = new (nothrow) char[LZ4_sizeofState()];
@@ -112,7 +112,7 @@ namespace libdar
     {
 #if LIBLZ4_AVAILABLE
 	if(clear_size > get_max_compressing_size() || clear_size < 1)
-	    throw Erange("lz4_module::get_min_size_to_compress", "out of range block size submitted to lz4_module::get_min_size_to_compress");
+	    throw Erange("out of range block size submitted to lz4_module::get_min_size_to_compress");
 
 	return LZ4_compressBound(clear_size);
 #else
@@ -131,7 +131,7 @@ namespace libdar
 	S_I ret;
 
 	if(normal_size > get_max_compressing_size())
-	    throw Erange("lz4_module::compress_data", "oversized uncompressed data given to LZ4 compression engine");
+	    throw Erange("oversized uncompressed data given to LZ4 compression engine");
 
 	ret = LZ4_compress_fast_extState((void *)state,
 					 normal,
@@ -140,7 +140,7 @@ namespace libdar
 					 zip_buf_size,
 					 acceleration);
 	if(ret <= 0)
-	    throw Erange("lz4_module::compress_data", "undersized compressed buffer given to LZ4 compression engine");
+	    throw Erange("undersized compressed buffer given to LZ4 compression engine");
 
 	return ret;
 #else

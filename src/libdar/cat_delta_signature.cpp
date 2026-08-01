@@ -350,7 +350,7 @@ namespace libdar
 		    sig_block_len = 0;
 		    tmp.unstack(sig_block_len);
 		    if(!tmp.is_zero())
-			throw Erange("cat_delta_signature::fetch_data", gettext("data corrupted when attempting to read delta signature block size"));
+			throw Erange(gettext("data corrupted when attempting to read delta signature block size"));
 		}
 		else
 		    sig_block_len = 2048; // RS_DEFAULT_BLOCK_LEN from librsync. Using value in case this macro would change in the future
@@ -372,9 +372,9 @@ namespace libdar
 
 		delta_sig_crc = create_crc_from_file(*src);
 		if(delta_sig_crc == nullptr)
-		    throw Erange("cat_delta_signature::fetch_data", gettext("Error while reading CRC of delta signature data. Data corruption occurred"));
+		    throw Erange(gettext("Error while reading CRC of delta signature data. Data corruption occurred"));
 		if(*delta_sig_crc != *calculated)
-		    throw Erange("cat_delta_signature::read_data", gettext("CRC error met while reading delta signature: data corruption."));
+		    throw Erange(gettext("CRC error met while reading delta signature: data corruption."));
 	    }
 	    catch(...)
 	    {

@@ -204,7 +204,7 @@ namespace libdar
 	    {
 		err = rs_build_hash_table(sumset);
 		if(err != RS_DONE)
-		    throw Erange("generic_rsync::generic_rsync", string(gettext("Error met building the rsync hash table: ")) + string(rs_strerror(err)));
+		    throw Erange(string(gettext("Error met building the rsync hash table: ")) + string(rs_strerror(err)));
 		job = rs_delta_begin(sumset);
 		x_below = below;
 		x_input = nullptr;
@@ -488,7 +488,7 @@ namespace libdar
 	    ret = false;
 	    break;
 	default:
-	    throw Erange("generic_rsync::step_forward", string(gettext("Error met while feeding data to librsync: ")) + rs_strerror(res));
+	    throw Erange(string(gettext("Error met while feeding data to librsync: ")) + rs_strerror(res));
 	}
 
 	if(buf.avail_in > 0 && shift_input)
@@ -510,7 +510,7 @@ namespace libdar
 	    rs_result err = rs_job_free(job);
 	    job = nullptr;
 	    if(err != RS_DONE)
-		throw Erange("generic_rsync::inherited_terminate", string(gettext("Error releasing librsync job: ")) + string(rs_strerror(err)));
+		throw Erange(string(gettext("Error releasing librsync job: ")) + string(rs_strerror(err)));
 	}
 #endif
     }

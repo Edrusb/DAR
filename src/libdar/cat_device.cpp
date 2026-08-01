@@ -94,10 +94,10 @@ namespace libdar
 	if(saved == saved_status::saved)
 	{
 	    if(ptr->read((char *)&tmp, sizeof(tmp)) != sizeof(tmp))
-		throw Erange("special::special", gettext("missing data to build a special device"));
+		throw Erange(gettext("missing data to build a special device"));
 	    xmajor = ntohs(tmp);
 	    if(ptr->read((char *)&tmp, sizeof(tmp)) != sizeof(tmp))
-		throw Erange("special::special", gettext("missing data to build a special device"));
+		throw Erange(gettext("missing data to build a special device"));
 	    xminor = ntohs(tmp);
 	}
 	else
@@ -152,9 +152,9 @@ namespace libdar
 	if(get_saved_status() == saved_status::saved && d_other->get_saved_status() == saved_status::saved)
 	{
 	    if(get_major() != d_other->get_major())
-		throw Erange("cat_device::sub_compare", tools_printf(gettext("devices have not the same major number: %d <--> %d"), get_major(), d_other->get_major()));
+		throw Erange(tools_printf(gettext("devices have not the same major number: %d <--> %d"), get_major(), d_other->get_major()));
 	    if(get_minor() != d_other->get_minor())
-		throw Erange("cat_device::sub_compare", tools_printf(gettext("devices have not the same minor number: %d <--> %d"), get_minor(), d_other->get_minor()));
+		throw Erange(tools_printf(gettext("devices have not the same minor number: %d <--> %d"), get_minor(), d_other->get_minor()));
 	}
     }
 

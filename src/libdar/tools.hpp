@@ -586,7 +586,7 @@ namespace libdar
 	std::deque<B> ret;
 
 	if(base <= 0)
-	    throw Erange("tools_number_decoupe_in_big_endian", "base must be strictly positive");
+	    throw Erange("base must be strictly positive");
 
 	while(number != 0)
 	{

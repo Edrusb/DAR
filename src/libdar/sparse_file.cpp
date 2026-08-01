@@ -187,7 +187,7 @@ namespace libdar
 				offset += zero_count;
 				zero_count = 0;
 				if(!ref.skip(offset))
-				    throw Erange("sparse_file::copy_to", gettext("Cannot skip forward to restore a hole"));
+				    throw Erange(gettext("Cannot skip forward to restore a hole"));
 				last_is_skip = true;
 			    }
 			}
@@ -200,7 +200,7 @@ namespace libdar
 			    if(m == seqt_file)
 				throw SRC_BUG; // should have been reported above by next_to_read_is_mark(seqt_file)
 			    else
-				throw Erange("sparse_file::copy", gettext("Data corruption or unknown sparse_file mark found in file's data"));
+				throw Erange(gettext("Data corruption or unknown sparse_file mark found in file's data"));
 			else // Yes, this is the EOF
 			{
 			    if(last_is_skip)
@@ -404,7 +404,7 @@ namespace libdar
 			    if(t == seqt_file)
 				throw SRC_BUG;
 			    else
-				throw Erange("sparse_file::inherited_read", gettext("Incoherent structure in data carrying sparse files: unknown mark"));
+				throw Erange(gettext("Incoherent structure in data carrying sparse files: unknown mark"));
 			    // we were not at the end of file, while an escape sequence different from seqt_file was met
 			else
 			    eof = true; // no mark next to be read, thus we are at EOF for real

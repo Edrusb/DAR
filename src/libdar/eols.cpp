@@ -51,7 +51,7 @@ namespace libdar
     void eols::add_sequence(const std::string & seq)
     {
 	if(seq.empty())
-	    throw Erange("eols::add_sequence", gettext("Empty string cannot be provided as sequence defining an end of line"));
+	    throw Erange(gettext("Empty string cannot be provided as sequence defining an end of line"));
 	eols_curs.push_back(in_progress(seq));
     }
 

@@ -173,7 +173,7 @@ namespace libdar
 			throw SRC_BUG;
 
 		    if(!allow_over)
-			throw Erange("trivial_sar::trivial_sar", tools_printf(gettext("%S already exists, and overwritten is forbidden, aborting"), &filename));
+			throw Erange(tools_printf(gettext("%S already exists, and overwritten is forbidden, aborting"), &filename));
 		    if(warn_over)
 			get_ui().pause(tools_printf(gettext("%S is about to be overwritten, continue ?"), &filename));
 
@@ -481,7 +481,7 @@ namespace libdar
 	case gf_read_only:
 	    tete.read(get_ui(), *reference);
 	    if(tete.get_flag() == flag_type_non_terminal)
-		throw Erange("trivial_sar::trivial_sar", gettext("This archive has slices and is not possible to read from a pipe"));
+		throw Erange(gettext("This archive has slices and is not possible to read from a pipe"));
 		// if flag is flag_type_located_at_end_of_slice, we will warn at end of slice
 	    offset = reference->get_position();
 	    cur_pos = 0;
@@ -538,7 +538,7 @@ namespace libdar
 		{
 		    --ret;
 		    if(a[ret] != flag_type_terminal)
-			throw Erange("trivial_sar::inherited_read", gettext("This archive is not single sliced, more data exists in the next slices but cannot be read from the current pipe, aborting"));
+			throw Erange(gettext("This archive is not single sliced, more data exists in the next slices but cannot be read from the current pipe, aborting"));
 		    else
 			end_of_slice = 1;
 		}

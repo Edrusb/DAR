@@ -373,7 +373,7 @@ namespace libdar
 				  && data_restored == filesystem_restore::done_data_restored);
 
 			    if(tmp_exc.active)
-				throw Erange("", tmp_exc.message);
+				throw Erange(tmp_exc.message);
 
 			    if(cat.get_escape_layer() != nullptr && cat.get_escape_layer()->skip_to_next_mark(escape::seqt_dirty, false))
 			    {
@@ -1497,7 +1497,7 @@ namespace libdar
 									     0,
 									     nullptr);
 					if(dat == nullptr)
-					    throw Erange("filtre_test", gettext("Can't read saved data."));
+					    throw Erange(gettext("Can't read saved data."));
 
 					dirty_file = false;
 
@@ -1543,7 +1543,7 @@ namespace libdar
 						    if(typeid(*check) != typeid(*original))
 							throw SRC_BUG;
 						    if(*check != *original)
-							throw Erange("fitre_test", gettext("CRC error: data corruption."));
+							throw Erange(gettext("CRC error: data corruption."));
 						}
 					    }
 					    catch(...)
@@ -2988,7 +2988,7 @@ namespace libdar
 		    // fact user could not produce a missing
 		    // slice, thus we replace the exception
 		    // by a Erange one.
-		throw Erange("filtre_merge_step2", e.get_message());
+		throw Erange(e.get_message());
 	    else
 		throw;
 	}
@@ -3479,7 +3479,7 @@ namespace libdar
 						if(typeid(*original) != typeid(*val))
 						    throw SRC_BUG;
 						if(*original != *val)
-						    throw Erange("save_inode", gettext("Copied data does not match CRC"));
+						    throw Erange(gettext("Copied data does not match CRC"));
 					    }
 					}
 
@@ -3623,7 +3623,7 @@ namespace libdar
 					try
 					{
 					    if(!pdesc.stack->skip(rewinder))
-						throw Erange("save_inode","skipping was possible in theory but not in reality");
+						throw Erange("skipping was possible in theory but not in reality");
 						// this situation may arise when some data
 						// is pending to be written (cache layer) and
 						// before skipping back leads the cache to flush
@@ -3739,11 +3739,11 @@ namespace libdar
 							{
 							    if(!pdesc.stack->skip(start))
 								throw SRC_BUG;
-							    throw Erange("",""); // used locally
+							    throw Erange(""); // used locally
 							}
 						    }
 						    else
-							throw Erange("",""); // used locally, not propagated over this try / catch block
+							throw Erange(""); // used locally, not propagated over this try / catch block
 						}
 					    }
 					    catch(...)

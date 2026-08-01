@@ -43,7 +43,7 @@ namespace libdar
 	    ptr = pdesc->stack;
 
 	if(ptr->read((char *)&signe, 1) != 1)
-	    throw Erange("cat_detruit::cat_detruit", gettext("missing data to build"));
+	    throw Erange(gettext("missing data to build"));
 
 	if(reading_ver > 7)
 	    del_date.read(*ptr, reading_ver);

@@ -41,13 +41,13 @@ namespace libdar
 	if(f == nullptr)
 	    throw SRC_BUG;
 	if(look_for_label(label) != stack.end())
-	    throw Erange("pile::push", "Label already used while pushing a generic_file on a stack");
+	    throw Erange("Label already used while pushing a generic_file on a stack");
 	if(stack.empty())
 	    set_mode(f->get_mode());
 	if(f->get_mode() != get_mode()                         // not the exact same mode
 	   && (!extend_mode || f->get_mode() != gf_read_write) // not extending the mode
 	   && get_mode() != gf_read_write)                     // not reducing the mode
-	    throw Erange("pile::push", "Adding to the stack of generic_file an object using an incompatible read/write mode");
+	    throw Erange("Adding to the stack of generic_file an object using an incompatible read/write mode");
 	set_mode(f->get_mode());
 	to_add.ptr = f;
 	to_add.labels.clear();
@@ -119,7 +119,7 @@ namespace libdar
 	    deque<face>::iterator it = look_for_label(label);
 
 	    if(it == stack.end())
-		throw Erange("pile::get_by_label", "Label requested in generic_file stack is unknown");
+		throw Erange("Label requested in generic_file stack is unknown");
 
 	    if(it->ptr == nullptr)
 		throw SRC_BUG;
@@ -131,7 +131,7 @@ namespace libdar
     void pile::clear_label(const string & label)
     {
 	if(label == "")
-	    throw Erange("pile::clear_label", "Empty string is an invalid label, cannot clear it");
+	    throw Erange("Empty string is an invalid label, cannot clear it");
 	deque<face>::iterator it = look_for_label(label);
 	if(it != stack.end())
 	{
@@ -146,13 +146,13 @@ namespace libdar
     void pile::add_label(const string & label)
     {
 	if(stack.empty())
-	    throw Erange("pile::add_label", "Cannot add a label to an empty stack");
+	    throw Erange("Cannot add a label to an empty stack");
 
 	if(label == "")
-	    throw Erange("pile::add_label", "An empty string is an invalid label, cannot add it");
+	    throw Erange("An empty string is an invalid label, cannot add it");
 
 	if(look_for_label(label) != stack.end())
-	    throw Erange("pile::add_label", "Label already used in stack, cannot add it");
+	    throw Erange("Label already used in stack, cannot add it");
 
 	stack.back().labels.push_back(label);
     }
@@ -169,7 +169,7 @@ namespace libdar
 	    return stack.back().ptr->skippable(direction, amount);
 	}
 	else
-	    throw Erange("pile::skip", "Error: skippable() on empty stack");
+	    throw Erange("Error: skippable() on empty stack");
     }
 
     bool pile::skip(const infinint & pos)
@@ -184,7 +184,7 @@ namespace libdar
 	    return stack.back().ptr->skip(pos);
 	}
 	else
-	    throw Erange("pile::skip", "Error: skip() on empty stack");
+	    throw Erange("Error: skip() on empty stack");
     }
 
     bool pile::skip_to_eof()
@@ -199,7 +199,7 @@ namespace libdar
 	    return stack.back().ptr->skip_to_eof();
 	}
 	else
-	    throw Erange("pile::skip_to_eof", "Error: skip_to_eof() on empty stack");
+	    throw Erange("Error: skip_to_eof() on empty stack");
     }
 
     bool pile::skip_relative(S_I x)
@@ -214,7 +214,7 @@ namespace libdar
 	    return stack.back().ptr->skip_relative(x);
 	}
 	else
-	    throw Erange("pile::skip_relative", "Error: skip_relative() on empty stack");
+	    throw Erange("Error: skip_relative() on empty stack");
     }
 
     bool pile::truncatable(const infinint & pos) const
@@ -229,7 +229,7 @@ namespace libdar
 	    return stack.back().ptr->truncatable(pos);
 	}
 	else
-	    throw Erange("pile::truncatable", "Error: truncatable() on empty stack");
+	    throw Erange("Error: truncatable() on empty stack");
     }
 
     infinint pile::get_position() const
@@ -244,7 +244,7 @@ namespace libdar
 	    return stack.back().ptr->get_position();
 	}
 	else
-	    throw Erange("pile::get_position", "Error: get_position() on empty stack");
+	    throw Erange("Error: get_position() on empty stack");
     }
 
     void pile::copy_to(generic_file & ref)
@@ -259,7 +259,7 @@ namespace libdar
 	    stack.back().ptr->copy_to(ref);
 	}
 	else
-	    throw Erange("pile::copy_to", "Error: copy_to() from empty stack");
+	    throw Erange("Error: copy_to() from empty stack");
     }
 
     void pile::copy_to(generic_file & ref, const infinint & crc_size, crc * & value)
@@ -274,7 +274,7 @@ namespace libdar
 	    stack.back().ptr->copy_to(ref, crc_size, value);
 	}
 	else
-	    throw Erange("pile::copy_to(crc)", "Error: copy_to(crc) from empty stack");
+	    throw Erange("Error: copy_to(crc) from empty stack");
     }
 
     void pile::inherited_read_ahead(const infinint & amount)
@@ -300,7 +300,7 @@ namespace libdar
 	    return stack.back().ptr->read(a, size);
 	}
 	else
-	    throw Erange("pile::skip", "Error: inherited_read() on empty stack");
+	    throw Erange("Error: inherited_read() on empty stack");
     }
 
     void pile::inherited_write(const char *a, U_I size)
@@ -312,7 +312,7 @@ namespace libdar
 	    stack.back().ptr->write(a, size);
 	}
 	else
-	    throw Erange("pile::skip", "Error: inherited_write() on empty stack");
+	    throw Erange("Error: inherited_write() on empty stack");
     }
 
     void pile::inherited_truncate(const infinint & pos)
@@ -324,7 +324,7 @@ namespace libdar
 	    stack.back().ptr->truncate(pos);
 	}
 	else
-	    throw Erange("pile::skip", "Error: inherited_write() on empty stack");
+	    throw Erange("Error: inherited_write() on empty stack");
     }
 
     void pile::sync_write_above(generic_file *ptr)

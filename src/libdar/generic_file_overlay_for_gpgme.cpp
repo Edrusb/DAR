@@ -52,7 +52,7 @@ namespace libdar
 	err = gpgme_data_new_from_cbs(&handle, &cbs, this);
 	if(gpgme_err_code(err) != GPG_ERR_NO_ERROR)
 	{
-	    throw Erange("generic_file_overlay_for_gpgme::generi_file_overlay_for_gpgme", tools_printf(gettext("Error creating data buffer overlay for GPGME: %s"), tools_gpgme_strerror_r(err).c_str()));
+	    throw Erange(tools_printf(gettext("Error creating data buffer overlay for GPGME: %s"), tools_gpgme_strerror_r(err).c_str()));
 	}
 #else
 	throw Efeature("Asymetric Strong encryption algorithms using GPGME");
@@ -104,7 +104,7 @@ namespace libdar
 	    ret = 0;
 	    tmp.unstack(ret);
 	    if(!tmp.is_zero())
-		throw Erange("gpgme_data_seek_cb", gettext("File offset too large to be stored in off_t type"));
+		throw Erange(gettext("File offset too large to be stored in off_t type"));
 	}
 
 	return ret;

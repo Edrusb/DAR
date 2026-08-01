@@ -129,9 +129,9 @@ namespace libdar
 			    slice_header ignored;
 
 			    if(options.get_ref_basename() == "-")
-				throw Erange("archive::i_archive::archive", gettext("Reading the archive of reference from pipe or standard input is not possible"));
+				throw Erange(gettext("Reading the archive of reference from pipe or standard input is not possible"));
 			    if(options.get_ref_basename() == "+")
-				throw Erange("archive::i_archive::archive", gettext("The basename '+' is reserved for special a purpose that has no meaning in this context"));
+				throw Erange(gettext("The basename '+' is reserved for special a purpose that has no meaning in this context"));
 
 				// we open the archive of reference also to get its different layers (ref_stack)
 			    macro_tools_open_archive(get_pointer(),
@@ -205,7 +205,7 @@ namespace libdar
 			}
 			catch(Egeneric & e)
 			{
-			    throw Erange("archive::i_archive::archive", string(gettext("Error while opening the archive of reference: ")) + e.get_message());
+			    throw Erange(string(gettext("Error while opening the archive of reference: ")) + e.get_message());
 			}
 		    }
 		    catch(...)
@@ -254,8 +254,7 @@ namespace libdar
 		if(options.get_header_only())
 		{
 		    ver.display(get_ui());
-		    throw Erange("archive::i_archive::achive",
-				 gettext("header only mode asked"));
+		    throw Erange(gettext("header only mode asked"));
 		}
 
 		pdesc = pile_descriptor(&stack);
@@ -291,7 +290,7 @@ namespace libdar
 			// checking for compatibility of the archive of reference with this archive data_name
 
 		    if(get_layer1_data_name() != get_catalogue_data_name())
-			throw Erange("archive::i_archive::archive", gettext("The archive and the isolated catalogue do not correspond to the same data, they are thus incompatible between them"));
+			throw Erange(gettext("The archive and the isolated catalogue do not correspond to the same data, they are thus incompatible between them"));
 
 			// we drop delta signature as they refer to the isolated catalogue container/archive
 			// to avoid having to fetch them at wrong offset from the original archive we created
@@ -509,7 +508,7 @@ namespace libdar
 	       && options.get_reference().get()->pimpl != nullptr
 	       && options.get_reference().get()->pimpl->cat != nullptr
 	       && options.get_reference().get()->pimpl->cat->get_early_memory_release())
-		throw Erange("i_archive::i_archive (create)", gettext("Early memory release is not possible for a backup of reference"));
+		throw Erange(gettext("Early memory release is not possible for a backup of reference"));
 
 	    try
 	    {
@@ -729,17 +728,17 @@ namespace libdar
 		    comp_bs_kept = 0;
 		    i_comp_bs_kept.unstack(comp_bs_kept);
 		    if(!i_comp_bs_kept.is_zero())
-			throw Erange("archive::i_archive::i_archive(merge)", gettext("compression block size used in the archive exceed integer capacity of the current system"));
+			throw Erange(gettext("compression block size used in the archive exceed integer capacity of the current system"));
 		}
 
 		if(ref_cat1 == nullptr)
 		    throw SRC_BUG;
 
 		if(ref_cat1->get_early_memory_release())
-		    throw Erange("i_archive::i_archive (merge)", gettext("Early memory release is not compatible with the merging operation"));
+		    throw Erange(gettext("Early memory release is not compatible with the merging operation"));
 
 		if(ref_cat2 != nullptr && ref_cat2->get_early_memory_release())
-		    throw Erange("i_archive::i_archive (merge)", gettext("Early memory release is not compatible with the merging operation"));
+		    throw Erange(gettext("Early memory release is not compatible with the merging operation"));
 
 		if(options.get_delta_signature())
 		{
@@ -917,7 +916,7 @@ namespace libdar
 	    compr_bs = src.pimpl->ver.get_compression_block_size();
 	    compr_bs.unstack(compr_bs_ui);
 	    if(! compr_bs.is_zero())
-		throw Erange("macro_tools_open_layers", gettext("compression block size used in the archive exceed integer capacity of the current system"));
+		throw Erange(gettext("compression block size used in the archive exceed integer capacity of the current system"));
 
 	    op_create_in_sub(oper_repair,
 			     FAKE_ROOT,            // fs_root must be
@@ -1051,7 +1050,7 @@ namespace libdar
 	    if(options.get_in_place())
 	    {
 		if(!get_cat().get_in_place(real_fs_root))
-		    throw Erange("op_extract", gettext("Cannot use in-place restoration as no in-place path is stored in the archive"));
+		    throw Erange(gettext("Cannot use in-place restoration as no in-place path is stored in the archive"));
 	    }
 	    else
 		real_fs_root = fs_root;
@@ -1334,13 +1333,13 @@ namespace libdar
 	    thread_cancellation thr;
 
 	    if(options.get_display_ea() && sequential_read)
-		throw Erange("archive::i_archive::get_children_of", gettext("Fetching EA value while listing an archive is not possible in sequential read mode"));
+		throw Erange(gettext("Fetching EA value while listing an archive is not possible in sequential read mode"));
 
 	    if(options.get_slicing_location())  // -Tslice is asked
 	    {
 		if(!only_contains_an_isolated_catalogue()
 		   && sequential_read)
-		    throw Erange("archive::i_archive::op_listing", gettext("slicing focused output is not available in sequential-read mode"));
+		    throw Erange(gettext("slicing focused output is not available in sequential-read mode"));
 
 		if(!get_catalogue_slice_layout(used_layout))
 		{
@@ -1350,7 +1349,7 @@ namespace libdar
 			    get_ui().printf(gettext("Using user provided modified slicing (first slice = %i bytes, other slices = %i bytes)"), &used_layout.first_size, &used_layout.other_size);
 		    }
 		    else
-			throw Erange("archive::i_archive::op_listing", gettext("No slice layout of the archive of reference for the current isolated catalogue is available, cannot provide slicing information, aborting"));
+			throw Erange(gettext("No slice layout of the archive of reference for the current isolated catalogue is available, cannot provide slicing information, aborting"));
 		}
 	    }
 
@@ -1506,7 +1505,7 @@ namespace libdar
 	    if(options.get_in_place())
 	    {
 		if(!get_cat().get_in_place(real_fs_root))
-		    throw Erange("op_extract", gettext("Cannot use in-place restoration as no in-place path is stored in the archive"));
+		    throw Erange(gettext("Cannot use in-place restoration as no in-place path is stored in the archive"));
 	    }
 	    else
 		real_fs_root = fs_root;
@@ -1692,7 +1691,7 @@ namespace libdar
 	    slice_header isol_slices; // this field is not used here, but necessary to call macro_tools_create_layers()
 
 	    if(!exploitable && options.get_delta_signature())
-		throw Erange("archive::i_archive::op_isolate", gettext("Isolation with delta signature is not possible on a just created archive (on-fly isolation)"));
+		throw Erange(gettext("Isolation with delta signature is not possible on a just created archive (on-fly isolation)"));
 
 	    do
 	    {
@@ -1876,12 +1875,12 @@ namespace libdar
 	bool ret;
 
 	if(callback == nullptr)
-	    throw Erange("archive::i_archive::get_children_of", "nullptr provided as user callback function");
+	    throw Erange("nullptr provided as user callback function");
 
 	if(fetch_ea && sequential_read)
-	    throw Erange("archive::i_archive::get_children_of", gettext("Fetching EA value while listing an archive is not possible in sequential read mode"));
+	    throw Erange(gettext("Fetching EA value while listing an archive is not possible in sequential read mode"));
 	if(cat != nullptr && cat->get_early_memory_release())
-	    throw Erange("i_archive::load_catalogue", gettext("get_children_of is not possible on a catalogue set with early memory release"));
+	    throw Erange(gettext("get_children_of is not possible on a catalogue set with early memory release"));
 
 	load_catalogue(false);
 	    // OK, now that we have the whole catalogue available in memory, let's rock!
@@ -1915,10 +1914,10 @@ namespace libdar
 	    throw SRC_BUG;
 
 	if(fetch_ea && sequential_read)
-	    throw Erange("archive::i_archive::get_children_of", gettext("Fetching EA value while listing an archive is not possible in sequential read mode"));
+	    throw Erange(gettext("Fetching EA value while listing an archive is not possible in sequential read mode"));
 
 	if(cat != nullptr && cat->get_early_memory_release())
-	    throw Erange("i_archive::load_catalogue", gettext("get_children_in_table is not possible on a catalogue set with early memory release"));
+	    throw Erange(gettext("get_children_in_table is not possible on a catalogue set with early memory release"));
 
 	me->load_catalogue(false);
 
@@ -2015,7 +2014,7 @@ namespace libdar
 	    throw SRC_BUG;
 
 	if(cat->get_memory_released())
-	    throw Erange("i_archive::load_catalogue", gettext("cannot get catalogue which memory has been (early) released"));
+	    throw Erange(gettext("cannot get catalogue which memory has been (early) released"));
 
 	return *cat;
     }
@@ -2224,7 +2223,7 @@ namespace libdar
 					    empty);
 
 	if(ref_arch != nullptr && ref_arch->pimpl->sequential_read && (delta_signature || delta_diff))
-	    throw Erange("archive::i_archive::op_create_in", gettext("Cannot sequentially read an archive of reference when delta signature or delta patch is requested"));
+	    throw Erange(gettext("Cannot sequentially read an archive of reference when delta signature or delta patch is requested"));
 
 	local_cat_size = 0; // unknown catalogue size (need to re-open the archive, once creation has completed) [object member variable]
 
@@ -2524,7 +2523,7 @@ namespace libdar
 		catch(Erange & e)
 		{
 		    string tmp = fs_root.display();
-		    throw Erange("archive::i_archive::op_create_in_sub", tools_printf(gettext("Error while fetching information for %S: "), &tmp) + e.get_message());
+		    throw Erange(tools_printf(gettext("Error while fetching information for %S: "), &tmp) + e.get_message());
 		}
 
 		switch(op)
@@ -2936,7 +2935,7 @@ namespace libdar
 	if(l1 != nullptr)
 	    return l1->get_slice_info().get_data_name();
 	else
-	    throw Erange("catalogue::get_data_name", gettext("Cannot get data name of the archive, this archive is not completely initialized"));
+	    throw Erange(gettext("Cannot get data name of the archive, this archive is not completely initialized"));
     }
 
     const label & archive::i_archive::get_catalogue_data_name() const
@@ -2961,7 +2960,7 @@ namespace libdar
 		if(only_contains_an_isolated_catalogue())
 		{
 		    if(!lax)
-			throw Erange("archive::i_archive::check_against_isolation", gettext("This archive contains an isolated catalogue, it cannot be used for this operation. It can only be used as reference for a incremental/differential backup or as backup of the original archive's catalogue"));
+			throw Erange(gettext("This archive contains an isolated catalogue, it cannot be used for this operation. It can only be used as reference for a incremental/differential backup or as backup of the original archive's catalogue"));
 			// note1: that old archives do not have any data_name neither in the catalogue nor in the layer1 of the archive
 			// both are faked equal to a zeroed label when reading them with recent dar version. Older archives than "08" would
 			// thus pass this test successfully if no check was done against the archive version
@@ -2973,7 +2972,7 @@ namespace libdar
 	    }
 	    catch(Erange & e)
 	    {
-		throw Erange("archive::i_archive::check_against_isolation", string(gettext("Error while fetching archive properties: ")) + e.get_message());
+		throw Erange(string(gettext("Error while fetching archive properties: ")) + e.get_message());
 	    }
 	}
 	else
@@ -3061,7 +3060,7 @@ namespace libdar
 		    parent = nullptr;
 
 		if(parent == nullptr)
-		    throw Erange("archive::i_archive::get_children_in_table", tools_printf("%S entry does not exist", &dir));
+		    throw Erange(tools_printf("%S entry does not exist", &dir));
 	    }
 	}
 	    // else returning the root of the archive

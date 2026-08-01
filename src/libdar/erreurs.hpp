@@ -217,7 +217,7 @@ namespace libdar
     class Erange : public Egeneric
     {
     public :
-        Erange(const std::string & source, const std::string & message) : Egeneric(message) {};
+        Erange(const std::string & message) : Egeneric(message) {};
 	Erange(const Erange & ref) = default;
 	Erange(Erange && ref) = default;
 	Erange & operator = (const Erange & ref) = default;

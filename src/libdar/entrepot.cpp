@@ -68,7 +68,7 @@ namespace libdar
     void entrepot::set_root(const path & p_root)
     {
 	if(p_root.is_relative())
-	    throw Erange("entrepot::set_root", std::string(gettext("root's entrepot must be an absolute path: ")) + p_root.display());
+	    throw Erange(std::string(gettext("root's entrepot must be an absolute path: ")) + p_root.display());
 	root = p_root;
     }
 

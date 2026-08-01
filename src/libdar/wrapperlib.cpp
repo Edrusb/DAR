@@ -465,7 +465,7 @@ namespace libdar
         S_I ret;
 
         if(level < 0)
-            throw Erange("wrapperlib::compressReset", gettext("compressReset called but compressInit never called before"));
+            throw Erange(gettext("compressReset called but compressInit never called before"));
         ret = compressEnd();
         if(ret == WR_OK)
             return compressInit(level);

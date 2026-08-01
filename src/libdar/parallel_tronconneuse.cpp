@@ -64,7 +64,7 @@ namespace libdar
 	proto_tronco(encrypted_side.get_mode() == gf_read_only ? gf_read_only : gf_write_only)
     {
 	if(block_size == 0)
-	    throw Erange("parallel_tronconneuse::parallel_tronconneuse", tools_printf(gettext("%d is not a valid block size"), block_size));
+	    throw Erange(tools_printf(gettext("%d is not a valid block size"), block_size));
 
 	num_workers = workers;
 	clear_block_size = block_size;
@@ -478,8 +478,7 @@ namespace libdar
 			{
 				// we must change this exception message
 				// to something more relevant to the context
-			    throw Erange("parallel_tronconneuse::inherited_read",
-					 gettext("data deciphering failed"));
+			    throw Erange(gettext("data deciphering failed"));
 			}
 
 			    // now current should have possible clear data removed

@@ -72,15 +72,13 @@ namespace libdar
 
 	    err = gcry_md_test_algo(hash_gcrypt);
 	    if(err != GPG_ERR_NO_ERROR)
-		throw Erange("hash_fichier::hash_fichier",
-			     tools_printf(gettext("Error while initializing hash: Hash algorithm not available in libgcrypt: %s/%s"),
+		throw Erange(tools_printf(gettext("Error while initializing hash: Hash algorithm not available in libgcrypt: %s/%s"),
 					  gcry_strsource(err),
 					  gcry_strerror(err)));
 
 	    err = gcry_md_open(&hash_handle, hash_gcrypt, 0); // no need of secure memory here
 	    if(err != GPG_ERR_NO_ERROR)
-		throw Erange("hash_fichier::hash_fichier",
-			     tools_printf(gettext("Error while creating hash handle: %s/%s"),
+		throw Erange(tools_printf(gettext("Error while creating hash handle: %s/%s"),
 					  gcry_strsource(err),
 					  gcry_strerror(err)));
 #else
@@ -295,7 +293,7 @@ namespace libdar
 	}
 	catch(Egeneric & e)
 	{
-	    throw Erange("hash_fichier::write_hash_in_hexa", gettext("Failed writing down the hash: ") + e.get_message());
+	    throw Erange(gettext("Failed writing down the hash: ") + e.get_message());
 	}
     }
 

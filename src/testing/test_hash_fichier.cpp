@@ -135,5 +135,5 @@ libdar::hash_algo str2hash(const string & val)
 	return libdar::hash_algo::md5;
     if(val == "sha1")
 	return libdar::hash_algo::sha1;
-    throw Erange("str2hash", "unknown hash algorithm");
+    throw Erange("unknown hash algorithm");
 }

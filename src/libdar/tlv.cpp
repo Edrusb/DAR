@@ -63,7 +63,7 @@ namespace libdar
 	length.read(f);
 	reset();
 	if(f.copy_to(*this, length) != length)
-	    throw Erange("tlv::init",gettext("Missing data to initiate a TLV object"));
+	    throw Erange(gettext("Missing data to initiate a TLV object"));
     }
 
 } // end of namespace

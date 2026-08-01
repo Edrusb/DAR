@@ -41,7 +41,7 @@ namespace libdar
     {
 #if LIBZ_AVAILABLE
 	if(compression_level > 9 || compression_level < 1)
-	    throw Erange("gzip_module::gzip_module", tools_printf(gettext("out of range GZIP compression level: %d"), compression_level));
+	    throw Erange(tools_printf(gettext("out of range GZIP compression level: %d"), compression_level));
 	level = compression_level;
 #else
 	throw Ecompilation(gettext("gzip compression"));
@@ -63,7 +63,7 @@ namespace libdar
     {
 #if LIBZ_AVAILABLE
 	if(clear_size > get_max_compressing_size() || clear_size < 1)
-	    throw Erange("gzip_module::get_min_size_to_compress", "out of range block size submitted to gzip_module::get_min_size_to_compress");
+	    throw Erange("out of range block size submitted to gzip_module::get_min_size_to_compress");
 
 	return compressBound(clear_size);
 #else
@@ -83,7 +83,7 @@ namespace libdar
 	uLong zip_buf_size_ulong = zip_buf_size;
 
 	if(normal_size > get_max_compressing_size())
-	    throw Erange("gzip_module::compress_data", "oversized uncompressed data given to GZIP compression engine");
+	    throw Erange("oversized uncompressed data given to GZIP compression engine");
 
 	ret = compress2((Bytef*)zip_buf,
 			&zip_buf_size_ulong,
@@ -100,11 +100,11 @@ namespace libdar
 	case Z_OK:
 	    break;
 	case Z_MEM_ERROR:
-	    throw Erange("gzip_module::compress_data", "lack of memory to perform the gzip compression operation");
+	    throw Erange("lack of memory to perform the gzip compression operation");
 	case Z_BUF_ERROR:
-	    throw Erange("gzip_module::compress_data", "too small buffer provided to receive compressed data");
+	    throw Erange("too small buffer provided to receive compressed data");
 	case Z_STREAM_ERROR:
-	    throw Erange("gzip_module::compress_data", gettext("invalid compression level provided to the gzip compression engine"));
+	    throw Erange(gettext("invalid compression level provided to the gzip compression engine"));
 	default:
 	    throw SRC_BUG;
 	}
@@ -134,9 +134,9 @@ namespace libdar
 	case Z_OK:
 	    break;
 	case Z_MEM_ERROR:
-	    throw Erange("gzip_module::uncompress_data", "lack of memory to perform the gzip decompression operation");
+	    throw Erange("lack of memory to perform the gzip decompression operation");
 	case Z_BUF_ERROR:
-	    throw Erange("gzip_module::uncompress_data", "too small buffer provided to receive decompressed data");
+	    throw Erange("too small buffer provided to receive decompressed data");
 	case Z_DATA_ERROR:
 	    throw Edata(gettext("corrupted compressed data met"));
 	default:

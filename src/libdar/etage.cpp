@@ -114,8 +114,7 @@ namespace libdar
             if(fddir < 0)
             {
                 if(errno != EPERM)
-                    throw Erange("etage::etage",
-                                 string(gettext("Error opening directory in furtive read mode: ")) + dirname + " : " + tools_strerror_r(errno));
+                    throw Erange(string(gettext("Error opening directory in furtive read mode: ")) + dirname + " : " + tools_strerror_r(errno));
                 else // using back normal access mode
                 {
                     string tmp = tools_strerror_r(errno);
@@ -144,7 +143,7 @@ namespace libdar
             bool is_cache_dir = false;
 
             if(tmp == nullptr)
-                throw Erange("etage::etage" , string(gettext("Error opening directory: ")) + dirname + " : " + tools_strerror_r(errno));
+                throw Erange(string(gettext("Error opening directory: ")) + dirname + " : " + tools_strerror_r(errno));
 
             fichier.clear();
 	    while(!is_cache_dir && (ret = readdir(tmp)) != nullptr)

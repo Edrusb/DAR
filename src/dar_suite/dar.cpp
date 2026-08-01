@@ -267,7 +267,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    if(param.op == merging && param.aux_root != nullptr && param.info_details)
 			dialog->message(gettext("Considering the (first) archive of reference:"));
 		    if(param.sequential_read && param.delta_diff)
-			throw Erange("little_main",gettext("Sequential reading of the archive of reference is not possible when delta difference is requested, you need either to read the archive of reference in direct access mode (without \'--sequential-read\' option) or disable binary delta (adding \'--delta no-patch\' option)"));
+			throw Erange(gettext("Sequential reading of the archive of reference is not possible when delta difference is requested, you need either to read the archive of reference in direct access mode (without \'--sequential-read\' option) or disable binary delta (adding \'--delta no-patch\' option)"));
 
 		    read_options.clear();
 		    if(no_cipher_given)
@@ -294,7 +294,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    if(param.sequential_read)
 		    {
 			if(param.op == merging)
-			    throw Erange("little_main", gettext("Using sequential reading mode for archive source is not possible for merging operation"));
+			    throw Erange(gettext("Using sequential reading mode for archive source is not possible for merging operation"));
 			else
 			    read_options.set_sequential_read(true);
 		    }
@@ -349,7 +349,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 			read_options.set_silent(param.quiet_crypto);
 
 			if(param.sequential_read)
-			    throw Erange("little_main", gettext("Using sequential reading mode for archive source is not possible for merging operation"));
+			    throw Erange(gettext("Using sequential reading mode for archive source is not possible for merging operation"));
 			if(aux_repo)
 			    read_options.set_entrepot(aux_repo);
 
@@ -408,7 +408,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    create_options.set_crypto_size(param.crypto_size);
 		    create_options.set_gnupg_recipients(recipients);
 		    if(recipients.empty() && !param.signatories.empty())
-			throw Erange("little_main", gettext("Archive signature is only possible with gnupg encryption"));
+			throw Erange(gettext("Archive signature is only possible with gnupg encryption"));
 		    create_options.set_gnupg_signatories(param.signatories);
 		    create_options.set_compr_mask(*param.compress_mask);
 		    create_options.set_min_compr_size(param.min_compr_size);
@@ -534,7 +534,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    merge_options.set_crypto_size(param.crypto_size);
 		    merge_options.set_gnupg_recipients(recipients);
 		    if(recipients.empty() && !param.signatories.empty())
-			throw Erange("little_main", gettext("Archive signature is only possible with gnupg encryption"));
+			throw Erange(gettext("Archive signature is only possible with gnupg encryption"));
 		    merge_options.set_gnupg_signatories(param.signatories);
 		    merge_options.set_compr_mask(*param.compress_mask);
 		    merge_options.set_min_compr_size(param.min_compr_size);
@@ -594,7 +594,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		    repair_options.set_crypto_size(param.crypto_size);
 		    repair_options.set_gnupg_recipients(recipients);
 		    if(recipients.empty() && !param.signatories.empty())
-			throw Erange("little_main", gettext("Archive signature is only possible with gnupg encryption"));
+			throw Erange(gettext("Archive signature is only possible with gnupg encryption"));
 		    repair_options.set_gnupg_signatories(param.signatories);
 		    repair_options.set_empty(param.empty);
 		    repair_options.set_slice_permission(param.slice_perm);
@@ -680,7 +680,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 			    isolate_options.set_crypto_size(param.aux_crypto_size);
 			    isolate_options.set_gnupg_recipients(recipients);
 			    if(recipients.empty() && !param.signatories.empty())
-				throw Erange("little_main", gettext("Archive signature is only possible with gnupg encryption"));
+				throw Erange(gettext("Archive signature is only possible with gnupg encryption"));
 			    isolate_options.set_gnupg_signatories(param.signatories);
 			    isolate_options.set_empty(param.empty);
 			    isolate_options.set_slice_permission(param.slice_perm);
@@ -783,7 +783,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 		isolate_options.set_crypto_size(param.crypto_size);
 		isolate_options.set_gnupg_recipients(recipients);
 		if(recipients.empty() && !param.signatories.empty())
-		    throw Erange("little_main", gettext("Archive signature is only possible with gnupg encryption"));
+		    throw Erange(gettext("Archive signature is only possible with gnupg encryption"));
 		isolate_options.set_gnupg_signatories(param.signatories);
 		isolate_options.set_empty(param.empty);
 		isolate_options.set_slice_permission(param.slice_perm);

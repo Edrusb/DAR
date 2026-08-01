@@ -172,9 +172,9 @@ namespace libdar
 	    }
 	    else
 		if(ref == nullptr)
-		    throw Erange("filesystem_diff::reset_read", string(gettext("Non existent file: ")) + tmp);
+		    throw Erange(string(gettext("Non existent file: ")) + tmp);
 		else
-		    throw Erange("filesystem_diff::reset_read", string(gettext("File must be a directory: ")) + tmp);
+		    throw Erange(string(gettext("File must be a directory: ")) + tmp);
 	}
 	catch(...)
 	{

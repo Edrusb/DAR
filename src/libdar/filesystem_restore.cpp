@@ -265,7 +265,7 @@ namespace libdar
 	    if(has_patch)
 	    {
 		if(exists == nullptr)
-		    throw Erange("filesystem_restore::write", string(gettext("Cannot restore a delta binary patch without a file to patch on filesystem")));
+		    throw Erange(string(gettext("Cannot restore a delta binary patch without a file to patch on filesystem")));
 		if(x_fil == nullptr)
 		    throw SRC_BUG;
 	    }
@@ -273,7 +273,7 @@ namespace libdar
 	    if(has_just_inode)
 	    {
 		if(exists == nullptr)
-		    throw Erange("filesystem_restore::write", string(gettext("Cannot restore a inode metadata only without an existing file on filesystem")));
+		    throw Erange(string(gettext("Cannot restore a inode metadata only without an existing file on filesystem")));
 	    }
 
 	    try
@@ -290,7 +290,7 @@ namespace libdar
 			// no conflict: there is not an already existing file present in filesystem
 
 		    if(x_det != nullptr)
-			throw Erange("filesystem_restore::write", tools_printf(gettext("Cannot remove non-existent file from filesystem: %S"),& spot_display));
+			throw Erange(tools_printf(gettext("Cannot remove non-existent file from filesystem: %S"),& spot_display));
 
 		    if((has_data_saved || hard_link || x_dir != nullptr) && !only_overwrite)
 		    {
@@ -679,7 +679,7 @@ namespace libdar
 	    }
 	    break;
 	case data_undefined:
-	    throw Erange("filesystem_restore::action_over_detruit", tools_printf(gettext("%S: Overwriting policy (Data) is undefined for that file, do not know whether removal is allowed or not!"), &spot));
+	    throw Erange(tools_printf(gettext("%S: Overwriting policy (Data) is undefined for that file, do not know whether removal is allowed or not!"), &spot));
 	case data_ask:
 	    throw SRC_BUG;
 	default:
@@ -716,7 +716,7 @@ namespace libdar
 	case data_preserve:
 	case data_preserve_mark_already_saved:
 	    if(tba_dir != nullptr && !tba_ino->same_as(*in_place))
-		throw Erange("filesystem_write::write", tools_printf(gettext("Directory %S cannot be restored: overwriting not allowed and a non-directory inode of that name already exists, all files in that directory will be skipped for restoration:"), &spot));
+		throw Erange(tools_printf(gettext("Directory %S cannot be restored: overwriting not allowed and a non-directory inode of that name already exists, all files in that directory will be skipped for restoration:"), &spot));
 	    data_done = done_no_change_policy;
 	    break;
 	case data_overwrite:
@@ -757,7 +757,7 @@ namespace libdar
 		bool got_fsa = true;
 
 		if(tba_ino->get_saved_status() == saved_status::inode_only)
-		    throw Erange("filesystem_restore::write", string(gettext("Existing file is of a different nature, cannot only restore inode metadata")));
+		    throw Erange(string(gettext("Existing file is of a different nature, cannot only restore inode metadata")));
 
 		try
 		{
@@ -875,7 +875,7 @@ namespace libdar
 	    data_done = done_data_removed;
 	    break;
 	case data_undefined:
-	    throw Erange("filesystem_restore::action_over_detruit", tools_printf(gettext("%S: Overwriting policy (Data) is undefined for that file, do not know whether overwriting is allowed or not!"), &spot));
+	    throw Erange(tools_printf(gettext("%S: Overwriting policy (Data) is undefined for that file, do not know whether overwriting is allowed or not!"), &spot));
 	case data_ask:
 	    throw SRC_BUG;
 	default:
@@ -1036,7 +1036,7 @@ namespace libdar
 	    }
 	    break;
 	case EA_undefined:
-	    throw Erange("filesystem_restore::action_over_detruit", tools_printf(gettext("%S: Overwriting policy (EA) is undefined for that file, do not know whether overwriting is allowed or not!"), &spot));
+	    throw Erange(tools_printf(gettext("%S: Overwriting policy (EA) is undefined for that file, do not know whether overwriting is allowed or not!"), &spot));
 	case EA_ask:
 	    throw SRC_BUG;
 	default:
@@ -1160,7 +1160,7 @@ namespace libdar
 	    }
 	    break;
 	case EA_undefined:
-	    throw Erange("filesystem_restore::action_over_detruit", tools_printf(gettext("%S: Overwriting policy (FSA) is undefined for that file, do not know whether overwriting is allowed or not!"), &spot));
+	    throw Erange(tools_printf(gettext("%S: Overwriting policy (FSA) is undefined for that file, do not know whether overwriting is allowed or not!"), &spot));
 	case EA_ask:
 	    throw SRC_BUG;
 	default:

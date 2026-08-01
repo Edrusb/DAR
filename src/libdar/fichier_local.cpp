@@ -139,7 +139,7 @@ namespace libdar
             throw SRC_BUG;
 
         if(fstat(filedesc, &dat) < 0)
-            throw Erange("fichier_local::get_size()", string(gettext("Error getting size of file: ")) + tools_strerror_r(errno));
+            throw Erange(string(gettext("Error getting size of file: ")) + tools_strerror_r(errno));
         else
             filesize = dat.st_size;
 
@@ -158,7 +158,7 @@ namespace libdar
 	if(ret == EBADF)
 	    throw SRC_BUG; // filedesc not a valid file descriptor !?!
 	if(ret != 0)
-	    throw Erange("fichier_local::fadvise", string("Set posix advise failed: ") + tools_strerror_r(errno));
+	    throw Erange(string("Set posix advise failed: ") + tools_strerror_r(errno));
 #endif
     }
 
@@ -172,7 +172,7 @@ namespace libdar
 	S_I st = ::fsync(filedesc);
 #endif
 	if(st < 0)
-	    throw Erange("fichier_local::fsync", string("Failed sync the slice (fdatasync): ") + tools_strerror_r(errno));
+	    throw Erange(string("Failed sync the slice (fdatasync): ") + tools_strerror_r(errno));
     }
 
     bool fichier_local::skip(const infinint &q)
@@ -249,7 +249,7 @@ namespace libdar
         off_t ret = lseek(filedesc, 0, SEEK_CUR);
 
         if(ret == -1)
-            throw Erange("fichier_local::get_position", string(gettext("Error getting file reading position: ")) + tools_strerror_r(errno));
+            throw Erange(string(gettext("Error getting file reading position: ")) + tools_strerror_r(errno));
 
         return ret;
     }
@@ -265,14 +265,14 @@ namespace libdar
 
 	tmp_pos.unstack(offset);
 	if(!tmp_pos.is_zero())
-	    throw Erange("fichier_local::inherited_truncate", gettext("File too large for the operating system to be truncate at the requested position"));
+	    throw Erange(gettext("File too large for the operating system to be truncate at the requested position"));
 
 	if(offset >= get_eof_offset())
 	    return; // will not expand the file size
 
 	ret = ftruncate(filedesc, offset);
 	if(ret != 0)
-	    throw Erange("fichier_local::inherited_truncate", string(dar_gettext("Error while calling system call truncate(): ")) + tools_strerror_r(errno));
+	    throw Erange(string(dar_gettext("Error while calling system call truncate(): ")) + tools_strerror_r(errno));
 
 	if(get_position() > pos)
 	    skip_to_eof();
@@ -308,7 +308,7 @@ namespace libdar
                 case EIO:
                     throw Ehardware("fichier_local::inherited_read", string(gettext("Error while reading from file: ")) + tools_strerror_r(errno));
                 default :
-                    throw Erange("fichier_local::inherited_read", string(gettext("Error while reading from file: ")) + tools_strerror_r(errno));
+                    throw Erange(string(gettext("Error while reading from file: ")) + tools_strerror_r(errno));
                 }
             }
             else
@@ -363,7 +363,7 @@ namespace libdar
 			// because there is no space left on device. The parent class manages the user interaction
 			// to allow abortion or action that frees up some storage space.
                 default :
-                    throw Erange("fichier_local::inherited_write", string(gettext("Error while writing to file: ")) + tools_strerror_r(errno));
+                    throw Erange(string(gettext("Error while writing to file: ")) + tools_strerror_r(errno));
                 }
             }
             else
@@ -452,7 +452,7 @@ namespace libdar
 		    case EROFS:
 			throw Esystem("fichier_local::open", tools_strerror_r(errno), Esystem::io_ro_fs);
 		    default:
-			throw Erange("fichier_local::open", string(gettext("Cannot open file : ")) + tools_strerror_r(errno));
+			throw Erange(string(gettext("Cannot open file : ")) + tools_strerror_r(errno));
 		    }
 		}
 	    }
@@ -475,7 +475,7 @@ namespace libdar
 	if(filedesc < 0)
 	{
 	    string tmp = tools_strerror_r(errno);
-	    throw Erange("fichier_local::copy_from", tools_printf(gettext("Cannot dup() filedescriptor while copying \"fichier_local\" object: %s"), tmp.c_str()));
+	    throw Erange(tools_printf(gettext("Cannot dup() filedescriptor while copying \"fichier_local\" object: %s"), tmp.c_str()));
 	}
 	adv = ref.adv;
     }
@@ -518,15 +518,15 @@ namespace libdar
 	off_t cur = lseek(filedesc, 0, SEEK_CUR);
 
 	if(cur < 0)
-	    throw Erange("fichier_local::get_eof_offset()", string("Error while reading current file offset: ") + tools_strerror_r(errno));
+	    throw Erange(string("Error while reading current file offset: ") + tools_strerror_r(errno));
 
 	ret = lseek(filedesc, 0, SEEK_END);
 	if(ret < 0)
-	    throw Erange("fichier_local::get_eof_offset()", string("Error while reading current file offset: ") + tools_strerror_r(errno));
+	    throw Erange(string("Error while reading current file offset: ") + tools_strerror_r(errno));
 
 	tmp = lseek(filedesc, cur, SEEK_SET);
 	if(tmp < 0)
-	    throw Erange("fichier_local::get_eof_offset()", string("Error while seeking back to previous offset: ") + tools_strerror_r(errno));
+	    throw Erange(string("Error while seeking back to previous offset: ") + tools_strerror_r(errno));
 	if(tmp != cur)
 	    throw SRC_BUG;
 

@@ -130,7 +130,7 @@ namespace libdar
 
 		input = ::open(tty, O_RDONLY|O_TEXT);
 		if(input < 0)
-		    throw Erange("",""); // used locally
+		    throw Erange(""); // used locally
 		else
 		{
 		    if(silent)
@@ -155,7 +155,7 @@ namespace libdar
 			    has_terminal = true;
 			}
 			else // failed to retrieve parameters from tty
-			    throw Erange("",""); // used locally
+			    throw Erange(""); // used locally
 		}
 	    }
 	    catch(Erange & e)
@@ -185,7 +185,7 @@ namespace libdar
 	{
 	    input = dup(ref.input);
 	    if(input < 0)
-		throw Erange("shell_interaction::shell_interaction", string("Failed dup()-licating file descriptor: ") + tools_strerror_r(errno));
+		throw Erange(string("Failed dup()-licating file descriptor: ") + tools_strerror_r(errno));
 	}
 	else
 	    input = ref.input;
@@ -229,7 +229,7 @@ namespace libdar
 	    tools_block_all_signals(old_mask);
 	    set_term_mod(m_inter);
 	    if(read(input, &a, 1) < 0)
-		throw Erange("shell_interaction_read_char", string(gettext("Error reading character: ")) + strerror(errno));
+		throw Erange(string(gettext("Error reading character: ")) + strerror(errno));
 	    tools_blocking_read(input, true);
 	    set_term_mod(m_initial);
 	    tools_set_back_blocked_signals(old_mask);
@@ -486,7 +486,7 @@ namespace libdar
 		if(tmp_ret < 0)
 		{
 		    if(errno_bk != EINTR)
-			throw Erange("shell_interaction:interaction_pause", string(gettext("Error while reading user answer from terminal: ")) + strerror(errno_bk));
+			throw Erange(string(gettext("Error while reading user answer from terminal: ")) + strerror(errno_bk));
 		    else // a signal interrupted the read() system call
 		    {
 			    // emulating the answer of an escape char (= "NO" answer)
@@ -570,7 +570,7 @@ namespace libdar
 	U_I last = 0, i = 0;
 
 	if(!has_terminal)
-	    throw Erange("shell_interaction::interaction_secu_string", gettext("Secured string can only be read from a terminal"));
+	    throw Erange(gettext("Secured string can only be read from a terminal"));
 
 	if(!echo)
 	    set_term_mod(shell_interaction::m_noecho);
@@ -595,7 +595,7 @@ namespace libdar
 		    last = i;
 
 		if(ret.get_size() == taille && !fin)
-		    throw Erange("interaction_secu_string", gettext("provided password is too long for the allocated memory"));
+		    throw Erange(gettext("provided password is too long for the allocated memory"));
 	    }
 	    while(!fin);
 
@@ -631,7 +631,7 @@ namespace libdar
 	}
 
 	if(tcsetattr(input, TCSANOW, ptr) < 0)
-	    throw Erange("shell_interaction : set_term_mod", string(gettext("Error while changing user terminal properties: ")) + strerror(errno));
+	    throw Erange(string(gettext("Error while changing user terminal properties: ")) + strerror(errno));
     }
 
     void shell_interaction::my_message(const std::string & mesg)

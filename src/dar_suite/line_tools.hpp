@@ -411,7 +411,7 @@ template <class T> void line_tools_split_in_words(generic_file & f, T & mots)
 	    }
     }
     if(!quotes.empty())
-	throw Erange("make_args_from_file", tools_printf(dar_gettext("Parse error: Unmatched `%c'"), quotes.back()));
+	throw Erange(tools_printf(dar_gettext("Parse error: Unmatched `%c'"), quotes.back()));
 }
 
 

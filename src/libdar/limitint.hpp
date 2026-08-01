@@ -269,7 +269,7 @@ namespace libdar
             lu = x.read((char *)&a, 1);
 
             if(lu <= 0)
-                throw Erange("limitint::build_from_file(proto_generic_file)", gettext("Reached end of file before all data could be read"));
+                throw Erange(gettext("Reached end of file before all data could be read"));
 
             if(a == 0)
                 ++skip;
@@ -282,7 +282,7 @@ namespace libdar
                 for(S_I i = 0; i < 8; ++i)
                     pos += bf[i];
                 if(pos != 1)
-                    throw Erange("limitint::build_from_file(proto_generic_file)", gettext("Badly formed \"infinint\" or not supported format")); // more than 1 bit is set to 1
+                    throw Erange(gettext("Badly formed \"infinint\" or not supported format")); // more than 1 bit is set to 1
 
                 pos = 0;
                 while(bf[pos] == 0)
@@ -420,7 +420,7 @@ namespace libdar
     template <class B> limitint<B> & limitint<B>::operator -= (const limitint & arg)
     {
         if(field < arg.field)
-            throw Erange("limitint::operator", gettext("Subtracting an \"infinint\" greater than the first, \"infinint\" cannot be negative"));
+            throw Erange(gettext("Subtracting an \"infinint\" greater than the first, \"infinint\" cannot be negative"));
 
             // now processing the operation
 

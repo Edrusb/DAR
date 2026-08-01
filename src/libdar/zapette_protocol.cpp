@@ -67,7 +67,7 @@ namespace libdar
         U_16 pas;
 
         if(f->read(&serial_num, 1) == 0)
-            throw Erange("request::read", gettext("Partial request received, aborting\n"));
+            throw Erange(gettext("Partial request received, aborting\n"));
 	if(f == nullptr)
 	    throw SRC_BUG;
         offset = infinint(*f);
@@ -142,7 +142,7 @@ namespace libdar
             size = 0;
             break;
         default:
-            throw Erange("answer::read", gettext("Corrupted data read on pipe"));
+            throw Erange(gettext("Corrupted data read on pipe"));
         }
     }
 

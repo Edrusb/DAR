@@ -244,7 +244,7 @@ namespace libdar
 	    }
 	}
 	else
-	    throw Erange("get_catalogue_from", gettext("Missing catalogue in file."));
+	    throw Erange(gettext("Missing catalogue in file."));
 
 
         return ret;
@@ -374,7 +374,7 @@ namespace libdar
 	    }
 	    catch(Egeneric & e)
 	    {
-		throw Erange("get_catalogue_from", string(gettext("Cannot open catalogue: ")) + e.get_message());
+		throw Erange(string(gettext("Cannot open catalogue: ")) + e.get_message());
 	    }
 	}
 	catch(...)
@@ -638,7 +638,7 @@ namespace libdar
 		    if(!has_external_cat)
 		    {
 			if(!lax)
-			    throw Erange("macro_tools_open_archive",gettext("Found a correct archive header at the beginning of the archive, which does not stands to be an old archive, the end of the archive is corrupted and thus the catalogue is not readable, aborting. Either retry providing in addition an isolated catalogue of that archive to perform the operation, or try reading the archive in sequential mode or try in lax mode or, last chance, try both lax and sequential read mode at the same time"));
+			    throw Erange(gettext("Found a correct archive header at the beginning of the archive, which does not stands to be an old archive, the end of the archive is corrupted and thus the catalogue is not readable, aborting. Either retry providing in addition an isolated catalogue of that archive to perform the operation, or try reading the archive in sequential mode or try in lax mode or, last chance, try both lax and sequential read mode at the same time"));
 			else
 			    dialog->pause(gettext("Found a correct archive header at the beginning of the archive, which does not stands to be an old archive, the end of the archive is thus corrupted. Without external catalogue provided and as we do not read the archive in sequential mode, there is very little chance to retreive something from this corrupted archive. Do we continue anyway ?"));
 		    }
@@ -692,7 +692,7 @@ namespace libdar
 		    dialog->message(gettext("LAX MODE: Archive is flagged as being ciphered, assuming data corruption occurred and considering the archive is not ciphered"));
 		}
 		else
-		    throw Erange("macro_tools_open_archive", tools_printf(gettext("The archive %S is encrypted and no encryption cipher has been given, cannot open archive."), &basename));
+		    throw Erange(tools_printf(gettext("The archive %S is encrypted and no encryption cipher has been given, cannot open archive."), &basename));
 	    }
 
 	    if(ver.get_crypted_key() != nullptr) // we will find the passphrase from the header's encrypted key
@@ -811,7 +811,7 @@ namespace libdar
 			    // are know after having read the header_version at the end of the backup
 		    }		break;
 	    default:
-		throw Erange("macro_tools_open_archive", gettext("Unknown encryption algorithm"));
+		throw Erange(gettext("Unknown encryption algorithm"));
 	    }
 
 	    if(tmp == nullptr)
@@ -856,7 +856,7 @@ namespace libdar
 		if(!lax)
 		{
 		    if(sequential_read)
-			throw Erange("macro_tools_open_archive", gettext("Sequential read asked, but this archive is flagged to not have the necessary embedded escape sequences for that operation, aborting"));
+			throw Erange(gettext("Sequential read asked, but this archive is flagged to not have the necessary embedded escape sequences for that operation, aborting"));
 		}
 		else // lax mode
 		{
@@ -926,7 +926,7 @@ namespace libdar
 
 		ibs.unstack(compr_bs);
 		if(!ibs.is_zero())
-		    throw Erange("macro_tools_open_layers", gettext("compression block size used in the archive exceed integer capacity of the current system"));
+		    throw Erange(gettext("compression block size used in the archive exceed integer capacity of the current system"));
 
 		tmp = macro_tools_build_block_compressor(ver.get_compression_algo(),
 							 *(stack.top()),
@@ -1021,10 +1021,10 @@ namespace libdar
 	}
 
 	if(max_offset.is_zero())
-	    throw Erange("macro_tools_lax_search_catalogue", gettext("LAX MODE: Failed to read the catalogue (no data to inspect)"));
+	    throw Erange(gettext("LAX MODE: Failed to read the catalogue (no data to inspect)"));
 
 	if(fraction.is_zero())
-    	    throw Erange("macro_tools_lax_search_catalogue", gettext("LAX MODE: Failed to read the catalogue (0 bytes of the archive length asked to look for the catalogue)"));
+	    throw Erange(gettext("LAX MODE: Failed to read the catalogue (0 bytes of the archive length asked to look for the catalogue)"));
 
 
 	    // calculating starting offset and offset range
@@ -1131,7 +1131,7 @@ namespace libdar
 	}
 
 	if(ret == nullptr)
-	    throw Erange("macro_tools_lax_search_catalogue", gettext("LAX MODE: Failed to read the catalogue"));
+	    throw Erange(gettext("LAX MODE: Failed to read the catalogue"));
 	else
 	    return ret;
     }
@@ -1333,7 +1333,7 @@ namespace libdar
 		}
 
 		if(! gnupg_signatories.empty() && gnupg_recipients.empty())
-		    throw Erange("macro_tools_create_layers", gettext("Archive signature is only possible with gnupg encryption (and at least one recipient)"));
+		    throw Erange(gettext("Archive signature is only possible with gnupg encryption (and at least one recipient)"));
 
 		if(!gnupg_recipients.empty())
 		{
@@ -1354,8 +1354,7 @@ namespace libdar
 			case crypto_algo::none:
 			    throw SRC_BUG;
 			case crypto_algo::scrambling:
-			    throw Erange("macro_tools_create_layers",
-					 gettext("Scrambling is a very weak encryption algorithm, this is a non-sens to use with asymmetric encryption"));
+			    throw Erange(gettext("Scrambling is a very weak encryption algorithm, this is a non-sens to use with asymmetric encryption"));
 			    break;
 			case crypto_algo::blowfish:
 			case crypto_algo::aes256:
@@ -1461,7 +1460,7 @@ namespace libdar
 			if(t1 == t2)
 			    real_pass = t1;
 			else
-			    throw Erange("op_create_in_sub", gettext("The two passwords are not identical. Aborting"));
+			    throw Erange(gettext("The two passwords are not identical. Aborting"));
 		    }
 		}
 

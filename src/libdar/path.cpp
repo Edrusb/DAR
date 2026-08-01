@@ -61,7 +61,7 @@ namespace libdar
 	    {
 		dirs.clear();
 		if(chem.empty())
-		    throw Erange("path::path", gettext("Empty string is not a valid path"));
+		    throw Erange(gettext("Empty string is not a valid path"));
 		if(chem == "/")
 		    undisclosed = false;
 		relative = (chem[0] != '/');
@@ -82,7 +82,7 @@ namespace libdar
 		else
 		    path_split(s, dirs);
 		if(dirs.empty() && relative)
-		    throw Erange("path::path", gettext("Empty string is not a valid path"));
+		    throw Erange(gettext("Empty string is not a valid path"));
 		if(!undisclosed)
 		    reduce();
 		reading = dirs.begin();
@@ -90,7 +90,7 @@ namespace libdar
 	    catch(Erange & e)
 	    {
 		string e_tmp = e.get_message();
-		throw Erange("path::path", tools_printf(gettext("%S is an not a valid path: %S"), &chem, &e_tmp));
+		throw Erange(tools_printf(gettext("%S is an not a valid path: %S"), &chem, &e_tmp));
 	    }
 	}
 	catch(...)
@@ -194,7 +194,7 @@ namespace libdar
     path & path::operator += (const path &arg)
     {
         if(!arg.relative)
-            throw Erange("path::operator +", dar_gettext("Cannot add an absolute path"));
+            throw Erange(dar_gettext("Cannot add an absolute path"));
 
         list<string>::const_iterator it = arg.dirs.begin();
         list<string>::const_iterator it_fin = arg.dirs.end();

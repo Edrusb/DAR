@@ -132,7 +132,7 @@ namespace libdar
 	    throw SRC_BUG;
 
 	if(rw == gf_write_only)
-	    throw Erange("generic_file::read", gettext("Reading ahead a write only generic_file"));
+	    throw Erange(gettext("Reading ahead a write only generic_file"));
 	else
 	    if(no_read_ahead)
 		return;
@@ -147,7 +147,7 @@ namespace libdar
 	    throw SRC_BUG;
 
         if(rw == gf_write_only)
-            throw Erange("generic_file::read", gettext("Reading a write only generic_file"));
+            throw Erange(gettext("Reading a write only generic_file"));
         else
             return (this->*active_read)(a, size);
     }
@@ -157,7 +157,7 @@ namespace libdar
 	if(terminated)
 	    throw SRC_BUG;
         if(rw == gf_read_only)
-            throw Erange("generic_file::write", gettext("Writing to a read only generic_file"));
+            throw Erange(gettext("Writing to a read only generic_file"));
         else
             (this->*active_write)(a, size);
     }
@@ -339,7 +339,7 @@ namespace libdar
 	    throw SRC_BUG;
 
         if(get_mode() == gf_write_only || f.get_mode() == gf_write_only)
-            throw Erange("generic_file::diff", gettext("Cannot compare files in write only mode"));
+            throw Erange(gettext("Cannot compare files in write only mode"));
         skip(0);
         f.skip(0);
 	read_ahead(me_read_ahead);
@@ -426,7 +426,7 @@ namespace libdar
 	if(rw == gf_write_only || rw == gf_read_write)
 	    inherited_truncate(pos);
 	else
-	    throw Erange("generic_file::truncate", gettext("Cannot truncate a read-only generic_file"));
+	    throw Erange(gettext("Cannot truncate a read-only generic_file"));
     }
 
     void generic_file::sync_write()
@@ -437,7 +437,7 @@ namespace libdar
 	if(rw == gf_write_only || rw == gf_read_write)
 	    inherited_sync_write();
 	else
-	    throw Erange("generic_file::sync_write", gettext("Cannot sync write on a read-only generic_file"));
+	    throw Erange(gettext("Cannot sync write on a read-only generic_file"));
     }
 
     void generic_file::flush_read()
@@ -448,7 +448,7 @@ namespace libdar
 	if(rw == gf_read_only || rw == gf_read_write)
 	    inherited_flush_read();
 	else
-	    throw Erange("genercic_file::flush_read", gettext("Cannot flush read a write-only generic_file"));
+	    throw Erange(gettext("Cannot flush read a write-only generic_file"));
     }
 
     void generic_file::enable_crc(bool mode)

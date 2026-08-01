@@ -371,7 +371,7 @@ namespace libdar
 				if(typeid(*crc_dyn) != typeid(*crc_ori))
 				    throw SRC_BUG;
 				if(*crc_dyn != *crc_ori)
-				    throw Erange("filesystem_hard_link_write::make_file", gettext("Bad CRC, data corruption occurred"));
+				    throw Erange(gettext("Bad CRC, data corruption occurred"));
 				    // else nothing to do, nor to signal
 			    }
 				// else this is a very old archive
@@ -434,7 +434,7 @@ namespace libdar
 			    if(strlen(addr.sun_path) < strlen(name))
 				get_ui().pause(tools_printf(gettext("error restoring Unix socket %s, path too long to be stored properly, socket will be created as %s instead, do you confirm?"), name, addr.sun_path));
 			    if(::bind(sd, (struct sockaddr *)&addr, sizeof(addr)) < 0)
-				throw Erange("filesystem_hard_link_write::make_file (socket bind)", string(gettext("Error creating Unix socket file: ")) + name + " : " + tools_strerror_r(errno));
+				throw Erange(string(gettext("Error creating Unix socket file: ")) + name + " : " + tools_strerror_r(errno));
 			}
 			catch(...)
 			{
@@ -454,7 +454,7 @@ namespace libdar
 		if(ret < 0)
 		{
 		    if(errno != ENOSPC)
-			throw Erange("filesystem_hard_link_write::make_file", string(gettext("Could not create inode: ")) + name + " : " + tools_strerror_r(errno));
+			throw Erange(string(gettext("Could not create inode: ")) + name + " : " + tools_strerror_r(errno));
 		    else
 			get_ui().pause(string(gettext("Cannot create inode: ")) + tools_strerror_r(errno) + gettext(" Ready to continue ?"));
 		}

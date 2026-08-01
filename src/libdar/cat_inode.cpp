@@ -162,7 +162,7 @@ namespace libdar
 		    ea_saved = ea_saved_status::removed;
 		    break;
 		default:
-		    throw Erange("cat_inode::cat_inode", gettext("badly structured inode: unknown inode flag"));
+		    throw Erange(gettext("badly structured inode: unknown inode flag"));
 		}
 	    }
 	    else
@@ -173,10 +173,10 @@ namespace libdar
 		    // UID and GID were stored on 16 bits each
 
 		if(ptr->read((char *)&tmp, sizeof(tmp)) != sizeof(tmp))
-		    throw Erange("cat_inode::cat_inode", gettext("missing data to build an inode"));
+		    throw Erange(gettext("missing data to build an inode"));
 		uid = ntohs(tmp);
 		if(ptr->read((char *)&tmp, sizeof(tmp)) != sizeof(tmp))
-		    throw Erange("cat_inode::cat_inode", gettext("missing data to build an inode"));
+		    throw Erange(gettext("missing data to build an inode"));
 		gid = ntohs(tmp);
 	    }
 	    else // archive format >= "08"
@@ -186,7 +186,7 @@ namespace libdar
 	    }
 
 	    if(ptr->read((char *)&tmp, sizeof(tmp)) != sizeof(tmp))
-		throw Erange("cat_inode::cat_inode", gettext("missing data to build an inode"));
+		throw Erange(gettext("missing data to build an inode"));
 	    perm = ntohs(tmp);
 
 	    last_acc.read(*ptr, reading_ver);
@@ -277,7 +277,7 @@ namespace libdar
 		    fsa_saved = fsa_saved_status::full;
 		    break;
 		default:
-		    throw Erange("cat_inode::cat_inode", gettext("badly structured inode: unknown inode flag for FSA"));
+		    throw Erange(gettext("badly structured inode: unknown inode flag for FSA"));
 		}
 
 		if(fsa_saved !=  fsa_saved_status::none)
@@ -392,24 +392,24 @@ namespace libdar
 	bool do_mtime_test = dynamic_cast<const cat_lien *>(&other) == nullptr || symlink_date;
 
         if(!same_as(other))
-            throw Erange("cat_inode::compare",gettext("different file type"));
+            throw Erange(gettext("different file type"));
         if(what_to_check == comparison_fields::all && get_uid() != other.get_uid())
 	{
 	    infinint u1 = get_uid();
 	    infinint u2 = other.get_uid();
-            throw Erange("cat_inode.compare", tools_printf(gettext("different owner (uid): %i <--> %i"), &u1, &u2));
+            throw Erange(tools_printf(gettext("different owner (uid): %i <--> %i"), &u1, &u2));
 	}
         if(what_to_check == comparison_fields::all && get_gid() != other.get_gid())
 	{
 	    infinint g1 = get_gid();
 	    infinint g2 = other.get_gid();
-            throw Erange("cat_inode.compare", tools_printf(gettext("different owner group (gid): %i <--> %i"), &g1, &g2));
+            throw Erange(tools_printf(gettext("different owner group (gid): %i <--> %i"), &g1, &g2));
 	}
         if((what_to_check == comparison_fields::all || what_to_check == comparison_fields::ignore_owner) && get_perm() != other.get_perm())
 	{
 	    string p1 = tools_int2octal(get_perm());
 	    string p2 = tools_int2octal(other.get_perm());
-            throw Erange("cat_inode.compare", tools_printf(gettext("different permission: %S <--> %S"), &p1, &p2));
+            throw Erange(tools_printf(gettext("different permission: %S <--> %S"), &p1, &p2));
 	}
         if(do_mtime_test
 	   && (what_to_check == comparison_fields::all || what_to_check == comparison_fields::ignore_owner || what_to_check == comparison_fields::mtime)
@@ -417,7 +417,7 @@ namespace libdar
 	{
 	    string s1 = tools_display_date(get_last_modif());
 	    string s2 = tools_display_date(other.get_last_modif());
-            throw Erange("cat_inode.compare", tools_printf(gettext("difference of last modification date: %S <--> %S"), &s1, &s2));
+            throw Erange(tools_printf(gettext("difference of last modification date: %S <--> %S"), &s1, &s2));
 	}
 
         sub_compare(other, isolated_mode, seq_read_mode);
@@ -432,13 +432,13 @@ namespace libdar
 		    const ea_attributs *me = get_ea(); // this pointer must not be freed
 		    const ea_attributs *you = other.get_ea(); // this pointer must not be freed neither
 		    if(me->diff(*you, ea_mask))
-			throw Erange("cat_inode::compare", gettext("different Extended Attributes"));
+			throw Erange(gettext("different Extended Attributes"));
 		}
             }
             else
             {
 #ifdef EA_SUPPORT
-                throw Erange("cat_inode::compare", gettext("no Extended Attribute to compare with"));
+                throw Erange(gettext("no Extended Attribute to compare with"));
 #else
                 throw Ecompilation(gettext("Cannot compare EA: EA support has not been activated at compilation time"));
 #endif
@@ -454,12 +454,12 @@ namespace libdar
             {
                 if(!tools_is_equal_with_hourshift(hourshift, get_last_change(), other.get_last_change())
                    && get_last_change() < other.get_last_change())
-                    throw Erange("cat_inode::compare", gettext("inode last change date (ctime) greater, EA might be different"));
+                    throw Erange(gettext("inode last change date (ctime) greater, EA might be different"));
             }
             else
             {
 #ifdef EA_SUPPORT
-                throw Erange("cat_inode::compare", gettext("no Extended Attributes to compare with"));
+                throw Erange(gettext("no Extended Attributes to compare with"));
 #else
                 throw Ecompilation(gettext("Cannot compare EA: EA support has not been activated at compilation time"));
 #endif
@@ -488,13 +488,13 @@ namespace libdar
 			throw SRC_BUG;
 
 		    if(!me->is_included_in(*you, scope))
-			throw Erange("cat_inode::compare", gettext("different Filesystem Specific Attributes"));
+			throw Erange(gettext("different Filesystem Specific Attributes"));
 		}
 	    }
 	    else
 	    {
 		if(scope.size() > 0)
-		    throw Erange("cat_inode::compare", gettext("No Filesystem Specific Attribute to compare with"));
+		    throw Erange(gettext("No Filesystem Specific Attribute to compare with"));
 
 		    // this is not perfect, the "other" could have no FSA due to the non empty scope excluding only
 		    // the valid FSAs. A more specific comparison would worth it...
@@ -505,12 +505,12 @@ namespace libdar
 	    {
 		if(!tools_is_equal_with_hourshift(hourshift, get_last_change(), other.get_last_change())
                    && get_last_change() < other.get_last_change())
-                    throw Erange("cat_inode::compare", gettext("inode last change date (ctime) greater, FSA might be different"));
+                    throw Erange(gettext("inode last change date (ctime) greater, FSA might be different"));
 	    }
 	    else
 	    {
 		if(scope.size() > 0)
-		    throw Erange("cat_inode::compare", gettext("Filesystem Specific Attribute are missing"));
+		    throw Erange(gettext("Filesystem Specific Attribute are missing"));
 
 		    // this is not perfect, the "other" could have no FSA due to the non empty scope excluding only
 		    // the valid FSAs. A more specific comparison would worth it...
@@ -740,7 +740,7 @@ namespace libdar
 				// we are reading from the stack the possible thread is not in read_ahead operation
 				// so it is pending for read request or other orders
 			    if(!get_escape_layer()->skip_to_next_mark(escape::seqt_ea, false))
-				throw Erange("cat_inode::get_ea", string("Error while fetching EA from archive: No escape mark found for that file"));
+				throw Erange(string("Error while fetching EA from archive: No escape mark found for that file"));
 				// resuming compression (EA are always stored compressed)
 			    get_pile()->flush_read_above(get_compressor_layer());
 			    get_compressor_layer()->resume_compression();
@@ -785,7 +785,7 @@ namespace libdar
 			    }
 			    catch(Egeneric & e)
 			    {
-				throw Erange("cat_inode::get_ea", string("Error while reading EA from archive: ") + e.get_message());
+				throw Erange(string("Error while reading EA from archive: ") + e.get_message());
 			    }
 			}
 			catch(...)
@@ -802,7 +802,7 @@ namespace libdar
 			    throw SRC_BUG;
 
 			if(typeid(*val) != typeid(*my_crc) || *val != *my_crc)
-			    throw Erange("cat_inode::get_ea", gettext("CRC error detected while reading EA"));
+			    throw Erange(gettext("CRC error detected while reading EA"));
 		    }
 		    catch(...)
 		    {
@@ -946,7 +946,7 @@ namespace libdar
                     delete tmp;
                     throw;
                 }
-                throw Erange("cat_inode::ea_get_crc", gettext("Error while reading CRC for EA from the archive: No escape mark found for that file"));
+                throw Erange(gettext("Error while reading CRC for EA from the archive: No escape mark found for that file"));
             }
         }
 
@@ -1108,7 +1108,7 @@ namespace libdar
 				// we are reading from the get_pile() the possible thread is not in read_ahead operation
 				// so it is pending for read request or other orders
 			    if(!get_escape_layer()->skip_to_next_mark(escape::seqt_fsa, false))
-				throw Erange("cat_inode::get_fsa", string("Error while fetching FSA from archive: No escape mark found for that file"));
+				throw Erange(string("Error while fetching FSA from archive: No escape mark found for that file"));
 			    const_cast<cat_inode *>(this)->fsa_set_offset(get_escape_layer()->get_position());
 			}
 
@@ -1155,7 +1155,7 @@ namespace libdar
 			    }
 			    catch(Egeneric & e)
 			    {
-				throw Erange("cat_inode::get_fda", string("Error while reading FSA from archive: ") + e.get_message());
+				throw Erange(string("Error while reading FSA from archive: ") + e.get_message());
 			    }
 			}
 			catch(...)
@@ -1173,7 +1173,7 @@ namespace libdar
 			    throw SRC_BUG;
 
 			if(typeid(*val) != typeid(*my_crc) || *val != *my_crc)
-			    throw Erange("cat_inode::get_fsa", gettext("CRC error detected while reading FSA"));
+			    throw Erange(gettext("CRC error detected while reading FSA"));
 		    }
 		    catch(...)
 		    {
@@ -1297,7 +1297,7 @@ namespace libdar
                     delete tmp;
                     throw;
                 }
-                throw Erange("cat_inode::fsa_get_crc", gettext("Error while reading CRC for FSA from the archive: No escape mark found for that file"));
+                throw Erange(gettext("Error while reading CRC for FSA from the archive: No escape mark found for that file"));
             }
         }
 

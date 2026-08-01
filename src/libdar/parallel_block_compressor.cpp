@@ -846,7 +846,7 @@ namespace libdar
 			// the read infinint does not hold in an a U_I assuming
 			// data corruption occured
 
-		    throw Erange("zip_below_read::work", gettext("incoherent compressed block structure, compressed data corruption"));
+		    throw Erange(gettext("incoherent compressed block structure, compressed data corruption"));
 		}
 	    }
 	    else // we are asked to stop by the parallel_block_compressor thread
@@ -860,7 +860,7 @@ namespace libdar
 	    case compress_block_header::H_EOF:
 		push_flag_to_all_workers(compressor_block_flags::eof_die);
 		if(aux != 0)
-		    throw Erange("zip_below_read::work", gettext("incoherent compressed block structure, compressed data corruption"));
+		    throw Erange(gettext("incoherent compressed block structure, compressed data corruption"));
 		end = true;
 		break;
 	    case compress_block_header::H_DATA:
@@ -896,7 +896,7 @@ namespace libdar
 		}
 		break;
 	    default:
-		throw Erange("zip_below_read::work", gettext("incoherent compressed block structure, compressed data corruption"));
+		throw Erange(gettext("incoherent compressed block structure, compressed data corruption"));
 	    }
 	}
 	while(!end);
