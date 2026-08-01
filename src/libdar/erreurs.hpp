@@ -327,7 +327,7 @@ namespace libdar
     class Escript : public Egeneric
     {
     public :
-        Escript(const std::string & source, const std::string & msg) : Egeneric(msg) {};
+        Escript(const std::string & msg): Egeneric(msg) {};
 	Escript(const Escript & ref) = default;
 	Escript(Escript && ref) = default;
 	Escript & operator = (const Escript & ref) = default;

@@ -1461,14 +1461,14 @@ namespace libdar
                 {
                     map<char, string>::const_iterator mptr = corres.find(*it);
                     if(mptr == corres.end())
-                        throw Escript("tools_substitute", string(dar_gettext("Unknown substitution string: %")) + *it);
+                        throw Escript(string(dar_gettext("Unknown substitution string: %")) + *it);
                     else
                         ret += mptr->second;
                     it++;
                 }
                 else // reached end of "hook" string
                 {
-                    throw Escript("tools_substitute", dar_gettext("last char of user command-line to execute is '%', (use '%%' instead to avoid this message)"));
+                    throw Escript(dar_gettext("last char of user command-line to execute is '%', (use '%%' instead to avoid this message)"));
                 }
             }
             else
@@ -1582,7 +1582,7 @@ namespace libdar
         }
         catch(Euser_abort & g)
         {
-            throw Escript("sar::hook_execute", string(dar_gettext("Fatal error on user command line: ")) + g.get_message());
+            throw Escript(string(dar_gettext("Fatal error on user command line: ")) + g.get_message());
         }
     }
 
