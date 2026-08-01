@@ -272,7 +272,7 @@ namespace libdar
     class Ehardware : public Egeneric
     {
     public :
-        Ehardware(const std::string & source, const std::string & message) : Egeneric(message) {};
+        Ehardware(const std::string & message) : Egeneric(message) {};
 	Ehardware(const Ehardware & ref) = default;
 	Ehardware(Ehardware && ref) = default;
 	Ehardware & operator = (const Ehardware & ref) = default;

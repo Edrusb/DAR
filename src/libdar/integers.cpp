@@ -33,7 +33,7 @@ namespace libdar
     template<class T> void integer_check_width(const char *type_name, T x, unsigned int expected)
     {
 	if(sizeof(T) != expected)
-	    throw Ehardware("interger_check_width", tools_printf(gettext("%s type length is not %d byte(s) but %d"), type_name, expected, sizeof(T)));
+	    throw Ehardware(tools_printf(gettext("%s type length is not %d byte(s) but %d"), type_name, expected, sizeof(T)));
     }
 
     template<class T> void integer_check_sign(const char *type_name, T x, bool expected_signed)
@@ -41,9 +41,9 @@ namespace libdar
 	x = 0;
 	--x;
 	if(x > 0 && expected_signed) //	"x > 0" to avoid compilation warning when T is unsigned
-	    throw Ehardware("integer_check_sign", tools_printf(gettext("%s type is not a signed type as expected"), type_name));
+	    throw Ehardware(tools_printf(gettext("%s type is not a signed type as expected"), type_name));
 	if(x < 1 && !expected_signed) // "x < 1" to avoid compilation warning when T is unsigned we compare against 1
-	    throw Ehardware("integer_check_sign", tools_printf(gettext("%s type is not an unsigned type as expected"), type_name));
+	    throw Ehardware(tools_printf(gettext("%s type is not an unsigned type as expected"), type_name));
     }
 
     template<class T> bool is_unsigned_big_endian(const char *type_name, T x)
@@ -98,7 +98,7 @@ namespace libdar
 	    if(i > size)
 		throw SRC_BUG;
 	    else // i < size, thus CPU/system uses neither a little nor a big endian sequence!!!
-		throw Ehardware("is_unsigned_big_endian", tools_printf(gettext("type %s is neither big nor little endian! Do not know how to handle integer in a portable manner on this host, aborting"), type_name));
+		throw Ehardware(tools_printf(gettext("type %s is neither big nor little endian! Do not know how to handle integer in a portable manner on this host, aborting"), type_name));
     }
 
     void integer_check()
@@ -151,11 +151,11 @@ namespace libdar
 	ref = is_unsigned_big_endian("U_16", u16);
 
 	if(ref != is_unsigned_big_endian("U_32", u32))
-	    throw Ehardware("integers_system_is_big_endian", gettext("incoherent endian between U_16 and U_32"));
+	    throw Ehardware(gettext("incoherent endian between U_16 and U_32"));
 	if(ref != is_unsigned_big_endian("U_64", u64))
-	    throw Ehardware("integers_system_is_big_endian", gettext("incoherent endian between U_16 and U_64"));
+	    throw Ehardware(gettext("incoherent endian between U_16 and U_64"));
 	if(ref != is_unsigned_big_endian("U_I", ui))
-	    throw Ehardware("integers_system_is_big_endian", gettext("incoherent endian between U_16 and U_I"));
+	    throw Ehardware(gettext("incoherent endian between U_16 and U_I"));
 
 	return ref;
     }

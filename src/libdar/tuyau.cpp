@@ -297,7 +297,7 @@ namespace libdar
                 case EINTR:
                     break;
                 case EIO:
-                    throw Ehardware("tuyau::inherited_read", "");
+                    throw Ehardware("Input/Output error");
                 default:
                     throw Erange(string(gettext("Error while reading from pipe: "))+tools_strerror_r(errno));
                 }
@@ -353,7 +353,7 @@ namespace libdar
                 case EINTR:
                     break;
                 case EIO:
-                    throw Ehardware("tuyau::inherited_write", string(gettext("Error while writing data to pipe: ")) + tools_strerror_r(errno));
+                    throw Ehardware(string(gettext("Error while writing data to pipe: ")) + tools_strerror_r(errno));
                 case ENOSPC:
                     get_ui().pause(gettext("No space left on device, you have the opportunity to make room now. When ready : can we continue ?"));
                     break;

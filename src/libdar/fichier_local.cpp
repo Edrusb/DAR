@@ -306,7 +306,7 @@ namespace libdar
                     throw SRC_BUG;
 			// "non blocking" read is not expected in this implementation
                 case EIO:
-                    throw Ehardware("fichier_local::inherited_read", string(gettext("Error while reading from file: ")) + tools_strerror_r(errno));
+                    throw Ehardware(string(gettext("Error while reading from file: ")) + tools_strerror_r(errno));
                 default :
                     throw Erange(string(gettext("Error while reading from file: ")) + tools_strerror_r(errno));
                 }
@@ -357,7 +357,7 @@ namespace libdar
                 case EINTR:
                     break;
                 case EIO:
-                    throw Ehardware("fichier_local::inherited_write", string(gettext("Error while writing to file: ")) + tools_strerror_r(errno));
+                    throw Ehardware(string(gettext("Error while writing to file: ")) + tools_strerror_r(errno));
                 case ENOSPC:
 		    return total; // partial writing, we stop here returning the amount of data wrote so far
 			// because there is no space left on device. The parent class manages the user interaction
