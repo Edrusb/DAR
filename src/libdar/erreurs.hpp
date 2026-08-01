@@ -236,7 +236,7 @@ namespace libdar
     class Edeci : public Egeneric
     {
     public :
-        Edeci(const std::string & source, const std::string & message) : Egeneric(message) {};
+        Edeci(const std::string & message) : Egeneric(message) {};
 	Edeci(const Edeci & ref) = default;
 	Edeci(Edeci && ref) = default;
 	Edeci & operator = (const Edeci & ref) = default;

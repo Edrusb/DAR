@@ -43,7 +43,7 @@ namespace libdar
     static inline chiffre digit_htoc(unsigned char c)
     {
         if(c < '0' || c > '9')
-            throw Edeci("deci.cpp : digit_htoc", gettext("invalid decimal digit"));
+            throw Edeci(gettext("invalid decimal digit"));
         return chiffre(c - '0');
     }
 

@@ -124,7 +124,7 @@ namespace libdar
 	}
 	catch(Edeci & e)
 	{
-	    throw Edeci("semaphore::build_string", string(gettext("Error while converting UID/GID to string for backup hook file: ")) + e.get_message());
+	    throw Edeci(string(gettext("Error while converting UID/GID to string for backup hook file: ")) + e.get_message());
 	}
 
 	return tools_substitute(execute, corres);

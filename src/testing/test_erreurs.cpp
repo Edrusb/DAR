@@ -36,7 +36,7 @@ void f1(S_I i)
     if(i < 0)
 	throw Erange("f1", "i < 0");
     if(i == 0)
-	throw Edeci("f1", "i == 0");
+	throw Edeci("i == 0");
 }
 
 void f2(S_I i, S_I j)
@@ -61,7 +61,7 @@ void f4()
 {
     Erange *y;
     Erange x = Erange("essai", "coucou");
-    Edeci dec = Edeci("f4", "essai");
+    Edeci dec = Edeci("essai");
 
     x.prepend_message("par ici: ");
     x.prepend_message("par ila: ");
