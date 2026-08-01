@@ -309,7 +309,7 @@ namespace libdar
     class Edata : public Egeneric
     {
     public :
-        Edata(const std::string & msg) : Egeneric(msg) {};
+        Edata(const std::string & msg): Egeneric(msg) {};
 	Edata(const Edata & ref) = default;
 	Edata(Edata && ref) = default;
 	Edata & operator = (const Edata & ref) = default;
@@ -345,7 +345,7 @@ namespace libdar
     class Elibcall : public Egeneric
     {
     public :
-        Elibcall(const std::string & source, const std::string & msg) : Egeneric(msg) {};
+        Elibcall(const std::string & msg) : Egeneric(msg) {};
 	Elibcall(const Elibcall & ref) = default;
 	Elibcall(Elibcall && ref) = default;
 	Elibcall & operator = (const Elibcall & ref) = default;

@@ -623,7 +623,7 @@ namespace libdar
 	    }
 	    catch(...)
 	    {
-		throw Elibcall("database::i_database::show_most_recent_stats", "user provided callback should not throw any exception");
+		throw Elibcall("user provided callback should not throw any exception");
 	    }
 	}
 	catch(...)

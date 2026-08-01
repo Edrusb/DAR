@@ -641,9 +641,9 @@ namespace libdar
 		    // useless arguments are not reported.
 
 		if(options.get_slice_size().is_zero() && !options.get_first_slice_size().is_zero())
-		    throw Elibcall("op_merge", gettext("\"first_file_size\" cannot be different from zero if \"file_size\" is equal to zero"));
+		    throw Elibcall(gettext("\"first_file_size\" cannot be different from zero if \"file_size\" is equal to zero"));
 		if(options.get_crypto_size() < 10 && options.get_crypto_algo() != crypto_algo::none)
-		    throw Elibcall("op_merge", gettext("Crypto block size must be greater than 10 bytes"));
+		    throw Elibcall(gettext("Crypto block size must be greater than 10 bytes"));
 
 		check_libgcrypt_hash_bug(get_ui(), options.get_hash_algo(), options.get_first_slice_size(), options.get_slice_size());
 
@@ -671,7 +671,7 @@ namespace libdar
 
 		if(ref_arch1 == nullptr)
 		    if(!ref_arch2)
-			throw Elibcall("archive::i_archive::archive[merge]", string(gettext("Both reference archive are nullptr, cannot merge archive from nothing")));
+			throw Elibcall(string(gettext("Both reference archive are nullptr, cannot merge archive from nothing")));
 		    else
 			if(ref_arch2->pimpl->cat == nullptr)
 			    throw SRC_BUG; // an archive should always have a catalogue available
@@ -679,7 +679,7 @@ namespace libdar
 			    if(ref_arch2->pimpl->exploitable)
 				ref_cat1 = ref_arch2->pimpl->cat;
 			    else
-				throw Elibcall("archive::i_archive::archive[merge]", gettext(ARCHIVE_NOT_EXPLOITABLE));
+				throw Elibcall(gettext(ARCHIVE_NOT_EXPLOITABLE));
 		else
 		    if(!ref_arch2)
 			if(ref_arch1->pimpl->cat == nullptr)
@@ -688,11 +688,11 @@ namespace libdar
 			    if(ref_arch1->pimpl->exploitable)
 				ref_cat1 = ref_arch1->pimpl->cat;
 			    else
-				throw Elibcall("archive::i_archive::archive[merge]", gettext(ARCHIVE_NOT_EXPLOITABLE));
+				throw Elibcall(gettext(ARCHIVE_NOT_EXPLOITABLE));
 		    else // both catalogues available
 		    {
 			if(!ref_arch1->pimpl->exploitable || !ref_arch2->pimpl->exploitable)
-			    throw Elibcall("archive::i_archive::archive[merge]", gettext(ARCHIVE_NOT_EXPLOITABLE));
+			    throw Elibcall(gettext(ARCHIVE_NOT_EXPLOITABLE));
 			if(ref_arch1->pimpl->cat == nullptr)
 			    throw SRC_BUG;
 			if(ref_arch2->pimpl->cat == nullptr)
@@ -743,7 +743,7 @@ namespace libdar
 		if(options.get_delta_signature())
 		{
 		    if(options.get_keep_compressed() && options.get_has_delta_mask_been_set())
-			throw Elibcall("op_merge", gettext("Cannot calculate delta signature when merging if keep compressed is asked"));
+			throw Elibcall(gettext("Cannot calculate delta signature when merging if keep compressed is asked"));
 		    if(options.get_sparse_file_min_size().is_zero() && options.get_has_delta_mask_been_set())
 			dialog->message(gettext("To calculate delta signatures of files saved as sparse files, you need to activate sparse file detection mechanism with merging operation"));
 		}
@@ -1028,7 +1028,7 @@ namespace libdar
                 // sanity checks
 
 	    if(!exploitable)
-                throw Elibcall("op_extract", gettext("This archive is not exploitable, check documentation for more"));
+                throw Elibcall(gettext("This archive is not exploitable, check documentation for more"));
 
 	    check_against_isolation(lax_read_mode);
 		// this avoid to try extracting archive directly from an isolated catalogue
@@ -1233,7 +1233,7 @@ namespace libdar
 	    // sanity checks
 
 	if(!exploitable)
-	    throw Elibcall("summary", gettext("This archive is not exploitable, check the archive class usage in the API documentation"));
+	    throw Elibcall(gettext("This archive is not exploitable, check the archive class usage in the API documentation"));
 
 	    // end of sanity checks
 
@@ -1325,7 +1325,7 @@ namespace libdar
 	    throw SRC_BUG;
 
 	if(callback == nullptr)
-	    throw Elibcall("archive::op_listing", "null pointer given as callback function for archive listing");
+	    throw Elibcall("null pointer given as callback function for archive listing");
 
         try
         {
@@ -1423,13 +1423,12 @@ namespace libdar
 			    }
 			    catch(Egeneric & e)
 			    {
-				throw Elibcall("archive::i_archive::op_listing",
-					       tools_printf(gettext("Exception caught from archive_listing_callback execution: %s"),
+				throw Elibcall(tools_printf(gettext("Exception caught from archive_listing_callback execution: %s"),
 							    e.get_message().c_str()));
 			    }
 			    catch(...)
 			    {
-				throw Elibcall("archive::i_archive::op_listing", gettext("Exception caught from archive_listing_callback execution"));
+				throw Elibcall(gettext("Exception caught from archive_listing_callback execution"));
 			    }
 			}
 			else // not saved, filtered out
@@ -1487,7 +1486,7 @@ namespace libdar
                 // sanity checks
 
             if(!exploitable)
-                throw Elibcall("op_diff", gettext("This archive is not exploitable, check documentation for more"));
+               throw Elibcall(gettext("This archive is not exploitable, check documentation for more"));
 
 	    try
 	    {
@@ -1576,7 +1575,7 @@ namespace libdar
                 // sanity checks
 
             if(!exploitable)
-                throw Elibcall("op_test", gettext("This archive is not exploitable, check the archive class usage in the API documentation"));
+                throw Elibcall(gettext("This archive is not exploitable, check the archive class usage in the API documentation"));
 
 	    try
 	    {
@@ -1897,7 +1896,7 @@ namespace libdar
 	    }
 	    catch(...)
 	    {
-		throw Elibcall("archive::i_archive::get_children_of", "user provided callback function should not throw any exception");
+		throw Elibcall("user provided callback function should not throw any exception");
 	    }
 	}
 
@@ -2008,7 +2007,7 @@ namespace libdar
     const catalogue & archive::i_archive::get_catalogue() const
     {
 	if(exploitable && sequential_read)
-	    throw Elibcall("archive::i_archive::get_catalogue", "Reading the first time the catalogue of an archive open in sequential read mode needs passing a \"user_interaction\" object to the argument of archive::i_archive::get_catalogue or call init_catalogue() first ");
+	    throw Elibcall("Reading the first time the catalogue of an archive open in sequential read mode needs passing a \"user_interaction\" object to the argument of archive::i_archive::get_catalogue or call init_catalogue() first ");
 
 	if(cat == nullptr)
 	    throw SRC_BUG;
@@ -2191,11 +2190,11 @@ namespace libdar
             // useless arguments are not reported.
 
         if((compression_level > 9 && algo != compression::zstd) || compression_level < 1)
-            throw Elibcall("op_create_in", gettext("Compression_level must be between 1 and 9 included"));
+            throw Elibcall(gettext("Compression_level must be between 1 and 9 included"));
         if(file_size.is_zero() && !first_file_size.is_zero())
-            throw Elibcall("op_create_in", gettext("\"first_file_size\" cannot be different from zero if \"file_size\" is equal to zero"));
+            throw Elibcall(gettext("\"first_file_size\" cannot be different from zero if \"file_size\" is equal to zero"));
         if(crypto_size < 10 && crypto != crypto_algo::none)
-            throw Elibcall("op_create_in", gettext("Crypto block size must be greater than 10 bytes"));
+            throw Elibcall(gettext("Crypto block size must be greater than 10 bytes"));
 #ifndef	LIBDAR_NODUMP_FEATURE
 	if(nodump)
 	    throw Ecompilation(gettext("nodump flag feature has not been activated at compilation time, it is thus not available"));

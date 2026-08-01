@@ -1107,7 +1107,7 @@ namespace libdar
 	}
 	catch(...)
 	{
-	    throw Elibcall("data_tree::display_line", "provided callback function should not throw any exception");
+	    throw Elibcall("provided callback function should not throw any exception");
 	}
     }
 

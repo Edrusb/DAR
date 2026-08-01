@@ -87,11 +87,11 @@ namespace libdar
 	}
 	catch(Egeneric & e)
 	{
-	    throw Elibcall("user_interaction::pause", tools_printf("%s : %s", errmsg, e.get_message().c_str()));
+	    throw Elibcall(tools_printf("%s : %s", errmsg, e.get_message().c_str()));
 	}
 	catch(...)
 	{
-	    throw Elibcall("user_interaction::pause", errmsg);
+	    throw Elibcall(errmsg);
 	}
 
 	if(!ret)
@@ -112,11 +112,11 @@ namespace libdar
 	}
 	catch(Egeneric & e)
 	{
-	    throw Elibcall("user_interaction::warning", tools_printf("%s : %s", errmsg, e.get_message().c_str()));
+	    throw Elibcall(tools_printf("%s : %s", errmsg, e.get_message().c_str()));
 	}
 	catch(...)
 	{
-	    throw Elibcall("user_interaction::warning", errmsg);
+	    throw Elibcall(errmsg);
 	}
     }
 
@@ -134,11 +134,11 @@ namespace libdar
 	}
 	catch(Egeneric & e)
 	{
-	    throw Elibcall("user_interaction::get_string", tools_printf("%s : %s", errmsg, e.get_message().c_str()));
+	    throw Elibcall(tools_printf("%s : %s", errmsg, e.get_message().c_str()));
 	}
-		catch(...)
+	catch(...)
 	{
-	    throw Elibcall("user_interaction::get_string", errmsg);
+	    throw Elibcall(errmsg);
 	}
     }
 
@@ -156,11 +156,11 @@ namespace libdar
 	}
 	catch(Egeneric & e)
 	{
-	    throw Elibcall("user_interaction::get_secu_string", tools_printf("%s : %s", errmsg, e.get_message().c_str()));
+	    throw Elibcall(tools_printf("%s : %s", errmsg, e.get_message().c_str()));
 	}
 	catch(...)
 	{
-	    throw Elibcall("user_interaction::get_secu_string", errmsg);
+	    throw Elibcall(errmsg);
 	}
     }
 

@@ -82,7 +82,7 @@ namespace libdar
 	try
 	{
 	    if(x_message_callback == nullptr || x_answer_callback == nullptr || x_string_callback == nullptr || x_secu_string_callback == nullptr)
-		throw Elibcall("user_interaction_callback::user_interaction_callback", dar_gettext("nullptr given as argument of user_interaction_callback()"));
+		throw Elibcall(dar_gettext("nullptr given as argument of user_interaction_callback()"));
 	    message_cb = x_message_callback;
 	    pause_cb  = x_answer_callback;
 	    get_string_cb  = x_string_callback;
@@ -109,7 +109,7 @@ namespace libdar
 	    }
 	    catch(...)
 	    {
-		throw Elibcall("user_interaction_callback::inherited_message", "user provided callback function (user_interaction_callback/message) should not throw any exception");
+		throw Elibcall("user provided callback function (user_interaction_callback/message) should not throw any exception");
 	    }
 	}
     }
@@ -126,7 +126,7 @@ namespace libdar
 	    }
 	    catch(...)
 	    {
-		throw Elibcall("user_interaction_callback::inherited_pause", "user provided callback function (user_interaction_callback/pause) should not throw any exception");
+		throw Elibcall("user provided callback function (user_interaction_callback/pause) should not throw any exception");
 	    }
 	}
     }
@@ -143,7 +143,7 @@ namespace libdar
 	    }
 	    catch(...)
 	    {
-		throw Elibcall("user_interaction_callback::inherited_get_string", "user provided callback function (user_interaction_callback/get_string) should not throw any exception");
+		throw Elibcall("user provided callback function (user_interaction_callback/get_string) should not throw any exception");
 	    }
 	}
     }
@@ -160,7 +160,7 @@ namespace libdar
 	    }
 	    catch(...)
 	    {
-		throw Elibcall("user_interaction_callback::inherited_get_secu_string", "user provided callback function (user_interaction_callback/get_secu_string) should not throw any exception");
+		throw Elibcall("user provided callback function (user_interaction_callback/get_secu_string) should not throw any exception");
 	    }
 	}
     }

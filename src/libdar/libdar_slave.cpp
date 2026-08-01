@@ -89,17 +89,17 @@ namespace libdar
 	U_I output_fd;
 
 	if(input_pipe.size() == 0)
-	    throw Elibcall("libdar_slave::libdar_slave", "empty string given to argument input_pipe of libdar_slave constructor");
+	    throw Elibcall("empty string given to argument input_pipe of libdar_slave constructor");
 	if(output_pipe.size() == 0)
-	    throw Elibcall("libdar_slave::libdar_slave", "empty string given to argument input_pipe of libdar_slave constructor");
+	    throw Elibcall("empty string given to argument input_pipe of libdar_slave constructor");
 
 	if(input_pipe_is_fd)
 	    if(!tools_my_atoi(input_pipe.c_str(), input_fd))
-		throw Elibcall("libdar_slave::libdar_slave", "non integer provided to argument input_pipe of libdar_slave constructor while input_pipe_is_fd was set");
+		throw Elibcall("non integer provided to argument input_pipe of libdar_slave constructor while input_pipe_is_fd was set");
 
 	if(output_pipe_is_fd)
 	    if(!tools_my_atoi(output_pipe.c_str(), output_fd))
-		throw Elibcall("libdar_slave::libdar_slave", "non integer provided to argument output_pipe of libdar_slave constructor while output_pipe_is_fd was set");
+		throw Elibcall("non integer provided to argument output_pipe of libdar_slave constructor while output_pipe_is_fd was set");
 
 	entrep.reset(new (nothrow) entrepot_local("", "", false));
 	if(!entrep)

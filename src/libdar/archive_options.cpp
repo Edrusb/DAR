@@ -170,7 +170,7 @@ namespace libdar
         try
         {
 	    if(!external_cat)
-		throw Elibcall("archive_options_read::get_external_catalogue", gettext("Cannot get catalogue of reference as it has not been provided"));
+		throw Elibcall(gettext("Cannot get catalogue of reference as it has not been provided"));
 	}
         catch(...)
         {
@@ -188,7 +188,7 @@ namespace libdar
 	try
 	{
 	    if(!external_cat)
-		throw Elibcall("archive_options_read::get_external_catalogue", gettext("Error, catalogue of reference has not been provided"));
+		throw Elibcall(gettext("Error, catalogue of reference has not been provided"));
 	}
         catch(...)
         {

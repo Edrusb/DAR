@@ -419,7 +419,7 @@ namespace libdar
 		}
 		catch(...)
 		{
-		    throw Elibcall("data_dir::show", "user provided callback function should not throw any exception");
+		    throw Elibcall("user provided callback function should not throw any exception");
 		}
 	    }
 	    if(dir != nullptr)
