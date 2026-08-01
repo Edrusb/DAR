@@ -85,7 +85,7 @@ int main()
     }
     catch(Ebug & e)
     {
-	ui->message(e.dump_str());
+	ui->message(e.get_message());
     }
     catch(Egeneric & e)
     {

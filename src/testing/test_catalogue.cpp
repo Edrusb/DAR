@@ -174,7 +174,7 @@ void f1()
     }
     catch(Egeneric & e)
     {
-        cerr << e.dump_str();
+        cerr << e.get_message() << endl;
     }
 }
 
@@ -203,7 +203,7 @@ void f2()
         }
         catch(Egeneric & e)
         {
-            cerr << e.dump_str();
+            cerr << e.get_message() << endl;
         }
         cat.add(new cat_file(1024, 102, 0644, datetime(1), datetime(2), datetime(3), "fichier", path("."), 1024, 0, false));
         cat.add(new cat_lien(1025, 103, 0645, datetime(4), datetime(5), datetime(6),  "lien", "fichier", 0));
@@ -292,7 +292,7 @@ void f2()
     }
     catch(Egeneric &e)
     {
-	cerr << e.dump_str();
+	cerr << e.get_message() << endl;
     }
 }
 

@@ -67,12 +67,12 @@ int main(int argc, char *argv[])
 	catch(Egeneric & e)
 	{
 	    ui->message(e.get_message());
-	    cerr << e.dump_str();
+	    cerr << e.get_message() << endl;
 	}
     }
     catch(Egeneric & e)
     {
-	cout << e.dump_str() << endl;
+	cout << e.get_message() << endl;
     }
     ui.reset();
 }

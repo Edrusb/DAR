@@ -88,22 +88,12 @@ namespace libdar
 	pile.front().objet = context + pile.front().objet;
     }
 
-    string Egeneric::dump_str() const
+    void Egeneric::append_message(const std::string & precision)
     {
-	string ret;
-        deque<niveau>::const_iterator it = pile.begin();
+	if(pile.empty())
+	    throw SRC_BUG;
 
-        ret +=  "---- exception type = [" + exceptionID() + "] ----------\n";
-        ret +=  "[source]\n";
-        while(it != pile.end())
-        {
-            ret += "\t" + it->lieu + " : " + it->objet + "\n";
-            it++;
-        }
-        ret += "[most outside call]\n";
-        ret += "-----------------------------------\n\n";
-
-	return ret;
+	pile.front().objet += precision;
     }
 
     bool Egeneric::get_tag(const string & key,
@@ -128,11 +118,13 @@ namespace libdar
 	void *buffer[buf_size];
 	int size = backtrace(buffer, buf_size);
 	char **symbols = backtrace_symbols(buffer, size);
+	static constexpr const char* delimiter = "----------------------------------------------------------------------\n";
 
+	prepend_message(delimiter);
 	try
 	{
 	    for(int i = 0; i < size; ++i)
-		prepend_message(tools_printf("\tstack: %s\n", symbols[i]));
+		prepend_message(tools_printf("  %d\t: %s\n", size-i, symbols[i]));
 	}
 	catch(...)
 	{
@@ -142,7 +134,10 @@ namespace libdar
 	}
 	if(symbols != nullptr)
 	    free(symbols);
-	prepend_message("Stack dump\n");
+	prepend_message("Stack dump:\n");
+	prepend_message(delimiter);
+	prepend_message("\n");
+	append_message(delimiter);
 #else
 	Egeneric::stack("stack dump", "backtrace() call absent, cannot dump the stack information at the time the exception was thrown");
 #endif

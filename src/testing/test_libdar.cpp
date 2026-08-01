@@ -65,7 +65,7 @@ int main()
     }
     catch(Egeneric & e)
     {
-	cout << e.dump_str() << endl;
+	cout << e.get_message() << endl;
     }
 }
 

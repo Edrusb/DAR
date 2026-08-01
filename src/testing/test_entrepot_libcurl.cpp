@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
     }
     catch(Egeneric & e)
     {
-	cout << "Execption caught: " << e.dump_str() << endl;
+	cout << "Execption caught: " << e.get_message() << endl;
     }
 }
 

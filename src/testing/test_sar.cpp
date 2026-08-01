@@ -76,7 +76,7 @@ static void f1()
     }
     catch(Egeneric &e)
     {
-        cerr << e.dump_str();
+        cerr << e.get_message() << endl;
     }
 }
 
@@ -95,7 +95,7 @@ static void f2()
     }
     catch(Egeneric &e)
     {
-        cerr << e.dump_str();
+        cerr << e.get_message() << endl;
     }
 }
 
@@ -165,7 +165,7 @@ static void f3()
     }
     catch(Egeneric & e)
     {
-        cerr << e.dump_str();
+        cerr << e.get_message() << endl;
     }
 }
 
@@ -189,7 +189,7 @@ void f4()
     }
     catch(Egeneric & e)
     {
-	cerr << e.dump_str();
+	cerr << e.get_message() << endl;
     }
 
 }

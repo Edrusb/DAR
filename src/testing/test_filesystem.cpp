@@ -230,6 +230,6 @@ static void re_test()
     }
     catch(Egeneric & e)
     {
-	cerr << e.dump_str();
+	cerr << e.get_message() << endl;
     }
 }

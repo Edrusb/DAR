@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
     catch(Egeneric & e)
     {
 	ui->printf("Exception caught: %S", &(e.get_message()));
-	cout << e.dump_str() << endl;
+	cout << e.get_message() << endl;
     }
     catch(...)
     {

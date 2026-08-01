@@ -84,8 +84,8 @@ namespace libdar
 	    /// prepend error message by the given string
 	void prepend_message(const std::string & context);
 
-	    /// return a string result of the exception information dump
-	std::string dump_str() const;
+	    /// append message to the current stirng
+	void append_message(const std::string & precision);
 
 	    /// set a tag to the exception
 	void set_tag(const std::string & key,

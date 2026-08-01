@@ -125,7 +125,7 @@ void f1()
 	    }
 	    catch(Egeneric & e)
 	    {
-		cerr << e.dump_str();
+		cerr << e.get_message() << endl;
 	    }
 
 	    t->skip_to_eof();
@@ -146,13 +146,13 @@ void f1()
 	}
 	catch(Egeneric &f)
 	{
-	    cerr << f.dump_str();
+	    cerr << f.get_message() << endl;
 	}
 	ui.reset();
     }
     catch(Egeneric & f)
     {
-	cerr << f.dump_str();
+	cerr << f.get_message() << endl;
     }
 }
 
@@ -226,12 +226,12 @@ void f2()
 	}
 	catch(Egeneric &e)
 	{
-	    cerr << e.dump_str();
+	    cerr << e.get_message() << endl;
 	}
 	ui.reset();
     }
     catch(Egeneric & f)
     {
-	cerr << f.dump_str();
+	cerr << f.get_message() << endl;
     }
 }

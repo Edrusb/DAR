@@ -175,7 +175,7 @@ static void routine1()
     }
     catch(Egeneric & e)
     {
-	cerr << e.dump_str();
+	cerr << e.get_message() << endl;
     }
 
     f1 = 21;

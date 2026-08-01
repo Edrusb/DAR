@@ -286,7 +286,7 @@ int dar_suite_global(int argc,
     }
     catch(Egeneric & e)
     {
-	cerr << e.dump_str();
+	cerr << e.get_message() << endl;
 	general_report(string(gettext("INTERNAL ERROR, PLEASE REPORT THE PREVIOUS OUTPUT TO MAINTAINER")));
 	ret = EXIT_BUG;
     }
@@ -305,7 +305,7 @@ int dar_suite_global(int argc,
     catch(...)
     {
 	Ebug x = SRC_BUG;
-	cerr << x.dump_str();
+	cerr << x.get_message() << endl;
 	general_report(string(gettext("CAUGHT A NON (LIB)DAR EXCEPTION")));
 	general_report(string(gettext("INTERNAL ERROR, PLEASE REPORT THE PREVIOUS OUTPUT TO MAINTAINER")));
 	ret = EXIT_BUG;

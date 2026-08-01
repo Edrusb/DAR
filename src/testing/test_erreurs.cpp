@@ -65,11 +65,11 @@ void f4()
 
     x.prepend_message("par ici: ");
     x.prepend_message("par ila: ");
-    cerr << dec.dump_str();
+    cerr << dec.get_message() << endl;
 
     y = new Erange(x);
-    cerr << y->dump_str();
-    cerr << y->dump_str();
+    cerr << y->get_message() << endl;
+    cerr << y->get_message() << endl;
     delete y;
 }
 
@@ -94,7 +94,7 @@ int main()
     }
     catch(Egeneric & e)
     {
-        cerr << e.dump_str();
+        cerr << e.get_message() << endl;
     }
 
     try
@@ -103,7 +103,7 @@ int main()
     }
     catch(Egeneric & e)
     {
-        cerr << e.dump_str();
+        cerr << e.get_message() << endl;
     }
 
     try
@@ -112,6 +112,6 @@ int main()
     }
     catch(Egeneric & e)
     {
-	cerr << e.dump_str();
+	cerr << e.get_message() << endl;
     }
 }

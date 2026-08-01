@@ -111,7 +111,7 @@ static void f1()
     }
     catch(Egeneric & e)
     {
-        cerr << e.dump_str();
+        cerr << e.get_message() << endl;
     }
 
     try
@@ -135,7 +135,7 @@ static void f1()
         }
         catch(Erange &e)
         {
-            cerr << e.dump_str();
+            cerr << e.get_message() << endl;
             c2.skip(pos2);
 	    dst2.skip(0);
 	    c2.copy_to(dst2);
@@ -147,7 +147,7 @@ static void f1()
         }
         catch(Erange &e)
         {
-            cerr << e.dump_str();
+            cerr << e.get_message() << endl;
             c3.skip(pos3);
 	    dst3.skip(0);
 	    c3.copy_to(dst3);
@@ -155,7 +155,7 @@ static void f1()
     }
     catch(Egeneric & e)
     {
-        cerr << e.dump_str();
+        cerr << e.get_message() << endl;
     }
     unlink("tutu.none");
     unlink("tutu.gz");
@@ -206,6 +206,6 @@ static void f2()
     }
     catch(Egeneric &e)
     {
-	cerr << e.dump_str();
+	cerr << e.get_message() << endl;
     }
 }

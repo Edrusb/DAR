@@ -1426,7 +1426,7 @@ namespace libdar
 			    {
 				throw Elibcall("archive::i_archive::op_listing",
 					       tools_printf(gettext("Exception caught from archive_listing_callback execution: %s"),
-							    e.dump_str().c_str()));
+							    e.get_message().c_str()));
 			    }
 			    catch(...)
 			    {
