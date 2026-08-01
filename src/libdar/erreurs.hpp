@@ -113,6 +113,9 @@ namespace libdar
     protected :
         virtual std::string exceptionID() const = 0;
 
+	    /// replace the whole message by a new value
+	void replace_message(const std::string & message) { msg = message; };
+
     private :
 	std::string msg;
 	std::map<std::string, std::string> tag;
