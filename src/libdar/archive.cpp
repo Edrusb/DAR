@@ -54,7 +54,7 @@ namespace libdar
 						options));
 
 	    if(!pimpl)
-		throw Ememory("archive::archive");
+		throw Ememory();
 	}
 	catch(...)
 	{
@@ -85,7 +85,7 @@ namespace libdar
 						options,
 						progressive_report));
 	    if(!pimpl)
-		throw Ememory("archive::archive");
+		throw Ememory();
 
 	}
         catch(...)
@@ -118,7 +118,7 @@ namespace libdar
 						options,
 						progressive_report));
 	    if(!pimpl)
-		throw Ememory("archive::archive");
+		throw Ememory();
 	}
 	catch(...)
 	{
@@ -153,7 +153,7 @@ namespace libdar
 						options_repair,
 						progressive_report));
 	    if(!pimpl)
-		throw Ememory("archive::archive");
+		throw Ememory();
 	}
 	catch(...)
 	{

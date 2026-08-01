@@ -311,7 +311,7 @@ namespace libdar
                 throw SRC_BUG; // size mismatch in this algorithm
         }
         else
-            throw Ememory("template infinint::infinint_from");
+            throw Ememory();
     }
 
     template <class T> T infinint::max_val_of(T x)

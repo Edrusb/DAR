@@ -97,7 +97,7 @@ namespace libdar
         }
 
         if(! ret)
-            throw Ememory("create_remote_entrepot");
+            throw Ememory();
 
         return ret;
     }

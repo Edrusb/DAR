@@ -309,7 +309,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 							 EXTENSION,
 							 read_options));
 			if(!arch)
-			    throw Ememory("little_main");
+			    throw Ememory();
 		    }
 		    else // repairing
 			arch.reset();
@@ -359,7 +359,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 							EXTENSION,
 							read_options));
 			if(!aux)
-			    throw Ememory("little_main");
+			    throw Ememory();
 		    }
 		}
 
@@ -505,7 +505,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 						    create_options,
 						    &st));
 		    if(!cur)
-			throw Ememory("little_main");
+			throw Ememory();
 		    if(!param.quiet)
 			display_sauv_stat(*dialog, st);
 		    break;
@@ -574,7 +574,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 						    merge_options,
 						    &st));             // statistics*
 		    if(!cur)
-			throw Ememory("little_main");
+			throw Ememory();
 		    if(!param.quiet)
 			display_merge_stat(*dialog, st);
 		    break;
@@ -623,7 +623,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 						    EXTENSION,
 						    repair_options));
 		    if(!cur)
-			throw Ememory("little_main");
+			throw Ememory();
 		    break;
 		default:
 		    throw SRC_BUG;
@@ -758,7 +758,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 						 EXTENSION,
 						 read_options));
 		if(!arch)
-		    throw Ememory("little_main");
+		    throw Ememory();
 
 		if(param.delta_sig == rsync_sig_magic::none)
 		    arch->drop_all_filedescriptors(param.isolation_repair);
@@ -895,7 +895,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 							   datopt));
 
 		    if(!extractdb)
-			throw Ememory("little_main");
+			throw Ememory();
 		}
 		else
 		{
@@ -905,7 +905,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 						     EXTENSION,
 						     read_options));
 		    if(!arch)
-			throw Ememory("little_main");
+			throw Ememory();
 		}
 
 		extract_options.clear();
@@ -1041,7 +1041,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 						 EXTENSION,
 						 read_options));
 		if(!arch)
-		    throw Ememory("little_main");
+		    throw Ememory();
 
 		diff_options.clear();
 		diff_options.set_selection(*param.selection);
@@ -1133,7 +1133,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 						 EXTENSION,
 						 read_options));
 		if(!arch)
-		    throw Ememory("little_main");
+		    throw Ememory();
 
 		test_options.clear();
 		test_options.set_selection(*param.selection);
@@ -1189,7 +1189,7 @@ static S_I little_main(shared_ptr<user_interaction> & dialog, S_I argc, char * c
 						 EXTENSION,
 						 read_options));
 		if(!arch)
-		    throw Ememory("little_main");
+		    throw Ememory();
 
 		if(param.quiet)
 		{

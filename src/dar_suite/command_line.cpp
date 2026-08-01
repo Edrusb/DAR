@@ -164,7 +164,7 @@ struct recursive_param
     {
         dialog = x_dialog;
         if(!dialog)
-            throw Ememory("recursive_param::recursive_param");
+            throw Ememory();
         home = x_home;
 
             //
@@ -442,7 +442,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
         {
             p.fs_root = new (nothrow) path(".");
             if(p.fs_root == nullptr)
-                throw Ememory("get_args");
+                throw Ememory();
 	    *p.fs_root = tools_relative2absolute_path(*p.fs_root, tools_getcwd());
         }
 	if(p.extract_from_database && p.op != extract)
@@ -716,7 +716,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
         {
             p.compress_mask = new (nothrow) bool_mask(true);
             if(p.compress_mask == nullptr)
-                throw Ememory("get_args");
+                throw Ememory();
         }
 
             ////////////////////////////////
@@ -803,7 +803,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
             {
                 p.overwrite = new (nothrow) crit_constant_action(data_preserve, EA_merge_preserve);
                 if(p.overwrite == nullptr)
-                    throw Ememory("get_args");
+                    throw Ememory();
             }
             break;
         case extract:
@@ -816,7 +816,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
                                                                    rec.ea_erase,
                                                                    p.overwrite);
                 if(p.overwrite == nullptr)
-                    throw Ememory("get_args");
+                    throw Ememory();
             }
             break;
         default:
@@ -1001,7 +1001,7 @@ static bool get_args_recursive(recursive_param & rec,
                     {
                         p.ref_filename = new (nothrow) string();
                         if(p.ref_filename == nullptr)
-                            throw Ememory("get_args");
+                            throw Ememory();
                         try
                         {
 			    string path_basename;
@@ -1164,7 +1164,7 @@ static bool get_args_recursive(recursive_param & rec,
 			*p.fs_root = tools_relative2absolute_path(*p.fs_root, cwd);
 		}
                 if(p.fs_root == nullptr)
-                    throw Ememory("get_args");
+                    throw Ememory();
                 break;
             case 's':
                 if(!p.file_size.is_zero())
@@ -1810,7 +1810,7 @@ static bool get_args_recursive(recursive_param & rec,
                 {
                     p.aux_filename = new (nothrow) string();
                     if(p.aux_filename == nullptr)
-                        throw Ememory("get_args");
+                        throw Ememory();
                     try
                     {
 			string path_basename;
@@ -2913,7 +2913,7 @@ static void make_args_from_file(shared_ptr<user_interaction> & dialog,
         argv = new (nothrow) char *[argc];
         if(argv == nullptr)
 	{
-            Ememory e("");
+            Ememory e;
 	    e.set_tag(ERROR_KEY, ERROR_VAL_MAKE_ARGS_FROM_FILE);
 	    throw e;
 	}
@@ -2925,7 +2925,7 @@ static void make_args_from_file(shared_ptr<user_interaction> & dialog,
         char *pseudo_command = new (nothrow) char[strlen(command)+1];
         if(pseudo_command == nullptr)
 	{
-            Ememory e("");
+            Ememory e;
 	    e.set_tag(ERROR_KEY, ERROR_VAL_MAKE_ARGS_FROM_FILE);
 	    throw e;
 	}
@@ -3169,7 +3169,7 @@ static mask *make_include_exclude_name(const string & x, mask_opt opt)
         ret = new (nothrow) regular_mask(x, opt.case_sensit);
 
     if(ret == nullptr)
-        throw Ememory("make_include_exclude_name");
+        throw Ememory();
     else
         return ret;
 }
@@ -3186,7 +3186,7 @@ static mask *make_exclude_path_ordered(const string & x, mask_opt opt)
 	line_tools_split_mask_list_from_eols(x, filename_list, eols);
         ret = new (nothrow) mask_list(filename_list, opt.case_sensit, opt.prefix, false, eols);
         if(ret == nullptr)
-            throw Ememory("make_exclude_path");
+            throw Ememory();
     }
     else // not file listing mask
     {
@@ -3195,7 +3195,7 @@ static mask *make_exclude_path_ordered(const string & x, mask_opt opt)
             ou_mask *val = new (nothrow) ou_mask();
 
             if(val == nullptr)
-                throw Ememory("make_exclude_path");
+                throw Ememory();
 
             val->add_mask(simple_mask((opt.prefix + x).display(), opt.case_sensit));
             val->add_mask(simple_mask((opt.prefix + x).display() + "/*", opt.case_sensit));
@@ -3206,7 +3206,7 @@ static mask *make_exclude_path_ordered(const string & x, mask_opt opt)
             ret = new (nothrow) regular_mask(tools_build_regex_for_exclude_mask(opt.prefix.display(), x), opt.case_sensit);
 
             if(ret == nullptr)
-                throw Ememory("make_exclude_path");
+                throw Ememory();
         }
     }
 
@@ -3232,7 +3232,7 @@ static mask *make_exclude_path_unordered(const string & x, mask_opt opt)
         else
             ret = new (nothrow) regular_mask(tools_build_regex_for_exclude_mask(opt.prefix.display(), x), opt.case_sensit);
     if(ret == nullptr)
-        throw Ememory("make_exclude_path");
+        throw Ememory();
 
     return ret;
 }
@@ -3252,7 +3252,7 @@ static mask *make_include_path(const string & x, mask_opt opt)
     else
         ret = new (nothrow) simple_path_mask(opt.prefix + x, opt.case_sensit);
     if(ret == nullptr)
-        throw Ememory("make_include_path");
+        throw Ememory();
 
     return ret;
 }
@@ -3275,7 +3275,7 @@ static mask *make_ordered_mask(deque<pre_mask> & listing, mask *(*make_include_m
                 {
                     ret_mask = (*make_include_mask)(listing.front().mask, opt);
                     if(ret_mask == nullptr)
-                        throw Ememory("make_ordered_mask");
+                        throw Ememory();
                 }
                 else // ret_mask != nullptr (need to chain to existing masks)
                 {
@@ -3291,7 +3291,7 @@ static mask *make_ordered_mask(deque<pre_mask> & listing, mask *(*make_include_m
                         tmp_mask = (*make_include_mask)(listing.front().mask, opt);
                         tmp_ou_mask = new (nothrow) ou_mask();
                         if(tmp_ou_mask == nullptr)
-                            throw Ememory("make_ordered_mask");
+                            throw Ememory();
                         tmp_ou_mask->add_mask(*ret_mask);
                         tmp_ou_mask->add_mask(*tmp_mask);
                         delete tmp_mask;
@@ -3307,7 +3307,7 @@ static mask *make_ordered_mask(deque<pre_mask> & listing, mask *(*make_include_m
                     tmp_mask = (*make_exclude_mask)(listing.front().mask, opt);
                     ret_mask = new (nothrow) not_mask(*tmp_mask);
                     if(ret_mask == nullptr)
-                        throw Ememory("make_ordered_mask");
+                        throw Ememory();
                     delete tmp_mask;
                     tmp_mask = nullptr;
                 }
@@ -3325,7 +3325,7 @@ static mask *make_ordered_mask(deque<pre_mask> & listing, mask *(*make_include_m
                         tmp_mask = (*make_exclude_mask)(listing.front().mask, opt);
                         tmp_et_mask = new (nothrow) et_mask();
                         if(tmp_et_mask == nullptr)
-                            throw Ememory("make_ordered_mask");
+                            throw Ememory();
                         tmp_et_mask->add_mask(*ret_mask);
                         tmp_et_mask->add_mask(not_mask(*tmp_mask));
                         delete tmp_mask;
@@ -3342,7 +3342,7 @@ static mask *make_ordered_mask(deque<pre_mask> & listing, mask *(*make_include_m
         {
             ret_mask = new (nothrow) bool_mask(true);
             if(ret_mask == nullptr)
-                throw Ememory("get_args");
+                throw Ememory();
         }
     }
     catch(...)
@@ -3381,7 +3381,7 @@ static mask *make_unordered_mask(deque<pre_mask> & listing, mask *(*make_include
     mask_opt opt = prefix;
 
     if(ret_mask == nullptr)
-        throw Ememory("make_unordered_mask");
+        throw Ememory();
 
     try
     {

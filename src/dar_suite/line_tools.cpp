@@ -74,7 +74,7 @@ argc_argv::argc_argv(S_I size)
     {
 	x_argv = new (nothrow) char *[size];
 	if(x_argv == nullptr)
-	    throw Ememory("argc_argv::argc_argv");
+	    throw Ememory();
 
 	for(S_I i = 0; i < x_argc; i++)
 	    x_argv[i] = nullptr;
@@ -112,7 +112,7 @@ void argc_argv::set_arg(const string & arg, S_I index)
 
     x_argv[index] = new (nothrow) char[arg.size() + 1];
     if(x_argv[index] == nullptr)
-	throw Ememory("argc_argv::set_arg");
+	throw Ememory();
     strncpy(x_argv[index], arg.c_str(), arg.size());
     x_argv[index][arg.size()] = '\0';
 }
@@ -130,7 +130,7 @@ void argc_argv::set_arg(generic_file & f, U_I size, S_I index)
 
     x_argv[index] = new (nothrow) char [size+1];
     if(x_argv[index] == nullptr)
-	throw Ememory("argc_argv::set_arg");
+	throw Ememory();
 
     x_argv[index][f.read(x_argv[index], size)] = '\0';
 }
@@ -152,7 +152,7 @@ void argc_argv::resize(S_I size)
 
     tmp = new (nothrow) char*[size];
     if(tmp == nullptr)
-	throw Ememory("argc_argv::resize");
+	throw Ememory();
 
     try
     {
@@ -692,17 +692,17 @@ void line_tools_4_4_build_compatible_overwriting_policy(bool allow_over,
 	    else
 		overwrite = new (nothrow) crit_constant_action(data_overwrite, EA_merge_overwrite);
 	    if(overwrite == nullptr)
-		throw Ememory("tools_build_compatible_overwriting_policy");
+		throw Ememory();
 
 	    tmp1 = new (nothrow) crit_constant_action(data_preserve, EA_preserve);
 	    if(tmp1 == nullptr)
-		throw Ememory("tools_build_compatible_overwriting_policy");
+		throw Ememory();
 
 	    if(more_recent)
 	    {
 		tmp2 = new (nothrow) testing(crit_in_place_data_more_recent(hourshift), *tmp1, *overwrite);
 		if(tmp2 == nullptr)
-		    throw Ememory("tools_build_compatible_overwriting_policy");
+		    throw Ememory();
 
 		delete overwrite;
 		overwrite = tmp2;
@@ -713,7 +713,7 @@ void line_tools_4_4_build_compatible_overwriting_policy(bool allow_over,
 	    {
 		tmp2 = new (nothrow) testing(crit_invert(crit_in_place_is_inode()), *overwrite, *tmp1);
 		if(tmp2 == nullptr)
-		    throw Ememory("tools_build_compatible_overwriting_policy");
+		    throw Ememory();
 		delete overwrite;
 		overwrite = tmp2;
 		tmp2 = nullptr;
@@ -726,7 +726,7 @@ void line_tools_4_4_build_compatible_overwriting_policy(bool allow_over,
 	{
 	    overwrite = new (nothrow) crit_constant_action(data_preserve, EA_preserve);
 	    if(overwrite == nullptr)
-		throw Ememory("tools_build_compatible_overwriting_policy");
+		throw Ememory();
 	}
 
 	if(overwrite == nullptr)
@@ -964,7 +964,7 @@ void line_tools_split_path_basename(const char *all, path * &chemin, string & ba
     }
 
     if(chemin == nullptr)
-	throw Ememory("line_tools_split_path_basename");
+	throw Ememory();
 }
 
 void line_tools_split_path_basename(const string & all, string & chemin, string & base)
@@ -1608,7 +1608,7 @@ string line_tools_getcwd()
 	{
 	    buffer = new (nothrow) char[length];
 	    if(buffer == nullptr)
-		throw Ememory("line_tools_getcwd()");
+		throw Ememory();
 	    ret = getcwd(buffer, length-1); // length-1 to keep a place for ending '\0'
 	    if(ret == nullptr) // could not get the CWD
 	    {

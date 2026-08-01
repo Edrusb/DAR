@@ -33,7 +33,7 @@ namespace libdar
     {
 	x_attr = new (nothrow) infinint(attr);
 	if(x_attr == nullptr)
-	    throw Ememory("Ethread_cancel_with_attr::Ethread_cancel_with_attr");
+	    throw Ememory();
     }
 
     Ethread_cancel_with_attr & Ethread_cancel_with_attr::operator = (Ethread_cancel_with_attr && ref) noexcept
@@ -63,7 +63,7 @@ namespace libdar
     {
 	x_attr = new (nothrow) infinint(*ref.x_attr);
 	if(x_attr == nullptr)
-	    throw Ememory("Ethread_cancel_with_attr::Ethread_cancel_with_attr");
+	    throw Ememory();
     }
 
 } // end of namespace

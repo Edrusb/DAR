@@ -170,7 +170,7 @@ namespace libdar
         {
             user_group = new (nothrow) user_group_bases();
             if(user_group == nullptr)
-                throw Ememory("tools_init");
+                throw Ememory();
         }
 #endif
     }
@@ -432,7 +432,7 @@ namespace libdar
 #if HAVE_CTIME_R
 	    char *str = new (nothrow) char [str_size];
 	    if(str == nullptr)
-		throw Ememory("tools_display_date");
+		throw Ememory();
 	    try
 	    {
 		val = ctime_r(&pas, str);
@@ -470,7 +470,7 @@ namespace libdar
 	char *ret = new (nothrow) char[size+1];
 
 	if(ret == nullptr)
-	    throw Ememory("line_tools_str2charptr");
+	    throw Ememory();
 	(void)memcpy(ret, x.c_str(), size);
 	ret[size] = '\0';
 
@@ -597,7 +597,7 @@ namespace libdar
 
                 tube = new (nothrow) tuyau(dialog);
                 if(tube == nullptr)
-                    throw Ememory("tools_system_with_pipe");
+                    throw Ememory();
 
                 const string read_fd = tools_int2str(tube->get_read_fd());
                 tlv_list pipeargs;
@@ -769,7 +769,7 @@ namespace libdar
             {
                 buffer = new (nothrow) char[length];
                 if(buffer == nullptr)
-                    throw Ememory("tools_readlink");
+                    throw Ememory();
                 lu = readlink(root, buffer, length-1); // length-1 to have room to add '\0' at the end
 
                 if(lu < 0) // error occured with readlink
@@ -1067,7 +1067,7 @@ namespace libdar
 
         copie = new (nothrow) char[taille];
         if(copie == nullptr)
-            throw Ememory("tools_printf");
+            throw Ememory();
         try
         {
             char *ptr = copie, *start = copie;
@@ -1841,7 +1841,7 @@ namespace libdar
 		{
 		    buf = new (nothrow) char[size];
 		    if(buf == nullptr)
-			throw Ememory("tools_ownership2uid");
+			throw Ememory();
 
 		    int val = getpwnam_r(c_user,
 					 &puser,
@@ -1934,7 +1934,7 @@ namespace libdar
 		{
 		    buf = new (nothrow) char[size];
 		    if(buf == nullptr)
-			throw Ememory("tools_ownsership2gid");
+			throw Ememory();
 
 		    S_I val = getgrnam_r(c_group,
 					 &pgroup,
@@ -2131,7 +2131,7 @@ namespace libdar
 	    {
 		buffer = new (nothrow) char[length];
 		if(buffer == nullptr)
-		    throw Ememory("line_tools_getcwd()");
+		    throw Ememory();
 		ret = getcwd(buffer, length-1); // length-1 to keep a place for ending '\0'
 		if(ret == nullptr) // could not get the CWD
 		{
@@ -2240,7 +2240,7 @@ namespace libdar
         wchar_t *dst = new (nothrow) wchar_t[val.size() + 1];
 
         if(dst == nullptr)
-            throw Ememory("tools_string_to_wcs");
+            throw Ememory();
         try
         {
             mbstate_t state_wc;
@@ -2283,7 +2283,7 @@ namespace libdar
 
         char *dst = new (nothrow) char[len + 1];
         if(dst == nullptr)
-            throw Ememory("tools_wstring_to_string");
+            throw Ememory();
         try
         {
             size_t len2;

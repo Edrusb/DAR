@@ -99,7 +99,7 @@ namespace libdar
 	me->detruit();
 	me->contents = new (nothrow) etage(aveugle, get_location().display().c_str(), datetime(0), datetime(0), false, furtive_mode);
 	if(contents == nullptr)
-	    throw Ememory("entrepot_local::read_dir_reset");
+	    throw Ememory();
     }
 
     bool entrepot_local::read_dir_next(string & filename) const
@@ -151,7 +151,7 @@ namespace libdar
 	    case EROFS:
 		throw Esystem("entrepot_local::create_dir", gettext(create_msg) + tools_strerror_r(errno), Esystem::io_ro_fs);
 	    case ENOMEM:
-		throw Ememory("entrepot_local::create_dir");
+		throw Ememory();
 	    default:
 		throw Erange("entrepot_local::create_dir", gettext(create_msg) + tools_strerror_r(errno));
 	    }
@@ -174,7 +174,7 @@ namespace libdar
 		switch(errno)
 		{
 		case ENOMEM:
-		    throw Ememory("entrepot_local::create_dir");
+		    throw Ememory();
 		default:
 		    throw Erange("entrepot_local::create_dir", gettext(owner_msg) + tools_strerror_r(errno));
 		}
@@ -204,7 +204,7 @@ namespace libdar
 					  erase,
 					  false);
 	if(ret == nullptr)
-	    throw Ememory("entrepot_local::inherited_open");
+	    throw Ememory();
 	try
 	{
 	    if(force_permission)

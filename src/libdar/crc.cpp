@@ -417,7 +417,7 @@ namespace libdar
 	    //////////////////////////////////////////////////////////////////////
 
 	if(cyclic == nullptr)
-	    throw Ememory("crc::copy_from");
+	    throw Ememory();
 	pointer = cyclic;
     }
 
@@ -472,7 +472,7 @@ namespace libdar
 	}
 
 	if(ret == nullptr)
-	    throw Ememory("create_crc_from_file");
+	    throw Ememory();
 
 	return ret;
     }
@@ -494,7 +494,7 @@ namespace libdar
 	    ret = new (nothrow) crc_i(width);
 
 	if(ret == nullptr)
-	    throw Ememory("create_crc_from_size");
+	    throw Ememory();
 
 	return ret;
     }

@@ -107,7 +107,7 @@ namespace libdar
                     fin = true;
                 }
                 else
-                    throw Ememory("infinint::build_from_file(proto_generic_file)");
+                    throw Ememory();
             }
         }
         reduce(); // necessary to reduce due to TG storage
@@ -674,7 +674,7 @@ namespace libdar
         {
             field = new (nothrow) storage(*(ref.field));
             if(field == nullptr)
-                throw Ememory("infinint::copy_from");
+                throw Ememory();
         }
         else
             throw SRC_BUG;

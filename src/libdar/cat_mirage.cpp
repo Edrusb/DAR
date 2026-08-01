@@ -162,7 +162,7 @@ namespace libdar
                     tmp_tiquette = infinint(*ptr);
                 }
                 else
-                    throw Ememory("cat_mirage::init");
+                    throw Ememory();
             }
             else
                 entree_ptr = cat_entree::read(dialog, pdesc, reading_ver, fake_stats, corres, default_algo, lax, false, small);
@@ -193,7 +193,7 @@ namespace libdar
                     try
                     {
                         if(star_ref == nullptr)
-                            throw Ememory("cat_mirage::cat_mirage");
+                            throw Ememory();
                         ino_ptr = nullptr; // the object pointed to by ino_ptr is now managed by star_ref
                         star_ref->add_ref(this);
                         corres[tmp_tiquette] = star_ref;

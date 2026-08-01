@@ -438,7 +438,7 @@ namespace libdar
 	    throw SRC_BUG;
 	x_crit = ref.x_crit->clone();
 	if(x_crit == nullptr)
-	    throw Ememory("crit_not::copy_from");
+	    throw Ememory();
     }
 
     void crit_and::add_crit(const criterium & ref)
@@ -446,7 +446,7 @@ namespace libdar
 	criterium *cloned = ref.clone();
 
 	if(cloned == nullptr)
-	    throw Ememory("crit_and::add_crit");
+	    throw Ememory();
 
 	try
 	{
@@ -535,7 +535,7 @@ namespace libdar
 	    {
 		cloned = (*it)->clone();
 		if(cloned == nullptr)
-		    throw Ememory("crit_add::copy_from");
+		    throw Ememory();
 		operand.push_back(cloned);
 		++it;
 	    }

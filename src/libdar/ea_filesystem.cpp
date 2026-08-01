@@ -253,7 +253,7 @@ namespace libdar
 		    {
 			ret = new (nothrow) ea_attributs();
 			if(ret == nullptr)
-			    throw Ememory("read_ea");
+			    throw Ememory();
 			ret->clear();
 		    }
 
@@ -261,7 +261,7 @@ namespace libdar
 		    {
 			value = new (nothrow) char[taille+MARGIN];
 			if(value == nullptr)
-			    throw Ememory("filesystem : read_ea_from");
+			    throw Ememory();
 			try
 			{
 			    taille = my_lgetxattr(n_ptr, a_name, value, taille+MARGIN);
@@ -325,7 +325,7 @@ namespace libdar
 
 	liste = new (nothrow) char[taille+MARGIN];
         if(liste == nullptr)
-            throw Ememory("filesystem : get_ea_list_for");
+            throw Ememory();
         try
         {
             S_64 cursor = 0;

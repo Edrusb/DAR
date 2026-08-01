@@ -76,7 +76,7 @@ namespace libdar
             else
             {
                 buf_size = 0;
-                throw Ememory("scramble::inherited_write");
+                throw Ememory();
             }
         }
 

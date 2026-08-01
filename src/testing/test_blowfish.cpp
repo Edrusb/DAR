@@ -96,7 +96,7 @@ void f1(const shared_ptr<user_interaction> & dialog)
 						 hash_algo::sha1,
 						 true));
     if(!ptr)
-	throw Ememory("crypto_sym");
+	throw Ememory();
     tronconneuse bf(10, fic, archive_format_supported_version, ptr);
     char buffer[100] = "bonjour les amis il fait chaud il fait beau ! ";
 
@@ -118,7 +118,7 @@ void f2(const shared_ptr<user_interaction> & dialog)
 						 hash_algo::sha1,
 						 true));
     if(!ptr)
-	throw Ememory("crypto_sym");
+	throw Ememory();
 
     tronconneuse bf(10, fic, archive_format_supported_version, ptr);
     char buffer[100];

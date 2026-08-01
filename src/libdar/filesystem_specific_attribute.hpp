@@ -251,7 +251,7 @@ namespace libdar
 	    throw SRC_BUG;
 	T *ret = new (std::nothrow) T(*x);
 	if(ret == nullptr)
-	    throw Ememory("cloner template");
+	    throw Ememory();
 
 	return ret;
     }

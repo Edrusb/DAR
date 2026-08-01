@@ -96,7 +96,7 @@ namespace libdar
 	virtual infinint get_size() const override { return size; };
 
     protected:
-	virtual crc *clone() const override { crc *tmp = new (std::nothrow) crc_i(*this); if(tmp == nullptr) throw Ememory("crc"); return tmp; };
+	virtual crc *clone() const override { crc *tmp = new (std::nothrow) crc_i(*this); if(tmp == nullptr) throw Ememory(); return tmp; };
 
     private:
 
@@ -133,7 +133,7 @@ namespace libdar
 	virtual infinint get_size() const override { return size; };
 
     protected:
-	virtual crc *clone() const override { crc *tmp = new (std::nothrow) crc_n(*this); if(tmp == nullptr) throw Ememory("crc"); return tmp; };
+	virtual crc *clone() const override { crc *tmp = new (std::nothrow) crc_n(*this); if(tmp == nullptr) throw Ememory(); return tmp; };
 
     private:
 

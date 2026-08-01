@@ -63,7 +63,7 @@ namespace libdar
 	dar_path = "";
 	files = new (nothrow) data_dir("."); // "." or whaterver else (this name is not used)
 	if(files == nullptr)
-	    throw Ememory("database::i_database::database");
+	    throw Ememory();
 	data_files = nullptr;
 	check_order_asked = true;
 	head.clear();
@@ -79,7 +79,7 @@ namespace libdar
 					       head,
 					       true);
 	if(f == nullptr)
-	    throw Ememory("database::i_database::database");
+	    throw Ememory();
 	try
 	{
 	    check_order_asked = opt.get_warn_order();
@@ -178,7 +178,7 @@ namespace libdar
 	    {
 		files = data_dir::data_tree_read(f, head.get_version());
 		if(files == nullptr)
-		    throw Ememory("database::i_database::database");
+		    throw Ememory();
 		if(files->get_name() != PSEUDO_ROOT)
 		    files->set_name(PSEUDO_ROOT);
 		data_files = nullptr;
@@ -226,7 +226,7 @@ namespace libdar
 						 true);
 
 	if(f == nullptr)
-	    throw Ememory("database::i_database::dump");
+	    throw Ememory();
 
 	try
 	{
@@ -937,7 +937,7 @@ namespace libdar
 					     tmp_read));
 
 	    if(!arch)
-		throw Ememory("database::i_database::restore");
+		throw Ememory();
 
 	    if(opt.get_info_details())
 	    {
@@ -1005,7 +1005,7 @@ static storage *file2storage(generic_file &f)
     S_I lu;
 
     if(st == nullptr)
-        throw Ememory("dar_manager:file2storage");
+        throw Ememory();
 
     do
     {

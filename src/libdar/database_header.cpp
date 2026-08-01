@@ -292,7 +292,7 @@ namespace libdar
 	proto_compressor *comp;
 
 	if(stack == nullptr)
-	    throw Ememory("database_header_create");
+	    throw Ememory();
 
 	try
 	{
@@ -300,7 +300,7 @@ namespace libdar
 		throw Erange("database_header_create", gettext("Cannot create database, file exists"));
 	    tmp = new (nothrow) fichier_local(dialog, filename, gf_write_only, 0666, !overwrite, overwrite, false);
 	    if(tmp == nullptr)
-		throw Ememory("database_header_create");
+		throw Ememory();
 
 	    stack->push(tmp); // now the fichier_local is managed by stack
 
@@ -319,7 +319,7 @@ namespace libdar
 										true, // asking to use pkcs5
 										info_details);
 		if(cipher == nullptr)
-		    throw Ememory("database_header_create");
+		    throw Ememory();
 
 		try
 		{
@@ -355,7 +355,7 @@ namespace libdar
 							  params.get_compression_level(),
 							  2); // using 2 workers at most
 	    if(comp == nullptr)
-		throw Ememory("database_header_create");
+		throw Ememory();
 
 	    stack->push(comp);
 	}
@@ -378,7 +378,7 @@ namespace libdar
 	generic_file *tmp = nullptr;
 
 	if(stack == nullptr)
-	    throw Ememory("database_header_open");
+	    throw Ememory();
 
 	try
 	{
@@ -391,7 +391,7 @@ namespace libdar
 		throw Erange("database_header_open", tools_printf(gettext("Error reading database %S : "), &filename) + e.get_message());
 	    }
 	    if(tmp == nullptr)
-		throw Ememory("database_header_open");
+		throw Ememory();
 
 	    stack->push(tmp);
 
@@ -418,7 +418,7 @@ namespace libdar
 										info_details);
 
 		if(cipher == nullptr)
-		    throw Ememory("database_header_open");
+		    throw Ememory();
 
 		try
 		{
@@ -441,7 +441,7 @@ namespace libdar
 							 params.get_compression_level(), // not used for decompression (here)
 							 2); // using 2 workers at most
 	    if(tmp == nullptr)
-		throw Ememory("database_header_open");
+		throw Ememory();
 
 	    stack->push(tmp);
 	}

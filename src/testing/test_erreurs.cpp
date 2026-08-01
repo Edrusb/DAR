@@ -53,7 +53,7 @@ void f3()
     Ebug y = SRC_BUG;
     string s;
 
-    x = new Ememory("f3");
+    x = new Ememory();
     delete x;
 }
 

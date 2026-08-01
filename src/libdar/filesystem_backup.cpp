@@ -131,7 +131,7 @@ namespace libdar
 	{
 	    fs_root = filesystem_tools_get_root_with_symlink(*dialog, root, x_info_details);
 	    if(fs_root == nullptr)
-		throw Ememory("filesystem_backup::filesystem_backup");
+		throw Ememory();
 	    info_details = x_info_details;
 	    no_dump_check = check_no_dump_flag;
 	    alter_atime = x_alter_atime;
@@ -141,7 +141,7 @@ namespace libdar
 	    ignore_unknown = x_ignore_unknown;
 	    ea_mask = x_ea_mask.clone();
 	    if(ea_mask == nullptr)
-		throw Ememory("filesystem_backup::filesystem_backup");
+		throw Ememory();
 	    reset_read(root_fs_device);
 	}
 	catch(...)
@@ -177,7 +177,7 @@ namespace libdar
             delete current_dir;
         current_dir = new (nothrow) path(*fs_root);
         if(current_dir == nullptr)
-            throw Ememory("filesystem_backup::reset_read");
+            throw Ememory();
         pile.clear();
 
 	const string display = current_dir->display();
@@ -342,7 +342,7 @@ namespace libdar
         while(once_again);
 
         if(ref == nullptr)
-            throw Ememory("filesystem_backup::read");
+            throw Ememory();
         else
             return true;
     }

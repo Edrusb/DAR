@@ -202,7 +202,7 @@ namespace libdar
 
 	ciphering_keys = new (nothrow) gpgme_key_t[size];
 	if(ciphering_keys == nullptr)
-	    throw Ememory("crypto_asym::build_key_list");
+	    throw Ememory();
 
 	    // clearing all fields in order to be able to know which
 	    // index has been allocated and need to be restored in case of error

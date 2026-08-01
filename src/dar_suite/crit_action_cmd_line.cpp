@@ -78,7 +78,7 @@ const crit_action * crit_action_create_from_string(user_interaction & dialog,
 		    throw SRC_BUG;
 		ret = ret_chain = new (nothrow) crit_chain();
 		if(ret == nullptr)
-		    throw Ememory("crit_action_create_from_string");
+		    throw Ememory();
 		tmp = crit_action_create_from_string(dialog, string(argument.begin(), it), hourshift);
 		if(tmp == nullptr)
 		    throw SRC_BUG;
@@ -135,7 +135,7 @@ const crit_action * crit_action_create_from_string(user_interaction & dialog,
 		{
 		    go_false = new (nothrow) crit_constant_action(data_undefined, EA_undefined);
 		    if(go_false == nullptr)
-			throw Ememory("crit_action_create_from_string");
+			throw Ememory();
 		}
 		else
 		{
@@ -146,7 +146,7 @@ const crit_action * crit_action_create_from_string(user_interaction & dialog,
 
 		ret = new (nothrow) testing(*crit, *go_true, *go_false);
 		if(ret == nullptr)
-		    throw Ememory("crit_action_create_from_string");
+		    throw Ememory();
 		delete crit;
 		crit = nullptr;
 		delete go_true;
@@ -235,7 +235,7 @@ const crit_action * crit_action_create_from_string(user_interaction & dialog,
 
 	    ret = new (nothrow) crit_constant_action(data, ea);
 	    if(ret == nullptr)
-		throw Ememory("crit_action_create_from_string");
+		throw Ememory();
 	    else
 		return ret;
 	}
@@ -279,7 +279,7 @@ static const criterium * criterium_create_from_string(user_interaction &dialog, 
 		    throw SRC_BUG;
 		ret = ret_or = new (nothrow) crit_or();
 		if(ret == nullptr)
-		    throw Ememory("criterium_create_from_string");
+		    throw Ememory();
 		tmp = criterium_create_from_string(dialog, string(argument.begin(), it), hourshift);
 		if(tmp == nullptr)
 		    throw SRC_BUG;
@@ -320,7 +320,7 @@ static const criterium * criterium_create_from_string(user_interaction &dialog, 
 		    throw SRC_BUG;
 		ret = ret_and = new (nothrow) crit_and();
 		if(ret == nullptr)
-		    throw Ememory("criterium_create_from_string");
+		    throw Ememory();
 		tmp = criterium_create_from_string(dialog, string(argument.begin(), it), hourshift);
 		if(tmp == nullptr)
 		    throw SRC_BUG;
@@ -370,7 +370,7 @@ static const criterium * criterium_create_from_string(user_interaction &dialog, 
 		    delete tmp;
 		    tmp = nullptr;
 		    if(ret == nullptr)
-			throw Ememory("criterium_create_from_string");
+			throw Ememory();
 		    return ret;
 		case '~':
 		    tmp = criterium_create_from_string(dialog, string(argument.begin() + 1, argument.end()), hourshift);
@@ -380,7 +380,7 @@ static const criterium * criterium_create_from_string(user_interaction &dialog, 
 		    delete tmp;
 		    tmp = nullptr;
 		    if(ret == nullptr)
-			throw Ememory("criterium_create_from_string");
+			throw Ememory();
 		    return ret;
 		}
 	    }
@@ -441,7 +441,7 @@ static const criterium * criterium_create_from_string(user_interaction &dialog, 
 		}
 
 		if(ret == nullptr)
-		    throw Ememory("criterium_create_from_string");
+		    throw Ememory();
 		else
 		    return ret;
 	    }
@@ -515,7 +515,7 @@ static const criterium * criterium_create_from_string(user_interaction &dialog, 
 	    }
 
 	    if(ret == nullptr)
-		throw Ememory("criterium_create_from_string");
+		throw Ememory();
 	    else
 		return ret;
 	}

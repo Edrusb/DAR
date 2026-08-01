@@ -497,7 +497,7 @@ namespace libdar
     class crit_not : public criterium
     {
     public:
-	crit_not(const criterium & crit) { x_crit = crit.clone(); if(x_crit == nullptr) throw Ememory("crit_not::crit_not"); };
+	crit_not(const criterium & crit) { x_crit = crit.clone(); if(x_crit == nullptr) throw Ememory(); };
 	crit_not(const crit_not & ref): criterium(ref) { copy_from(ref); };
 	crit_not(crit_not && ref) noexcept: criterium(std::move(ref)) { x_crit = nullptr; std::swap(x_crit, ref.x_crit); };
 	crit_not & operator = (const crit_not & ref) { destroy(); copy_from(ref); return *this; };

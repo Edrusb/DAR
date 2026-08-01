@@ -162,7 +162,7 @@ int dar_suite_global(int argc,
 			      silent);
 	ui.reset(new (nothrow) shell_interaction(cerr, cerr, silent));
 	if(!ui)
-	    throw Ememory("dar_suite_global");
+	    throw Ememory();
 
 	    // checking whether the user set the environment variable for non-default secured memory amount
 	if(secu_mem != nullptr)

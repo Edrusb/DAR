@@ -170,7 +170,7 @@ namespace libdar
 	}
 	catch(bad_alloc &)
 	{
-	    throw Ememory("xz_module::clone");
+	    throw Ememory();
 	}
 #else
 	throw Ecompilation(gettext("xz/lzma compression"));
@@ -197,7 +197,7 @@ namespace libdar
 	case LZMA_OK:
 	    break;
 	case LZMA_MEM_ERROR:
-	    throw Ememory("xz_module::init_decompr");
+	    throw Ememory();
 	case LZMA_OPTIONS_ERROR:
 	    throw Ecompilation("The expected compression preset is not supported by this build of liblzma");
 	case LZMA_PROG_ERROR:
@@ -220,7 +220,7 @@ namespace libdar
 	case LZMA_OK:
 	    break;
 	case LZMA_MEM_ERROR:
-	    throw Ememory("xz_module::init_decompr");
+	    throw Ememory();
 	case LZMA_OPTIONS_ERROR:
 	    throw Ecompilation("The given compression preset is not supported by this build of liblzma");
 	case LZMA_UNSUPPORTED_CHECK:

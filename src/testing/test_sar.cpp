@@ -66,7 +66,7 @@ static void f1()
 {
     shared_ptr<entrepot> where(new entrepot_local("", "", false));
     if(!where)
-	throw Ememory("f1");
+	throw Ememory();
     where->set_location(path("./test"));
     try
     {
@@ -84,7 +84,7 @@ static void f2()
 {
     shared_ptr<entrepot> where(new entrepot_local("", "", false));
     if(!where)
-	throw Ememory("f2");
+	throw Ememory();
     where->set_location(path("./test"));
     try
     {
@@ -103,7 +103,7 @@ static void f3()
 {
     shared_ptr<entrepot> where(new entrepot_local("", "", false));
     if(!where)
-	throw Ememory("f3");
+	throw Ememory();
     where->set_location(path("./test"));
 
     try
@@ -173,7 +173,7 @@ void f4()
 {
     shared_ptr<entrepot> where(new entrepot_local("", "", false));
     if(!where)
-	throw Ememory("f4");
+	throw Ememory();
     where->set_location(path("./test"));
 
     try

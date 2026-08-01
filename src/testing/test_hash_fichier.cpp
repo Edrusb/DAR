@@ -98,7 +98,7 @@ void f1(const string & src_filename, const string & dst_filename, hash_algo algo
     {
 	if(dst_hash == nullptr
 	   || dst_data == nullptr)
-	    throw Ememory("f1");
+	    throw Ememory();
 	else
 	{
 	    hash_fichier dst(ui,

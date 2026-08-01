@@ -98,7 +98,7 @@ namespace libdar
 
 	buffer = new (nothrow) char[buf_size];
 	if(buffer == nullptr)
-	    throw Ememory("slave_zapette::action");
+	    throw Ememory();
 
         try
         {
@@ -120,7 +120,7 @@ namespace libdar
 
 			    buffer = new (nothrow) char [req.size];
                             if(buffer == nullptr)
-                                throw Ememory("slave_zapette::action");
+                                throw Ememory();
                             else
                                 buf_size = req.size;
                         }
@@ -224,7 +224,7 @@ namespace libdar
 
 			tmp_data = new (nothrow) char[ans.size];
 			if(tmp_data == nullptr)
-			    throw Ememory("slave_zapette::action");
+			    throw Ememory();
 
 			try
 			{

@@ -46,7 +46,7 @@ namespace libdar
 	execute = backup_hook_file_execute;
 	match = backup_hook_file_mask.clone();
 	if(match == nullptr)
-	    throw Ememory("semaphore::semaphore");
+	    throw Ememory();
     }
 
     void semaphore::raise(const string & x_chem,
@@ -143,7 +143,7 @@ namespace libdar
 	    throw SRC_BUG;
 	match = ref.match->clone();
 	if(match == nullptr)
-	    throw Ememory("semaphore::copy_from");
+	    throw Ememory();
     }
 
     void semaphore::move_from(semaphore && ref) noexcept

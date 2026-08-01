@@ -158,7 +158,7 @@ namespace libdar
                 }
             }
 	    if(ret == nullptr && type != ' ')
-		throw Ememory("cat_entree::read");
+		throw Ememory();
         }
         catch(...)
         {

@@ -144,7 +144,7 @@ namespace libdar
 	}
 	catch(bad_alloc &)
 	{
-	    throw Ememory("lzo_module::clone");
+	    throw Ememory();
 	}
 #else
 	throw Ecompilation(gettext("lzo compression"));
@@ -189,7 +189,7 @@ namespace libdar
 	}
 	catch(bad_alloc &)
 	{
-	    throw Ememory("lzo_module::lzo_module");
+	    throw Ememory();
 	}
 #else
 	throw Ecompilation(gettext("lzo compression"));

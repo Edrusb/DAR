@@ -238,7 +238,7 @@ namespace libdar
 	}
 	patch_result_check = c.clone();
 	if(patch_result_check == nullptr)
-	    throw Ememory("cat_delta_signature::set_crc");
+	    throw Ememory();
     }
 
     void cat_delta_signature::init() noexcept
@@ -265,7 +265,7 @@ namespace libdar
 	{
 	    patch_base_check = ref.patch_base_check->clone();
 	    if(patch_base_check == nullptr)
-		throw Ememory("cat_delta_signature::copy_from");
+		throw Ememory();
 	}
 	else
 	    patch_base_check = nullptr;
@@ -273,7 +273,7 @@ namespace libdar
 	{
 	    patch_result_check = ref.patch_result_check->clone();
 	    if(patch_result_check == nullptr)
-		throw Ememory("cat_delta_signature::copy_from");
+		throw Ememory();
 	}
 	else
 	    patch_result_check = nullptr;
@@ -362,7 +362,7 @@ namespace libdar
 
 		sig.reset(new (nothrow) memory_file());
 		if(!sig)
-		    throw Ememory("cat_delta_signature::read");
+		    throw Ememory();
 
 		bounded.skip(0);
 		bounded.copy_to(*sig, crc_size, calculated);

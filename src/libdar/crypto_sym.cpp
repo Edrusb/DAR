@@ -250,7 +250,7 @@ namespace libdar
 	}
 	catch(bad_alloc &)
 	{
-	    throw Ememory("crypto_sym::clone");
+	    throw Ememory();
 	}
     }
 
@@ -337,7 +337,7 @@ namespace libdar
 	unsigned char* buffer = new (nothrow) unsigned char[size];
 
 	if(buffer == nullptr)
-	    throw Ememory("crypto_sym::generate_salt");
+	    throw Ememory();
 
 	try
 	{
@@ -626,7 +626,7 @@ namespace libdar
 
 	sect = new (nothrow) unsigned char[size];
 	if(sect == nullptr)
-	    throw Ememory("crypto_sym::make_ivec");
+	    throw Ememory();
 
 	try
 	{
@@ -706,12 +706,12 @@ namespace libdar
 	    retval.resize(output_length);
 	    Ti = (char *)gcry_malloc_secure(gcry_md_get_algo_dlen(hash_gcrypt));
 	    if(Ti == nullptr)
-		throw Ememory("crypto_sym::pkcs5_pass2key");
+		throw Ememory();
 	    try
 	    {
 		Uj = (char *)gcry_malloc_secure(gcry_md_get_algo_dlen(hash_gcrypt));
 		if(Uj == nullptr)
-		    throw Ememory("crypto_sym::pkcs5_pass2key");
+		    throw Ememory();
 		try
 		{
 		    for (U_32 i = 1; i <= l; ++i)

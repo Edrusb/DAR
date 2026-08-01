@@ -227,7 +227,7 @@ namespace libdar
                 S_I lu;
 
                 if(buffer == nullptr)
-                    throw Ememory("etage:cache_directory_tagging_check");
+                    throw Ememory();
                 try
                 {
                     lu = fic.read(buffer, len);

@@ -85,7 +85,7 @@ namespace libdar
 	}
 	catch(std::bad_alloc & e)
 	{
-	    throw Ememory("parallel_block_compressor::parallel_block_compressor");
+	    throw Ememory();
 	}
 
             // now filling the head that was created empty

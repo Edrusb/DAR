@@ -133,14 +133,14 @@ namespace libdar
 	    {
 		base = xbase->clone();
 		if(base == nullptr)
-		    throw Ememory("data_tree::status_plus::status_plus");
+		    throw Ememory();
 	    }
 
 	    if(xresult != nullptr)
 	    {
 		result = xresult->clone();
 		if(result == nullptr)
-		    throw Ememory("data_tree::status_plus::status_plus");
+		    throw Ememory();
 	    }
 	}
 	catch(...)
@@ -211,7 +211,7 @@ namespace libdar
 	{
 	    base = xref.base->clone();
 	    if(base == nullptr)
-		throw Ememory("data_tree::status_plus::copy_from");
+		throw Ememory();
 	}
 	else
 	    base = nullptr;
@@ -220,7 +220,7 @@ namespace libdar
 	{
 	    result = xref.result->clone();
 	    if(result == nullptr)
-		throw Ememory("data_tree::status_plus::copy_from");
+		throw Ememory();
 	}
 	else
 	    result = nullptr;

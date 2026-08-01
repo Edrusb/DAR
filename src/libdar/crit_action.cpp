@@ -41,7 +41,7 @@ namespace libdar
 	if(!check())
 	{
 	    free();
-	    throw Ememory("testing::testing");
+	    throw Ememory();
 	}
     }
 
@@ -72,7 +72,7 @@ namespace libdar
 	if(!check())
 	{
 	    free();
-	    throw Ememory("testing::copy_from");
+	    throw Ememory();
 	}
     }
 
@@ -92,7 +92,7 @@ namespace libdar
     {
 	crit_action *tmp = act.clone();
 	if(tmp == nullptr)
-	    throw Ememory("crit_chain::add");
+	    throw Ememory();
 	sequence.push_back(tmp);
     }
 
@@ -195,7 +195,7 @@ namespace libdar
 		    throw SRC_BUG;
 		tmp = (*it)->clone();
 		if(tmp == nullptr)
-		    throw Ememory("crit_chain::copy_from");
+		    throw Ememory();
 		sequence.push_back(tmp);
 		tmp = nullptr;
 		++it;

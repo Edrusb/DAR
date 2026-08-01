@@ -420,13 +420,13 @@ namespace libdar
         {
             ret = new (nothrow) path(root);
             if(ret == nullptr)
-                throw  Ememory("get_root_with_symlink");
+                throw  Ememory();
         }
         else if(S_ISLNK(buf.st_mode))
         {
             ret = new (nothrow) path(tools_readlink(ptr));
             if(ret == nullptr)
-                throw Ememory("get_root_with_symlink");
+                throw Ememory();
             if(ret->is_relative())
             {
                 string tmp;
@@ -565,7 +565,7 @@ namespace libdar
                 rdiffer = new (nothrow) generic_rsync(current,
                                                       delta);
                 if(rdiffer == nullptr)
-                    throw Ememory("filesystem_restore::make_delta_patch");
+                    throw Ememory();
 
 
                     // patching the existing file to the resulting inode (which is a new file)

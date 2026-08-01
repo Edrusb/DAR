@@ -1034,7 +1034,7 @@ namespace libdar
 				st.incr_ignored();
 
 				if(ig == nullptr)
-				    throw Ememory("filtre_sauvegarde");
+				    throw Ememory();
 				else
 				    cat.add(ig);
 
@@ -1128,7 +1128,7 @@ namespace libdar
 				e = nullptr;
 
 				if(tmp == nullptr)
-				    throw Ememory("fitre_sauvegarde");
+				    throw Ememory();
 				cat.add(tmp);
 
 				if(dir != nullptr)
@@ -1848,7 +1848,7 @@ namespace libdar
 		{
 		    crit_chain *decr_crit_chain = new (nothrow) crit_chain();
 		    if(decr_crit_chain == nullptr)
-			throw Ememory("filtre_merge");
+			throw Ememory();
 		    decr = decr_crit_chain;
 		    crit_and c_and = crit_and();
 		    crit_or  c_or = crit_or();
@@ -2454,7 +2454,7 @@ namespace libdar
 							{
 							    if_removed = new (nothrow) cat_ignored_dir(*al_dir);
 							    if(if_removed == nullptr)
-								throw Ememory("filtre_merge");
+								throw Ememory();
 							}
 						    }
 
@@ -2534,7 +2534,7 @@ namespace libdar
 
 						dolly = new (nothrow) cat_detruit(the_name, firm, ref_tab[index]->get_current_reading_dir().get_last_modif());
 						if(dolly == nullptr)
-						    throw Ememory("filtre_merge");
+						    throw Ememory();
 						dolly_nom = dynamic_cast<cat_nomme *>(dolly);
 					    }
 
@@ -2589,7 +2589,7 @@ namespace libdar
 				    {
 					cat_ignored_dir *igndir = new (nothrow) cat_ignored_dir(*e_dir);
 					if(igndir == nullptr)
-					    throw Ememory("filtre_merge");
+					    throw Ememory();
 					else
 					    cat.add(igndir);
 				    }
@@ -2654,7 +2654,7 @@ namespace libdar
 				const cat_nomme *already = nullptr;
 
 				if(tmp == nullptr)
-				    throw Ememory("filtre_merge");
+				    throw Ememory();
 				if(dynamic_cast<cat_eod *>(tmp) == nullptr)
 				    throw SRC_BUG;
 				cat.add(tmp); // add cat_eod to catalogue (add cursor)
@@ -3281,7 +3281,7 @@ namespace libdar
 				    {
 					delta_sig.reset(new (nothrow) memory_file());
 					if(!delta_sig)
-					    throw Ememory("saved_inode");
+					    throw Ememory();
 					source = fic->get_data(cat_file::normal,
 							       delta_sig,
 							       sig_magic,
@@ -3302,7 +3302,7 @@ namespace libdar
 				    {
 					delta_sig.reset(new (nothrow) memory_file());
 					if(!delta_sig)
-					    throw Ememory("save_inode");
+					    throw Ememory();
 					if(display_treated)
 					    dialog->message(tools_printf(gettext("building delta signature with block size of %d bytes"), signature_block_size));
 				    }
@@ -3376,7 +3376,7 @@ namespace libdar
 
 					    dst_hole = new (nothrow) sparse_file(pdesc.stack->top(), hole_size);
 					    if(dst_hole == nullptr)
-						throw Ememory("save_inode");
+						throw Ememory();
 					    pdesc.stack->push(dst_hole);
 					}
 
@@ -4198,7 +4198,7 @@ namespace libdar
 	    case ea_saved_status::full:
 		tmp_ea = new (nothrow) ea_attributs(*add_ino->get_ea()); // we clone the EA of add_ino
 		if(tmp_ea == nullptr)
-		    throw Ememory("filtre::do_EFSA_transfert");
+		    throw Ememory();
 		try
 		{
 		    if(place_ino->ea_get_saved_status() == ea_saved_status::full) // then we must drop the old EA:
@@ -4236,7 +4236,7 @@ namespace libdar
 	    case fsa_saved_status::full:
 		tmp_fsa = new (nothrow) filesystem_specific_attribute_list(*add_ino->get_fsa()); // we clone the FSA of add_ino
 		if(tmp_fsa == nullptr)
-		    throw Ememory("filtre::do_EFSA_transfer");
+		    throw Ememory();
 		try
 		{
 		    if(place_ino->fsa_get_saved_status() == fsa_saved_status::full) // we must drop the old FSA
@@ -4292,7 +4292,7 @@ namespace libdar
 	    {
 		tmp_ea = new (nothrow) ea_attributs();
 		if(tmp_ea == nullptr)
-		    throw Ememory("filtre.cpp:do_EFSA_transfert");
+		    throw Ememory();
 		try
 		{
 		    merge_ea(*place_ino->get_ea(), *add_ino->get_ea(), *tmp_ea);
@@ -4316,7 +4316,7 @@ namespace libdar
 		    place_ino->ea_set_saved_status(ea_saved_status::full); // it was not the case else we would have executed the above block
 		    tmp_ea = new (nothrow) ea_attributs(*add_ino->get_ea());   // we clone the EA set of to_add
 		    if(tmp_ea == nullptr)
-			throw Ememory("filtre.cpp:do_EFSA_transfert");
+			throw Ememory();
 		    try
 		    {
 			place_ino->ea_attach(tmp_ea);
@@ -4342,7 +4342,7 @@ namespace libdar
 	    {
 		tmp_fsa = new (nothrow) filesystem_specific_attribute_list();
 		if(tmp_fsa == nullptr)
-		    throw Ememory("filtre.cpp::do_EFSA_transfer");
+		    throw Ememory();
 
 		try
 		{
@@ -4368,7 +4368,7 @@ namespace libdar
 		    place_ino->fsa_set_saved_status(fsa_saved_status::full);
 		    tmp_fsa = new (nothrow) filesystem_specific_attribute_list(*add_ino->get_fsa());
 		    if(tmp_fsa == nullptr)
-			throw Ememory("filtre.cpp:do_EFSA_transfert");
+			throw Ememory();
 		    try
 		    {
 			place_ino->fsa_attach(tmp_fsa);
@@ -4402,7 +4402,7 @@ namespace libdar
 	    {
 		tmp_ea = new (nothrow) ea_attributs();
 		if(tmp_ea == nullptr)
-		    throw Ememory("filtre.cpp:do_EFSA_transfert");
+		    throw Ememory();
 		try
 		{
 		    merge_ea(*add_ino->get_ea(), *place_ino->get_ea(), *tmp_ea);
@@ -4426,7 +4426,7 @@ namespace libdar
 		    place_ino->ea_set_saved_status(ea_saved_status::full); // it was not the case else we would have executed the above block
 		    tmp_ea = new (nothrow) ea_attributs(*add_ino->get_ea());
 		    if(tmp_ea == nullptr)
-			throw Ememory("filtre.cpp:do_EFSA_transfert");
+			throw Ememory();
 		    try
 		    {
 			place_ino->ea_attach(tmp_ea);
@@ -4451,7 +4451,7 @@ namespace libdar
 	    {
 		tmp_fsa = new (nothrow) filesystem_specific_attribute_list();
 		if(tmp_fsa == nullptr)
-		    throw Ememory("filtre.cpp::do_EFSA_transfer");
+		    throw Ememory();
 
 		try
 		{
@@ -4477,7 +4477,7 @@ namespace libdar
 		    place_ino->fsa_set_saved_status(fsa_saved_status::full);
 		    tmp_fsa = new (nothrow) filesystem_specific_attribute_list(*add_ino->get_fsa());
 		    if(tmp_fsa == nullptr)
-			throw Ememory("filtre.cpp:do_EFSA_transfert");
+			throw Ememory();
 		    try
 		    {
 			place_ino->fsa_attach(tmp_fsa);
@@ -4546,18 +4546,18 @@ namespace libdar
 		    cat_inode *dollinode = dynamic_cast<cat_inode *>(dolly);
 
 		    if(dollinode == nullptr)
-			throw Ememory("filtre:make_clone");
+			throw Ememory();
 
 		    infinint shift_etiquette = ref_mir->get_etiquette() + etiquette_offset;
 		    filante = new (nothrow) cat_etoile(dollinode, shift_etiquette);
 		    if(filante == nullptr)
-			throw Ememory("make_clone");
+			throw Ememory();
 		    try
 		    {
 			dolly = nullptr; // the inode is now managed by filante
 			dolly = new (nothrow) cat_mirage(the_name, filante);
 			if(dolly == nullptr)
-			    throw Ememory("make_clone");
+			    throw Ememory();
 			try
 			{
 			    hard_link_base[shift_etiquette] = filante; // we now record this file_etiquette in the map of already enrolled hard_link sets
@@ -4595,7 +4595,7 @@ namespace libdar
 	    dolly = ref->clone();  // we just clone the entry
 
 	if(dolly == nullptr)
-	    throw Ememory("make_clone");
+	    throw Ememory();
 
 	return dolly;
     }
@@ -4667,7 +4667,7 @@ namespace libdar
     {
 	const crit_action *ret = new (nothrow) testing(crit_invert(crit_in_place_is_inode()), crit_constant_action(data_preserve, EA_preserve), crit_constant_action(data_overwrite, EA_overwrite));
 	if(ret == nullptr)
-	    throw Ememory("make_overwriting_fir_only_deleted");
+	    throw Ememory();
 
 	return ret;
     }
@@ -4738,7 +4738,7 @@ namespace libdar
 			    {
 				sig.reset(new (nothrow) memory_file());
 				if(!sig)
-				    throw Ememory("filtre_sauvegarde");
+				    throw Ememory();
 
 				data = e_file->get_data(cat_file::normal,
 							sig,
@@ -4746,7 +4746,7 @@ namespace libdar
 							block_size,
 							nullptr);
 				if(data == nullptr)
-				    throw Ememory("filtre_sauvegarde");
+				    throw Ememory();
 				data->copy_to(trou_noir, crc_size, patch_sig_crc);
 				if(patch_sig_crc == nullptr)
 				    throw SRC_BUG;

@@ -140,7 +140,7 @@ static S_I sub_main(shared_ptr<user_interaction> & dialog, S_I argc, char * cons
 						       src_min_digits,
 						       execute_src));
 	    if(!xform)
-		throw Ememory("dar_xform");
+		throw Ememory();
 
 	    if(dst == "-")
 		xform->xform_to(1, execute_dst);

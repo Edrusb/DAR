@@ -135,15 +135,15 @@ namespace libdar
 	{
 	    fs_root = filesystem_tools_get_root_with_symlink(*dialog, root, x_info_details);
 	    if(fs_root == nullptr)
-		throw Ememory("filesystem_write::filesystem_write");
+		throw Ememory();
 	    ea_mask = x_ea_mask.clone();
 	    if(ea_mask == nullptr)
-		throw Ememory("filesystem_restore::filesystem_restore");
+		throw Ememory();
 	    if(x_overwrite == nullptr)
 		throw SRC_BUG;
 	    overwrite = x_overwrite->clone();
 	    if(overwrite == nullptr)
-		throw Ememory("filesystem_restore::filesystem_restore");
+		throw Ememory();
 	}
 	catch(...)
 	{
@@ -169,7 +169,7 @@ namespace libdar
             delete current_dir;
         current_dir = new (nothrow) path(*fs_root);
         if(current_dir == nullptr)
-            throw Ememory("filesystem_write::reset_write");
+            throw Ememory();
 	ignore_over_restricts = false;
     }
 

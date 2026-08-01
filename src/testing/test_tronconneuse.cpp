@@ -123,13 +123,13 @@ void f1(const shared_ptr<user_interaction> & dialog)
     fichier_local fic = fichier_local(dialog, "toto", gf_write_only, 0666, false, true, false);
     unique_ptr<crypto_module> ptr(new test());
     if(!ptr)
-	throw Ememory("test");
+	throw Ememory();
     tronconneuse* toto = new tronconneuse(10,
 					  fic,
 					  archive_format_supported_version,
 		 			  ptr);
     if(toto == nullptr)
-	throw Ememory("test");
+	throw Ememory();
 
 #define TEST_WRITE(x) toto->write(x, strlen(x))
 #define WRITE_TO(x, y) x.write(y, strlen(y))
@@ -151,13 +151,13 @@ void f2(const shared_ptr<user_interaction> & dialog)
 
     unique_ptr<crypto_module> ptr(new test());
     if(!ptr)
-	throw Ememory("test");
+	throw Ememory();
     tronconneuse *toto = new tronconneuse(10,
 					  fic,
 					  archive_format_supported_version,
 					  ptr);
     if(toto == nullptr)
-	throw Ememory("test");
+	throw Ememory();
 
     const int taille = 100;
     char buffer[taille];
@@ -212,7 +212,7 @@ void f3(const shared_ptr<user_interaction> & dialog)
 
     unique_ptr<crypto_module> ptr(new test());
     if(!ptr)
-	throw Ememory("test");
+	throw Ememory();
     tronconneuse fuc(10,
 		    fic,
 		    archive_format_supported_version,

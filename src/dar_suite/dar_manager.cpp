@@ -902,7 +902,7 @@ static void op_add(shared_ptr<user_interaction> & dialog,
     read_options.set_slice_min_digits(min_digits);
     arch = new (nothrow) archive(dialog, path(arch_path), arch_base, EXTENSION, read_options);
     if(arch == nullptr)
-	throw Ememory("dar_manager.cpp:op_add");
+	throw Ememory();
 
     try
     {
@@ -1260,7 +1260,7 @@ static database *read_base(shared_ptr<user_interaction> & dialog,
 	dat_opt.set_password(pass);
         ret = new (nothrow) database(dialog, base, dat_opt);
         if(ret == nullptr)
-            throw Ememory("read_base");
+            throw Ememory();
     }
     catch(Erange & e)
     {
@@ -1433,7 +1433,7 @@ static void op_interactive(shared_ptr<user_interaction> & dialog, database *dat,
 		line_tools_split_path_basename(input, input, input2);
 		arch = new (nothrow) archive(dialog, path(input), input2, EXTENSION, read_options);
 		if(arch == nullptr)
-		    throw Ememory("dar_manager.cpp:op_interactive");
+		    throw Ememory();
 		try
 		{
 		    dialog->message(gettext("Updating database with catalogue..."));

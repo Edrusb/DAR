@@ -732,7 +732,7 @@ namespace libdar
 							       label_zero,
 							       only_detruit && ! compare_content);
 		    if(ceci->cat_det == nullptr)
-			throw Ememory("escape_catalogue::read");
+			throw Ememory();
 
 		    try
 		    {
@@ -911,7 +911,7 @@ namespace libdar
 	x_pdesc.check(true); // always expecting an escape layer
 	pdesc.assign(new (nothrow) pile_descriptor(x_pdesc));
 	if(pdesc.is_null())
-	    throw Ememory("escape_catalogue::set_esc_and_stack");
+	    throw Ememory();
     }
 
     void escape_catalogue::copy_from(const escape_catalogue & ref)
@@ -927,7 +927,7 @@ namespace libdar
 	else
 	    cat_det = new (nothrow) catalogue(*ref.cat_det);
 	if(cat_det == nullptr)
-	    throw Ememory("escape_catalogue::copy_from");
+	    throw Ememory();
 	min_read_offset = ref.min_read_offset;
 	depth = ref.depth;
 	wait_parent_depth = ref.wait_parent_depth;

@@ -101,7 +101,7 @@ void f1()
 	std::map <infinint, cat_etoile *> corres;
 
 	if(pdesc.is_null())
-	    throw Ememory("f1");
+	    throw Ememory();
 	stack.push(dump);
 	dump = nullptr;
 	stack.push(comp);

@@ -335,7 +335,7 @@ namespace libdar
 
 		    filesystem_specific_attribute_list *fsal = new (nothrow) filesystem_specific_attribute_list();
 		    if(fsal == nullptr)
-			throw Ememory("filesystem_hard_link_read::make_entree");
+			throw Ememory();
 		    try
 		    {
 			fsal->get_fsa_from_filesystem_for(get_ui(),
@@ -369,7 +369,7 @@ namespace libdar
 		    //
 
 		if(ref == nullptr)
-		    throw Ememory("filesystem_hard_link_read::make_read_entree");
+		    throw Ememory();
 
 		if(buf.st_nlink > 1 && see_hard_link && dynamic_cast<cat_directory *>(ref) == nullptr)
 		{
@@ -384,7 +384,7 @@ namespace libdar
 			    throw SRC_BUG;
 			tmp_et = new (nothrow) cat_etoile(ino_ref, etiquette_counter++);
 			if(tmp_et == nullptr)
-			    throw Ememory("filesystem_hard_link_read::make_read_entree");
+			    throw Ememory();
 			try
 			{
 			    ref = nullptr; // the object pointed to by ref is now managed by tmp_et
@@ -427,7 +427,7 @@ namespace libdar
 		}
 
 		if(ref == nullptr)
-		    throw Ememory("filesystem_hard_link_read::make_read_entree");
+		    throw Ememory();
 	    }
 	}
 	catch(...)

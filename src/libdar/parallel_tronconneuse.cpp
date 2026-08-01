@@ -93,21 +93,21 @@ namespace libdar
 
 	    scatter.reset(new (nothrow) ratelier_scatter<crypto_segment>(get_ratelier_size(num_workers)));
 	    if(!scatter)
-		throw Ememory("parallel_tronconneuse::parallel_tronconneuse");
+		throw Ememory();
 
 	    gather.reset(new (nothrow) ratelier_gather<crypto_segment>(get_ratelier_size(num_workers)));
 	    if(!gather)
-		throw Ememory("parallel_tronconneuse::parallel_tronconneuse");
+		throw Ememory();
 
 	    waiter.reset(new (nothrow) barrier(num_workers + 2));
 	    if(!waiter)
-		throw Ememory("parallel_tronconneuse::parallel_tronconneuse");
+		throw Ememory();
 
 		// tas is created empty
 
 	    tas.reset(new (nothrow) heap<crypto_segment>());
 	    if(!tas)
-		throw Ememory("parallel_tronconneuse::parallel_tronconneuse");
+		throw Ememory();
 
 		// filling the heap (tas) with preallocated crypto_segments
 
@@ -138,7 +138,7 @@ namespace libdar
 							tas,
 							initial_shift);
 		if(!crypto_reader)
-		    throw Ememory("parallel_tronconneuse::parallel_tronconneuse");
+		    throw Ememory();
 		break;
 	    case gf_write_only:
 		crypto_writer = make_unique<write_below>(gather,
@@ -147,7 +147,7 @@ namespace libdar
 							 encrypted,
 							 tas);
 		if(!crypto_writer)
-		    throw Ememory("parallel_tronconneuse::parallel_tronconneuse");
+		    throw Ememory();
 		break;
 	    case gf_read_write:
 		throw SRC_BUG;
@@ -160,7 +160,7 @@ namespace libdar
 	}
 	catch(std::bad_alloc &)
 	{
-	    throw Ememory("parallel_tronconneuse::parallel_tronconneuse");
+	    throw Ememory();
 	}
     }
 
@@ -1198,13 +1198,13 @@ namespace libdar
 	{
 	case gf_read_only:
 	    if(!crypto_reader)
-		throw Ememory("parallel_tronconneuse::parallel_tronconneuse");
+		throw Ememory();
 	    else
 		crypto_reader->run();
 	    break;
 	case gf_write_only:
 	    if(!crypto_writer)
-		throw Ememory("parallel_tronconneuse::parallel_tronconneuse");
+		throw Ememory();
 	    else
 		crypto_writer->run();
 	    waiter->wait(); // release all threads

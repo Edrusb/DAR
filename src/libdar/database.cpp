@@ -53,7 +53,7 @@ namespace libdar
 	    pimpl.reset(new (nothrow) i_database(dialog));
 
 	    if(!pimpl)
-		throw Ememory("database::database");
+		throw Ememory();
 	}
 	catch(...)
 	{
@@ -75,7 +75,7 @@ namespace libdar
 						 opt));
 
 	    if(!pimpl)
-		throw Ememory("database::database");
+		throw Ememory();
 	}
 	catch(...)
 	{

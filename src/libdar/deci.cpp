@@ -69,7 +69,7 @@ namespace libdar
 
 	    decimales = new (nothrow) storage(PAS);
 	    if(decimales == nullptr)
-		throw Ememory("template deci::decicoupe");
+		throw Ememory();
 
 	    decimales->clear(0xFF);
 	    it = decimales->rbegin();
@@ -133,7 +133,7 @@ namespace libdar
 
 	    decimales = new (nothrow) storage(size);
 	    if(decimales == nullptr)
-		throw Ememory("deci::deci(string s)");
+		throw Ememory();
 	    decimales->clear(0xFF); // FF is not a valid couple of decimal digit
 
 	    ut = decimales->rbegin();

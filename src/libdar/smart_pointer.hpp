@@ -93,7 +93,7 @@ namespace libdar
 	    {
 		ptr = new (std::nothrow) smart_node<T>(arg);
 		if(ptr == nullptr)
-		    throw Ememory("smart_pointer::smart_pointer");
+		    throw Ememory();
 		ptr->add_ref();
 	    }
 	    else

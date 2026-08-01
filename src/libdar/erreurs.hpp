@@ -129,7 +129,7 @@ namespace libdar
     class Ememory : public Egeneric
     {
     public:
-        Ememory(const std::string &source) : Egeneric(dar_gettext("Lack of Memory")) {};
+        Ememory(): Egeneric(dar_gettext("Lack of Memory")) {};
 	Ememory(const Ememory & ref) = default;
 	Ememory(Ememory && ref) = default;
 	Ememory & operator = (const Ememory & ref) = default;
@@ -145,7 +145,7 @@ namespace libdar
     class Esecu_memory : public Ememory
     {
     public:
-        Esecu_memory(const std::string &source) : Ememory(dar_gettext("Lack of Secured Memory")) {};
+        Esecu_memory(const std::string &source) : Ememory() { replace_message(dar_gettext("Lack of Secured Memory")); };
 	Esecu_memory(const Esecu_memory & ref) = default;
 	Esecu_memory(Esecu_memory && ref) = default;
 	Esecu_memory & operator = (const Esecu_memory & ref) = default;

@@ -323,7 +323,7 @@ namespace libdar
 	    buf_size = ref.buf_size;
 	    buf = new (nothrow) char[buf_size];
 	    if(buf == nullptr)
-		throw Ememory("tronconneuse::copy_from");
+		throw Ememory();
 	    (void)memcpy(buf, ref.buf, buf_byte_data);
 	    clear_block_size = ref.clear_block_size;
 	    current_position = ref.current_position;
@@ -336,14 +336,14 @@ namespace libdar
 	    encrypted_buf_data = ref.encrypted_buf_data;
 	    encrypted_buf = new (nothrow) char[encrypted_buf_size];
 	    if(encrypted_buf == nullptr)
-		throw Ememory("tronconneuse::copy_from");
+		throw Ememory();
 	    (void)memcpy(encrypted_buf, ref.encrypted_buf, encrypted_buf_data);
 
 	    extra_buf_size = ref.extra_buf_size;
 	    extra_buf_data = ref.extra_buf_data;
 	    extra_buf = new (nothrow) char[extra_buf_size];
 	    if(extra_buf == nullptr)
-		throw Ememory("tronconneuse::copy_from");
+		throw Ememory();
 	    (void)memcpy(extra_buf, ref.extra_buf, extra_buf_data);
 	    weof = ref.weof;
 	    reof = ref.reof;
@@ -520,7 +520,7 @@ namespace libdar
 	    if(encrypted_buf == nullptr)
 	    {
 		encrypted_buf_size = 0;
-		throw Ememory("tronconneuse::init_encrypte_buf_size");
+		throw Ememory();
 	    }
 	}
 	if(buf == nullptr)
@@ -533,7 +533,7 @@ namespace libdar
 	    if(buf == nullptr)
 	    {
 		buf_size = 0;
-		throw Ememory("tronconneuse::init_encrypte_buf_size");
+		throw Ememory();
 	    }
 	}
 	if(extra_buf == nullptr)
@@ -544,7 +544,7 @@ namespace libdar
 	    if(extra_buf == nullptr)
 	    {
 		extra_buf_size = 0;
-		throw Ememory("tronconneuse::init_encrypte_buf_size");
+		throw Ememory();
 	    }
 	}
     }

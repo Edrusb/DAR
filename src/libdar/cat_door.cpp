@@ -60,7 +60,7 @@ namespace libdar
 	{
 	    ret = new (nothrow) null_file(gf_read_only);
 	    if(ret == nullptr)
-		throw Ememory("cat_door::get_data");
+		throw Ememory();
 	}
 	else
 	    ret = cat_file::get_data(mode,

@@ -75,7 +75,7 @@ namespace libdar
 
 	working_buffer = new (nothrow) char[BUFFER_SIZE];
 	if(working_buffer == nullptr)
-	    throw Ememory("generic_rsync::generic_rsync (sign)");
+	    throw Ememory();
 	try
 	{
 	    working_size = 0;
@@ -131,7 +131,7 @@ namespace libdar
 	data_crc = nullptr;
 	working_buffer = new (nothrow) char[BUFFER_SIZE];
 	if(working_buffer == nullptr)
-	    throw Ememory("generic_rsync::generic_rsync (sign)");
+	    throw Ememory();
 
 	try
 	{
@@ -143,7 +143,7 @@ namespace libdar
 		inbuf = new (nothrow) char[BUFFER_SIZE];
 		outbuf = new (nothrow) char [SMALL_BUF]; // nothing should be output
 		if(inbuf == nullptr || outbuf == nullptr)
-		    throw Ememory("generic_rsync::generic_rsync (delta)");
+		    throw Ememory();
 
 		base_signature->skip(0);
 
@@ -198,7 +198,7 @@ namespace libdar
 	    if(checksum != nullptr)
 		data_crc = create_crc_from_size(crc_size);
 	    if(data_crc == nullptr)
-		throw Ememory("generic_rsync::generic_rsync");
+		throw Ememory();
 
 	    try
 	    {
@@ -257,7 +257,7 @@ namespace libdar
 	data_crc = nullptr;
 	working_buffer = new (nothrow) char[BUFFER_SIZE];
 	if(working_buffer == nullptr)
-	    throw Ememory("generic_rsync::generic_rsync (sign)");
+	    throw Ememory();
 	try
 	{
 	    job = rs_patch_begin(generic_rsync::patch_callback, this);

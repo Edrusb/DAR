@@ -65,7 +65,7 @@ namespace libdar
 	archive_option_destroy_mask(ptr);
 	ptr = new (nothrow) bool_mask(all);
 	if(ptr == nullptr)
-	    throw Ememory("archive_option_clean_mask");
+	    throw Ememory();
     }
 
     inline void archive_option_destroy_mask(mask * & ptr) noexcept
@@ -82,7 +82,7 @@ namespace libdar
 	archive_option_destroy_crit_action(ptr);
 	ptr = default_crit_action.clone();
 	if(ptr == nullptr)
-	    throw Ememory("archive_options::archive_option_clean_crit_action");
+	    throw Ememory();
     }
 
     inline void archive_option_destroy_crit_action(crit_action * & ptr) noexcept
@@ -127,7 +127,7 @@ namespace libdar
 	x_slice_min_digits = 0;
 	x_entrepot = shared_ptr<entrepot>(new (nothrow) entrepot_local("", "", false)); // never using furtive_mode to read slices
 	if(!x_entrepot)
-	    throw Ememory("archive_options_read::clear");
+	    throw Ememory();
 	x_ignore_signature_check_failure = false;
 	x_multi_threaded_crypto = 2;
 	x_multi_threaded_compress = 1;
@@ -147,7 +147,7 @@ namespace libdar
 	x_ref_slice_min_digits = 0;
 	x_ref_entrepot = shared_ptr<entrepot>(new (nothrow) entrepot_local("", "", false)); // never using furtive_mode to read slices
 	if(!x_ref_entrepot)
-	    throw Ememory("archive_options_read::clear");
+	    throw Ememory();
 	x_ignore_external_slice_header = false;
     }
 
@@ -379,7 +379,7 @@ namespace libdar
 	    x_ignore_unknown = false;
 	    x_entrepot = shared_ptr<entrepot>(new (nothrow) entrepot_local( "", "", false)); // never using furtive_mode to read slices
 	    if(!x_entrepot)
-		throw Ememory("archive_options_create::clear");
+		throw Ememory();
 	    x_scope = all_fsa_families();
 	    x_multi_threaded_crypto = 2;
 	    x_multi_threaded_compress = 1;
@@ -419,7 +419,7 @@ namespace libdar
 	    archive_option_destroy_mask(x_selection);
 	    x_selection = selection.clone();
 	    if(x_selection == nullptr)
-		throw Ememory("archive_options_create::set_selection");
+		throw Ememory();
 	}
 	catch(...)
 	{
@@ -437,7 +437,7 @@ namespace libdar
 	    archive_option_destroy_mask(x_subtree);
 	    x_subtree = subtree.clone();
 	    if(x_subtree == nullptr)
-		throw Ememory("archive_options_create::set_subtree");
+		throw Ememory();
 	}
 	catch(...)
 	{
@@ -455,7 +455,7 @@ namespace libdar
 	    archive_option_destroy_mask(x_ea_mask);
 	    x_ea_mask = ea_mask.clone();
 	    if(x_ea_mask == nullptr)
-		throw Ememory("archive_options_create::set_ea_mask");
+		throw Ememory();
 	}
 	catch(...)
 	{
@@ -473,7 +473,7 @@ namespace libdar
 	    archive_option_destroy_mask(x_compr_mask);
 	    x_compr_mask = compr_mask.clone();
 	    if(x_compr_mask == nullptr)
-		throw Ememory("archive_options_create::set_compr_mask");
+		throw Ememory();
 	}
 	catch(...)
 	{
@@ -523,7 +523,7 @@ namespace libdar
 	    archive_option_destroy_mask(x_backup_hook_file_mask);
 	    x_backup_hook_file_mask = which_files.clone();
 	    if(x_backup_hook_file_mask == nullptr)
-		throw Ememory("archive_options_create::set_backup_hook");
+		throw Ememory();
 
 	    x_backup_hook_file_execute = execute;
 	}
@@ -543,7 +543,7 @@ namespace libdar
 	    archive_option_destroy_mask(x_delta_mask);
 	    x_delta_mask = delta_mask.clone();
 	    if(x_delta_mask == nullptr)
-		throw Ememory("archive_options_create::set_delta_mask");
+		throw Ememory();
 	    has_delta_mask_been_set = true;
 	}
 	catch(...)
@@ -602,7 +602,7 @@ namespace libdar
 	x_backup_hook_file_mask = ref.x_backup_hook_file_mask->clone();
 
 	if(x_selection == nullptr || x_subtree == nullptr || x_ea_mask == nullptr || x_compr_mask == nullptr || x_backup_hook_file_mask == nullptr)
-	    throw Ememory("archive_options_create::copy_from");
+	    throw Ememory();
 
 	x_ref_arch = ref.x_ref_arch;
 	x_allow_over = ref.x_allow_over;
@@ -656,7 +656,7 @@ namespace libdar
 	    throw SRC_BUG;
 	x_entrepot = ref.x_entrepot;
 	if(!x_entrepot)
-	    throw Ememory("archive_options_create::copy_from");
+	    throw Ememory();
 	x_scope = ref.x_scope;
 	x_multi_threaded_crypto = ref.x_multi_threaded_crypto;
 	x_multi_threaded_compress = ref.x_multi_threaded_compress;
@@ -812,7 +812,7 @@ namespace libdar
 	    x_sequential_marks = true;
 	    x_entrepot = shared_ptr<entrepot>(new (nothrow) entrepot_local("", "", false)); // never using furtive_mode to read slices
 	    if(!x_entrepot)
-		throw Ememory("archive_options_isolate::clear");
+		throw Ememory();
 	    x_multi_threaded_crypto = 2;
 	    x_multi_threaded_compress = 1;
 	    x_delta_signature = rsync_sig_magic::none;
@@ -852,7 +852,7 @@ namespace libdar
 		archive_option_destroy_mask(x_delta_mask);
 		x_delta_mask = delta_mask.clone();
 		if(x_delta_mask == nullptr)
-		    throw Ememory("archive_options_create::set_delta_mask");
+		    throw Ememory();
 		has_delta_mask_been_set = true;
 	    }
 	}
@@ -906,7 +906,7 @@ namespace libdar
 	    throw SRC_BUG;
 	x_entrepot = ref.x_entrepot;
 	if(x_entrepot == nullptr)
-	    throw Ememory("archive_options_isolate::copy_from");
+	    throw Ememory();
 	x_multi_threaded_crypto = ref.x_multi_threaded_crypto;
 	x_multi_threaded_compress = ref.x_multi_threaded_compress;
 	x_delta_signature = ref.x_delta_signature;
@@ -1017,7 +1017,7 @@ namespace libdar
 	    x_slice_min_digits = 0;
 	    x_entrepot = shared_ptr<entrepot>(new (nothrow) entrepot_local("", "", false)); // never using furtive_mode to read slices
 	    if(x_entrepot == nullptr)
-		throw Ememory("archive_options_merge::clear");
+		throw Ememory();
 	    x_scope = all_fsa_families();
 	    x_multi_threaded_crypto = 2;
 	    x_multi_threaded_compress = 1;
@@ -1053,7 +1053,7 @@ namespace libdar
 	    archive_option_destroy_mask(x_selection);
 	    x_selection = selection.clone();
 	    if(x_selection == nullptr)
-		throw Ememory("archive_options_merge::set_selection");
+		throw Ememory();
 	}
 	catch(...)
 	{
@@ -1071,7 +1071,7 @@ namespace libdar
 	    archive_option_destroy_mask(x_subtree);
 	    x_subtree = subtree.clone();
 	    if(x_subtree == nullptr)
-		throw Ememory("archive_options_merge::set_subtree");
+		throw Ememory();
 	}
         catch(...)
         {
@@ -1089,7 +1089,7 @@ namespace libdar
 	    archive_option_destroy_crit_action(x_overwrite);
 	    x_overwrite = overwrite.clone();
 	    if(x_overwrite == nullptr)
-		throw Ememory("archive_options_merge::set_overwriting_rules");
+		throw Ememory();
 	}
         catch(...)
         {
@@ -1107,7 +1107,7 @@ namespace libdar
 	    archive_option_destroy_mask(x_ea_mask);
 	    x_ea_mask = ea_mask.clone();
 	    if(x_ea_mask == nullptr)
-		throw Ememory("archive_options_merge::set_ea_mask");
+		throw Ememory();
 	}
 	catch(...)
 	{
@@ -1125,7 +1125,7 @@ namespace libdar
 	    archive_option_destroy_mask(x_compr_mask);
 	    x_compr_mask = compr_mask.clone();
 	    if(x_compr_mask == nullptr)
-		throw Ememory("archive_options_merge::set_compr_mask");
+		throw Ememory();
 	}
 	catch(...)
 	{
@@ -1148,7 +1148,7 @@ namespace libdar
 		archive_option_destroy_mask(x_delta_mask);
 		x_delta_mask = delta_mask.clone();
 		if(x_delta_mask == nullptr)
-		    throw Ememory("archive_options_create::set_delta_mask");
+		    throw Ememory();
 		has_delta_mask_been_set = true;
 	    }
 	}
@@ -1214,7 +1214,7 @@ namespace libdar
 	       || x_overwrite == nullptr
 	       || x_entrepot == nullptr
 	       || x_delta_mask == nullptr)
-		throw Ememory("archive_options_merge::copy_from");
+		throw Ememory();
 
 	    x_ref = ref.x_ref;
 	    x_allow_over = ref.x_allow_over;
@@ -1374,7 +1374,7 @@ namespace libdar
 	    archive_option_destroy_mask(x_selection);
 	    x_selection = selection.clone();
 	    if(x_selection == nullptr)
-		throw Ememory("archive_options_extract::set_selection");
+		throw Ememory();
 	}
 	catch(...)
 	{
@@ -1392,7 +1392,7 @@ namespace libdar
 	    archive_option_destroy_mask(x_subtree);
 	    x_subtree = subtree.clone();
 	    if(x_subtree == nullptr)
-		throw Ememory("archive_options_extract::set_subtree");
+		throw Ememory();
 	}
 	catch(...)
 	{
@@ -1410,7 +1410,7 @@ namespace libdar
 	    archive_option_destroy_mask(x_ea_mask);
 	    x_ea_mask = ea_mask.clone();
 	    if(x_ea_mask == nullptr)
-		throw Ememory("archive_options_extract::set_ea_mask");
+		throw Ememory();
 	}
 	catch(...)
 	{
@@ -1428,7 +1428,7 @@ namespace libdar
 	    archive_option_destroy_crit_action(x_overwrite);
 	    x_overwrite = over.clone();
 	    if(x_overwrite == nullptr)
-		throw Ememory("archive_options_extract::set_overwriting_rules");
+		throw Ememory();
 	}
 	catch(...)
 	{
@@ -1472,7 +1472,7 @@ namespace libdar
 	    x_overwrite = ref.x_overwrite->clone();
 
 	    if(x_selection == nullptr || x_subtree == nullptr || x_ea_mask == nullptr || x_overwrite == nullptr)
-		throw Ememory("archive_options_extract::copy_from");
+		throw Ememory();
 
 	    x_warn_over = ref.x_warn_over;
 	    x_info_details = ref.x_info_details;
@@ -1568,7 +1568,7 @@ namespace libdar
 	    archive_option_destroy_mask(x_selection);
 	    x_selection = selection.clone();
 	    if(x_selection == nullptr)
-		throw Ememory("archive_options_listing::set_selection");
+		throw Ememory();
 	}
 	catch(...)
 	{
@@ -1586,7 +1586,7 @@ namespace libdar
 	    archive_option_destroy_mask(x_subtree);
 	    x_subtree = subtree.clone();
 	    if(x_subtree == nullptr)
-		throw Ememory("archive_options_listing::set_subtree");
+		throw Ememory();
 	}
 	catch(...)
 	{
@@ -1602,7 +1602,7 @@ namespace libdar
 	{
 	    x_slicing_first = new (nothrow) infinint(slicing_first);
 	    if(x_slicing_first == nullptr)
-		throw Ememory("archive_options_listing::set_user_slicing");
+		throw Ememory();
 	}
 	else
 	    *x_slicing_first = slicing_first;
@@ -1611,7 +1611,7 @@ namespace libdar
 	{
 	    x_slicing_others = new (nothrow) infinint(slicing_others);
 	    if(x_slicing_others == nullptr)
-		throw Ememory("archive_options_listing::set_user_slicing");
+		throw Ememory();
 	}
 	else
 	    *x_slicing_others = slicing_others;
@@ -1680,20 +1680,20 @@ namespace libdar
 	    x_subtree = ref.x_subtree->clone();
 
 	    if(x_selection == nullptr || x_subtree == nullptr)
-		throw Ememory("archive_options_listing::copy_from");
+		throw Ememory();
 
 	    if(ref.x_slicing_first != nullptr)
 	    {
 		x_slicing_first = new (nothrow) infinint(*ref.x_slicing_first);
 		if(x_slicing_first == nullptr)
-		    throw Ememory("archive_options_listing::copy_from");
+		    throw Ememory();
 	    }
 
 	    if(ref.x_slicing_others != nullptr)
 	    {
 		x_slicing_others = new (nothrow) infinint(*ref.x_slicing_others);
 		if(x_slicing_others == nullptr)
-		    throw Ememory("archive_options_listing::copy_from");
+		    throw Ememory();
 	    }
 
 	    x_info_details = ref.x_info_details;
@@ -1770,7 +1770,7 @@ namespace libdar
 	    archive_option_destroy_mask(x_selection);
 	    x_selection = selection.clone();
 	    if(x_selection == nullptr)
-		throw Ememory("archive_options_diff::set_selection");
+		throw Ememory();
 	}
         catch(...)
         {
@@ -1788,7 +1788,7 @@ namespace libdar
 	    archive_option_destroy_mask(x_subtree);
 	    x_subtree = subtree.clone();
 	    if(x_subtree == nullptr)
-		throw Ememory("archive_options_diff::set_subtree");
+		throw Ememory();
 	}
         catch(...)
         {
@@ -1806,7 +1806,7 @@ namespace libdar
 	    archive_option_destroy_mask(x_ea_mask);
 	    x_ea_mask = ea_mask.clone();
 	    if(x_ea_mask == nullptr)
-		throw Ememory("archive_options_dif::set_ea_mask");
+		throw Ememory();
 	}
         catch(...)
         {
@@ -1875,7 +1875,7 @@ namespace libdar
 	    x_ea_mask = ref.x_ea_mask->clone();
 
 	    if(x_selection == nullptr || x_subtree == nullptr || x_ea_mask == nullptr)
-		throw Ememory("archive_options_extract::copy_from");
+		throw Ememory();
 
 	    x_info_details = ref.x_info_details;
 	    x_display_treated = ref.x_display_treated;
@@ -1956,7 +1956,7 @@ namespace libdar
 	    archive_option_destroy_mask(x_selection);
 	    x_selection = selection.clone();
 	    if(x_selection == nullptr)
-		throw Ememory("archive_options_test::set_selection");
+		throw Ememory();
 	}
         catch(...)
         {
@@ -1974,7 +1974,7 @@ namespace libdar
 	    archive_option_destroy_mask(x_subtree);
 	    x_subtree = subtree.clone();
 	    if(x_subtree == nullptr)
-		throw Ememory("archive_option_test::set_subtree");
+		throw Ememory();
 	}
         catch(...)
         {
@@ -2012,7 +2012,7 @@ namespace libdar
 	    x_subtree = ref.x_subtree->clone();
 
 	    if(x_selection == nullptr || x_subtree == nullptr)
-		throw Ememory("archive_options_extract::copy_from");
+		throw Ememory();
 
 	    x_info_details = ref.x_info_details;
 	    x_display_treated = ref.x_display_treated;
@@ -2085,7 +2085,7 @@ namespace libdar
             x_slice_min_digits = 0;
             x_entrepot = shared_ptr<entrepot>(new (nothrow) entrepot_local( "", "", false)); // never using furtive_mode to read slices
             if(x_entrepot == nullptr)
-                throw Ememory("archive_options_repair::clear");
+                throw Ememory();
             x_multi_threaded_crypto = 2;
 	    x_multi_threaded_compress = 1;
 	    if(compile_time::libargon2())

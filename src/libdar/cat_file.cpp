@@ -82,7 +82,7 @@ namespace libdar
             size = new (nothrow) infinint(taille);
             storage_size = new (nothrow) infinint(0);
             if(offset == nullptr || size == nullptr || storage_size == nullptr)
-                throw Ememory("cat_file::cat_file");
+                throw Ememory();
         }
         catch(...)
         {
@@ -142,7 +142,7 @@ namespace libdar
         {
             size = new (nothrow) infinint(*ptr);
             if(size == nullptr)
-                throw Ememory("cat_file::cat_file(generic_file)");
+                throw Ememory();
 
             if(!small) // inode not partially dumped
             {
@@ -151,12 +151,12 @@ namespace libdar
                 {
                     offset = new (nothrow) infinint(*ptr);
                     if(offset == nullptr)
-                        throw Ememory("cat_file::cat_file(generic_file)");
+                        throw Ememory();
                     if(reading_ver > 1)
                     {
                         storage_size = new (nothrow) infinint(*ptr);
                         if(storage_size == nullptr)
-                            throw Ememory("cat_file::cat_file(generic_file)");
+                            throw Ememory();
                         if(reading_ver > 7)
                         {
                             char tmp;
@@ -199,7 +199,7 @@ namespace libdar
                     {
                         storage_size = new (nothrow) infinint(*size);
                         if(storage_size == nullptr)
-                            throw Ememory("cat_file::cat_file(generic_file)");
+                            throw Ememory();
                         *storage_size *= 2;
                             // compressed file should be less larger than twice
                             // the original file
@@ -211,7 +211,7 @@ namespace libdar
                     {
 			check = create_crc_from_file(*ptr);
                         if(check == nullptr)
-                            throw Ememory("cat_file::cat_file");
+                            throw Ememory();
                     }
                         // before version 8, crc was dump in any case, not only when data was saved
 			// general case treated below
@@ -231,7 +231,7 @@ namespace libdar
                     offset = new (nothrow) infinint(0);
                     storage_size = new (nothrow) infinint(0);
                     if(offset == nullptr || storage_size == nullptr)
-                        throw Ememory("cat_file::cat_file(generic_file)");
+                        throw Ememory();
                 }
 
 		    // treating case of version below 8 where CRC
@@ -248,7 +248,7 @@ namespace libdar
 
                         check = create_crc_from_file(*ptr, true);
                         if(check == nullptr)
-                            throw Ememory("cat_file::cat_file");
+                            throw Ememory();
                     }
                         // archive version >= 8, crc only present if  saved == s_saved/s_delta or when delta_sig (treated above)
                 }
@@ -304,11 +304,11 @@ namespace libdar
 
 		offset = new (nothrow) infinint(0); // can only be set from post_constructor
                 if(offset == nullptr)
-                    throw Ememory("cat_file::cat_file(generic_file)");
+                    throw Ememory();
 
                 storage_size = new (nothrow) infinint(0); // cannot know the storage_size at that time
                 if(storage_size == nullptr)
-                    throw Ememory("cat_file::cat_file(generic_file)");
+                    throw Ememory();
 
                 check = nullptr;
             }
@@ -370,7 +370,7 @@ namespace libdar
 		}
 		check = ref.check->clone();
                 if(check == nullptr)
-                    throw Ememory("cat_file::cat_file(cat_file)");
+                    throw Ememory();
             }
             else
                 check = nullptr;
@@ -378,20 +378,20 @@ namespace libdar
             size = new (nothrow) infinint(*ref.size);
             storage_size = new (nothrow) infinint(*ref.storage_size);
             if(offset == nullptr || size == nullptr || storage_size == nullptr)
-                throw Ememory("cat_file::cat_file(cat_file)");
+                throw Ememory();
 
 	    if(ref.patch_base_check != nullptr)
 	    {
 		patch_base_check = ref.patch_base_check->clone();
 		if(patch_base_check == nullptr)
-		    throw Ememory("cat_file::cat_file(cat_file)");
+		    throw Ememory();
 	    }
 
 	    if(ref.delta_sig != nullptr)
 	    {
 		delta_sig = new (nothrow) cat_delta_signature(*ref.delta_sig);
 		if(delta_sig == nullptr)
-		    throw Ememory("cat_file::cat_file(cat_file)");
+		    throw Ememory();
 	    }
 
         }
@@ -604,7 +604,7 @@ namespace libdar
 		    {
 			pile *data = new (nothrow) pile();
 			if(data == nullptr)
-			    throw Ememory("cat_file::get_data");
+			    throw Ememory();
 			try
 			{
 			    data->push(tmp);
@@ -623,7 +623,7 @@ namespace libdar
 									       sig_magic,
 									       data->top());
 			    if(delta == nullptr)
-				throw Ememory("cat_file::get_data");
+				throw Ememory();
 			    try
 			    {
 				data->push(delta);
@@ -645,7 +645,7 @@ namespace libdar
 
 				me->delta_sig = new (nothrow) cat_delta_signature(sig_magic);
 				if(me->delta_sig == nullptr)
-				    throw Ememory("cat_file");
+				    throw Ememory();
 			    }
 			}
 
@@ -656,7 +656,7 @@ namespace libdar
 									      tools_file_size_to_crc_size(get_size()),
 									      checksum);
 			    if(diff == nullptr)
-				throw Ememory("cat_file::get_data");
+				throw Ememory();
 			    try
 			    {
 				data->push(diff);
@@ -682,7 +682,7 @@ namespace libdar
 			    // we will return a small stack of generic_file over the catalogue stack
 			pile *data = new (nothrow) pile();
 			if(data == nullptr)
-			    throw Ememory("cat_file::get_data");
+			    throw Ememory();
 
 			try
 			{
@@ -718,7 +718,7 @@ namespace libdar
 				{
 				    generic_file *tmp = new (nothrow) tronc(get_pile(), *offset, *storage_size, gf_read_only);
 				    if(tmp == nullptr)
-					throw Ememory("cat_file::get_data");
+					throw Ememory();
 				    try
 				    {
 					data->push(tmp);
@@ -760,7 +760,7 @@ namespace libdar
 			    {
 				sparse_file *stmp = new (nothrow) sparse_file(parent);
 				if(stmp == nullptr)
-				    throw Ememory("cat_file::get_data");
+				    throw Ememory();
 				try
 				{
 				    data->push(stmp);
@@ -801,7 +801,7 @@ namespace libdar
 										   sig_magic,
 										   parent);
 				if(delta == nullptr)
-				    throw Ememory("cat_file::get_data");
+				    throw Ememory();
 				try
 				{
 				    data->push(delta);
@@ -837,13 +837,13 @@ namespace libdar
 								       unused,
 								       nullptr);
 				    if(to_be_patched == nullptr)
-					throw Ememory("cat_file::get_data()");
+					throw Ememory();
 
 
 				    patcher = new (nothrow) generic_rsync(to_be_patched,
 									  parent);
 				    if(patcher == nullptr)
-					throw Ememory("cat_file::get_data");
+					throw Ememory();
 
 					// to_be_patched in put in the stack (sandwiched)
 					// for it get released when with the stack:
@@ -877,7 +877,7 @@ namespace libdar
 				tronc *tronc_tmp;
 				generic_file *tmp = tronc_tmp = new (nothrow) tronc(get_pile(), *offset, gf_read_only);
 				if(tmp == nullptr)
-				    throw Ememory("cat_file::get_data");
+				    throw Ememory();
 				if(tronc_tmp == nullptr)
 				    throw SRC_BUG;
 
@@ -914,7 +914,7 @@ namespace libdar
 	}
 
 	if(ret == nullptr)
-	    throw Ememory("cat_file::get_data");
+	    throw Ememory();
 	else
 	    return ret;
     }
@@ -1008,7 +1008,7 @@ namespace libdar
 	}
 	check = c.clone();
 	if(check == nullptr)
-	    throw Ememory("cat_file::set_crc");
+	    throw Ememory();
     }
 
     bool cat_file::get_crc(const crc * & c) const
@@ -1087,7 +1087,7 @@ namespace libdar
 			{
 			    const_cast<cat_file *>(this)->check = new (nothrow) crc_n(1);
 			    if(check == nullptr)
-				throw Ememory("cat_file::cat_file");
+				throw Ememory();
 			}
 			throw;
 		    }
@@ -1139,7 +1139,7 @@ namespace libdar
 		throw SRC_BUG;
 	    const_cast<cat_file *>(this)->patch_base_check = tmp->clone();
 	    if(patch_base_check == nullptr)
-		throw Ememory("cat_file::cat_file");
+		throw Ememory();
 	}
 
 	return patch_base_check != nullptr;
@@ -1165,7 +1165,7 @@ namespace libdar
 	patch_base_check = c.clone();
 
 	if(patch_base_check == nullptr)
-	    throw Ememory("cat_file::set_patch_base_crc");
+	    throw Ememory();
     }
 
     bool cat_file::has_patch_result_crc() const
@@ -1267,7 +1267,7 @@ namespace libdar
 	    }
 
 	    if(delta_sig == nullptr)
-		throw Ememory("cat_file::will_have_delta_signature()");
+		throw Ememory();
 	}
     }
 
@@ -1632,7 +1632,7 @@ namespace libdar
 		rsync_sig_magic sig_magic = rsync_sig_magic::none;
 
 		if(!sig_you)
-		    throw Ememory("cat_file::sub_compare_internal");
+		    throw Ememory();
 
 		read_delta_signature(sig_magic, sig_me, block_len);
 		if(!sig_me)
@@ -1794,7 +1794,7 @@ namespace libdar
 	cat_file* ret = new (nothrow) cat_file(*this);
 
 	if(ret == nullptr)
-	    throw Ememory("cat_file::clone_as_file");
+	    throw Ememory();
 
 	return ret;
     }

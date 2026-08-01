@@ -168,7 +168,7 @@ void f1(int argc, char *argv[])
 	U_I fast_retry = 30;
 
 	if(writetome == nullptr || writetomepart == nullptr)
-	    throw Ememory("f1");
+	    throw Ememory();
 
 
 	while(--fast_retry > 0)

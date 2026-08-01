@@ -65,7 +65,7 @@ namespace libdar
 	{
 	    behind_weak.reset(new (nothrow) scrambler(password, *encrypted));
 	    if(behind_weak == nullptr)
-		throw Ememory("tronco_with_elastic::tronc_with_elastic");
+		throw Ememory();
 
 	    beh = behind_weak.get();
 	}
@@ -84,7 +84,7 @@ namespace libdar
 					       kdf_hash,
 					       use_pkcs5));
 	    if(! ptr)
-		throw Ememory("tronco_with_elastic::tronc_with_elastic");
+		throw Ememory();
 	    else
 	    {
 		crypto_sym *csym = dynamic_cast<crypto_sym*>(ptr.get());
@@ -121,7 +121,7 @@ namespace libdar
 	    }
 
 	    if(! behind)
-		throw Ememory("tronco_with_elastic::tronc_with_elastic");
+		throw Ememory();
 
 	    beh = behind.get();
 	}
@@ -480,7 +480,7 @@ namespace libdar
         char *buffer = new (nothrow) char[tic.get_size()];
 
         if(buffer == nullptr)
-            throw Ememory("tools_add_elastic_buffer");
+            throw Ememory();
         try
         {
             tic.dump((unsigned char *)buffer, tic.get_size());

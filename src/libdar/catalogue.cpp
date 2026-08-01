@@ -91,7 +91,7 @@ namespace libdar
 	{
 	    contenu = new (nothrow) cat_directory(0,0,0,datetime(0),root_last_modif,datetime(0),PSEUDO_ROOT,0);
 	    if(contenu == nullptr)
-		throw Ememory("catalogue::catalogue(path)");
+		throw Ememory();
 	    current_compare = contenu;
 	    current_add = contenu;
 	    current_read = contenu;
@@ -200,10 +200,10 @@ namespace libdar
 		stats.clear();
 		smart_pointer<pile_descriptor> spdesc(new (nothrow) pile_descriptor(pdesc));
 		if(spdesc.is_null())
-		    throw Ememory("catalogue::catalogue");
+		    throw Ememory();
 		contenu = new (nothrow) cat_directory(ui, spdesc, reading_ver, st, stats, corres, default_algo, lax, only_detruit, false);
 		if(contenu == nullptr)
-		    throw Ememory("catalogue::catalogue(path)");
+		    throw Ememory();
 		if(only_detruit)
 		    contenu->remove_all_mirages_and_reduce_dirs();
 		current_compare = contenu;
@@ -674,7 +674,7 @@ namespace libdar
 
 		cat_detruit *det_tmp = new (nothrow) cat_detruit(pro_nom->get_name(), firm, current->get_last_modif());
 		if(det_tmp == nullptr)
-		    throw Ememory("catalogue::update_destroyed_with");
+		    throw Ememory();
 		try
 		{
 		    if(display_treated)
@@ -812,7 +812,7 @@ namespace libdar
 			    {
 				clo_eto = new (nothrow) cat_etoile(clo_ino, aborting_next_etoile++);
 				if(clo_eto == nullptr)
-				    throw Ememory("catalogue::update_absent_with");
+				    throw Ememory();
 				else
 				    clo_ent = nullptr; // object now managed by clo_eto
 
@@ -821,7 +821,7 @@ namespace libdar
 				    corres_clone[pro_mir->get_etiquette()] = clo_eto;
 				    clo_mir = new (nothrow) cat_mirage(pro_mir->get_name(), clo_eto);
 				    if(clo_mir == nullptr)
-					throw Ememory("catalogue::update_absent_with");
+					throw Ememory();
 				}
 				catch(...)
 				{
@@ -840,7 +840,7 @@ namespace libdar
 				    // so we add a new reference to the existing hard linked structure
 				clo_mir = new (nothrow) cat_mirage(pro_mir->get_name(), it->second);
 				if(clo_mir == nullptr)
-				    throw Ememory("catalogue::update_absent_with");
+				    throw Ememory();
 			    }
 
 				// adding it to the catalogue
@@ -1088,7 +1088,7 @@ namespace libdar
 	U_I block_len;
 
 	if(!mem)
-	    throw Ememory("catalogue::transfer_delta_signature");
+	    throw Ememory();
 
 	if(destination.compr == nullptr || destination.stack == nullptr)
 	    throw SRC_BUG;
@@ -1186,7 +1186,7 @@ namespace libdar
 
 			    checksum = new (nothrow)(const crc *);
 			    if(checksum == nullptr)
-				throw Ememory("catalogue::transfer_delta_signatures");
+				throw Ememory();
 			    *checksum = nullptr;
 			}
 
@@ -1343,7 +1343,7 @@ namespace libdar
     {
 	smart_pointer<pile_descriptor> tmp(new (nothrow) pile_descriptor(pdesc));
 	if(tmp.is_null())
-	    throw Ememory("catalogue::change_location");
+	    throw Ememory();
 	contenu->change_location(tmp);
     }
 
@@ -1366,7 +1366,7 @@ namespace libdar
 	    {
 		cat_eod *tmp = new (nothrow) cat_eod();
 		if(tmp == nullptr)
-		    throw Ememory("catalogue::copy_detruits_from");
+		    throw Ememory();
 		try
 		{
 		    add(tmp);
@@ -1381,7 +1381,7 @@ namespace libdar
 	    {
 		cat_detruit *cp = new (nothrow) cat_detruit(*ent_det);
 		if(cp == nullptr)
-		    throw Ememory("catalogue::copy_detruits_from");
+		    throw Ememory();
 		try
 		{
 		    add(cp);
@@ -1430,7 +1430,7 @@ namespace libdar
 		throw SRC_BUG;
 	    contenu = new (nothrow) cat_directory(*ref.contenu);
 	    if(contenu == nullptr)
-		throw Ememory("catalogue::catalogue(const catalogue &)");
+		throw Ememory();
 	    current_compare = contenu;
 	    current_add = contenu;
 	    current_read = contenu;
@@ -1438,7 +1438,7 @@ namespace libdar
 	    {
 		sub_tree = new (nothrow) path(*ref.sub_tree);
 		if(sub_tree == nullptr)
-		    throw Ememory("catalogue::partial_copy_from");
+		    throw Ememory();
 	    }
 	    else
 		sub_tree = nullptr;

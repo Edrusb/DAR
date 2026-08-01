@@ -88,7 +88,7 @@ namespace libdar
 
 	    compr = new (nothrow) xfer(BUFFER_SIZE, wr_mode);
 	    if(compr == nullptr)
-		throw Ememory("compressor::compressor");
+		throw Ememory();
 
 	    if(! read_mode)
 	    {
@@ -98,7 +98,7 @@ namespace libdar
 		    compr->wrap.set_avail_out(0);
 		    break;
 		case WR_MEM_ERROR:
-		    throw Ememory("compressor::compressor");
+		    throw Ememory();
 		case WR_VERSION_ERROR:
 		    throw Erange("compressor::compressor", gettext("incompatible compression library version or unsupported feature required from compression library"));
 		case WR_STREAM_ERROR:
@@ -116,7 +116,7 @@ namespace libdar
 		    break;
 		case WR_MEM_ERROR:
 		    compr->wrap.decompressEnd();
-		    throw Ememory("compressor::compressor");
+		    throw Ememory();
 		case WR_VERSION_ERROR:
 		    compr->wrap.decompressEnd();
 		    throw Erange("compressor::compressor", gettext("incompatible compression library version or unsupported feature required from compression library"));
@@ -281,7 +281,7 @@ namespace libdar
             case WR_DATA_ERROR:
                 throw Erange("compressor::gzip_read", gettext("compressed data CRC error"));
             case WR_MEM_ERROR:
-                throw Ememory("compressor::gzip_read");
+                throw Ememory();
             case WR_BUF_ERROR:
                     // no process is possible:
                 if(compr->wrap.get_avail_in() == 0) // because we reached EOF
@@ -456,7 +456,7 @@ namespace libdar
     {
         buffer = new (nothrow) char[sz];
         if(buffer == nullptr)
-            throw Ememory("compressor::xfer::xfer");
+            throw Ememory();
         size = sz;
     }
 

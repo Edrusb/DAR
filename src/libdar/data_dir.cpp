@@ -142,7 +142,7 @@ namespace libdar
 	    else
 		ret = new (nothrow) data_tree(name);
 	    if(ret == nullptr)
-		throw Ememory("data_dir::find_or_addition");
+		throw Ememory();
 	    add_child(ret);
 	}
 	else  // already saved in another archive
@@ -153,7 +153,7 @@ namespace libdar
 	    {
 		ret = new (nothrow) data_dir(*fils); // upgrade data_tree in an empty data_dir
 		if(ret == nullptr)
-		    throw Ememory("data_dir::find_or_addition");
+		    throw Ememory();
 		try
 		{
 		    remove_child(name);
@@ -628,7 +628,7 @@ namespace libdar
 	    throw Erange("read_next_in_list_from_file", gettext("Unknown record type"));
 
 	if(ret == nullptr)
-	    throw Ememory("read_next_in_list_from_file");
+	    throw Ememory();
 
 	return ret;
     }

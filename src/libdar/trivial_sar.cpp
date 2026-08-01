@@ -280,7 +280,7 @@ namespace libdar
 		reference = new (nothrow) tuyau(dialog, pipename, gf_read_only);
 
 	    if(reference == nullptr)
-		throw Ememory("trivial_sar::trivial_sar");
+		throw Ememory();
 
 	    for_init.clear();
 	    init_read();
@@ -318,7 +318,7 @@ namespace libdar
 	{
 	    reference = new (nothrow) tuyau(dialog, filedescriptor, gf_read_only);
 	    if(reference == nullptr)
-		throw Ememory("trivial_sar::trivial_sar");
+		throw Ememory();
 
 	    for_init.clear();
 	    init_read();

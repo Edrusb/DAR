@@ -623,7 +623,7 @@ namespace libdar
 
 	buffer = new (nothrow) char[x_size];
 	if(buffer == nullptr)
-	    throw Ememory("cache::alloc_buffer");
+	    throw Ememory();
 	size = x_size;
 	half = size / 2;
     }

@@ -103,7 +103,7 @@ namespace libdar
 
 	entrep.reset(new (nothrow) entrepot_local("", "", false));
 	if(!entrep)
-	    throw Ememory("libdar_slave::libdar_slave");
+	    throw Ememory();
 
 	entrep->set_location(chemin);
 
@@ -119,7 +119,7 @@ namespace libdar
 				       false,
 				       execute);
 	    if(source == nullptr)
-		throw Ememory("libdar_slave::libdar_slave");
+		throw Ememory();
 
 	    if(input_pipe_is_fd)
 		input = new (nothrow) tuyau(dialog, input_fd, gf_read_only);
@@ -127,7 +127,7 @@ namespace libdar
 		input = new (nothrow) tuyau(dialog, input_pipe, gf_read_only);
 
 	    if(input == nullptr)
-		throw Ememory("libdar_slave::libdar_slave");
+		throw Ememory();
 
 	    if(output_pipe_is_fd)
 		output = new (nothrow) tuyau(dialog, output_fd, gf_write_only);
@@ -135,11 +135,11 @@ namespace libdar
 		output = new (nothrow) tuyau(dialog, output_pipe, gf_write_only);
 
 	    if(output == nullptr)
-		throw Ememory("libdar_slave::libdar_slave");
+		throw Ememory();
 
 	    zap.reset(new (nothrow) slave_zapette(dialog, input, output, source));
 	    if(!zap)
-		throw Ememory("libdar_slave::libdar_slave");
+		throw Ememory();
             input = output = nullptr; // now managed by zap;
             source = nullptr;  // now managed by zap;
 	}
@@ -185,7 +185,7 @@ namespace libdar
 						     min_digits));
 
 	    if(!pimpl)
-		throw Ememory("libdar_slave::libdar_slave");
+		throw Ememory();
 	}
 	catch(...)
 	{

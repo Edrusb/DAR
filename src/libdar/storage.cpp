@@ -289,7 +289,7 @@ namespace libdar
                         number -= can_rem;
                     }
                     else
-                        throw Ememory("storage::remove_bytes_at_iterator");
+                        throw Ememory();
                 }
                 else // we can remove from the chain the whole cellule
                 {
@@ -328,7 +328,7 @@ namespace libdar
                     number = 0;
                 }
                 else
-                    throw Ememory("storage::remove_bytes_at_iterator");
+                    throw Ememory();
             }
         }
         reduce();
@@ -651,7 +651,7 @@ namespace libdar
 		{
 		    detruit(begin);
 		    begin = nullptr;
-		    throw Ememory("storage::make_alloc");
+		    throw Ememory();
 		}
 
 		do
@@ -671,7 +671,7 @@ namespace libdar
 			    newone->size = 0;
 			    detruit(begin);
 			    begin = nullptr;
-			    throw Ememory("storage::make_alloc");
+			    throw Ememory();
 			}
 		}
 		while(dsize > 1 && newone->data == nullptr);

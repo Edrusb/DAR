@@ -175,7 +175,7 @@ namespace libdar
 	}
 	catch(bad_alloc &)
 	{
-	    throw Ememory("bzip2_module::clone");
+	    throw Ememory();
 	}
 #else
 	throw Ecompilation(gettext("bzip2 compression"));

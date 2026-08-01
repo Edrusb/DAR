@@ -78,7 +78,7 @@ namespace libdar
 		    throw SRC_BUG;
 		tmp_ptr.reset(new (nothrow) restore_tree(tmp, max_date));
 		if(!tmp_ptr)
-		    throw Ememory("restore_tree:restore_tree");
+		    throw Ememory();
 		else
 		    children[*it] = std::move(tmp_ptr);
 	    }

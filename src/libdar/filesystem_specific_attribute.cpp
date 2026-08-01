@@ -266,7 +266,7 @@ namespace libdar
 		}
 
 		if(ptr == nullptr)
-		    throw Ememory("filesystem_specific_attribute_list::read");
+		    throw Ememory();
 		fsa.push_back(ptr);
 		ptr = nullptr;
 
@@ -463,7 +463,7 @@ namespace libdar
 	    {
 		filesystem_specific_attribute *rep = ref.clone();
 		if(rep == nullptr)
-		    throw Ememory("filesystem_specific_attribute_list::add");
+		    throw Ememory();
 		try
 		{
 		    delete fsa[index];
@@ -480,7 +480,7 @@ namespace libdar
 	{
 	    filesystem_specific_attribute *rep = ref.clone();
 	    if(rep == nullptr)
-		throw Ememory("filesystem_specific_attribute_list::add");
+		throw Ememory();
 
 	    try
 	    {
@@ -514,7 +514,7 @@ namespace libdar
 
 	ref = new (nothrow) T(f, n, val);
 	if(ref == nullptr)
-	    throw Ememory("template create_or_throw");
+	    throw Ememory();
     }
 
     void filesystem_specific_attribute_list::fill_extX_FSA_with(const std::string & target,

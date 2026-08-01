@@ -179,7 +179,7 @@ namespace libdar
 					     false); // only_detruit
 
 	    if(ret == nullptr)
-		throw Ememory("get_catalogue_from");
+		throw Ememory();
 
 		// the following is necessary in multi-threaded context
 		// where the data_ctxt is a tuyau object:
@@ -277,10 +277,10 @@ namespace libdar
 		{
 		    global_hash_to_compare = new (nothrow) generic_to_global_file(dialog, &hash_to_compare, gf_write_only);
 		    if(global_hash_to_compare == nullptr)
-			throw Ememory("macro_tools_get_derivated_catalogue_from");
+			throw Ememory();
 		    global_cata_top_stack = new (nothrow) generic_to_global_file(dialog, cata_pdesc.stack->top(), gf_read_only);
 		    if(global_cata_top_stack == nullptr)
-			throw Ememory("macro_tools_get_derivated_catalogue_from");
+			throw Ememory();
 
 		    hasher = new (nothrow) hash_fichier(dialog,
 							global_cata_top_stack,
@@ -288,7 +288,7 @@ namespace libdar
 							global_hash_to_compare,
 							hash_algo::sha512);
 		    if(hasher == nullptr)
-			throw Ememory("macro_tools_get_derivated_catalogue_from");
+			throw Ememory();
 
 			// at this stage, hasher is created
 			// and manages the objects global_cata_stack and global_hash_to_compare
@@ -317,7 +317,7 @@ namespace libdar
 					      lax_layer1_data_name,
 					      only_detruits);
 		if(ret == nullptr)
-		    throw Ememory("macro_tools_read_catalogue");
+		    throw Ememory();
 		try
 		{
 
@@ -545,7 +545,7 @@ namespace libdar
 	    }
 
 	    if(tmp == nullptr)
-		throw Ememory("open_archive");
+		throw Ememory();
 	    else
 	    {
 		    // we always ignore read_ahead as no slave thread will exist for LEVEL1 layer
@@ -655,7 +655,7 @@ namespace libdar
 		    dialog->printf(gettext("Opening construction layer..."));
 		tmp = new (nothrow) tronc(stack.top(), 0, second_terminateur_offset, false);
 		if(tmp == nullptr)
-		    throw Ememory("macro_tools_open_archive");
+		    throw Ememory();
 		else
 		{
 		    tmp->ignore_read_ahead(!remote_repo);
@@ -774,7 +774,7 @@ namespace libdar
 							       info_details);
 
 		if(tmp_tronco == nullptr)
-			throw Ememory("macro_tools_open_archive");
+			throw Ememory();
 		else
 		    tmp = tmp_tronco;
 
@@ -817,7 +817,7 @@ namespace libdar
 	    if(tmp == nullptr)
 	    {
 		if(crypto != crypto_algo::none || !ver.get_tape_marks())
-		    throw Ememory("open_archive");
+		    throw Ememory();
 	    }
 	    else
 	    {
@@ -888,7 +888,7 @@ namespace libdar
 		unjump.insert(escape::seqt_catalogue);
 		tmp = new (nothrow) escape(stack.top(), unjump);
 		if(tmp == nullptr)
-		    throw Ememory("open_archive");
+		    throw Ememory();
 		tmp->ignore_read_ahead(!remote_repo && (crypto == crypto_algo::none || multi_threaded_crypto == 1));
 		stack.push(tmp);
 		tmp = nullptr;
@@ -939,7 +939,7 @@ namespace libdar
 	    }
 
 	    if(tmp == nullptr)
-		throw Ememory("open_archive");
+		throw Ememory();
 	    else
 	    {
 		stack.push(tmp, LIBDAR_STACK_LABEL_UNCOMPRESSED);
@@ -1085,7 +1085,7 @@ namespace libdar
 	    {
 		ret = new (nothrow) catalogue(dialog, pdesc, edition, compr_algo, even_partial_catalogue, layer1_data_name);
 		if(ret == nullptr)
-		    throw Ememory("macro_tools_lax_search_catalogue");
+		    throw Ememory();
 		stats = ret->get_stats();
 		dialog->printf(gettext("Could read a catalogue data structure at offset %i, it contains the following:"), &offset);
 		stats.listing(*dialog);
@@ -1295,7 +1295,7 @@ namespace libdar
 		}
 
 		if(tmp == nullptr)
-		    throw Ememory("op_create_in_sub");
+		    throw Ememory();
 		else
 		{
 		    layers.push(tmp);
@@ -1312,7 +1312,7 @@ namespace libdar
 
 		    cache *c_tmp = new (nothrow) cache(*(layers.top()), true);
 		    if(c_tmp == nullptr)
-			throw Ememory("op_create_in_sub");
+			throw Ememory();
 		    else
 		    {
 			tmp = c_tmp; // to handle the object destruction in case of exception
@@ -1340,7 +1340,7 @@ namespace libdar
 #if GPGME_SUPPORT
 		    memory_file *key = new (nothrow) memory_file();
 		    if(key == nullptr)
-			throw Ememory("macro_tools_create_layers");
+			throw Ememory();
 
 		    try
 		    {
@@ -1502,7 +1502,7 @@ namespace libdar
 									 info_details);
 
 		    if(tmp_tronco == nullptr)
-			throw Ememory("macro_tools_create_layers");
+			throw Ememory();
 
 		    if(use_pkcs5 && crypto != crypto_algo::scrambling)
 		    {
@@ -1536,7 +1536,7 @@ namespace libdar
 		if(!writing_to_pipe || crypto != crypto_algo::none)
 		{
 		    if(tmp == nullptr)
-			throw Ememory("op_create_in_sub");
+			throw Ememory();
 		    else
 		    {
 			layers.push(tmp);
@@ -1575,7 +1575,7 @@ namespace libdar
 
 		    utmp.reset(new (nothrow) slice_header(*ref_header));
 		    if(!utmp)
-			throw Ememory("macro_tools_create_layers");
+			throw Ememory();
 
 		    ver.set_slice_header(utmp);
 		}
@@ -1588,7 +1588,7 @@ namespace libdar
 
 		    utmp.reset(new (nothrow) header_version(*ref_version));
 		    if(!utmp)
-			throw Ememory("macro_tools_create_layers");
+			throw Ememory();
 
 		    ver.set_ref_header_version(utmp, ref_second_terminateur_offset);
 		}
@@ -1636,7 +1636,7 @@ namespace libdar
 		    unjump.insert(escape::seqt_catalogue);
 		    tmp = esc = new (nothrow) escape(layers.top(), unjump);
 		    if(tmp == nullptr)
-			throw Ememory("op_create_in_sub");
+			throw Ememory();
 		    else
 		    {
 			layers.push(tmp);
@@ -1666,7 +1666,7 @@ namespace libdar
 		}
 
 		if(tmp == nullptr)
-		    throw Ememory("op_create_in_sub");
+		    throw Ememory();
 		else
 		{
 		    layers.push(tmp);
@@ -1748,11 +1748,11 @@ namespace libdar
 
 		hash_to_sign = new (nothrow) memory_file();
 		if(hash_to_sign == nullptr)
-		    throw Ememory("macro_tools_close_layers");
+		    throw Ememory();
 
 		signed_hash = new (nothrow) tlv();
 		if(signed_hash == nullptr)
-		    throw Ememory("macro_tools_close_layers");
+		    throw Ememory();
 
 		try
 		{
@@ -1760,7 +1760,7 @@ namespace libdar
 		    global_layers = new (nothrow) generic_to_global_file(dialog, layers.top(), gf_write_only);
 
 		    if(global_hash_to_sign == nullptr || global_layers == nullptr)
-			throw Ememory("macro_tools_close_layers");
+			throw Ememory();
 
 		    hasher = new (nothrow) hash_fichier(dialog,
 							global_layers,
@@ -1768,7 +1768,7 @@ namespace libdar
 							global_hash_to_sign,
 							hash_algo::sha512);
 		    if(hasher == nullptr)
-			throw Ememory("macro_tools_close_layers");
+			throw Ememory();
 
 			// at this stage, hasher has been built and now manages
 			// both global_hash_to_sign and global_layers which will
@@ -2085,7 +2085,7 @@ namespace libdar
         {
             tmp = new (nothrow) tuyau(dialog, fd, mode);
             if(tmp == nullptr)
-                throw Ememory("macro_tools_open_archive_tuyau");
+                throw Ememory();
             ret = new (nothrow) trivial_sar(dialog,
 					    tmp,
 					    internal_name,
@@ -2093,7 +2093,7 @@ namespace libdar
 					    slice_header_format_07,
 					    execute);
             if(ret == nullptr)
-                throw Ememory("macro_tools_open_archive_tuyau");
+                throw Ememory();
 	    else
 		tmp = nullptr;
         }
@@ -2123,14 +2123,14 @@ namespace libdar
             else
                 in = new (nothrow) tuyau(dialog, 0, gf_read_only); // stdin by default
             if(in == nullptr)
-                throw Ememory("tools_open_pipes");
+                throw Ememory();
 
             if(output != "")
                 out = new (nothrow) tuyau(dialog, output, gf_write_only);
             else
                 out = new (nothrow) tuyau(dialog, 1, gf_write_only); // stdout by default
             if(out == nullptr)
-                throw Ememory("tools_open_pipes");
+                throw Ememory();
 
         }
         catch(...)
@@ -2186,7 +2186,7 @@ namespace libdar
 	}
 
 	if(ret == nullptr)
-	    throw Ememory("macro_tools_build_streaming_compressor");
+	    throw Ememory();
 
 	return ret;
     }
@@ -2219,7 +2219,7 @@ namespace libdar
 	}
 
 	if(ret == nullptr)
-	    throw Ememory("macro_tools_build_block_compressor");
+	    throw Ememory();
 
 	return ret;
     }
@@ -2270,7 +2270,7 @@ namespace libdar
 	}
 	catch(bad_alloc &)
 	{
-	    throw Ememory("make_compress_module_ptr");
+	    throw Ememory();
 	}
 
 	if(!ret)

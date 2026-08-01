@@ -229,10 +229,10 @@ void f1()
     }
 
     if(!ptr1)
-	throw Ememory("pseudo_crypto");
+	throw Ememory();
     unique_ptr<crypto_module> ptr2 = ptr1->clone();
     if(!ptr2)
-	throw Ememory("pseudo_crypto");
+	throw Ememory();
 
     if(single_encr)
 	encry = make_unique<tronconneuse>(chain_size,

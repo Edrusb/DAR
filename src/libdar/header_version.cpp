@@ -183,7 +183,7 @@ namespace libdar
 	{
 	    crypted_key = new (nothrow) memory_file(*ref.crypted_key);
 	    if(crypted_key == nullptr)
-		throw Ememory("header_version::copy_from");
+		throw Ememory();
 	}
 	else
 	    crypted_key = nullptr;
@@ -192,7 +192,7 @@ namespace libdar
 	{
 	    ref_header.reset(new (nothrow) slice_header(*(ref.ref_header)));
 	    if(!ref_header)
-		throw Ememory("header_version::copy_from");
+		throw Ememory();
 	    ref_second_term_offset = ref.ref_second_term_offset;
 	}
 	else
@@ -202,7 +202,7 @@ namespace libdar
 	{
 	    ref_version.reset(new (nothrow) header_version(*(ref.ref_version)));
 	    if(!ref_version)
-		throw Ememory("header_version::copy_from");
+		throw Ememory();
 	}
 	else
 	    ref_version.reset();
@@ -440,7 +440,7 @@ namespace libdar
 
 	    crypted_key = new (nothrow) memory_file();
 	    if(crypted_key == nullptr)
-		throw Ememory("header_version::read");
+		throw Ememory();
 	    if(f.copy_to(*crypted_key, key_size) != key_size)
 		throw Erange("header_version::read", gettext("Missing data for encrypted symmetrical key"));
 	}
@@ -456,7 +456,7 @@ namespace libdar
 		{
 		    ref_header.reset(new (nothrow) slice_header());
 		    if(!ref_header)
-			throw Ememory("header_version::read");
+			throw Ememory();
 		}
 		ref_header->clear();
 
@@ -502,7 +502,7 @@ namespace libdar
 	{
 	    ref_version.reset(new (nothrow) header_version());
 	    if(!ref_version)
-		throw Ememory("header_version::read");
+		throw Ememory();
 
 	    ref_version->inner_read(f, dialog, lax_mode, true);
 	    ref_second_term_offset.read(f);

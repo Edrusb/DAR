@@ -167,14 +167,14 @@ namespace libdar
     {
         ref = m.ref->clone();
         if(ref == nullptr)
-            throw Ememory("not_mask::copy_from(not_mask)");
+            throw Ememory();
     }
 
     void not_mask::copy_from(const mask &m)
     {
         ref = m.clone();
         if(ref == nullptr)
-            throw Ememory("not_mask::copy_from(mask)");
+            throw Ememory();
     }
 
     void not_mask::move_from(not_mask && m) noexcept
@@ -207,7 +207,7 @@ namespace libdar
         if(t != nullptr)
             lst.push_back(t);
         else
-            throw Ememory("et_mask::et_mask");
+            throw Ememory();
     }
 
     string et_mask::dump_logical(const string & prefix, const string & boolop) const
@@ -242,7 +242,7 @@ namespace libdar
         if(it != m.lst.end())
         {
             detruit();
-            throw Ememory("et_mask::copy_from");
+            throw Ememory();
         }
     }
 

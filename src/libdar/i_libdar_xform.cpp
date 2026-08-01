@@ -49,7 +49,7 @@ namespace libdar
 	init_entrep();
 	src_path.reset(new (nothrow) path(chem));
 	if(!src_path)
-	    throw Ememory("i_libdar_xform::lidar_xform");
+	    throw Ememory();
 
 	entrep_src->set_location(*src_path);
 
@@ -63,7 +63,7 @@ namespace libdar
 					       false,
 					       execute));
 	if(!source)
-	    throw Ememory("i_libdar_xform::lidar_xform");
+	    throw Ememory();
 	else
 	{
 		// yes we modify directly the object
@@ -81,7 +81,7 @@ namespace libdar
 	init_entrep();
 	source.reset(new (nothrow) libdar::trivial_sar(get_pointer(), pipename, false));
 	if(!source)
-	    throw Ememory("i_libdar_xform::i_libdar_xform");
+	    throw Ememory();
     }
 
     libdar_xform::i_libdar_xform::i_libdar_xform(const shared_ptr<user_interaction> & ui,
@@ -91,7 +91,7 @@ namespace libdar
 	init_entrep();
 	source.reset(new (nothrow) libdar::trivial_sar(get_pointer(), filedescriptor, false));
 	if(!source)
-	    throw Ememory("i_libdar_xform::i_libdar_xform");
+	    throw Ememory();
     }
 
     void libdar_xform::i_libdar_xform::xform_to(const string & chem,
@@ -117,7 +117,7 @@ namespace libdar
 	U_I perm = force_perm ? tools_octal2int(slice_perm) : 0;
 
 	if(!dst_path)
-	    throw Ememory("i_libdar_xform::xform_to");
+	    throw Ememory();
 
 	if(!source)
 	    throw SRC_BUG;
@@ -176,7 +176,7 @@ namespace libdar
 							execute));
 	}
 	if(!destination)
-	    throw Ememory("i_libdar_xform::xform_to");
+	    throw Ememory();
 
 	xform_to(destination.get());
     }
@@ -197,7 +197,7 @@ namespace libdar
 							 execute));
 
 	if(!destination)
-	    throw Ememory("i_libdar_xform::xform_to");
+	    throw Ememory();
 
 	xform_to(destination.get());
     }
@@ -206,10 +206,10 @@ namespace libdar
     {
 	entrep_src.reset(new (nothrow) entrepot_local("", "", false));
 	if(!entrep_src)
-	    throw Ememory("i_libdar_xform::lidar_xform");
+	    throw Ememory();
 	entrep_dst.reset(new (nothrow) entrepot_local("", "", false));
 	if(!entrep_dst)
-	    throw Ememory("i_libdar_xform::lidar_xform");
+	    throw Ememory();
     }
 
     void libdar_xform::i_libdar_xform::xform_to(generic_file *dst)

@@ -42,7 +42,7 @@ namespace libdar
 	}
 	catch(std::bad_alloc & e)
 	{
-	    throw Ememory("mem_ui::mem_ui");
+	    throw Ememory();
 	}
     }
 

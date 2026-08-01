@@ -86,7 +86,7 @@ namespace libdar
 	bool info_details = options.get_info_details();
 
 	if(where == nullptr)
-	    throw Ememory("archive::i_archive::archive");
+	    throw Ememory();
 
 	cat = nullptr;
 	live_crypto_bs = options.get_crypto_size();
@@ -114,7 +114,7 @@ namespace libdar
 		{
 		    shared_ptr<entrepot> ref_where = options.get_ref_entrepot();
 		    if(ref_where == nullptr)
-			throw Ememory("archive::i_archive::archive");
+			throw Ememory();
 
 		    if(info_details)
 			dialog->printf(gettext("Opening the archive of reference %s to retreive the isolated catalog ... "), options.get_ref_basename().c_str());
@@ -383,7 +383,7 @@ namespace libdar
 									 options.get_lax());
 				}
 				if(cat == nullptr)
-				    throw Ememory("archive::i_archive::archive");
+				    throw Ememory();
 			    }
 			    else
 				throw SRC_BUG;
@@ -496,7 +496,7 @@ namespace libdar
 
 	    shared_ptr<entrepot> sauv_path_t = options.get_entrepot();
 	    if(!sauv_path_t)
-		throw Ememory("archive::i_archive::archive");
+		throw Ememory();
 	    sauv_path_t->set_user_ownership(options.get_slice_user_ownership());
 	    sauv_path_t->set_group_ownership(options.get_slice_group_ownership());
 	    sauv_path_t->set_location(sauv_path);
@@ -628,7 +628,7 @@ namespace libdar
 	try
 	{
 	    if(sauv_path_t == nullptr)
-		throw Ememory("archive::i_archive::archive(merge)");
+		throw Ememory();
 	    sauv_path_t->set_user_ownership(options.get_slice_user_ownership());
 	    sauv_path_t->set_group_ownership(options.get_slice_group_ownership());
 	    sauv_path_t->set_location(sauv_path);
@@ -882,7 +882,7 @@ namespace libdar
 
 	shared_ptr<entrepot> sauv_path_t = options_repair.get_entrepot();
 	if(sauv_path_t == nullptr)
-	    throw Ememory("archive::i_archive::archive(repair)");
+	    throw Ememory();
 
 	try
 	{
@@ -1668,7 +1668,7 @@ namespace libdar
 	const slice_header* ref_slicing = &sl_header;
 	shared_ptr<entrepot> sauv_path_t = options.get_entrepot();
 	if(sauv_path_t == nullptr)
-	    throw Ememory("archive::i_archive::archive");
+	    throw Ememory();
 
 	sauv_path_t->set_user_ownership(options.get_slice_user_ownership());
 	sauv_path_t->set_group_ownership(options.get_slice_group_ownership());
@@ -1945,7 +1945,7 @@ namespace libdar
 	    }
 	    catch(std::bad_alloc &)
 	    {
-		throw Ememory("std::vector<libdar::list_entry>::reserve()");
+		throw Ememory();
 	    }
 	}
 
@@ -2547,7 +2547,7 @@ namespace libdar
 		}
 
 		if(cat == nullptr)
-		    throw Ememory("archive::i_archive::op_create_in_sub");
+		    throw Ememory();
 
 
 		    // *********** now we can perform the data filtering operation (adding data to the archive) *************** //
@@ -2577,7 +2577,7 @@ namespace libdar
 							       datetime(0),
 							       data_name);
 			    if(void_cat == nullptr)
-				throw Ememory("archive::i_archive::op_create_in_sub");
+				throw Ememory();
 			    ref_cat_ptr = void_cat;
 			}
 			else

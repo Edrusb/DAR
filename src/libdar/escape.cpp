@@ -86,7 +86,7 @@ namespace libdar
 	read_buffer_alloc = INITIAL_READ_BUFFER_SIZE;
 	read_buffer = new (nothrow) char[read_buffer_alloc];
 	if(read_buffer == nullptr)
-	    throw Ememory("escape::escape");
+	    throw Ememory();
     }
 
     escape::~escape()
@@ -651,7 +651,7 @@ namespace libdar
 			read_buffer_alloc = read;
 			read_buffer = new (nothrow) char[read_buffer_alloc];
 			if(read_buffer == nullptr)
-			    throw Ememory("escape::inherited_read");
+			    throw Ememory();
 		    }
 		    read_buffer_size = read - escape_seq_offset_in_buffer;
 		    escape_seq_offset_in_buffer = 0;
@@ -988,7 +988,7 @@ namespace libdar
 	}
 	read_buffer = new (nothrow) char[read_buffer_alloc];
 	if(read_buffer == nullptr)
-	    throw Ememory("escape::copy_from");
+	    throw Ememory();
 	(void)memcpy(read_buffer, ref.read_buffer, read_buffer_size);
 	already_read = ref.already_read;
 	read_eof = ref.read_eof;

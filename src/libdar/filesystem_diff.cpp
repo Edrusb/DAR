@@ -127,11 +127,11 @@ namespace libdar
 	{
 	    fs_root = filesystem_tools_get_root_with_symlink(*dialog, root, x_info_details);
 	    if(fs_root == nullptr)
-		throw Ememory("filesystem_diff::filesystem_diff");
+		throw Ememory();
 	    info_details = x_info_details;
 	    ea_mask = x_ea_mask.clone();
 	    if(ea_mask == nullptr)
-		throw Ememory("filesystem_diff::filesystem_diff");
+		throw Ememory();
 	    alter_atime = x_alter_atime;
 	    furtive_read_mode = x_furtive_read_mode;
 	    current_dir = nullptr;
@@ -154,7 +154,7 @@ namespace libdar
         current_dir = new (nothrow) path(*fs_root);
         filename_pile.clear();
         if(current_dir == nullptr)
-            throw Ememory("filesystem_diff::reset_read");
+            throw Ememory();
 	const string display = current_dir->display();
 	const char* tmp = display.c_str();
 

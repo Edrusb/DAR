@@ -43,7 +43,7 @@ namespace libdar
 				     shift_mode,
 				     size);
 	if(buffer == nullptr)
-	    throw Ememory("cache_global::cache_global");
+	    throw Ememory();
     }
 
     void cache_global::detruit()

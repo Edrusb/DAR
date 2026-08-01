@@ -148,9 +148,9 @@ namespace libdar
 	    /// \param[in] go_true is the action to use for evaluation if the criterium states true
 	    /// \param[in] go_false is the action to use for evaluation if the criterium states false
 	testing(const criterium & input, const crit_action & go_true, const crit_action & go_false);
-	testing(const testing & ref) : crit_action(ref) { copy_from(ref); if(!check()) throw Ememory("testing::testing(const testing &)"); };
+	testing(const testing & ref) : crit_action(ref) { copy_from(ref); if(!check()) throw Ememory(); };
 	testing(testing && ref) noexcept : crit_action(std::move(ref)) { nullifyptr(); move_from(std::move(ref)); };
-	testing & operator = (const testing & ref) { free(); copy_from(ref); if(!check()) throw Ememory("testing::testing(const testing &)"); return *this; };
+	testing & operator = (const testing & ref) { free(); copy_from(ref); if(!check()) throw Ememory(); return *this; };
 	testing & operator = (testing && ref) noexcept { crit_action::operator = (std::move(ref)); move_from(std::move(ref)); return *this; };
 	~testing() { free(); };
 

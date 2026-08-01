@@ -41,7 +41,7 @@ namespace libdar
 	tree.reset(new (nothrow) restore_tree(racine, ignore_older_than_that));
 
 	if(!tree)
-	    throw Ememory("mask_database::mask_database");
+	    throw Ememory();
     }
 
     void mask_database::compose_with(const mask & ref)

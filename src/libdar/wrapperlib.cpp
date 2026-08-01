@@ -54,7 +54,7 @@ namespace libdar
 #if LIBZ_AVAILABLE
 	    z_ptr = new (nothrow) z_stream;
             if(z_ptr == nullptr)
-                throw Ememory("wrapperlib::wrapperlib");
+                throw Ememory();
 #if LIBBZ2_AVAILABLE
             bz_ptr = nullptr;
 #endif
@@ -87,7 +87,7 @@ namespace libdar
 #if LIBBZ2_AVAILABLE
 	    bz_ptr = new (nothrow) bz_stream;
             if(bz_ptr == nullptr)
-                throw Ememory("wrapperlib::wrapperlib");
+                throw Ememory();
 #if LIBZ_AVAILABLE
             z_ptr = nullptr;
 #endif
@@ -126,7 +126,7 @@ namespace libdar
 #endif
 	    lzma_ptr = new (nothrow) lzma_stream;
 	    if(lzma_ptr == nullptr)
-		throw Ememory("wrapperlib::wrapperlib");
+		throw Ememory();
 	    *lzma_ptr = LZMA_STREAM_INIT;
             x_compressInit = & wrapperlib::lzma_compressInit;
             x_decompressInit = & wrapperlib::lzma_decompressInit;

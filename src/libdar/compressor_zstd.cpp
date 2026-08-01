@@ -65,7 +65,7 @@ namespace libdar
 	    case gf_read_only:
 		decomp = ZSTD_createDStream();
 		if(decomp == nullptr)
-		    throw Ememory("zstd::zstd");
+		    throw Ememory();
 		below_tampon_size = ZSTD_DStreamInSize();
 		above_tampon_size = ZSTD_DStreamOutSize();
 		flueof = false;
@@ -74,7 +74,7 @@ namespace libdar
 	    case gf_read_write: // but read operation will fail
 		comp = ZSTD_createCStream();
 		if(comp == nullptr)
-		    throw Ememory("zsts::zstd");
+		    throw Ememory();
 		below_tampon_size = ZSTD_CStreamOutSize();
 		above_tampon_size = ZSTD_CStreamInSize();
 		flueof = true;
@@ -86,7 +86,7 @@ namespace libdar
 
 	    below_tampon = new (nothrow) char[below_tampon_size];
 	    if(below_tampon == nullptr)
-		throw Ememory("zstd::zstd");
+		throw Ememory();
 	}
 	catch(...)
 	{

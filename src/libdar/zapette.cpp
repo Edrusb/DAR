@@ -211,7 +211,7 @@ namespace libdar
 
 	data_buf = new(nothrow) char[data_size_step];
 	if(data_buf == nullptr)
-	    throw Ememory("zapette:get_slice_info");
+	    throw Ememory();
 
 
 	    // getting and deserializing the datastructure

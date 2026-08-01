@@ -65,7 +65,7 @@ void f2()
 {
     smart_pointer<pile_descriptor> spdesc(new (nothrow) pile_descriptor());
     if(spdesc.is_null())
-	throw Ememory("f2");
+	throw Ememory();
 
     cout << "sizeof(smart_pointer<pile_descriptor>) = " << sizeof(spdesc) << endl;
     cout << "sizeof(pile_descriptor) = " << sizeof(pile_descriptor) << endl;

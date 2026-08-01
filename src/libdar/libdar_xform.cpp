@@ -56,7 +56,7 @@ namespace libdar
 						     min_digits,
 						     execute));
 	    if(!pimpl)
-		throw Ememory("libdar_xform::libdar_xform");
+		throw Ememory();
 	}
 	catch(...)
 	{
@@ -75,7 +75,7 @@ namespace libdar
 	    pimpl.reset(new (nothrow) i_libdar_xform(ui,
 						     pipename));
 	    if(!pimpl)
-		throw Ememory("libdar_xform::libdar_xform");
+		throw Ememory();
 	}
 	catch(...)
 	{
@@ -100,7 +100,7 @@ namespace libdar
 	    pimpl.reset(new (nothrow) i_libdar_xform(ui,
 						     filedescriptor));
 	    if(!pimpl)
-		throw Ememory("libdar_xform::libdar_xform");
+		throw Ememory();
 	}
 	catch(...)
 	{

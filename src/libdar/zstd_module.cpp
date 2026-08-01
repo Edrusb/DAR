@@ -132,7 +132,7 @@ namespace libdar
 	}
 	catch(bad_alloc &)
 	{
-	    throw Ememory("zstd_module::clone");
+	    throw Ememory();
 	}
 #else
 	throw Ecompilation(gettext("zstd compression"));

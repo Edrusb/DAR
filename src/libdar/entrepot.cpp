@@ -117,7 +117,7 @@ namespace libdar
 						    ret);
 
 		if(pipe_g == nullptr)
-		    throw Ememory("entrepot::open");
+		    throw Ememory();
 		else
 		    ret = nullptr; // now managed by pipe_g
 
@@ -153,7 +153,7 @@ namespace libdar
 							 hash_file,
 							 algo);
 			if(tmp == nullptr)
-			    throw Ememory("entrepot::entrepot");
+			    throw Ememory();
 			else
 			{
 			    ret = tmp;

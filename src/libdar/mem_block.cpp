@@ -87,7 +87,7 @@ namespace libdar
 	{
 	    data = new (nothrow) char[size];
 	    if(data == nullptr)
-		throw Ememory("mem_block::mem_block");
+		throw Ememory();
 	}
 	alloc_size = size;
 	data_size = 0;

@@ -145,7 +145,7 @@ namespace libdar
 
 	return normal_size;
 #else
-	throw Ecompilation(gettext("gzip compression"));
+	throw Ecompilation(gettext());
 #endif
     }
 
@@ -159,7 +159,7 @@ namespace libdar
 	}
 	catch(bad_alloc &)
 	{
-	    throw Ememory("gzip_module::clone");
+	    throw Ememory();
 	}
 #else
 	throw Ecompilation(gettext("gzip compression"));

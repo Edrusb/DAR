@@ -90,14 +90,14 @@ static void routine1()
 
     fichier_local *fic = new (nothrow) fichier_local(ui, "toto", gf_write_only, 0600, false, true, false);
     if(fic == nullptr)
-	throw Ememory("routine1");
+	throw Ememory();
     f1.dump(*fic);
     delete fic;
     fic = nullptr;
 
     fic = new (nothrow) fichier_local("toto", false);
     if(fic == nullptr)
-	throw Ememory("routine1");
+	throw Ememory();
 
     f3 = infinint(*fic);
     d3 = libdar::deci(f3);
