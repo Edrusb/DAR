@@ -184,7 +184,8 @@ int dar_suite_global(int argc,
 	}
 	catch(Erange & e)
 	{
-	    if(e.get_source() == "libdar_init_gpgme")
+	    string val;
+	    if(e.get_tag(LIBDAR_INIT, val) && val == LIBDAR_INIT_GPGME)
 		ui->pause("INITIALIZATION FAILED FOR GPGME, missing gpg binary? Retry initializing without gpgme support, which may lead libdar to silently fail reading or writing gpg ciphered archive)?");
 	    close_and_clean();
 	    get_version(maj, med, min, true, false);

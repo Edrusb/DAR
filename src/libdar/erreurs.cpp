@@ -71,29 +71,14 @@ namespace libdar
 	return ret;
     }
 
-    const std::string Egeneric::empty_string = "";
-
-    Egeneric::Egeneric(const string &source, const string &message)
-    {
-        if(!initialized)
-            init();
-        pile.push_front(niveau(source, message));
-    }
-
     void Egeneric::prepend_message(const std::string & context)
     {
-	if(pile.empty())
-	    throw SRC_BUG;
-
-	pile.front().objet = context + pile.front().objet;
+	msg = context + msg;
     }
 
     void Egeneric::append_message(const std::string & precision)
     {
-	if(pile.empty())
-	    throw SRC_BUG;
-
-	pile.front().objet += precision;
+	msg += precision;
     }
 
     bool Egeneric::get_tag(const string & key,
@@ -110,7 +95,7 @@ namespace libdar
 	    return false;
     }
 
-    Ebug::Ebug(const string & file, S_I line) : Egeneric("", tools_printf(gettext("File %S line %d: it seems to be a bug here\n"), &file, line))
+    Ebug::Ebug(const string & file, S_I line) : Egeneric(tools_printf(gettext("File %S line %d: it seems to be a bug here\n"), &file, line))
     {
 	    // adding the current stack if possible
 #if BACKTRACE_AVAILABLE
@@ -144,7 +129,7 @@ namespace libdar
     }
 
     Esystem::Esystem(const string & source, const string & message, io_error code):
-	Egeneric(source, message)
+	Egeneric(message)
     {
 	x_code = code;
     }

@@ -30,6 +30,7 @@
 #include "../my_config.h"
 
 #include <list>
+#include <deque>
 #include "generic_file.hpp"
 
 namespace libdar

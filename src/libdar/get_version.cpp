@@ -236,12 +236,22 @@ namespace libdar
 	    {
 		if(gpgme_check_version(GPGME_MIN_VERSION) == nullptr)
 		{
-		    string tmp = "GPGME_SUPPORT";
-		    throw Erange("libdar_init_gpgme", tools_printf(gettext("GPGME version requirement is not satisfied, requires version > %s"), tmp.c_str()));
+#ifdef GPGME_MIN_VERSION
+		    string tmp = GPGME_MIN_VERSION; // defined in config.h
+#else
+		    throw SRC_BUG;
+#endif
+		    Erange err("", tools_printf(gettext("GPGME version requirement is not satisfied, requires version > %s"), tmp.c_str()));
+		    err.set_tag(LIBDAR_INIT, LIBDAR_INIT_GPGME);
+		    throw err;
 		}
 
 		if(gpgme_err_code(gpgme_engine_check_version(GPGME_PROTOCOL_OpenPGP)) != GPG_ERR_NO_ERROR)
-		    throw Erange("libdar_init_gpgme", tools_printf(gettext("GPGME engine not available: %s"), gpgme_get_protocol_name(GPGME_PROTOCOL_OpenPGP)));
+		{
+		    Erange err("", tools_printf(gettext("GPGME engine not available: %s"), gpgme_get_protocol_name(GPGME_PROTOCOL_OpenPGP)));
+		    err.set_tag(LIBDAR_INIT, LIBDAR_INIT_GPGME);
+		    throw err;
+		}
 	    }
 #endif
 	    // initializing libcurl

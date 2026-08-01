@@ -454,8 +454,9 @@ string line_tools_get_full_path_from_PATH(const deque<string> & the_path, const 
 	{
 	    path tmp(filename);
 
+
 	    if(!tmp.is_relative())
-		no_path = false; // no need to check if file exist using the_path, path is absolute
+		no_path = false; // no need to check whether file exists using the_path, path is absolute
 	    else
 		if(tmp.degre() != 1)
 		    no_path = false;  // this is a composed path, we must not inspect the_path
@@ -464,10 +465,7 @@ string line_tools_get_full_path_from_PATH(const deque<string> & the_path, const 
 	}
 	catch(Erange & e)
 	{
-	    if(e.get_source() == "path::path")
-		no_path = false; // not a valid path
-	    else
-		throw;
+	    no_path = false; // not a valid path
 	}
     }
 

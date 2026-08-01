@@ -301,7 +301,6 @@ namespace libdar
 			    struct cached_Erange
 			    {
 				bool active;
-				string source;
 				string message;
 				cached_Erange() { active = false; };
 			    } tmp_exc;    // used to hold exception information, when restoring in sequential reading in the hope another copy is available for the file
@@ -359,7 +358,6 @@ namespace libdar
 					// we will throw this exception (which we cannot not
 					// at this time if following sequential reading mode.
 				    tmp_exc.active = true;
-				    tmp_exc.source = e.get_source();
 				    tmp_exc.message = e.get_message();
 				}
 
@@ -375,7 +373,7 @@ namespace libdar
 				  && data_restored == filesystem_restore::done_data_restored);
 
 			    if(tmp_exc.active)
-				throw Erange(tmp_exc.source, tmp_exc.message);
+				throw Erange("", tmp_exc.message);
 
 			    if(cat.get_escape_layer() != nullptr && cat.get_escape_layer()->skip_to_next_mark(escape::seqt_dirty, false))
 			    {

@@ -33,6 +33,7 @@ extern "C"
 } // end extern "C"
 
 #include <set>
+#include <deque>
 #include "infinint.hpp"
 #include "path.hpp"
 

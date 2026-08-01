@@ -155,6 +155,14 @@ namespace libdar
 
 	/// gives the number of thread running libdar
     extern U_I get_thread_count();
+
+
+	/// constant field used as tag to exceptions to kown more precisely
+	/// the origin of an error. Not to be used from libdar API standpoint
+
+    constexpr const char* LIBDAR_INIT = "libdar_init";
+    constexpr const char* LIBDAR_INIT_GPGME = "gpgme_err";
+
 #endif
 
 

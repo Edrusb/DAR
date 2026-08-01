@@ -82,6 +82,9 @@ extern "C"
 
 #define DEFAULT_CRYPTO_SIZE 10240
 
+#define ERROR_KEY "source"
+#define ERROR_VAL_MAKE_ARGS_FROM_FILE "args_from_file"
+
 using namespace std;
 using namespace libdar;
 struct pre_mask
@@ -1504,9 +1507,9 @@ static bool get_args_recursive(recursive_param & rec,
                         }
                         catch(Erange & e)
                         {
-                            Erange more = Erange(e.get_source(), tools_printf(gettext("In included file %S: "), &tmp_string) + e.get_message());
+			    e.prepend_message(tools_printf(gettext("In included file %S: "), &tmp_string));
                             rec.inclusions.pop_back();
-                            throw more;
+                            throw;
                         }
                         catch(...)
                         {
@@ -1876,7 +1879,8 @@ static bool get_args_recursive(recursive_param & rec,
                     }
                     catch(Erange & e)
                     {
-                        throw Erange(e.get_source(), string(gettext("Syntax error in overwriting policy: ") + e.get_message()));
+			e.prepend_message(gettext("Syntax error in overwriting policy: "));
+			throw;
                     }
                 }
                 else
@@ -2908,7 +2912,11 @@ static void make_args_from_file(shared_ptr<user_interaction> & dialog,
             throw SRC_BUG; // integer overflow occurred
         argv = new (nothrow) char *[argc];
         if(argv == nullptr)
-            throw Ememory("make_args_from_file");
+	{
+            Ememory e("");
+	    e.set_tag(ERROR_KEY, ERROR_VAL_MAKE_ARGS_FROM_FILE);
+	    throw e;
+	}
         for(S_I i = 0; i < argc; ++i)
             argv[i] = nullptr;
 
@@ -2916,7 +2924,11 @@ static void make_args_from_file(shared_ptr<user_interaction> & dialog,
             //
         char *pseudo_command = new (nothrow) char[strlen(command)+1];
         if(pseudo_command == nullptr)
-            throw Ememory("make_args_from_file");
+	{
+            Ememory e("");
+	    e.set_tag(ERROR_KEY, ERROR_VAL_MAKE_ARGS_FROM_FILE);
+	    throw e;
+	}
         strncpy(pseudo_command, command, strlen(command));
         pseudo_command[strlen(command)] = '\0';
         argv[0] = pseudo_command;
@@ -3011,8 +3023,8 @@ static bool update_with_config_files(recursive_param & rec, line_param & p)
             }
             catch(Erange & e)
             {
-                Erange more = Erange(e.get_source(), tools_printf(gettext("In included file %S: "), &buffer) + e.get_message());
-                throw more;
+		e.prepend_message(tools_printf(gettext("In included file %S: "), &buffer));
+                throw;
             }
         }
         catch(...)
@@ -3055,7 +3067,8 @@ static bool update_with_config_files(recursive_param & rec, line_param & p)
     }
     catch(Erange & e)
     {
-        if(e.get_source() != "make_args_from_file")
+	string val;
+	if(! e.get_tag(ERROR_KEY, val) || val != ERROR_VAL_MAKE_ARGS_FROM_FILE)
             throw;
     }
 
@@ -3093,8 +3106,8 @@ static bool update_with_config_files(recursive_param & rec, line_param & p)
                 }
                 catch(Erange & e)
                 {
-                    Erange more = Erange(e.get_source(), tools_printf(gettext("In included file %S: "), &buffer) + e.get_message());
-                    throw more;
+		    e.prepend_message(tools_printf(gettext("In included file %S: "), &buffer));
+                    throw;
                 }
             }
             catch(...)
@@ -3136,8 +3149,9 @@ static bool update_with_config_files(recursive_param & rec, line_param & p)
         }
         catch(Erange & e)
         {
-            if(e.get_source() != "make_args_from_file")
-                throw;
+	    string val;
+	    if(! e.get_tag(ERROR_KEY, val) || val != ERROR_VAL_MAKE_ARGS_FROM_FILE)
+		throw;
         }
     }
 
