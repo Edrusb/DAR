@@ -267,7 +267,7 @@ PYBIND11_MODULE(libdar, mod)
 						}
 						catch(libdar::Ebug & e)
 						{
-						    throw darexc(e.dump_str().c_str());
+						    throw darexc(e.get_message().c_str());
 						}
 						catch(libdar::Egeneric & e)
 						{
