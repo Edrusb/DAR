@@ -48,7 +48,7 @@ def slice_size_to_bytes(slice_size):
     """"
     converts a string describing a slice size
     possibily using k, K, M, G... suffix following
-    the syntax supported by Dar, inrto the
+    the syntax supported by Dar, into the
     equivalent size in bytes.
     """
     if len(slice_size) == 0:
@@ -64,7 +64,7 @@ def slice_size_to_bytes(slice_size):
         try:
             val = int(slice_size)
         except:
-            raise Exception("Not a valid slice format")
+            raise Exception("Not a valid format for a slice size information")
         if unit_char == "k" or unit_char == "K":
             unit_val = 1024
         elif unit_char == "M":
@@ -86,7 +86,7 @@ def slice_size_to_bytes(slice_size):
         elif unit_char == "Q":
             unit_val = 1024**10
         else:
-            raise Exception("Not a valid slice format")
+            raise Exception("Not a valid format for a slice size information")
     return val * unit_val
 
 
