@@ -150,8 +150,7 @@ namespace libdar
 		    throw SRC_BUG;
 		err = curl_easy_setopt(handle, *it, t_string->empty() ? nullptr : t_string->c_str());
 		if(err != CURLE_OK)
-		    throw Erange("mycurl_easyhandle_node::apply",
-				 tools_printf(gettext("Error met while setting string option %d on libcurl handle: %s"),
+		    throw Erange(tools_printf(gettext("Error met while setting string option %d on libcurl handle: %s"),
 					      *it,
 					      curl_easy_strerror(err)));
 		break;
@@ -160,8 +159,7 @@ namespace libdar
 		    throw SRC_BUG;
 		err = curl_easy_setopt(handle, *it, t_secu_string->empty() ? nullptr : t_secu_string->c_str());
 		if(err != CURLE_OK)
-		    throw Erange("mycurl_easyhandle_node::apply",
-				 tools_printf(gettext("Error met while setting secu_string option %d on libcurl handle: %s"),
+		    throw Erange(tools_printf(gettext("Error met while setting secu_string option %d on libcurl handle: %s"),
 					      *it,
 					      curl_easy_strerror(err)));
 		break;
@@ -170,8 +168,7 @@ namespace libdar
 		    throw SRC_BUG;
 		err = curl_easy_setopt(handle, *it, *t_pointer);
 		if(err != CURLE_OK)
-		    throw Erange("mycurl_easyhandle_node::apply",
-				 tools_printf(gettext("Error met while setting pointer option %d on libcurl handle: %s"),
+		    throw Erange(tools_printf(gettext("Error met while setting pointer option %d on libcurl handle: %s"),
 					      *it,
 					      curl_easy_strerror(err)));
 		break;
@@ -180,8 +177,7 @@ namespace libdar
 		    throw SRC_BUG;
 		err = curl_easy_setopt(handle, *it, *t_long);
 		if(err != CURLE_OK)
-		    throw Erange("mycurl_easyhandle_node::apply",
-				 tools_printf(gettext("Error met while setting long option %d on libcurl handle: %s"),
+		    throw Erange(tools_printf(gettext("Error met while setting long option %d on libcurl handle: %s"),
 					      *it,
 					      curl_easy_strerror(err)));
 		break;
@@ -190,8 +186,7 @@ namespace libdar
 		    throw SRC_BUG;
 		err = curl_easy_setopt(handle, *it, t_mycurl_slist->empty() ? nullptr: t_mycurl_slist->get_address());
 		if(err != CURLE_OK)
-		    throw Erange("mycurl_easyhandle_node::apply",
-				 tools_printf(gettext("Error met while setting curl_slist option %d on libcurl handle: %s"),
+		    throw Erange(tools_printf(gettext("Error met while setting curl_slist option %d on libcurl handle: %s"),
 					      *it,
 					      curl_easy_strerror(err)));
 		break;
@@ -200,8 +195,7 @@ namespace libdar
 		    throw SRC_BUG;
 		err = curl_easy_setopt(handle, *it, *t_curl_off_t);
 		if(err != CURLE_OK)
-		    throw Erange("mycurl_easyhandle_node::apply",
-				 tools_printf(gettext("Error met while setting curl_off_t option %d on libcurl handle: %s"),
+		    throw Erange(tools_printf(gettext("Error met while setting curl_off_t option %d on libcurl handle: %s"),
 					      *it,
 					      curl_easy_strerror(err)));
 		break;
@@ -234,8 +228,7 @@ namespace libdar
     {
 	handle = curl_easy_init();
 	if(handle == nullptr)
-	    throw Erange("mycurl_easyhandle_node::mycurl_easyhandle_node",
-			 gettext("Error met while creating a libcurl handle"));
+	    throw Erange(gettext("Error met while creating a libcurl handle"));
     }
 
     void mycurl_easyhandle_node::init_defaults()
@@ -357,8 +350,7 @@ namespace libdar
 	case CURLE_REMOTE_FILE_NOT_FOUND:
 	case CURLE_PARTIAL_FILE:
 	case CURLE_QUOTE_ERROR:
-	    throw Erange("entrepot_libcurl::check_wait_or_throw",
-			 tools_printf(gettext("%S: %s, aborting"),
+	    throw Erange(tools_printf(gettext("%S: %s, aborting"),
 				      &err_context,
 				      curl_easy_strerror(err)));
 	case CURLE_LOGIN_DENIED:

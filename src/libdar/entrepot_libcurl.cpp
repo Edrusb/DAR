@@ -72,7 +72,7 @@ namespace libdar
 							 verbose));
 
 	    if(!pimpl)
-		throw Ememory("entrepot_libcurl::entrepot_libcurl");
+		throw Ememory();
 	}
 	catch(...)
 	{

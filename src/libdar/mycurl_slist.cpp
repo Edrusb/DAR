@@ -57,7 +57,7 @@ namespace libdar
     {
 	curl_slist *tmp = curl_slist_append(header, s.c_str());
 	if(tmp == nullptr)
-	    throw Erange("mycurl_slist::append", "Failed to append command to a curl_slist");
+	    throw Erange("Failed to append command to a curl_slist");
 	header = tmp;
 	appended.push_back(s);
     }
@@ -74,7 +74,7 @@ namespace libdar
 	    {
 		tmp = curl_slist_append(ret, it->c_str());
 		if(tmp == nullptr)
-		    throw Erange("mycurl_slist::rebuild", "Failed to rebuild an slist from its recorded paramaters");
+		    throw Erange("Failed to rebuild an slist from its recorded paramaters");
 		ret = tmp;
 		++it;
 	    }

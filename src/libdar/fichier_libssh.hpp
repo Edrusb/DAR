@@ -44,6 +44,7 @@ extern "C"
 #include "cygwin_adapt.hpp"
 
 #include <string>
+#include <deque>
 
 namespace libdar
 {

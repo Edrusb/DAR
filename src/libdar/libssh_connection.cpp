@@ -168,21 +168,21 @@ namespace libdar
 
 	sess = ssh_new();
 	if(sess == nullptr)
-	    throw Ememory("libssh_connection::entrepot_libssh");
+	    throw Ememory();
 
 	try
 	{
 	    int ssh_verbosity;
 
 	    if(host.empty())
-		throw Erange("libssh_connection", gettext("An empty string is not a valid hostname or IP to connect to"));
+		throw Erange(gettext("An empty string is not a valid hostname or IP to connect to"));
 	    ssh_options_set(sess, SSH_OPTIONS_HOST, host.c_str());
 
 	    if(! port.empty())
 		ssh_options_set(sess, SSH_OPTIONS_PORT_STR, port.c_str());
 
 	    if(login.empty())
-		throw Erange("libssh_connection", gettext("An empty string is not a valid login name for an sftp connection"));
+		throw Erange(gettext("An empty string is not a valid login name for an sftp connection"));
 	    ssh_options_set(sess, SSH_OPTIONS_USER, login.c_str());
 
 	    if(! sftp_known_hosts.empty())
@@ -201,8 +201,7 @@ namespace libdar
 
 	    conn_status = ssh_connect(sess);
 	    if(conn_status != SSH_OK)
-		throw Erange("libssh_connection::create_session",
-			     tools_printf(gettext("Error initializing sftp connexion: %s"),
+		throw Erange(tools_printf(gettext("Error initializing sftp connexion: %s"),
 					  ssh_get_error(sess)));
 		    }
 	catch(...)
@@ -227,8 +226,7 @@ namespace libdar
 	{
 	    code = ssh_get_server_publickey(sess, &srv_pubkey);
 	    if(code != SSH_OK)
-		throw Erange("libssh_connection::server_authentication",
-			     tools_printf(gettext("Cannot obtain the ssh/sftp server public key: %s"),
+		throw Erange(tools_printf(gettext("Cannot obtain the ssh/sftp server public key: %s"),
 					  ssh_get_error(sess)));
 
 	    code = ssh_get_publickey_hash(srv_pubkey,
@@ -236,9 +234,8 @@ namespace libdar
 					  &hash,
 					  &hlen);
 	    if(code != SSH_OK)
-		throw Erange("libssh_connection::server_authentication",
-			     tools_printf(gettext("Could not obtain a hash from the ssh/sftp server public key: %s"),
-					  ssh_get_error(sess)));
+	       throw Erange(tools_printf(gettext("Could not obtain a hash from the ssh/sftp server public key: %s"),
+					 ssh_get_error(sess)));
 
 
 	    switch(ssh_session_is_known_server(sess))
@@ -247,17 +244,14 @@ namespace libdar
 		    // ok
 		break;
 	    case SSH_KNOWN_HOSTS_CHANGED:
-		throw Erange("libssh_connection::server_authentication",
-			     gettext("Server key has changed, first update the knownhosts file with server authority provided information, then retry"));
+		throw Erange(gettext("Server key has changed, first update the knownhosts file with server authority provided information, then retry"));
 	    case SSH_KNOWN_HOSTS_OTHER:
-		throw Erange("libssh_connection::server_authentication",
-			     gettext("Server provided key type is new from this server, first update the knownhosts file with server authority provided information, then retry"));
+		throw Erange(gettext("Server provided key type is new from this server, first update the knownhosts file with server authority provided information, then retry"));
 	    case SSH_KNOWN_HOSTS_UNKNOWN:   // host not found in knownhosts file
 	    case SSH_KNOWN_HOSTS_NOT_FOUND: // no knownhosts file found
 		finger = ssh_get_fingerprint_hash(SSH_PUBLICKEY_HASH_SHA256, hash, hlen);
 		if(finger == nullptr)
-		throw Erange("libssh_connection::server_authentication",
-			     tools_printf(gettext("Could not obtain hash representation of the server public key hash: %s"),
+		throw Erange(tools_printf(gettext("Could not obtain hash representation of the server public key hash: %s"),
 					  ssh_get_error(sess)));
 
 		dialog.message(gettext("Unauthenticated server, please ask the ssh/sftp server admin for the server key hashs [ for x in /etc/ssh/*.pub ; do ssh-keygen -l -f \"$x\" ; done ]"));
@@ -265,8 +259,7 @@ namespace libdar
 		code = ssh_session_update_known_hosts(sess);
 		break;
 	    case SSH_KNOWN_HOSTS_ERROR:
-		throw Erange("libssh_connection::server_authentication",
-			     gettext("An error occurred while checking the host presence in the knownhosts file"));
+		throw Erange(gettext("An error occurred while checking the host presence in the knownhosts file"));
 	    default:
 		throw SRC_BUG; // unexpected returned value from libssh
 	    }
@@ -328,8 +321,7 @@ namespace libdar
 
 	    code = ssh_pki_import_pubkey_file(sftp_pub_keyfile.c_str(), &pubkey);
 	    if(code != SSH_OK)
-		throw Erange("libssh_connection::user_authentication",
-			     tools_printf(gettext("Failed loading the public key: %s"),
+		throw Erange(tools_printf(gettext("Failed loading the public key: %s"),
 					  get_key_error_msg(code)));
 
 	    try
@@ -340,8 +332,7 @@ namespace libdar
 
 		code = ssh_userauth_try_publickey(sess, nullptr, pubkey);
 		if(code != SSH_AUTH_SUCCESS)
-		    throw Erange("entrepot_ssh::user_authentication",
-				 tools_printf(gettext("Failed public key authentication: %s"),
+		    throw Erange(tools_printf(gettext("Failed public key authentication: %s"),
 					      get_auth_error_msg(code)));
 
 		    // loading the private key (eventually using the password as pass for the key
@@ -365,8 +356,7 @@ namespace libdar
 		}
 
 		if(code != SSH_OK)
-		    throw Erange("libssh_connection::user_authentication",
-				 tools_printf(gettext("Failed loading the private key: %s"),
+		    throw Erange(tools_printf(gettext("Failed loading the private key: %s"),
 					      get_key_error_msg(code)));
 		try
 		{
@@ -374,8 +364,7 @@ namespace libdar
 						  login.c_str(),
 						  prvkey);
 		    if(code != SSH_AUTH_SUCCESS)
-			throw Erange("libssh_connection::user_authentication",
-				     tools_printf(gettext("Failed public/private key authentication: %s"),
+			throw Erange(tools_printf(gettext("Failed public/private key authentication: %s"),
 						  get_auth_error_msg(code)));
 		}
 		catch(...)
@@ -401,14 +390,12 @@ namespace libdar
 	int code;
 
 	if(sftp_sess == nullptr)
-	    throw Erange("libssh_connection::create_sftp_session",
-			 tools_printf(gettext("Error allocating SFTP session: %s"),
+	    throw Erange(tools_printf(gettext("Error allocating SFTP session: %s"),
 				      ssh_get_error(sess)));
 
 	code = sftp_init(sftp_sess);
 	if(code != SSH_OK)
-	    throw Erange("libssh_connection::create_sftp_session",
-			 tools_printf(gettext("Error initializing SFTP session: %s"),
+	    throw Erange(tools_printf(gettext("Error initializing SFTP session: %s"),
 				      get_sftp_error_msg()));
     }
 

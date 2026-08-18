@@ -70,8 +70,7 @@ namespace libdar
 	if(!mycurl_is_protocol_available(proto))
 	{
 	    string named_proto = mycurl_protocol2string(proto);
-	    throw Erange("entrepot_libcurl::i_entrepot_libcurl::i_entrepot_libcurl",
-			 tools_printf(gettext("protocol %S is not supported by libcurl, aborting"), & named_proto));
+	    throw Erange(tools_printf(gettext("protocol %S is not supported by libcurl, aborting"), & named_proto));
 	}
 
 	set_libcurl_authentication(*dialog,
@@ -192,7 +191,7 @@ namespace libdar
 	    read_dir_reset();
 	    while(read_dir_next(tmp))
 		if(tmp == filename)
-		    throw Esystem("i_entrepot_libcurl::inherited_open", "File exists on remote repository" , Esystem::io_exist);
+		    throw Esystem("File exists on remote repository" , Esystem::io_exist);
 	}
 
 	string chemin = (path(get_url(), true).append(filename)).display();
@@ -216,7 +215,7 @@ namespace libdar
 						erase);
 
 	    if(ret == nullptr)
-		throw Ememory("entrepot_libcurl::i_entrepot_libcurl::inherited_open");
+		throw Ememory();
 
 	    switch(mode)
 	    {
@@ -235,7 +234,7 @@ namespace libdar
 		    rw = nullptr;
 		}
 		else
-		    throw Ememory("entrpot_libcurl::inherited_open");
+		    throw Ememory();
 		break;
 	    case gf_read_only:
 		rw = new (nothrow) cache_global(dialog, ret, false);
@@ -479,7 +478,7 @@ namespace libdar
 			if(best_entry == temporary_list.end())
 			    throw SRC_BUG;
 			if(*best_entry == *filename_ptr)
-			    throw Erange("i_entrepot_libcurl::update_current_dir_with_line", tools_printf("duplicated entry %s in directory", filename_ptr->c_str()));
+			    throw Erange(tools_printf("duplicated entry %s in directory", filename_ptr->c_str()));
 			else
 			    throw SRC_BUG;
 		    }

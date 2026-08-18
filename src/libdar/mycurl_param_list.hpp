@@ -110,11 +110,11 @@ namespace libdar
 	    {
 		ret = std::make_unique<mycurl_param_element<T> >(val);
 		if(!ret)
-		    throw Ememory("mycurl_param_list::clone");
+		    throw Ememory();
 	    }
 	    catch(...)
 	    {
-		throw Ememory("mycurl_param_list::clone");
+		throw Ememory();
 	    }
 
 	    return ret;
@@ -158,7 +158,7 @@ namespace libdar
 	template<class T> void read_opt(const T* & val) const
 	{
 	    if(cursor == element_list.end())
-		throw Erange("mycurl_param_list::read_opt", "Cannot read option when no more option is available");
+		throw Erange("Cannot read option when no more option is available");
 
 	    if(cursor->second)
 	    {

@@ -98,8 +98,7 @@ namespace libdar
 	{
 	    CURLcode err = curl_easy_getinfo(handle, info, val);
 	    if(err != CURLE_OK)
-		throw Erange("mycurl_easyhandle_node::getinfo",
-			     tools_printf(gettext("Error met while fetching info %d: %s"),
+		throw Erange(tools_printf(gettext("Error met while fetching info %d: %s"),
 					  (S_I)info,
 					  curl_easy_strerror(err)));
 	}

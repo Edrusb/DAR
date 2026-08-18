@@ -95,15 +95,14 @@ namespace libdar
 			    permission);
 
 	if(sfd == nullptr)
-	    throw Erange("fichier_libssh::fichier_libssh",
-			 tools_printf(gettext("Failed openning SFTP file %s: %s"),
+	    throw Erange(tools_printf(gettext("Failed openning SFTP file %s: %s"),
 				      chemin.c_str(),
 				      connect->get_sftp_error_msg()));
 
 	rallocated = connect->get_max_read();
 	rabuffer = new char[rallocated];
 	if(rabuffer == nullptr)
-	    throw Ememory("fichier_libssh::fichier_libsssh");
+	    throw Ememory();
 
 	rareq_maxsize = read_ahead_window_size / rallocated;
 	if(read_ahead_window_size % rallocated != 0)
@@ -135,8 +134,7 @@ namespace libdar
 			      perm);
 
 	if(code != SSH_OK)
-	    throw Erange("fichier_libssh::change_permission",
-			 tools_printf(gettext("Unable to change permission of SFTP file %s: %s"),
+	    throw Erange(tools_printf(gettext("Unable to change permission of SFTP file %s: %s"),
 				      my_path.c_str(),
 				      connect->get_sftp_error_msg()));
     }
@@ -153,8 +151,7 @@ namespace libdar
 			 my_path.c_str());
 
 	if(attr == nullptr)
-	    throw Erange("fichier_libssh::change_permission",
-			 tools_printf(gettext("Unable to fetch SFTP file size of %s: %s"),
+	    throw Erange(tools_printf(gettext("Unable to fetch SFTP file size of %s: %s"),
 				      my_path.c_str(),
 				      connect->get_sftp_error_msg()));
 
@@ -224,7 +221,7 @@ namespace libdar
 
     void fichier_libssh::inherited_truncate(const infinint & pos)
     {
-	throw Erange("fichier_libssh::inherited_truncate", string(gettext("libcurl does not allow truncating at a given position while uploading files")));
+	throw Erange(string(gettext("libcurl does not allow truncating at a given position while uploading files")));
     }
 
     void fichier_libssh::inherited_read_ahead(const infinint & amount)
@@ -298,8 +295,7 @@ namespace libdar
 		if(ret == SSH_AGAIN)
 		    throw SRC_BUG;
 		if(ret == SSH_ERROR)
-		    throw Erange("fichier_libssh::fichier_global_inherited_read",
-				 tools_printf(gettext("Error while fetching SFTP read-ahead data: %s"),
+		    throw Erange(tools_printf(gettext("Error while fetching SFTP read-ahead data: %s"),
 					      connect->get_sftp_error_msg()));
 		if((ret < 0 || (U_I)(ret) != rallocated) && rareq.size() != 1)
 		    throw SRC_BUG; // unless this is last request, amount size per request should equal rallocated
@@ -333,8 +329,7 @@ namespace libdar
 	    else if(step == 0)
 		loop = false;
 	    else
-		throw Erange("fichier_libssh::fichier_global_inherited_read",
-			     tools_printf(gettext("Error while reading SFTP data: %s"),
+		throw Erange(tools_printf(gettext("Error while reading SFTP data: %s"),
 					  connect->get_sftp_error_msg()));
 	}
 
@@ -387,8 +382,7 @@ namespace libdar
 
 	    ret = sftp_aio_begin_read(sfd, microstep, & tmp.handle);
 	    if(ret == SSH_ERROR)
-		throw Erange("fichier_libssh::inherited_read_ahead",
-			     tools_printf(gettext("SFTP read-ahead failed: %s"),
+		throw Erange(tools_printf(gettext("SFTP read-ahead failed: %s"),
 					  connect->get_sftp_error_msg()));
 	    if(ret < 0)
 		throw SRC_BUG;

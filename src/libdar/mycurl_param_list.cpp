@@ -66,7 +66,7 @@ namespace libdar
 	while(wit != wanted.element_list.end())
 	{
 	    if(!wit->second)
-		throw Erange("mycurl_param_list", "empty value in mycurl_param_list");
+		throw Erange("empty value in mycurl_param_list");
 
 	    mit = element_list.find(wit->first);
 	    if(mit == element_list.end()            // entry not found

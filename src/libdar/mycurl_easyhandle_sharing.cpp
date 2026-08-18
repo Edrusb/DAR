@@ -51,7 +51,7 @@ namespace libdar
 	    }
 	    catch(bad_alloc & e)
 	    {
-		throw Ememory("mycurl_easyhandle_sharing::alloc_instance");
+		throw Ememory();
 	    }
 	}
 

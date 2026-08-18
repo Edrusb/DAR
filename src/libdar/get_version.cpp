@@ -219,13 +219,11 @@ namespace libdar
 		const char* tmp = ssh_get_error(nullptr);
 
 		if(tmp != nullptr)
-		    throw Erange("libdar_init_libssh_initialization",
-				 tools_printf("%s : %s",
+		    throw Erange(tools_printf("%s : %s",
 					      gettext(ERROR),
 					      tmp));
 		else
-		    throw Erange("libdar_init_libssh_initialization",
-				 tools_printf(gettext(ERROR)));
+		    throw Erange(tools_printf(gettext(ERROR)));
 	    }
 #endif
 
@@ -261,13 +259,13 @@ namespace libdar
 	    if(curlret != 0)
 	    {
 		const char *msg = curl_easy_strerror(curlret);
-		throw Erange("libdar_init_libcurl", tools_printf(gettext("libcurl initialization failed: %s"), msg));
+		throw Erange(tools_printf(gettext("libcurl initialization failed: %s"), msg));
 	    }
 	    const curl_version_info_data *cvers = curl_version_info(CURLVERSION_FOURTH);
 	    if(cvers->age < CURLVERSION_FOURTH)
-		throw Erange("libdar_init_libcurl", tools_printf(gettext("libcurl initialization failed: %s"), "libcurl version not available"));
+		throw Erange(tools_printf(gettext("libcurl initialization failed: %s"), "libcurl version not available"));
 	    if(cvers->version_num < 0x072600)
-		throw Erange("libdar_init_libcurl", tools_printf(gettext("libcurl initialization failed: %s"), "libcurl version is too old"));
+		throw Erange(tools_printf(gettext("libcurl initialization failed: %s"), "libcurl version is too old"));
 
 		// now that libgcrypt is eventually initialized (as well as libcurl, but it does not matter here)
 		// we can initialize the default values for mycurl_easyhandle_node::defaults static field

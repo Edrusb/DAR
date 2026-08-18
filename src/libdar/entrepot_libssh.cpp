@@ -77,7 +77,7 @@ namespace libdar
 						      waiting_time,
 						      verbose));
 	if(!connect)
-	    throw Ememory("entrepot_libssh::entrepot_libssh");
+	    throw Ememory();
 
 	server_url = "sftp://" + login + "@" + host;
 	if(!port.empty())
@@ -139,8 +139,7 @@ namespace libdar
 
 	sdir = sftp_opendir(connect->get_sftp_session(), where.c_str());
 	if(sdir == nullptr)
-	    throw Erange("entrepot_libssh::read_dir_reset_dirinfo",
-			 tools_printf(gettext("Could not open directory %s: %s"),
+	    throw Erange(tools_printf(gettext("Could not open directory %s: %s"),
 				      where.c_str(),
 				      ssh_get_error(connect->get_ssh_session())));
 #else
@@ -154,8 +153,7 @@ namespace libdar
 	sftp_attributes attrib;
 
 	if(sdir == nullptr)
-	    throw Erange("entrepot_libssh::read_dir_next_dirinfo",
-			 gettext("No directory has been openned, cannot read a directory content"));
+	    throw Erange(gettext("No directory has been openned, cannot read a directory content"));
 
 	if(!connect)
 	    throw SRC_BUG;
@@ -181,8 +179,7 @@ namespace libdar
 	else
 	{
 	    if(!sftp_dir_eof(sdir))
-		throw Erange("Entrepot_libssh::read_dir_next_dirinfo",
-			     tools_printf(gettext("Failed getting next entry of directory %s: %s"),
+		throw Erange(tools_printf(gettext("Failed getting next entry of directory %s: %s"),
 					  get_full_path().display().c_str(),
 					  connect->get_sftp_error_msg()));
 	    read_dir_flush();
@@ -205,8 +202,7 @@ namespace libdar
 	code = sftp_mkdir(connect->get_sftp_session(), where.display().c_str(), permission);
 
 	if(code != SSH_OK)
-	    throw Erange("entrepot_libss::create_dir",
-			 tools_printf(gettext("Failed creating directory %s: %s"),
+	    throw Erange(tools_printf(gettext("Failed creating directory %s: %s"),
 				      where.display().c_str(),
 				      connect->get_sftp_error_msg()));
 #else
@@ -234,7 +230,7 @@ namespace libdar
 							   erase);
 
 	if(ptr == nullptr)
-	    throw Ememory("entrepot_libssh::inherited_open");
+	    throw Ememory();
 
 	try
 	{
@@ -284,8 +280,7 @@ namespace libdar
 	code = sftp_unlink(connect->get_sftp_session(), where.display().c_str());
 
 	if(code != SSH_OK)
-	    throw Erange("entrepot_libss::create_dir",
-			 tools_printf(gettext("Failed delete entry %s: %s"),
+	    throw Erange(tools_printf(gettext("Failed delete entry %s: %s"),
 				      where.display().c_str(),
 				      connect->get_sftp_error_msg()));
 #else

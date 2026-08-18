@@ -229,7 +229,7 @@ namespace libdar
 	    flush_read();
 	    break;
 	case gf_write_only:
-	    throw Erange("fichier_libcurl::skip", string(gettext("libcurl does not allow skipping in write mode")));
+	    throw Erange(string(gettext("libcurl does not allow skipping in write mode")));
 	case gf_read_write:
 	    throw SRC_BUG;
 	default:
@@ -285,7 +285,7 @@ namespace libdar
     void fichier_libcurl::inherited_truncate(const infinint & pos)
     {
 	if(pos != get_position())
-	    throw Erange("fichier_libcurl::inherited_truncate", string(gettext("libcurl does not allow truncating at a given position while uploading files")));
+	    throw Erange(string(gettext("libcurl does not allow truncating at a given position while uploading files")));
     }
 
     void fichier_libcurl::inherited_sync_write()
@@ -482,7 +482,7 @@ namespace libdar
 	    try
 	    {
 		if(!thread_ui)
-		    throw Ememory("fichier_libcurl::inherited_run");
+		    throw Ememory();
 		subthread_cur_offset = current_offset;
 	    }
 	    catch(...)
@@ -612,8 +612,7 @@ namespace libdar
 		    resume = current_offset;
 		    resume.unstack(cur_pos);
 		    if(!resume.is_zero())
-			throw Erange("fichier_libcurl::switch_to_metadata",
-				     gettext("Integer too large for libcurl, cannot skip at the requested offset in the remote repository"));
+			throw Erange(gettext("Integer too large for libcurl, cannot skip at the requested offset in the remote repository"));
 
 		    ehandle->setopt(CURLOPT_RESUME_FROM_LARGE, cur_pos);
 		}
