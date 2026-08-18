@@ -102,7 +102,7 @@ namespace libdar
 
 	    // inherited from generic_file
 	virtual bool skippable(skippability direction, const infinint & amount) override { return false; };
-        virtual bool skip(const infinint & pos) override {if(ref == nullptr || pos != ref->get_position()) throw SRC_BUG; else return true; };
+        virtual bool skip(const infinint & pos) override;
         virtual bool skip_to_eof() override { if(get_mode() == gf_write_only) return true; else throw SRC_BUG; };
         virtual bool skip_relative(S_I x) override { if(x != 0) throw SRC_BUG; else return true; };
 	virtual bool truncatable(const infinint & pos) const override { return false; };
@@ -138,6 +138,7 @@ namespace libdar
 	bool eof;
 	bool hash_dumped;
 	hash_algo algor;
+	bool aborting_write;
 
 	void write_hash_in_hexa(void const* digest, U_I digest_size);
     };
