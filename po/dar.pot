@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: dar 2.8.5\n"
+"Project-Id-Version: dar 2.8.6.RC1\n"
 "Report-Msgid-Bugs-To: https://github.com/Edrusb/DAR/issues\n"
-"POT-Creation-Date: 2026-04-27 15:48+0200\n"
+"POT-Creation-Date: 2026-08-18 15:46+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1839,8 +1839,8 @@ msgstr ""
 
 #: src/dar_suite/command_line.cpp:696
 msgid ""
-"-Y and -Z are only useful with compression (-z option), ignoring any -Y and -"
-"Z option"
+"-Y and -Z are only useful with compression (-z option), ignoring any -Y and "
+"-Z option"
 msgstr ""
 
 #: src/dar_suite/command_line.cpp:698
@@ -2425,8 +2425,8 @@ msgstr ""
 #: src/dar_suite/command_line.cpp:2277
 #, c-format
 msgid ""
-"   -z [[algo:]level[:blocksize]]   compress data in archive. -z = -z9 = -"
-"zgzip:9\n"
+"   -z [[algo:]level[:blocksize]]   compress data in archive. -z = -z9 = "
+"-zgzip:9\n"
 msgstr ""
 
 #: src/dar_suite/command_line.cpp:2278
@@ -2455,8 +2455,8 @@ msgstr ""
 #: src/dar_suite/command_line.cpp:2284
 #, c-format
 msgid ""
-"                 optional suffixes for sizes of any opt.: k,M,G,T,P,E,Z,Y,R,"
-"Q\n"
+"                 optional suffixes for sizes of any opt.: "
+"k,M,G,T,P,E,Z,Y,R,Q\n"
 msgstr ""
 
 #: src/dar_suite/command_line.cpp:2285
@@ -2473,8 +2473,8 @@ msgstr ""
 #: src/dar_suite/command_line.cpp:2287
 #, c-format
 msgid ""
-"   -abinary      slice size suffixes k, M, G, T, etc. are powers of 2 (ki,Mi,"
-"Gi,...)\n"
+"   -abinary      slice size suffixes k, M, G, T, etc. are powers of 2 "
+"(ki,Mi,Gi,...)\n"
 msgstr ""
 
 #: src/dar_suite/command_line.cpp:2288
@@ -5167,46 +5167,53 @@ msgstr ""
 msgid "CRC error met while reading delta signature: data corruption."
 msgstr ""
 
-#: src/libdar/hash_fichier.cpp:73
+#: src/libdar/hash_fichier.cpp:74
 #, c-format
 msgid ""
 "Error while initializing hash: Hash algorithm not available in libgcrypt: %s/"
 "%s"
 msgstr ""
 
-#: src/libdar/hash_fichier.cpp:80
+#: src/libdar/hash_fichier.cpp:81
 #, c-format
 msgid "Error while creating hash handle: %s/%s"
 msgstr ""
 
-#: src/libdar/hash_fichier.cpp:84
+#: src/libdar/hash_fichier.cpp:85
 #, c-format
 msgid ""
 "Missing %s hash algorithm support (provided with strong encryption support, "
 "using libgcrypt)"
 msgstr ""
 
-#: src/libdar/hash_fichier.cpp:97
+#: src/libdar/hash_fichier.cpp:98
 #, c-format
 msgid "Error while initializing hash structure using librhash: %s"
 msgstr ""
 
-#: src/libdar/hash_fichier.cpp:100
+#: src/libdar/hash_fichier.cpp:101
 #, c-format
 msgid "Missing %s hash algorithm support (which is provided using librhash)"
 msgstr ""
 
-#: src/libdar/hash_fichier.cpp:157
+#: src/libdar/hash_fichier.cpp:169
 #, c-format
 msgid "Error updating %s hash with new data: %s"
 msgstr ""
 
-#: src/libdar/hash_fichier.cpp:201
+#: src/libdar/hash_fichier.cpp:224
 #, c-format
 msgid "Error adding updating %s hash with new data: %s"
 msgstr ""
 
-#: src/libdar/hash_fichier.cpp:334
+#: src/libdar/hash_fichier.cpp:289
+#, c-format
+msgid ""
+"No data will be written to the hash file for %S due to the interruption of "
+"the write operation (disk full)"
+msgstr ""
+
+#: src/libdar/hash_fichier.cpp:361
 msgid "Failed writing down the hash: "
 msgstr ""
 
@@ -6901,43 +6908,43 @@ msgstr ""
 msgid " is about to be overwritten."
 msgstr ""
 
-#: src/libdar/sar.cpp:1319
+#: src/libdar/sar.cpp:1324
 msgid ""
 "First slice size is too small to even just be able to drop the slice header"
 msgstr ""
 
-#: src/libdar/sar.cpp:1321
+#: src/libdar/sar.cpp:1326
 msgid "Slice size is too small to even just be able to drop the slice header"
 msgstr ""
 
-#: src/libdar/sar.cpp:1387
+#: src/libdar/sar.cpp:1392
 msgid "Finished writing to file "
 msgstr ""
 
-#: src/libdar/sar.cpp:1387
+#: src/libdar/sar.cpp:1392
 msgid ", ready to continue ? "
 msgstr ""
 
-#: src/libdar/sar.cpp:1405
+#: src/libdar/sar.cpp:1410
 #, c-format
 msgid ""
 "Finished writing to file %s, bypassing pause due to operation termination "
 "requested"
 msgstr ""
 
-#: src/libdar/sar.cpp:1434
+#: src/libdar/sar.cpp:1439
 msgid "file not open"
 msgstr ""
 
-#: src/libdar/sar.cpp:1471
+#: src/libdar/sar.cpp:1476
 msgid "The last file of the set is not present in "
 msgstr ""
 
-#: src/libdar/sar.cpp:1471
+#: src/libdar/sar.cpp:1476
 msgid " , please provide it."
 msgstr ""
 
-#: src/libdar/sar.cpp:1485
+#: src/libdar/sar.cpp:1490
 #, c-format
 msgid ""
 "No backup file is present in %S for archive %S, please provide the last file "
