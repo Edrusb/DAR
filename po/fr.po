@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: DAR 2.7.0\n"
 "Report-Msgid-Bugs-To: https://github.com/Edrusb/DAR/issues\n"
-"POT-Creation-Date: 2026-04-27 15:48+0200\n"
-"PO-Revision-Date: 2026-01-24 11:20+0100\n"
+"POT-Creation-Date: 2026-08-18 15:46+0200\n"
+"PO-Revision-Date: 2026-08-18 15:48+0200\n"
 "Last-Translator: Denis Corbin <dar.linux@free.fr>\n"
 "Language-Team: French <traduc@traduc.org>\n"
 "Language: fr\n"
@@ -777,8 +777,8 @@ msgstr ""
 msgid ""
 "            \t   date format: [[[year/]month]/day-]hour:minute[:second]\n"
 msgstr ""
-"          \t      format de date: [[[année/]mois]/jour-]heure:minute[:"
-"seconde]\n"
+"          \t      format de date: [[[année/]mois]/"
+"jour-]heure:minute[:seconde]\n"
 
 #: src/dar_suite/dar_manager.cpp:976
 #, c-format
@@ -2030,8 +2030,8 @@ msgstr ""
 
 #: src/dar_suite/command_line.cpp:696
 msgid ""
-"-Y and -Z are only useful with compression (-z option), ignoring any -Y and -"
-"Z option"
+"-Y and -Z are only useful with compression (-z option), ignoring any -Y and "
+"-Z option"
 msgstr ""
 "-Y et -Z ne sont utiles qu'avec la compression de données (option -z), -Y et "
 "-Z seront ignorés ici"
@@ -2689,8 +2689,8 @@ msgstr ""
 #: src/dar_suite/command_line.cpp:2277
 #, c-format
 msgid ""
-"   -z [[algo:]level[:blocksize]]   compress data in archive. -z = -z9 = -"
-"zgzip:9\n"
+"   -z [[algo:]level[:blocksize]]   compress data in archive. -z = -z9 = "
+"-zgzip:9\n"
 msgstr "   -z [[algo:]niveau[:blocksize]]   compression des données\n"
 
 #: src/dar_suite/command_line.cpp:2278
@@ -2699,8 +2699,8 @@ msgid ""
 "      Available algo: gzip,bzip2,lzo,xz,zstd,lz4. Exemples: -zlzo -zxz:5 -z1 "
 "-z\n"
 msgstr ""
-"      Algo. disponibles : gzip,bzip2,lzo,xz,zstd,lz4. Exemples -zlzo:5 -z1 -"
-"z\n"
+"      Algo. disponibles : gzip,bzip2,lzo,xz,zstd,lz4. Exemples -zlzo:5 -z1 "
+"-z\n"
 
 #: src/dar_suite/command_line.cpp:2280
 #, c-format
@@ -2724,8 +2724,8 @@ msgstr ""
 #: src/dar_suite/command_line.cpp:2284
 #, c-format
 msgid ""
-"                 optional suffixes for sizes of any opt.: k,M,G,T,P,E,Z,Y,R,"
-"Q\n"
+"                 optional suffixes for sizes of any opt.: "
+"k,M,G,T,P,E,Z,Y,R,Q\n"
 msgstr ""
 "                 suffixes optionnels pour les tailles : k,M,G,T,P,E,Z,Y,R,Q\n"
 
@@ -2745,8 +2745,8 @@ msgstr ""
 #: src/dar_suite/command_line.cpp:2287
 #, c-format
 msgid ""
-"   -abinary      slice size suffixes k, M, G, T, etc. are powers of 2 (ki,Mi,"
-"Gi,...)\n"
+"   -abinary      slice size suffixes k, M, G, T, etc. are powers of 2 "
+"(ki,Mi,Gi,...)\n"
 msgstr ""
 "   -abinary      signification des suffixes k, M, G, T, etc. comme "
 "puissances de 2 (ki, Mi, Gi,...)\n"
@@ -5862,7 +5862,7 @@ msgstr ""
 "Erreur de CRC lors de la lecture de la signature de différence binaire : "
 "Corruption de données."
 
-#: src/libdar/hash_fichier.cpp:73
+#: src/libdar/hash_fichier.cpp:74
 #, c-format
 msgid ""
 "Error while initializing hash: Hash algorithm not available in libgcrypt: %s/"
@@ -5871,14 +5871,14 @@ msgstr ""
 "Erreur lors de l'initialisation d'une fonction de hashage : Algorithme non "
 "disponible dans libgcrypt : %s/%s"
 
-#: src/libdar/hash_fichier.cpp:80
+#: src/libdar/hash_fichier.cpp:81
 #, c-format
 msgid "Error while creating hash handle: %s/%s"
 msgstr ""
 "Erreur lors de la création d'une référence pour générer un somme de "
 "contrôle : %s/%s"
 
-#: src/libdar/hash_fichier.cpp:84
+#: src/libdar/hash_fichier.cpp:85
 #, c-format
 msgid ""
 "Missing %s hash algorithm support (provided with strong encryption support, "
@@ -5887,27 +5887,34 @@ msgstr ""
 "Défaut de support de l'algo de hashage %s (apporté avec le chiffrement fort, "
 "en utilisant libgcrypt)"
 
-#: src/libdar/hash_fichier.cpp:97
+#: src/libdar/hash_fichier.cpp:98
 #, c-format
 msgid "Error while initializing hash structure using librhash: %s"
 msgstr "Erreur d'initialisation de structure de hashing avec librhash : %s"
 
-#: src/libdar/hash_fichier.cpp:100
+#: src/libdar/hash_fichier.cpp:101
 #, c-format
 msgid "Missing %s hash algorithm support (which is provided using librhash)"
 msgstr "Défaut de support de l'algorithme de hashage %s (apporté par librhash)"
 
-#: src/libdar/hash_fichier.cpp:157
+#: src/libdar/hash_fichier.cpp:169
 #, c-format
 msgid "Error updating %s hash with new data: %s"
 msgstr "Erreur de mise à jour du hashing %s avec de nouvelle données : %s"
 
-#: src/libdar/hash_fichier.cpp:201
+#: src/libdar/hash_fichier.cpp:224
 #, c-format
 msgid "Error adding updating %s hash with new data: %s"
 msgstr "Erreur de mise à jour du hashing %s avec de nouvelle données : %s"
 
-#: src/libdar/hash_fichier.cpp:334
+#: src/libdar/hash_fichier.cpp:289
+#, c-format
+msgid ""
+"No data will be written to the hash file for %S due to the interruption of "
+"the write operation (disk full)"
+msgstr "Rien ne sera écrit dans le fichier de hash pour %S car l'opération d'écriture a été interrompue (disque plein)"
+
+#: src/libdar/hash_fichier.cpp:361
 msgid "Failed writing down the hash: "
 msgstr "Échec lors de l'écriture de la somme de contrôle : "
 
@@ -7913,28 +7920,28 @@ msgstr "le fichier existe et l'option contre l'écrasement a été activée."
 msgid " is about to be overwritten."
 msgstr " est sur le point d'être écrasé."
 
-#: src/libdar/sar.cpp:1319
+#: src/libdar/sar.cpp:1324
 msgid ""
 "First slice size is too small to even just be able to drop the slice header"
 msgstr ""
 "La taille de la première tranche est trop petite pour être en mesure "
 "contenir ne serait-ce que l'en-tête de tranche"
 
-#: src/libdar/sar.cpp:1321
+#: src/libdar/sar.cpp:1326
 msgid "Slice size is too small to even just be able to drop the slice header"
 msgstr ""
 "La taille de tranche est trop petite pour être en mesure de contenir ne "
 "serait-ce que l'en-tête de tranche"
 
-#: src/libdar/sar.cpp:1387
+#: src/libdar/sar.cpp:1392
 msgid "Finished writing to file "
 msgstr "Écriture terminée dans le fichier "
 
-#: src/libdar/sar.cpp:1387
+#: src/libdar/sar.cpp:1392
 msgid ", ready to continue ? "
 msgstr ", prêt à continuer ? "
 
-#: src/libdar/sar.cpp:1405
+#: src/libdar/sar.cpp:1410
 #, c-format
 msgid ""
 "Finished writing to file %s, bypassing pause due to operation termination "
@@ -7943,19 +7950,19 @@ msgstr ""
 "Fin d'écriture dans le fichier %s, pause évitée du fait de la demande "
 "d'interruption en cours"
 
-#: src/libdar/sar.cpp:1434
+#: src/libdar/sar.cpp:1439
 msgid "file not open"
 msgstr "Fichier non ouvert"
 
-#: src/libdar/sar.cpp:1471
+#: src/libdar/sar.cpp:1476
 msgid "The last file of the set is not present in "
 msgstr "Le dernier fichier (tranche) de l'archive n'est pas présent dans "
 
-#: src/libdar/sar.cpp:1471
+#: src/libdar/sar.cpp:1476
 msgid " , please provide it."
 msgstr " , veuillez le fournir."
 
-#: src/libdar/sar.cpp:1485
+#: src/libdar/sar.cpp:1490
 #, c-format
 msgid ""
 "No backup file is present in %S for archive %S, please provide the last file "
@@ -8885,8 +8892,8 @@ msgstr "Impossible de reduire la taille d'un secu_string"
 #: src/libdar/secu_string.cpp:213
 msgid "exceeding storage capacity while requesting secu_string::set_size()"
 msgstr ""
-"dépassement de la capacité de stockage lors d'un appel à secu_string::"
-"set_size()"
+"dépassement de la capacité de stockage lors d'un appel à "
+"secu_string::set_size()"
 
 #: src/libdar/secu_string.cpp:231
 msgid "Out of range index requested for a secu_string"
@@ -9559,8 +9566,8 @@ msgstr ""
 
 #~ msgid "secu_string set_size() exceeds storage capacity"
 #~ msgstr ""
-#~ "dépassement de capacité de stockage lors d'un appel àrsecu_string::"
-#~ "set_size()"
+#~ "dépassement de capacité de stockage lors d'un appel "
+#~ "àrsecu_string::set_size()"
 
 #~ msgid ""
 #~ "Warning: birthtime for %s is not possible to restore under Linux (today), "

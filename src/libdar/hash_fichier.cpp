@@ -53,6 +53,7 @@ namespace libdar
 	eof = false;
 	hash_dumped = false;
 	algor = algo;
+	aborting_write = false;
 
 	switch(algo)
 	{
@@ -119,6 +120,17 @@ namespace libdar
 	}
     }
 
+    bool hash_fichier::skip(const infinint & pos)
+    {
+	if(aborting_write)
+	    return true;
+
+	if(ref == nullptr || pos != ref->get_position())
+	    throw SRC_BUG;
+	else
+	    return true;
+    };
+
     U_I hash_fichier::fichier_global_inherited_write(const char *a, U_I size)
     {
 	if(eof)
@@ -147,7 +159,18 @@ namespace libdar
 	}
 
 	if(!only_hash)
-	    ref->write(a, size);
+	{
+	    try
+	    {
+		ref->write(a, size);
+	    }
+	    catch(Euser_abort & e)
+	    {
+		aborting_write = true;
+		throw;
+	    }
+	}
+
 	return size;
     }
 
@@ -225,7 +248,11 @@ namespace libdar
 		    throw SRC_BUG;
 		}
 
-		write_hash_in_hexa(digest, digest_size);
+
+		if(aborting_write)
+		    get_ui().printf(gettext("No data will be written to the hash file for %S due to the interruption of the write operation (disk full)"), &ref_filename);
+		else
+		    write_hash_in_hexa(digest, digest_size);
 
 		    // no #else clause (routine used from constructor, if binary lack support
 		    // for strong encryption this has already been returned to the user

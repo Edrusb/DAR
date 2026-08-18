@@ -274,6 +274,28 @@
 	    <a href="date_past_N_days">date_past_N_days</a>
 	  </td>
 	</tr>
+	<tr>
+	  <td>
+	    Python script to have dar pausing when the next slice cannot fit on the target disk.
+	    This way, by choosing a slice size equal to a fraction (1/10 or less) of the smallest
+	    disk, one can easily save a backup over a set of variable sized disks.
+	    <br/>
+	    <br/>
+	    Usage is:
+	    <code>
+	      dar -c backup -s slice_size -E "slicer.py %p slice_size" ... other options...
+	    </code>
+	  </td>
+	  <td>
+	    Denis Corbin
+	  </td>
+	  <td>
+	    Python Script
+	  </td>
+	  <td>
+	    <a href="slicer.py">slicer.py</a>
+	  </td>
+	</tr>
       </table>
   </body>
 </html>
