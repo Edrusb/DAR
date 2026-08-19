@@ -264,6 +264,10 @@ a configuration file (-B option). Since version 2.2.2, giving this option also f
 the non-interactive mode, even if dar is launched from a terminal. This makes it possible for dar
 to run in the background. When you do, it's recommended to also redirect
 stdout and/or stderr to files: dar -Q ... &> /dev/null &
+.IP
+Note that if you are using an overwriting policy you need to add -w option if -Q is set. Without -w option,
+dar would asks for confirmation before overwriting anything, while -Q option would lead to
+automatically assume "no" as user's answer, leading to no overwriting at all, as if no overwriting policy was provided.
 .TP 20
 -n, --no-overwrite
 do not allow overwriting
