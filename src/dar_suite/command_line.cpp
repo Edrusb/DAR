@@ -828,7 +828,7 @@ bool get_args(shared_ptr<user_interaction> & dialog,
             {
                 delete p.overwrite;
                 p.overwrite = nullptr;
-                dialog->message(gettext("-/ option is only useful with -+ option, ignoring"));
+                dialog->message(gettext("-/ option is only useful with -+ or -x option, ignoring"));
             }
         }
 
