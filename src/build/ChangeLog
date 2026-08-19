@@ -20,6 +20,8 @@ from 2.8.5 to 2.8.6
 - fixing self reported bug at hash_fichier.hpp line 105, occurring when
   disk space is full and user refuses to continue when dar paused and
   waits for an answer.
+- Dar now fails if an overwriting policy (-/ option) is used with -Q
+  option and without the -w one.
 
 from 2.8.4 to 2.8.5
 - fixing bug of one-hour-shift in non-daylight saving months for
