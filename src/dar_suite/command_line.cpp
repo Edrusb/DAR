@@ -651,6 +651,13 @@ bool get_args(shared_ptr<user_interaction> & dialog,
 	if(p.fully_detailed_dates && p.op != listing)
 	    dialog->message(gettext("-afdd option is useless while listing (-l option), ignoring"));
 
+	if(p.op == extract || p.op == merging)
+	{
+	    if(p.overwrite != nullptr
+	       && p.warn_over
+	       && rec.no_inter)
+		throw Erange("get_args", gettext("using -Q option with an overwriting policy without -w option prevents the policy from work"));
+	}
 
             //////////////////////
             // generating masks
