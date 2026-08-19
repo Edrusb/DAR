@@ -353,7 +353,7 @@ dar_static()
 		--prefix="$LOCAL_PREFIX" || return 1
     make ${MAKE_FLAGS} || return 1
     make install-strip || return 1
-    VERSION=$(${LOCAL_PREFIX}/bin/dar_static -V | sed -rn -e 's/.*dar_static version\s+([\.0-9]+),\s+Copyright.*/\1/p')
+    VERSION=$(${LOCAL_PREFIX}/bin/dar_static -V | sed -rn -e 's/.*dar_static version\s+([\.0-9RC]+),\s+Copyright.*/\1/p')
     OS=$(uname -o | sed -e 's#/#_#g')
     TARGET="dar_static_${VERSION}_$(uname -m)_${OS}"
     mkdir "$TARGET"

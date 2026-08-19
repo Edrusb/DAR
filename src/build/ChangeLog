@@ -27,7 +27,7 @@ from 2.8.x to 2.9.0
 
 from 2.8.5 to 2.8.6
 - fixing bug met when restoring backup in dry-run mode (--empty option)
-  where dar inappropriately tries to set filesystem specific attributes
+  where dar inappropriately tries to set file-system specific attributes
   to files while they have not been restored, leading to error message.
 - Changed the way the configure script reports to dar/libdar whether the
   support for large files (>2GB) is available. This was necessary using
@@ -47,6 +47,17 @@ from 2.8.5 to 2.8.6
 - fixing self reported bug at hash_fichier.hpp line 105, occurring when
   disk space is full and user refuses to continue when dar paused and
   waits for an answer.
+- Dar now fails if an overwriting policy (-/ option) is used with -Q
+  option and without the -w one.
+- added the slicer.py DUC script to let dar pause when the disk space
+  is not sufficient to store the next slice. This was added to address
+  the need to store a very large backup over a set of disks of variable
+  capacity: Using a slice size of, let's 1/10 or even 1/1000 of the size
+  of the smallest disk, let dar pause only at each disk boundary whatever
+  its size is without wasting much disk space (the overhead of a slice is
+  about 100 bytes, this is more the number of slices per directly that
+  could put pressure on the file-system), and without having to do the
+  math about the greatest common divisor of disks capacities.
 
 from 2.8.4 to 2.8.5
 - fixing bug of one-hour-shift in non-daylight saving months for
